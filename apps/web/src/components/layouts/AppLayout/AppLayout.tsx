@@ -23,7 +23,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 				right={
 					<div className="relative flex flex-1 flex-row items-center justify-end space-x-2">
 						<Link
-							href={"https://github.com/OhMinsSup/"}
+							href={"https://github.com/OhMinsSup/jwc-form"}
 							arial-label="깃헙 사이트로 이동하기"
 							target="_blank"
 							rel="noopener noreferrer"
