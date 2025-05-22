@@ -1,0 +1,66 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "vcs": {
+    "enabled": false,
+    "clientKind": "git",
+    "useIgnoreFile": false
+  },
+  "files": {
+    "ignoreUnknown": false,
+    "ignore": [".next", ".turbo", ".zed", ".vscode", "dist", "node_modules", ".cache", "migrations", "payload.types.ts"]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "tab"
+  },
+  "organizeImports": {
+    "enabled": true
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "a11y": {
+        "recommended": true,
+        "useButtonType": "error",
+        "useKeyWithClickEvents": "error",
+        "useValidAnchor": "error"
+      },
+      "security": {
+        "recommended": true,
+        "noDangerouslySetInnerHtml": "error"
+      },
+      "suspicious": {
+        "noArrayIndexKey": "error",
+        "noExplicitAny": "error"
+      },
+      "style": {
+        "noDefaultExport": "off",
+        "useImportType": "error",
+        "noNonNullAssertion": "error",
+        "useShorthandArrayType": "error"
+      },
+      "correctness": {
+        "useExhaustiveDependencies": "info"
+      },
+      "nursery": {
+        "useSortedClasses": {
+          "level": "warn",
+          "fix": "safe",
+          "options": {
+            "functions": ["clsx", "cva", "cn"]
+          }
+        }
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "double",
+      "jsxQuoteStyle": "double",
+      "trailingCommas": "es5",
+      "semicolons": "always",
+      "arrowParentheses": "always"
+    }
+  }
+}

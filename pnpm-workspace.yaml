@@ -1,0 +1,41 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+  - "tooling/*"
+
+catalog:
+  zod: ^3.24.1
+  "next": ^15.3.1
+  "@tanstack/react-query": ^5.75.5
+  # tools
+  typescript: ^5.7.3
+  tailwindcss: ^3.4.17
+  postcss: ^8.5.1
+  autoprefixer: ^10.4.20
+  tsup: ^8.3.6
+
+catalogs:
+  react18:
+    react: 18.3.1
+    react-dom: 18.3.1
+    "@types/react": ^18.3.11
+    "@types/react-dom": ^18.3.1
+  react19:
+    react: 19.1.0
+    react-dom: 19.1.0
+    "@types/react": ^19.1.2
+    "@types/react-dom": ^19.1.2
+  orpc:
+    "@orpc/client": "^1.2.0"
+    "@orpc/openapi": "^1.2.0"
+    "@orpc/react": "^1.2.0"
+    "@orpc/react-query": "^1.2.0"
+    "@orpc/server": "^1.2.0"
+    "@orpc/zod": "^1.2.0"
+  payload:
+    "@payloadcms/db-postgres": "^3.35.1"
+    "@payloadcms/live-preview-react": "^3.35.1"
+    "@payloadcms/next": "^3.35.1"
+    "@payloadcms/richtext-lexical": "^3.35.1"
+    "@payloadcms/ui": "^3.35.1"
+    "payload": "^3.35.1"

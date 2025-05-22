@@ -1,0 +1,27 @@
+{
+  "name": "@jwc/schema",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "format": "biome format --write ./src",
+    "lint": "biome lint --error-on-warnings ./src",
+    "sort": "pnpm dlx sort-package-json@latest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "libphonenumber-js": "^1.12.6",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@jwc/tsconfig": "workspace:*",
+    "typescript": "catalog:"
+  }
+}

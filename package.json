@@ -1,0 +1,42 @@
+{
+  "name": "jwc-forms",
+  "private": true,
+  "keywords": [
+    "jwc"
+  ],
+  "license": "ISC",
+  "author": "OhMinsSup",
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "tooling/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "clean": "git clean -xdf node_modules",
+    "clean:workspaces": "turbo run clean",
+    "dev": "turbo watch dev --continue",
+    "dev:next": "turbo watch dev -F @jwc/web...",
+    "format": "turbo run format --continue -- --cache --cache-location .cache/.prettiercache",
+    "gen:init": "turbo gen init",
+    "postinstall": "pnpm lint:ws",
+    "lint": "turbo run lint --continue -- --cache --cache-location .cache/.eslintcache",
+    "lint:ws": "pnpm dlx sherif@latest",
+    "sort": "turbo run sort",
+    "typecheck": "turbo run typecheck",
+    "ui-add": "turbo run ui-add"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "@turbo/gen": "^2.4.0",
+    "@types/node": "^22.10.10",
+    "dotenv-cli": "^8.0.0",
+    "turbo": "^2.4.0",
+    "typescript": "catalog:"
+  },
+  "packageManager": "pnpm@9.7.0",
+  "engines": {
+    "bun": ">=1.0",
+    "node": ">=20.16.0"
+  }
+}

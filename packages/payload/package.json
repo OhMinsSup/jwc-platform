@@ -1,0 +1,52 @@
+{
+  "name": "@jwc/payload",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    "./package.json": "./package.json",
+    "./*": "./src/*.ts",
+    "./access/*": "./src/access/*/index.ts",
+    "./collections/*": "./src/collections/*/index.ts",
+    "./hooks/*": "./src/hooks/*/index.ts",
+    "./payload-types": "./src/payload.types.ts",
+    "./payload-config": "./src/payload.config.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "format": "biome format --write ./src",
+    "generate:types": "pnpm with-env payload generate:types",
+    "lint": "biome lint --error-on-warnings ./src",
+    "migrate": "pnpm with-env payload migrate",
+    "migrate:create": "pnpm with-env payload migrate:create",
+    "migrate:fresh": "pnpm with-env payload migrate:fresh",
+    "sort": "pnpm dlx sort-package-json@latest",
+    "typecheck": "tsc --noEmit",
+    "with-env": "dotenv -e ../../.env --"
+  },
+  "dependencies": {
+    "@jwc/env": "workspace:*",
+    "@payloadcms/db-postgres": "catalog:payload",
+    "@payloadcms/live-preview-react": "catalog:payload",
+    "@payloadcms/next": "catalog:payload",
+    "@payloadcms/richtext-lexical": "catalog:payload",
+    "@payloadcms/ui": "catalog:payload",
+    "cjk-slug": "^0.3.1",
+    "next": "catalog:",
+    "payload": "catalog:payload",
+    "react": "catalog:react19",
+    "react-dom": "catalog:react19",
+    "sharp": "^0.34.1",
+    "slugify": "^1.6.6"
+  },
+  "devDependencies": {
+    "@jwc/tsconfig": "workspace:*",
+    "@types/node": "^22.10.10",
+    "@types/qs": "^6.9.18",
+    "@types/react": "catalog:react19",
+    "@types/react-dom": "catalog:react19",
+    "typescript": "catalog:"
+  }
+}

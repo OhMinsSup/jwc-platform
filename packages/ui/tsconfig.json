@@ -1,0 +1,18 @@
+{
+  "extends": "@jwc/tsconfig/internal-package.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "lib": ["ES2022", "dom", "dom.iterable"],
+    "jsx": "preserve",
+    "rootDir": ".",
+    "paths": {
+      "@jwc/ui": ["./src/index.ts"],
+      "@jwc/ui/components/shadcn/*": ["./src/components/shadcn/*"],
+      "@jwc/ui/components/hooks/*": ["./src/components/hooks/*"],
+      "@jwc/ui/components/custom/*": ["./src/components/custom/*"],
+      "@jwc/ui/lib/*": ["./src/lib/*"]
+    }
+  },
+  "include": ["*.ts", "src"],
+  "exclude": ["node_modules"]
+}
