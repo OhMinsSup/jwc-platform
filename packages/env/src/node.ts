@@ -10,6 +10,8 @@ interface NodeServerEnv {
 	AES_KEY: string;
 }
 
+const isProduction = process.env.NODE_ENV === "production";
+
 export const node = (): Readonly<NodeServerEnv> =>
 	createEnv({
 		server: {
@@ -21,6 +23,16 @@ export const node = (): Readonly<NodeServerEnv> =>
 			GOOGLE_CLIENT_EMAIL: z.string().min(1),
 			GOOGLE_PRIVATE_KEY: z.string().min(1),
 			AES_KEY: z.string().min(1),
+			// Sentry Env
+			SENTRY_AUTH_TOKEN: isProduction
+				? z.string().min(1, "Must be a non-empty string")
+				: z.string().optional(),
+			SENTRY_PROJECT: isProduction
+				? z.string().min(1, "Must be a non-empty string")
+				: z.string().optional(),
+			SENTRY_ORG: isProduction
+				? z.string().min(1, "Must be a non-empty string")
+				: z.string().optional(),
 		},
 		// @ts-expect-error someting....
 		runtimeEnv: process.env,

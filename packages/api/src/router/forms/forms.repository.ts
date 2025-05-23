@@ -9,10 +9,11 @@ export class FormsRepository {
 	 * @param data - 등록할 폼의 데이터
 	 */
 	async createForm(data: Form) {
-		return (await this.payload.create({
+		const created = await this.payload.create({
 			collection: "forms",
 			data,
-		})) as unknown as Promise<TypeWithID & Form>;
+		});
+		return created as unknown as Promise<TypeWithID & Form>;
 	}
 
 	/**
@@ -21,11 +22,12 @@ export class FormsRepository {
 	 * @param data - 수정할 폼의 데이터
 	 */
 	async updateForm(id: string | number, data: Form) {
-		return (await this.payload.update({
+		const updated = await this.payload.update({
 			collection: "forms",
 			id,
 			data,
-		})) as unknown as Promise<TypeWithID & Form>;
+		});
+		return updated as unknown as Promise<TypeWithID & Form>;
 	}
 
 	/**
@@ -34,7 +36,7 @@ export class FormsRepository {
 	 * @param hashedPhoneNumber - 폼 번호
 	 */
 	async findFormByNameWithPhoneNumber(name: string, hashedPhoneNumber: string) {
-		return await this.payload.db.findOne({
+		const data = await this.payload.find({
 			collection: "forms",
 			where: {
 				and: [
@@ -50,7 +52,11 @@ export class FormsRepository {
 					},
 				],
 			},
+			limit: 1,
 		});
+		return data.docs.at(-1) as unknown as Promise<
+			(TypeWithID & Form) | undefined
+		>;
 	}
 
 	/**

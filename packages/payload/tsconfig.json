@@ -7,6 +7,7 @@
     "paths": {
       "@jwc/payload/*": ["./src/*"],
       "@jwc/payload/access/*": ["./src/access/*"],
+      "@jwc/payload/components/*": ["./src/components/*"],
       "@jwc/payload/collections/*": ["./src/collections/*"],
       "@jwc/payload/helpers/*": ["./src/helpers/*"],
       "@jwc/payload/hooks/*": ["./src/hooks/*"],

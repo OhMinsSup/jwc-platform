@@ -3,6 +3,7 @@
 import config from "@payload-config";
 
 import "@payloadcms/next/css";
+import "./globals.css";
 
 import { RootLayout, handleServerFunctions } from "@payloadcms/next/layouts";
 import type { ServerFunctionClient } from "payload";

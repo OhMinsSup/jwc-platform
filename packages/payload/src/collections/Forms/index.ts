@@ -1,3 +1,4 @@
+import { ExcelManager } from "@jwc/excel";
 import { authenticated } from "@jwc/payload/access/authenticated";
 import { decryptFieldValue } from "@jwc/payload/hooks/decryptFieldValue";
 import { encryptFieldValue } from "@jwc/payload/hooks/encryptFieldValue";
@@ -24,7 +25,68 @@ export const Forms: CollectionConfig = {
 	},
 	admin: {
 		useAsTitle: "name",
+		components: {
+			beforeListTable: [
+				{
+					path: "@jwc/payload/components/BeforeListTable#BeforeListTable",
+				},
+			],
+		},
 	},
+	endpoints: [
+		{
+			path: "/excel/export",
+			method: "get",
+			handler: async (req) => {
+				const $excel = new ExcelManager();
+
+				try {
+					const workbook = $excel.createWorkbook();
+
+					const sheet = $excel.createSheet(
+						workbook,
+						"청년부 연합 여름 수련회 참가자 명단"
+					);
+
+					const headers = $excel.head.createFormSheetHeaders();
+
+					const { docs } = await req.payload.find({
+						collection: "forms",
+						limit: 100,
+						req,
+					});
+
+					const rows = $excel.rowData.generateExcelFormRows(docs);
+
+					$excel.generateExcel({
+						workbook,
+						sheet,
+						headers,
+						rows,
+					});
+
+					const buffer = await workbook.xlsx.writeBuffer();
+
+					const arrayBufferLike = new Uint8Array(buffer);
+
+					return new Response(arrayBufferLike, {
+						headers: {
+							"Content-Type":
+								"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+							"Content-Disposition": 'attachment; filename="forms.xlsx"',
+						},
+					});
+				} catch (error) {
+					console.error(error);
+					return new Response("Internal Server Error", {
+						status: 500,
+					});
+				} finally {
+					$excel.destroyWorkbook();
+				}
+			},
+		},
+	],
 	fields: [
 		{
 			name: "name",

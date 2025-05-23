@@ -3,6 +3,7 @@ import { appRouter } from "@jwc/api";
 import type { Form } from "@jwc/schema";
 import { call } from "@orpc/server";
 import payloadConfig from "@payload-config";
+import * as Sentry from "@sentry/nextjs";
 import { headers } from "next/headers";
 
 export type State = {
@@ -32,4 +33,15 @@ export async function serverAction(
 			data: null,
 		} as const;
 	}
+}
+
+export async function upsertFormAction(state: State, body: Form) {
+	return await Sentry.withServerActionInstrumentation(
+		"upsertFormAction",
+		{
+			headers: await headers(),
+			recordResponse: true,
+		},
+		() => serverAction(state, body)
+	);
 }

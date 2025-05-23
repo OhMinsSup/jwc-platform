@@ -3,7 +3,10 @@ import { Button, Icons, ScrollArea } from "@jwc/ui";
 import React, { useActionState, useEffect } from "react";
 import { useStepAtomValue } from "~/atoms/stepAtom";
 import { useStepNavigation } from "~/libs/hooks/useStepNavigation";
-import { serverAction } from "~/libs/serverActions/upsertFormAction";
+import {
+	type State,
+	upsertFormAction,
+} from "~/libs/serverActions/upsertFormAction";
 import { formatMaskPhoneNumber } from "~/libs/utils/formatMaskPhoneNumber";
 import { getIdxToText } from "~/libs/utils/misc";
 
@@ -14,7 +17,12 @@ export default function FormConfirm() {
 
 	const list = Array.from(stepMap.entries());
 
-	const [state, formAction, isPending] = useActionState(serverAction, null);
+	const [state, formAction, isPending] = useActionState(
+		async (state: State, formData: Form) => {
+			return await upsertFormAction(state, formData);
+		},
+		null
+	);
 
 	const action = async (_: FormData) => {
 		const values = Object.values(Object.fromEntries(stepMap)) as Record<

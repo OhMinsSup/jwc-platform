@@ -22,9 +22,6 @@
 		"@orpc/client": "catalog:orpc",
 		"@orpc/server": "catalog:orpc",
 		"@orpc/zod": "catalog:orpc",
-		"google-auth-library": "^9.15.1",
-		"google-spreadsheet": "^4.1.4",
-		"googleapis": "^148.0.0",
 		"payload": "catalog:payload",
 		"server-only": "^0.0.1",
 		"zod": "catalog:"
