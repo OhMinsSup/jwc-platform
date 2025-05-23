@@ -1,5 +1,7 @@
 "use client";
 import { setDayjsLocale, setDayjsPlugin } from "@jwc/utils/date";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import type React from "react";
 
 setDayjsLocale();
@@ -10,5 +12,11 @@ type LayoutProps = {
 };
 
 export default function Layout({ children }: LayoutProps) {
-	return <>{children}</>;
+	return (
+		<>
+			{children}
+			<SpeedInsights />
+			<Analytics />
+		</>
+	);
 }
