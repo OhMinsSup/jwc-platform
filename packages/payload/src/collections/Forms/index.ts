@@ -3,6 +3,7 @@ import { authenticated } from "@jwc/payload/access/authenticated";
 import { decryptFieldValue } from "@jwc/payload/hooks/decryptFieldValue";
 import { encryptFieldValue } from "@jwc/payload/hooks/encryptFieldValue";
 import { formatFormUserFullName } from "@jwc/payload/hooks/formatFormUserFullName";
+import { syncGoogleSheet } from "@jwc/payload/hooks/syncGoogleSheet";
 import type { CollectionConfig } from "payload";
 
 export const Forms: CollectionConfig = {
@@ -381,4 +382,7 @@ export const Forms: CollectionConfig = {
 			required: true,
 		},
 	],
+	hooks: {
+		afterChange: [syncGoogleSheet],
+	},
 };

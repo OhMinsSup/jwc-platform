@@ -15,6 +15,7 @@ const nextConfig: NextConfig = {
 		"@jwc/schema",
 		"@jwc/api",
 		"@jwc/ui",
+		"@jwc/utils",
 	],
 
 	/** We already do linting and typechecking as separate tasks in CI */

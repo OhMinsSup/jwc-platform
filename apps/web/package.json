@@ -29,6 +29,7 @@
     "@orpc/zod": "catalog:orpc",
     "@payloadcms/live-preview-react": "catalog:payload",
     "@payloadcms/next": "catalog:payload",
+    "@payloadcms/plugin-sentry": "^3.39.1",
     "@payloadcms/richtext-lexical": "catalog:payload",
     "@payloadcms/ui": "catalog:payload",
     "@react-aria/visually-hidden": "^3.8.22",

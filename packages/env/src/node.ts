@@ -7,7 +7,12 @@ interface NodeServerEnv {
 	DATABASE_URL: string;
 	GOOGLE_CLIENT_EMAIL: string;
 	GOOGLE_PRIVATE_KEY: string;
+	GOOGLE_SHEET_ID: string;
 	AES_KEY: string;
+	// Sentry Env
+	SENTRY_AUTH_TOKEN?: string;
+	SENTRY_PROJECT?: string;
+	SENTRY_ORG?: string;
 }
 
 const isProduction = process.env.NODE_ENV === "production";
@@ -23,6 +28,8 @@ export const node = (): Readonly<NodeServerEnv> =>
 			GOOGLE_CLIENT_EMAIL: z.string().min(1),
 			GOOGLE_PRIVATE_KEY: z.string().min(1),
 			AES_KEY: z.string().min(1),
+			// Google Env
+			GOOGLE_SHEET_ID: z.string().min(1),
 			// Sentry Env
 			SENTRY_AUTH_TOKEN: isProduction
 				? z.string().min(1, "Must be a non-empty string")
