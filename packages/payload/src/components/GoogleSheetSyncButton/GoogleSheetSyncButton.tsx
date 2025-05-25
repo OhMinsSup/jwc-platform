@@ -1,10 +1,12 @@
 "use client";
 import { Button } from "@payloadcms/ui";
 import React, { useActionState } from "react";
-import { serverAction } from "./serverAction";
+import { type State, syncGoogleSheetAction } from "./serverAction";
 
 export function GoogleSheetSyncButton() {
-	const [, formAction, isPending] = useActionState(serverAction, null);
+	const [, formAction, isPending] = useActionState(async (state: State) => {
+		return await syncGoogleSheetAction(state);
+	}, null);
 
 	return (
 		<form action={formAction} aria-disabled={isPending}>

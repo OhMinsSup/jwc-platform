@@ -26,7 +26,7 @@ export async function serverAction(
 			},
 		});
 	} catch (error) {
-		console.error("Error in serverAction:", error);
+		console.error("Error in upsertFormAction:", error);
 		return {
 			success: false,
 			message: "An error occurred while processing the form.",

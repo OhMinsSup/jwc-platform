@@ -1,8 +1,10 @@
 "use client";
 
+import {
+	ErrorBoundary as ReactErrorBoundary,
+	type ErrorBoundaryProps as ReactErrorBoundaryProps,
+} from "@sentry/nextjs";
 import type React from "react";
-import type { ErrorBoundaryProps as ReactErrorBoundaryProps } from "react-error-boundary";
-import { ErrorBoundary as ReactErrorBoundary } from "react-error-boundary";
 
 type ErrorBoundaryProps = ReactErrorBoundaryProps & {
 	children: React.ReactNode;

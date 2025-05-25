@@ -9,6 +9,5 @@ export const decryptFieldValue: FieldHook<Form> = async ({
 	value,
 }) => {
 	if (operation === "read" && value) return decrypt(value, AES_KEY);
-
 	return value;
 };

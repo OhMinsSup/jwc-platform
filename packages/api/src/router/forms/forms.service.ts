@@ -1,47 +1,8 @@
-import crypto from "node:crypto";
-import utils from "node:util";
 import type { Form } from "@jwc/schema";
 import type { FormsRepository } from "./forms.repository";
 
-const randomBytesPromise = utils.promisify(crypto.randomBytes);
-const pbkdf2Promise = utils.promisify(crypto.pbkdf2);
-
 export class FormsService {
 	constructor(private readonly formsRepository: FormsRepository) {}
-
-	/**
-	 * 랜덤한 salt를 생성합니다.
-	 * @returns 랜덤한 salt
-	 */
-	async generateSalt() {
-		const buf = await randomBytesPromise(32);
-		return buf.toString("base64");
-	}
-
-	/**
-	 * 해시를 생성합니다.
-	 * @param value - 해시로 만들 값
-	 */
-	async generateHashed(value: string) {
-		const salt = await this.generateSalt();
-		const key = await pbkdf2Promise(value, salt, 104906, 64, "sha512");
-		const password = key.toString("base64");
-		return `${salt}:${password}`;
-	}
-
-	/**
-	 * 해시를 검증합니다.
-	 * @param value - 검증할 값
-	 * @param hash - 해시
-	 */
-	async verify(value: string, hash: string) {
-		const [salt, password] = hash.split(":");
-		if (!salt || !password) {
-			return false;
-		}
-		const key = await pbkdf2Promise(value, salt, 104906, 64, "sha512");
-		return key.toString("base64") === password;
-	}
 
 	/**
 	 * 폼 정보를 등록한다.
@@ -75,19 +36,22 @@ export class FormsService {
 	 * @param data - 등록할 폼의 데이터
 	 */
 	async upsertForm(data: Form) {
-		const hashedPhone = await this.generateHashed(data.phone);
-		const exists = await this.formsRepository.findFormByNameWithPhoneNumber(
-			data.name,
-			hashedPhone
-		);
+		const exists = await this.formsRepository.findFormByUser(data);
 
-		const newData = {
-			...data,
-			hashedPhone,
-		};
+		// 차량 지원 여부가 false이고 차량 지원 상세 내용이 있는 경우
+		// 차량 지원 여부를 true로 변경합니다.
+		if (
+			!data.carSupport &&
+			(data.carSupportContent ||
+				(data.carSupportContent && data.carSupportContent.length > 0))
+		) {
+			Object.assign(data, {
+				carSupport: true,
+			});
+		}
 
 		return exists
-			? await this.updateForm(exists.id, newData)
-			: await this.createForm(newData);
+			? await this.updateForm(exists.id, data)
+			: await this.createForm(data);
 	}
 }

@@ -139,7 +139,6 @@ export interface Form {
   id: number;
   name: string;
   phone: string;
-  hashedPhone: string;
   gender: '남성' | '여성';
   department: '청년1부' | '청년2부' | '기타';
   pickupTimeDesc?: string | null;
@@ -248,7 +247,6 @@ export interface UsersSelect<T extends boolean = true> {
 export interface FormsSelect<T extends boolean = true> {
   name?: T;
   phone?: T;
-  hashedPhone?: T;
   gender?: T;
   department?: T;
   pickupTimeDesc?: T;

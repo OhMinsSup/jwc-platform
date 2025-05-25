@@ -1,33 +1,30 @@
 "use client";
 
 import { Button } from "@jwc/ui";
-import * as Sentry from "@sentry/nextjs";
 import type React from "react";
-import { useEffect } from "react";
-import type { UseErrorBoundaryApi } from "react-error-boundary";
-import { useErrorBoundary } from "react-error-boundary";
+import { useCallback } from "react";
 
 interface BaseErrorFallbackProps<TError = unknown> {
 	error: TError;
+	componentStack: string;
+	eventId: string;
+	resetError: () => void;
 	unexpectedErrorHandler?: (
-		error: UseErrorBoundaryApi<TError>
+		props: Pick<
+			BaseErrorFallbackProps<TError>,
+			"error" | "resetError" | "componentStack" | "eventId"
+		>
 	) => React.ReactElement | null;
 }
 
 export default function BaseErrorFallback<TError>({
 	unexpectedErrorHandler,
-	error,
+	...props
 }: BaseErrorFallbackProps<TError>) {
-	const api = useErrorBoundary<TError>();
-
-	useEffect(() => {
-		Sentry.captureException(error);
-	}, [error]);
-
 	return (
 		<>
 			{unexpectedErrorHandler ? (
-				unexpectedErrorHandler(api)
+				unexpectedErrorHandler(props)
 			) : (
 				<div className="h-svh">
 					<div className="m-auto flex h-full w-full flex-col items-center justify-center gap-2">
@@ -39,14 +36,17 @@ export default function BaseErrorFallback<TError>({
 						</p>
 						<div className="mt-6 flex gap-4">
 							<Button
+								type="button"
 								variant="outline"
-								onClick={() => {
+								onClick={useCallback(() => {
 									location.reload();
-								}}
+								}, [])}
 							>
 								홈으로 돌아가기
 							</Button>
-							<Button onClick={() => api.resetBoundary()}>초기화</Button>
+							<Button type="button" onClick={props.resetError}>
+								초기화
+							</Button>
 						</div>
 					</div>
 				</div>

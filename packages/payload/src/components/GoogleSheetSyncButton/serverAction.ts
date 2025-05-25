@@ -1,7 +1,8 @@
 "use server";
-
 import { syncGoogleSpreadsheet } from "@jwc/payload/helpers/google";
 import payloadConfig from "@jwc/payload/payload.config";
+import * as Sentry from "@sentry/nextjs";
+import { headers } from "next/headers";
 import { getPayload } from "payload";
 
 export type State = {
@@ -40,4 +41,15 @@ export async function serverAction(_: State): Promise<NonNullable<State>> {
 			message: "An error occurred while processing the form.",
 		} as const;
 	}
+}
+
+export async function syncGoogleSheetAction(state: State) {
+	return await Sentry.withServerActionInstrumentation(
+		"syncGoogleSheetAction",
+		{
+			headers: await headers(),
+			recordResponse: true,
+		},
+		() => serverAction(state)
+	);
 }

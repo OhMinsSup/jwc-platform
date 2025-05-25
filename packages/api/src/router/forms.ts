@@ -16,7 +16,6 @@ export const upsert = pub
 	.handler(async ({ context, input }) => {
 		const { success, data, message } =
 			await context.formsService.upsertForm(input);
-
 		return {
 			success,
 			data: data.id,

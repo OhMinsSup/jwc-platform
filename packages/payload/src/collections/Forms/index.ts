@@ -129,13 +129,6 @@ export const Forms: CollectionConfig = {
 			required: true,
 		},
 		{
-			name: "hashedPhone",
-			type: "text",
-			hidden: true,
-			unique: true,
-			required: true,
-		},
-		{
 			name: "gender",
 			label: {
 				ko: "성별",

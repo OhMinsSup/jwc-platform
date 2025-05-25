@@ -158,6 +158,9 @@ export const STEP_COMPONENTS = [
 
 export const TOTAL_STEP_COUNT = 11;
 
+const CONFIRM_STEP = TOTAL_STEP_COUNT + 1;
+const COMPLETED_STEP = TOTAL_STEP_COUNT + 2;
+
 const componentMap = Object.fromEntries(
 	STEP_COMPONENTS.map(({ key, component }) => [key, component])
 );
@@ -177,9 +180,9 @@ export default function Page() {
 		[step]
 	);
 
-	const isConfirm = useMemo(() => step === TOTAL_STEP_COUNT + 1, [step]);
+	const isConfirm = useMemo(() => step === CONFIRM_STEP, [step]);
 
-	const isCompleted = useMemo(() => step === TOTAL_STEP_COUNT + 2, [step]);
+	const isCompleted = useMemo(() => step === COMPLETED_STEP, [step]);
 
 	return (
 		<AnimatePresence mode="wait">
@@ -198,7 +201,11 @@ export default function Page() {
 				)}
 				{isConfirm && (
 					<ErrorBoundary
-						fallbackRender={(p) => <BaseErrorFallback error={p.error} />}
+						fallback={BaseErrorFallback}
+						beforeCapture={(scope) => {
+							scope.setTag("conditionLazyRendererKey", "confirm");
+							scope.setTag("conditionLazyRendererIdx", CONFIRM_STEP);
+						}}
 					>
 						<Suspense fallback={<FormSkeleton />}>
 							<FormConfirm />
@@ -207,7 +214,11 @@ export default function Page() {
 				)}
 				{isCompleted && (
 					<ErrorBoundary
-						fallbackRender={(p) => <BaseErrorFallback error={p.error} />}
+						fallback={BaseErrorFallback}
+						beforeCapture={(scope) => {
+							scope.setTag("conditionLazyRendererKey", "completed");
+							scope.setTag("conditionLazyRendererIdx", COMPLETED_STEP);
+						}}
 					>
 						<Suspense fallback={<FormSkeleton />}>
 							<Completed />

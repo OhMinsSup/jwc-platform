@@ -1,6 +1,9 @@
 import type { Form } from "@jwc/schema";
 import type { Payload, TypeWithID, Where } from "payload";
 
+interface FindFormByUserOptions
+	extends Pick<Form, "name" | "phone" | "ageGroup" | "gender" | "department"> {}
+
 export class FormsRepository {
 	constructor(private readonly payload: Payload) {}
 
@@ -33,9 +36,10 @@ export class FormsRepository {
 	/**
 	 * 이름과 번호가 일치하는 폼을 찾습니다.
 	 * @param name - 폼 이름
-	 * @param hashedPhoneNumber - 폼 번호
+	 * @param phone - 폼 번호
 	 */
-	async findFormByNameWithPhoneNumber(name: string, hashedPhoneNumber: string) {
+	async findFormByUser(options: FindFormByUserOptions) {
+		const { phone, name, gender, ageGroup } = options;
 		const data = await this.payload.find({
 			collection: "forms",
 			where: {
@@ -46,17 +50,33 @@ export class FormsRepository {
 						},
 					},
 					{
-						hashedPhone: {
-							equals: hashedPhoneNumber,
+						gender: {
+							equals: gender,
+						},
+					},
+					{
+						ageGroup: {
+							equals: ageGroup,
 						},
 					},
 				],
 			},
-			limit: 1,
+			sort: "-createdAt",
 		});
-		return data.docs.at(-1) as unknown as Promise<
-			(TypeWithID & Form) | undefined
-		>;
+
+		const exists = data.docs.filter((doc) => doc.phone === phone);
+
+		if (exists.length === 0) {
+			return undefined;
+		}
+
+		if (exists.length > 1) {
+			this.payload.logger.warn(
+				`Multiple forms found for user ${name}. Returning the most recent one.`
+			);
+		}
+
+		return exists.at(-1) as unknown as Promise<(TypeWithID & Form) | undefined>;
 	}
 
 	/**

@@ -29,16 +29,19 @@ export default function ConditionLazyRenderer({
 			{Object.entries(conditions).map(([key, shouldRender], idx) => {
 				if (!shouldRender || !componentMap[key]) return null;
 
+				const index = idx + 1; // Adjust index for display purposes
 				const LazyComponent = componentMap[key];
 				return (
 					<ErrorBoundary
-						fallbackRender={(props) => (
-							<BaseErrorFallback error={props.error} />
-						)}
+						fallback={BaseErrorFallback}
 						key={key}
+						beforeCapture={(scope) => {
+							scope.setTag("conditionLazyRendererKey", key);
+							scope.setTag("conditionLazyRendererIdx", index);
+						}}
 					>
 						<Suspense fallback={<FormSkeleton />}>
-							<LazyComponent idx={idx + 1} componentKey={key} />
+							<LazyComponent idx={index} componentKey={key} />
 						</Suspense>
 					</ErrorBoundary>
 				);
