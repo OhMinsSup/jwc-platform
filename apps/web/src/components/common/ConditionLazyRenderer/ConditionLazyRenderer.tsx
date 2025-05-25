@@ -31,7 +31,12 @@ export default function ConditionLazyRenderer({
 
 				const LazyComponent = componentMap[key];
 				return (
-					<ErrorBoundary fallback={<BaseErrorFallback />} key={key}>
+					<ErrorBoundary
+						fallbackRender={(props) => (
+							<BaseErrorFallback error={props.error} />
+						)}
+						key={key}
+					>
 						<Suspense fallback={<FormSkeleton />}>
 							<LazyComponent idx={idx + 1} componentKey={key} />
 						</Suspense>

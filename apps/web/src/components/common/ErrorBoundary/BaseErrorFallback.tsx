@@ -1,25 +1,33 @@
 "use client";
 
 import { Button } from "@jwc/ui";
+import * as Sentry from "@sentry/nextjs";
 import type React from "react";
+import { useEffect } from "react";
 import type { UseErrorBoundaryApi } from "react-error-boundary";
 import { useErrorBoundary } from "react-error-boundary";
 
-interface BaseErrorBoundaryProps<TError> {
+interface BaseErrorFallbackProps<TError = unknown> {
+	error: TError;
 	unexpectedErrorHandler?: (
 		error: UseErrorBoundaryApi<TError>
 	) => React.ReactElement | null;
 }
 
-export default function BaseErrorBoundary<TError>({
+export default function BaseErrorFallback<TError>({
 	unexpectedErrorHandler,
-}: BaseErrorBoundaryProps<TError>) {
-	const error = useErrorBoundary<TError>();
+	error,
+}: BaseErrorFallbackProps<TError>) {
+	const api = useErrorBoundary<TError>();
+
+	useEffect(() => {
+		Sentry.captureException(error);
+	}, [error]);
 
 	return (
 		<>
 			{unexpectedErrorHandler ? (
-				unexpectedErrorHandler(error)
+				unexpectedErrorHandler(api)
 			) : (
 				<div className="h-svh">
 					<div className="m-auto flex h-full w-full flex-col items-center justify-center gap-2">
@@ -38,7 +46,7 @@ export default function BaseErrorBoundary<TError>({
 							>
 								홈으로 돌아가기
 							</Button>
-							<Button onClick={() => error.resetBoundary()}>초기화</Button>
+							<Button onClick={() => api.resetBoundary()}>초기화</Button>
 						</div>
 					</div>
 				</div>

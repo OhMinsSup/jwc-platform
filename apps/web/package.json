@@ -33,7 +33,7 @@
     "@payloadcms/richtext-lexical": "catalog:payload",
     "@payloadcms/ui": "catalog:payload",
     "@react-aria/visually-hidden": "^3.8.22",
-    "@sentry/nextjs": "^9.22.0",
+    "@sentry/nextjs": "catalog:",
     "@tanstack/react-query": "^5.76.0",
     "@tanstack/react-table": "^8.21.3",
     "@vercel/analytics": "^1.5.0",

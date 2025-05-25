@@ -38,9 +38,7 @@ export const syncGoogleSpreadsheet = async <
 	const rows = $excel.rowData.generateExcelFormRows(docs);
 
 	// 3. 데이터 업로드 (row 단위로 추가)
-	for (const row of rows) {
-		await sheet.addRow(row);
-	}
+	await sheet.addRows(rows);
 
 	return sheet;
 };

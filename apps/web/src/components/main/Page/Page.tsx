@@ -197,14 +197,18 @@ export default function Page() {
 					/>
 				)}
 				{isConfirm && (
-					<ErrorBoundary fallback={<BaseErrorFallback />}>
+					<ErrorBoundary
+						fallbackRender={(p) => <BaseErrorFallback error={p.error} />}
+					>
 						<Suspense fallback={<FormSkeleton />}>
 							<FormConfirm />
 						</Suspense>
 					</ErrorBoundary>
 				)}
 				{isCompleted && (
-					<ErrorBoundary fallback={<BaseErrorFallback />}>
+					<ErrorBoundary
+						fallbackRender={(p) => <BaseErrorFallback error={p.error} />}
+					>
 						<Suspense fallback={<FormSkeleton />}>
 							<Completed />
 						</Suspense>

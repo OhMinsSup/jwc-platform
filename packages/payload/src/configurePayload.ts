@@ -3,7 +3,9 @@ import { fileURLToPath } from "node:url";
 import { Forms } from "@jwc/payload/collections/Forms";
 import { Users } from "@jwc/payload/collections/Users";
 import { postgresAdapter } from "@payloadcms/db-postgres";
+import { sentryPlugin } from "@payloadcms/plugin-sentry";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
+import * as Sentry from "@sentry/nextjs";
 import type { Config } from "payload";
 import { buildConfig, deepMerge } from "payload";
 
@@ -38,7 +40,11 @@ const baseConfig: Config = {
 	i18n: {
 		supportedLanguages: { en, ko },
 	},
-	plugins: [],
+	plugins: [
+		sentryPlugin({
+			Sentry,
+		}),
+	],
 	secret: env.PAYLOAD_PRIVATE_SECRET,
 };
 
