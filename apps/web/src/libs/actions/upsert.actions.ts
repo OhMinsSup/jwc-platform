@@ -35,9 +35,9 @@ export async function serverAction(
 	}
 }
 
-export async function upsertFormAction(state: State, body: Form) {
+export async function upsert(state: State, body: Form) {
 	return await Sentry.withServerActionInstrumentation(
-		"upsertFormAction",
+		"upsertAction",
 		{
 			headers: await headers(),
 			recordResponse: true,

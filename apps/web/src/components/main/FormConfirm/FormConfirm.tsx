@@ -2,11 +2,8 @@ import type { Form } from "@jwc/schema";
 import { Button, Icons, ScrollArea } from "@jwc/ui";
 import React, { useActionState, useEffect } from "react";
 import { useStepAtomValue } from "~/atoms/stepAtom";
+import { type State, upsert } from "~/libs/actions/upsert.actions";
 import { useStepNavigation } from "~/libs/hooks/useStepNavigation";
-import {
-	type State,
-	upsertFormAction,
-} from "~/libs/serverActions/upsertFormAction";
 import { formatMaskPhoneNumber } from "~/libs/utils/formatMaskPhoneNumber";
 import { getIdxToText } from "~/libs/utils/misc";
 
@@ -19,7 +16,7 @@ export default function FormConfirm() {
 
 	const [state, formAction, isPending] = useActionState(
 		async (state: State, formData: Form) => {
-			return await upsertFormAction(state, formData);
+			return await upsert(state, formData);
 		},
 		null
 	);

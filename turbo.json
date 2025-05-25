@@ -22,11 +22,29 @@
     "sort": {
       "cache": false
     },
+    "generate:types": {
+      "cache": false
+    },
+    "generate:importmap": {
+      "cache": false
+    },
     "clean": {
       "cache": false
     },
     "//#clean": {
       "cache": false
+    },
+    "migrate": {
+      "cache": false,
+      "interactive": true
+    },
+    "migrate:create": {
+      "cache": false,
+      "interactive": true
+    },
+    "migrate:fresh": {
+      "cache": false,
+      "persistent": true
     },
     "codegen": {
       "cache": false
