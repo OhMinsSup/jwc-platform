@@ -9,3 +9,4 @@ export { default as FormPickupDescriptionContext } from "./FormPickupDescription
 export { default as FormCarSupportContext } from "./FormCarSupportContext";
 export { default as FormCarSupportContentContext } from "./FormCarSupportContentContext";
 export { default as FormPaidContext } from "./FormPaidContext";
+export { default as FormTshirtSizeContext } from "./FormTshirtSizeContext";
