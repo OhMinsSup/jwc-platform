@@ -1,5 +1,4 @@
 "use server";
-import { syncGoogleSpreadsheet } from "@jwc/payload/helpers/google";
 import payloadConfig from "@jwc/payload/payload.config";
 import * as Sentry from "@sentry/nextjs";
 import { headers } from "next/headers";
@@ -16,20 +15,10 @@ export async function serverAction(_: State): Promise<NonNullable<State>> {
 	});
 
 	try {
-		const { docs } = await payload.find({
-			collection: "forms",
-			limit: 100,
+		await payload.jobs.queue({
+			task: "syncGoogleSheet",
+			input: {},
 		});
-
-		if (!docs || docs.length === 0) {
-			return {
-				success: false,
-				message: "No Existing Forms Found",
-			} as const;
-		}
-
-		await syncGoogleSpreadsheet(docs);
-
 		return {
 			success: true,
 			message: "Google Sheet Sync Success",

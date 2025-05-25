@@ -8,7 +8,7 @@ export class FormsService {
 	 * 폼 정보를 등록한다.
 	 * @param data - 등록할 폼의 데이터
 	 */
-	async createForm(data: Form) {
+	async create(data: Form) {
 		const response = await this.formsRepository.createForm(data);
 		return {
 			success: true,
@@ -22,7 +22,7 @@ export class FormsService {
 	 * @param id - 수정할 폼의 ID
 	 * @param data - 수정할 폼의 데이터
 	 */
-	async updateForm(id: string | number, data: Form) {
+	async update(id: string | number, data: Form) {
 		const response = await this.formsRepository.updateForm(id, data);
 		return {
 			success: true,
@@ -35,7 +35,7 @@ export class FormsService {
 	 * 폼 정보를 등록한다.
 	 * @param data - 등록할 폼의 데이터
 	 */
-	async upsertForm(data: Form) {
+	async upsert(data: Form) {
 		const exists = await this.formsRepository.findFormByUser(data);
 
 		// 차량 지원 여부가 false이고 차량 지원 상세 내용이 있는 경우
@@ -51,7 +51,7 @@ export class FormsService {
 		}
 
 		return exists
-			? await this.updateForm(exists.id, data)
-			: await this.createForm(data);
+			? await this.update(exists.id, data)
+			: await this.create(data);
 	}
 }

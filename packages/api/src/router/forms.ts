@@ -14,8 +14,7 @@ export const upsert = pub
 	.input(FormSchema)
 	.output(FormResponseSchema)
 	.handler(async ({ context, input }) => {
-		const { success, data, message } =
-			await context.formsService.upsertForm(input);
+		const { success, data, message } = await context.formsService.upsert(input);
 		return {
 			success,
 			data: data.id,
