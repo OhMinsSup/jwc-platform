@@ -8,6 +8,7 @@ import {
 	ErrorBoundary,
 } from "~/components/common/ErrorBoundary";
 import { FormSkeleton } from "~/components/forms/FormSkeleton";
+import { Welcome } from "~/components/main/Welcome";
 
 const FormName = React.lazy(() =>
 	import("~/components/main/FormName").then((module) => ({
@@ -184,6 +185,8 @@ export default function Page() {
 
 	const isCompleted = useMemo(() => step === COMPLETED_STEP, [step]);
 
+	const isFirstStep = useMemo(() => step === 0, [step]);
+
 	return (
 		<AnimatePresence mode="wait">
 			<motion.div
@@ -193,7 +196,8 @@ export default function Page() {
 				exit={{ opacity: 0, y: 50 }}
 				transition={{ duration: 0.5 }}
 			>
-				{!isConfirm && !isCompleted && (
+				{isFirstStep && <Welcome />}
+				{!isFirstStep && !isConfirm && !isCompleted && (
 					<ConditionLazyRenderer
 						conditions={conditions}
 						componentMap={componentMap}

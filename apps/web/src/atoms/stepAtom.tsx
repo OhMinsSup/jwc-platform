@@ -3,7 +3,7 @@ import { useCallback, useMemo } from "react";
 import { TOTAL_STEP_COUNT } from "~/components/main/Page/Page";
 
 // 현재 step을 관리하는 atom
-const stepAtom = atom(1);
+const stepAtom = atom(0);
 
 // step에 연결된 데이터를 관리하는 Map 객체 atom
 const stepMapAtom = atom(new Map<number, unknown>());

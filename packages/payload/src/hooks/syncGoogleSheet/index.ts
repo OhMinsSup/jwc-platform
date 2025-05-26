@@ -14,7 +14,10 @@ export const syncGoogleSheet: CollectionAfterChangeHook<Form> = async ({
 
 		if (docs && docs.length > 0) {
 			const sheet = await syncGoogleSpreadsheet(docs);
-			console.log("Google Sheet updated successfully:", sheet.sheetId);
+			req.payload.logger.info(
+				"Google Sheet updated successfully",
+				sheet.sheetId
+			);
 		}
 	} catch (error) {
 		req.payload.logger.error("[collection hook]: google sheet sync", error);
