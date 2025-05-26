@@ -16,8 +16,6 @@ import { env } from "./env";
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
-export const AES_KEY = Buffer.from(env.AES_KEY, "base64");
-
 const baseConfig: Config = {
 	admin: {
 		user: Users.slug,

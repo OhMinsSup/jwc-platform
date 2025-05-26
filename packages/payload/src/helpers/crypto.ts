@@ -1,7 +1,12 @@
 "server only";
 import crypto from "node:crypto";
+import { env } from "@jwc/payload/env";
 
 const ALGORITHM = "aes-256-gcm" as const;
+
+export const secretKey = () => {
+	return Buffer.from(env.AES_KEY, "base64");
+};
 
 export function encrypt(data: string, secretKey: Buffer<ArrayBuffer>): string {
 	const iv = crypto.randomBytes(16);
