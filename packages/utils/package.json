@@ -11,8 +11,8 @@
   "scripts": {
     "build": "tsc",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
-    "format": "biome format --write *.ts",
-    "lint": "biome lint --error-on-warnings *.ts",
+    "format": "biome format --write ./src",
+    "lint": "biome lint --error-on-warnings ./src",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
