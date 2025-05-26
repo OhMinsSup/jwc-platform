@@ -7,7 +7,7 @@
     },
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".cache/tsbuildinfo.json", "dist/**"]
+      "outputs": [".next/**", "!.next/cache/**", "next-env.d.ts"]
     },
     "format": {
       "outputLogs": "new-only"
@@ -55,9 +55,18 @@
     }
   },
   "globalEnv": [
+    "SENTRY_AUTH_TOKEN",
+    "SENTRY_ORG",
+    "SENTRY_PROJECT",
+    "AES_KEY",
     "SKIP_ENV_VALIDATION",
+    "GOOGLE_CLIENT_EMAIL",
+    "GOOGLE_PRIVATE_KEY",
+    "GOOGLE_SHEET_ID",
     "PAYLOAD_PRIVATE_SECRET",
     "PAYLOAD_PRIVATE_REVALIDATION_KEY",
+    "NEXT_PUBLIC_SENTRY_DSN",
+    "NEXT_PUBLIC_PAID_ACCOUNT_NUMBER",
     "NEXT_PUBLIC_APP_URL",
     "DATABASE_ENGINE",
     "DATABASE_URL"

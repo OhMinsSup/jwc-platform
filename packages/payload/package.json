@@ -15,7 +15,6 @@
     "./payload-config": "./src/payload.config.ts"
   },
   "scripts": {
-    "build": "tsc",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "format": "biome format --write ./src",
     "generate:types": "pnpm with-env payload generate:types",
