@@ -24,7 +24,7 @@ export async function serverAction(_: State): Promise<NonNullable<State>> {
 
 		if (docs && docs.length > 0) {
 			const sheet = await syncGoogleSpreadsheet(docs);
-			console.log("Google Sheet updated successfully:", sheet.sheetId);
+			payload.logger.info("Google Sheet updated successfully:", sheet.sheetId);
 		}
 
 		return {
@@ -32,9 +32,11 @@ export async function serverAction(_: State): Promise<NonNullable<State>> {
 			message: "Google Sheet Sync Success",
 		};
 	} catch (error) {
-		if (env.NODE_ENV === "development") {
-			payload.logger.error(error);
-		} else {
+		if (error instanceof Error) {
+			Sentry.logger.error(error.message, {
+				name: "SyncGoogleSheet",
+				action: "serverAction",
+			});
 			Sentry.captureException(error, {
 				tags: {
 					name: "SyncGoogleSheet",

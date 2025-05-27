@@ -1,7 +1,9 @@
 import * as Sentry from "@sentry/nextjs";
 
 Sentry.init({
-	enabled: !!process.env.NEXT_PUBLIC_SENTRY_DSN,
+	enabled:
+		process.env.NODE_ENV === "production" &&
+		!!process.env.NEXT_PUBLIC_SENTRY_DSN,
 	dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
 
 	// Adds request headers and IP for users, for more info visit:
@@ -29,7 +31,10 @@ Sentry.init({
 			maskAllText: true,
 			blockAllMedia: true,
 		}),
+		Sentry.consoleLoggingIntegration({ levels: ["error"] }),
 	],
+
+	_experiments: { enableLogs: true },
 });
 
 // This export will instrument router navigations, and is only relevant if you enable tracing.

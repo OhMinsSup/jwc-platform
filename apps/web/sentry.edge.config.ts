@@ -6,7 +6,9 @@
 import * as Sentry from "@sentry/nextjs";
 
 Sentry.init({
-	enabled: !!process.env.NEXT_PUBLIC_SENTRY_DSN,
+	enabled:
+		process.env.NODE_ENV === "production" &&
+		!!process.env.NEXT_PUBLIC_SENTRY_DSN,
 	dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
 
 	// Adds request headers and IP for users, for more info visit:
@@ -18,4 +20,8 @@ Sentry.init({
 
 	// Setting this option to true will print useful information to the console while you're setting up Sentry.
 	debug: false,
+
+	_experiments: { enableLogs: true },
+
+	integrations: [Sentry.consoleLoggingIntegration({ levels: ["error"] })],
 });

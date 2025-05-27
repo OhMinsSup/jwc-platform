@@ -5,8 +5,6 @@ import { call } from "@orpc/server";
 import payloadConfig from "@payload-config";
 import * as Sentry from "@sentry/nextjs";
 import { headers } from "next/headers";
-import { getPayload } from "payload";
-import { env } from "~/env";
 
 export type State = {
 	readonly success: boolean;
@@ -28,12 +26,11 @@ export async function serverAction(
 			},
 		});
 	} catch (error) {
-		if (env.NODE_ENV === "development") {
-			const payload = await getPayload({
-				config: payloadConfig,
+		if (error instanceof Error) {
+			Sentry.logger.error(error.message, {
+				name: "upsert",
+				action: "serverAction",
 			});
-			payload.logger.error(error);
-		} else {
 			Sentry.captureException(error, {
 				tags: {
 					name: "upsert",
@@ -50,6 +47,7 @@ export async function serverAction(
 }
 
 export async function upsert(state: State, body: Form) {
+	// const func = serverAction.bind(null, state, body);
 	return await Sentry.withServerActionInstrumentation(
 		"upsertAction",
 		{

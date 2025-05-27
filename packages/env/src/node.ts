@@ -26,7 +26,10 @@ export const node = (): Readonly<NodeServerEnv> =>
 			DATABASE_ENGINE: z.enum(["postgres"]).default("postgres"),
 			DATABASE_URL: z.string().url(),
 			GOOGLE_CLIENT_EMAIL: z.string().min(1),
-			GOOGLE_PRIVATE_KEY: z.string().min(1),
+			GOOGLE_PRIVATE_KEY: z
+				.string()
+				.min(1)
+				.transform((str) => str.replace(/(\r\n|\n|\r)/g, "")),
 			AES_KEY: z.string().min(1),
 			// Google Env
 			GOOGLE_SHEET_ID: z.string().min(1),
