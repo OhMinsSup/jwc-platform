@@ -1,5 +1,7 @@
+import { env } from "@jwc/payload/env";
 import { syncGoogleSpreadsheet } from "@jwc/payload/helpers/google";
 import type { Form } from "@jwc/payload/payload-types";
+import * as Sentry from "@sentry/nextjs";
 import type { CollectionAfterChangeHook } from "payload";
 
 export const syncGoogleSheet: CollectionAfterChangeHook<Form> = async ({
@@ -20,11 +22,15 @@ export const syncGoogleSheet: CollectionAfterChangeHook<Form> = async ({
 			);
 		}
 	} catch (error) {
-		req.payload.logger.error("[collection SyncGoogleSheet]");
-		if (error instanceof Error) {
-			req.payload.logger.error(error.name);
-			req.payload.logger.error(error.message);
+		if (env.NODE_ENV === "development") {
 			req.payload.logger.error(error);
+		} else {
+			Sentry.captureException(error, {
+				tags: {
+					component: "syncGoogleSheet",
+					action: "collectionAfterChangeHook",
+				},
+			});
 		}
 	}
 

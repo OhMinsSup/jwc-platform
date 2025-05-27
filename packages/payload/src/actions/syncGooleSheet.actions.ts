@@ -4,6 +4,7 @@ import payloadConfig from "@jwc/payload/payload.config";
 import * as Sentry from "@sentry/nextjs";
 import { headers } from "next/headers";
 import { getPayload } from "payload";
+import { env } from "../env";
 
 export type State = {
 	readonly success: boolean;
@@ -31,11 +32,15 @@ export async function serverAction(_: State): Promise<NonNullable<State>> {
 			message: "Google Sheet Sync Success",
 		};
 	} catch (error) {
-		payload.logger.error("[serverAction SyncGoogleSheet]");
-		if (error instanceof Error) {
-			payload.logger.error(error.name);
-			payload.logger.error(error.message);
+		if (env.NODE_ENV === "development") {
 			payload.logger.error(error);
+		} else {
+			Sentry.captureException(error, {
+				tags: {
+					name: "SyncGoogleSheet",
+					action: "serverAction",
+				},
+			});
 		}
 		return {
 			success: false,
