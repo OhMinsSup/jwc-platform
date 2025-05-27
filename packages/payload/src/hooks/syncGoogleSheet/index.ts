@@ -20,7 +20,12 @@ export const syncGoogleSheet: CollectionAfterChangeHook<Form> = async ({
 			);
 		}
 	} catch (error) {
-		req.payload.logger.error("[collection hook]: google sheet sync", error);
+		req.payload.logger.error("[collection SyncGoogleSheet]");
+		if (error instanceof Error) {
+			req.payload.logger.error(error.name);
+			req.payload.logger.error(error.message);
+			req.payload.logger.error(error);
+		}
 	}
 
 	return doc;

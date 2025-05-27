@@ -31,7 +31,12 @@ export async function serverAction(_: State): Promise<NonNullable<State>> {
 			message: "Google Sheet Sync Success",
 		};
 	} catch (error) {
-		payload.logger.error("[serverAction]: google sheet sync", error);
+		payload.logger.error("[serverAction SyncGoogleSheet]");
+		if (error instanceof Error) {
+			payload.logger.error(error.name);
+			payload.logger.error(error.message);
+			payload.logger.error(error);
+		}
 		return {
 			success: false,
 			message: "An error occurred while processing the form.",
