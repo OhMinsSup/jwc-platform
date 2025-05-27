@@ -29,7 +29,7 @@ export const node = (): Readonly<NodeServerEnv> =>
 			GOOGLE_PRIVATE_KEY: z
 				.string()
 				.min(1)
-				.transform((str) => str.replace(/(\r\n|\n|\r)/g, "")),
+				.transform((str) => str.split("\\n").join("\n")),
 			AES_KEY: z.string().min(1),
 			// Google Env
 			GOOGLE_SHEET_ID: z.string().min(1),
