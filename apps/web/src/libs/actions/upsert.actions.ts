@@ -5,6 +5,8 @@ import { call } from "@orpc/server";
 import payloadConfig from "@payload-config";
 import * as Sentry from "@sentry/nextjs";
 import { headers } from "next/headers";
+import { getPayload } from "payload";
+import { env } from "~/env";
 
 export type State = {
 	readonly success: boolean;
@@ -26,7 +28,19 @@ export async function serverAction(
 			},
 		});
 	} catch (error) {
-		console.error("Error in upsertFormAction:", error);
+		if (env.NODE_ENV === "development") {
+			const payload = await getPayload({
+				config: payloadConfig,
+			});
+			payload.logger.error(error);
+		} else {
+			Sentry.captureException(error, {
+				tags: {
+					name: "upsert",
+					action: "serverAction",
+				},
+			});
+		}
 		return {
 			success: false,
 			message: "An error occurred while processing the form.",
