@@ -42,3 +42,14 @@ export const syncGoogleSpreadsheet = async <
 
 	return sheet;
 };
+
+export const getGoogleSpreadsheet = async () => {
+	await doc.loadInfo();
+	const sheet = doc.sheetsByTitle[SHEET_NAME];
+
+	if (!sheet) {
+		throw new Error(`Sheet with title "${SHEET_NAME}" not found.`);
+	}
+
+	return sheet;
+};

@@ -1,5 +1,6 @@
 import { ExcelManager } from "@jwc/excel";
 import { authenticated } from "@jwc/payload/access/authenticated";
+import { getGoogleSpreadsheet } from "@jwc/payload/helpers/google";
 import { decryptFieldValue } from "@jwc/payload/hooks/decryptFieldValue";
 import { encryptFieldValue } from "@jwc/payload/hooks/encryptFieldValue";
 import { formatFormUserFullName } from "@jwc/payload/hooks/formatFormUserFullName";
@@ -85,6 +86,22 @@ export const Forms: CollectionConfig = {
 				} finally {
 					$excel.destroyWorkbook();
 				}
+			},
+		},
+		{
+			path: "/google-sheet/export",
+			method: "get",
+			handler: async (req) => {
+				const sheet = await getGoogleSpreadsheet();
+
+				const buffer = await sheet.downloadAsCSV();
+
+				return new Response(buffer, {
+					headers: {
+						"Content-Type": "text/csv; charset=utf-8",
+						"Content-Disposition": 'attachment; filename="forms.csv"',
+					},
+				});
 			},
 		},
 	],
