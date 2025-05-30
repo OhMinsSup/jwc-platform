@@ -20,9 +20,9 @@
 		"generate:types": "pnpm with-env payload generate:types",
 		"lint": "biome lint --error-on-warnings ./src",
 		"migrate": "pnpm with-env payload migrate",
-		"migrate:reset": "pnpm with-env payload migrate:reset",
 		"migrate:create": "pnpm with-env payload migrate:create",
 		"migrate:fresh": "pnpm with-env payload migrate:fresh",
+		"migrate:reset": "pnpm with-env payload migrate:reset",
 		"sort": "pnpm dlx sort-package-json@latest",
 		"typecheck": "tsc --noEmit",
 		"with-env": "dotenv -e ../../.env --"

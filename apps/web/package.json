@@ -48,6 +48,7 @@
 		"react": "catalog:react19",
 		"react-dom": "catalog:react19",
 		"react-hook-form": "^7.54.2",
+		"require-in-the-middle": "^7.5.2",
 		"server-only": "^0.0.1",
 		"sonner": "^1.7.4",
 		"zod": "catalog:"
