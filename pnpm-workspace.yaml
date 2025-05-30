@@ -9,7 +9,7 @@ catalog:
   "@tanstack/react-query": ^5.75.5
   
   # sentry
-  "@sentry/nextjs": ^9.22.0
+  "@sentry/nextjs": ^9.24.0
 
   # tools
   typescript: ^5.7.3
