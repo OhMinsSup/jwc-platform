@@ -1,10 +1,10 @@
 "use server";
-import { syncGoogleSpreadsheet } from "@jwc/payload/helpers/google";
-import payloadConfig from "@jwc/payload/payload.config";
+import { configurePayload } from "@jwc/payload/configurePayload";
+import { env } from "@jwc/payload/env";
 import * as Sentry from "@sentry/nextjs";
 import { headers } from "next/headers";
 import { getPayload } from "payload";
-import { env } from "../env";
+import { GoogleSheetSyncer } from "./googleSheetSyncer";
 
 export type State = {
 	readonly success: boolean;
@@ -12,34 +12,45 @@ export type State = {
 } | null;
 
 export async function serverAction(_: State): Promise<NonNullable<State>> {
-	const payload = await getPayload({
-		config: payloadConfig,
-	});
+	const payloadPromise = await getPayload({ config: configurePayload() });
 
 	try {
-		const { docs } = await payload.find({
-			collection: "forms",
-			limit: 100,
-		});
+		const [forms, sheets] = await Promise.all([
+			GoogleSheetSyncer.getForms(payloadPromise),
+			GoogleSheetSyncer.getSheets(payloadPromise),
+		]);
 
-		if (docs && docs.length > 0) {
-			const sheet = await syncGoogleSpreadsheet(docs);
-			payload.logger.info("Google Sheet updated successfully:", sheet.sheetId);
+		if (!forms.length) {
+			return {
+				success: false,
+				message: "No forms found to sync with Google Sheets.",
+			} as const;
 		}
+
+		const sheet = sheets.at(-1);
+
+		const syncer = new GoogleSheetSyncer()
+			.setForms(forms)
+			.setSheet(sheet)
+			.setPayload(payloadPromise);
+
+		await syncer.sync();
 
 		return {
 			success: true,
 			message: "Google Sheet Sync Success",
 		};
 	} catch (error) {
-		if (error instanceof Error) {
+		if (env.NODE_ENV === "development") {
+			console.error(error);
+		} else if (error instanceof Error) {
 			Sentry.logger.error(error.message, {
-				name: "SyncGoogleSheet",
+				name: "syncGoogleSheet",
 				action: "serverAction",
 			});
 			Sentry.captureException(error, {
 				tags: {
-					name: "SyncGoogleSheet",
+					name: "syncGoogleSheet",
 					action: "serverAction",
 				},
 			});

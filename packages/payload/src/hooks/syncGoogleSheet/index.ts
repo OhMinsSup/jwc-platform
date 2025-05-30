@@ -1,30 +1,35 @@
+import { GoogleSheetSyncer } from "@jwc/payload/actions/googleSheetSyncer";
 import { env } from "@jwc/payload/env";
-import { syncGoogleSpreadsheet } from "@jwc/payload/helpers/google";
-import type { Form } from "@jwc/payload/payload-types";
+import type { Form } from "@jwc/payload/helpers/google";
 import * as Sentry from "@sentry/nextjs";
-import type { CollectionAfterChangeHook } from "payload";
+import { type CollectionAfterChangeHook, getPayload } from "payload";
 
 export const syncGoogleSheet: CollectionAfterChangeHook<Form> = async ({
 	doc,
 	req,
 }) => {
 	try {
-		const { docs } = await req.payload.find({
-			collection: "forms",
-			limit: 100,
-		});
+		const [forms, sheets] = await Promise.all([
+			GoogleSheetSyncer.getForms(req.payload),
+			GoogleSheetSyncer.getSheets(req.payload),
+		]);
 
-		if (docs && docs.length > 0) {
-			const sheet = await syncGoogleSpreadsheet(docs);
-			req.payload.logger.info(
-				"Google Sheet updated successfully",
-				sheet.sheetId
-			);
-		}
+		const sheet = sheets.at(-1);
+
+		const syncer = new GoogleSheetSyncer()
+			.setForms(forms.concat(doc))
+			.setSheet(sheet)
+			.setPayload(req.payload);
+
+		await syncer.sync();
 	} catch (error) {
 		if (env.NODE_ENV === "development") {
 			req.payload.logger.error(error);
-		} else {
+		} else if (error instanceof Error) {
+			Sentry.logger.error(error.message, {
+				name: "syncGoogleSheet",
+				action: "collectionAfterChangeHook",
+			});
 			Sentry.captureException(error, {
 				tags: {
 					component: "syncGoogleSheet",

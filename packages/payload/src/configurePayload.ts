@@ -1,6 +1,7 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { Forms } from "@jwc/payload/collections/Forms";
+import { Sheets } from "@jwc/payload/collections/Sheets";
 import { Users } from "@jwc/payload/collections/Users";
 import { postgresAdapter } from "@payloadcms/db-postgres";
 import { sentryPlugin } from "@payloadcms/plugin-sentry";
@@ -23,7 +24,7 @@ const baseConfig: Config = {
 			baseDir: path.resolve(dirname),
 		},
 	},
-	collections: [Users, Forms],
+	collections: [Users, Forms, Sheets],
 	typescript: {
 		outputFile: path.resolve(dirname, "payload.types.ts"),
 		declare: false,

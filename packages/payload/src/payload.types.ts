@@ -69,6 +69,7 @@ export interface Config {
   collections: {
     users: User;
     forms: Form;
+    sheets: Sheet;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -77,6 +78,7 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
+    sheets: SheetsSelect<false> | SheetsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -169,6 +171,39 @@ export interface Form {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sheets".
+ */
+export interface Sheet {
+  id: number;
+  fileId?: string | null;
+  kind?: string | null;
+  mimeType?: string | null;
+  name?: string | null;
+  webContentLink?: string | null;
+  webViewLink?: string | null;
+  schemaFile:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  permissions?:
+    | {
+        permissionId?: string | null;
+        type?: string | null;
+        role?: string | null;
+        emailAddress?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -181,6 +216,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'forms';
         value: number | Form;
+      } | null)
+    | ({
+        relationTo: 'sheets';
+        value: number | Sheet;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -258,6 +297,30 @@ export interface FormsSelect<T extends boolean = true> {
   memo?: T;
   tshirtSize?: T;
   ageGroup?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sheets_select".
+ */
+export interface SheetsSelect<T extends boolean = true> {
+  fileId?: T;
+  kind?: T;
+  mimeType?: T;
+  name?: T;
+  webContentLink?: T;
+  webViewLink?: T;
+  schemaFile?: T;
+  permissions?:
+    | T
+    | {
+        permissionId?: T;
+        type?: T;
+        role?: T;
+        emailAddress?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }

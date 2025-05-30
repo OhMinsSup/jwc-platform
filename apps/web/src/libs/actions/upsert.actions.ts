@@ -1,5 +1,6 @@
 "use server";
 import { appRouter } from "@jwc/api";
+import { env } from "@jwc/payload/env";
 import type { Form } from "@jwc/schema";
 import { call } from "@orpc/server";
 import payloadConfig from "@payload-config";
@@ -26,7 +27,9 @@ export async function serverAction(
 			},
 		});
 	} catch (error) {
-		if (error instanceof Error) {
+		if (env.NODE_ENV === "development") {
+			console.error(error);
+		} else if (error instanceof Error) {
 			Sentry.logger.error(error.message, {
 				name: "upsert",
 				action: "serverAction",
@@ -38,6 +41,7 @@ export async function serverAction(
 				},
 			});
 		}
+
 		return {
 			success: false,
 			message: "An error occurred while processing the form.",
