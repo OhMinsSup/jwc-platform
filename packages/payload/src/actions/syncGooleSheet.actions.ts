@@ -12,10 +12,10 @@ export type State = {
 } | null;
 
 export async function serverAction(_: State): Promise<NonNullable<State>> {
-	const payloadPromise = await getPayload({ config: configurePayload() });
+	const payload = await getPayload({ config: configurePayload() });
 
 	try {
-		const forms = await GoogleSheetSyncer.getForms(payloadPromise);
+		const forms = await GoogleSheetSyncer.getForms(payload);
 
 		if (!forms.length) {
 			return {
@@ -24,9 +24,7 @@ export async function serverAction(_: State): Promise<NonNullable<State>> {
 			} as const;
 		}
 
-		const syncer = new GoogleSheetSyncer()
-			.setForms(forms)
-			.setPayload(payloadPromise);
+		const syncer = new GoogleSheetSyncer().setForms(forms).setPayload(payload);
 
 		await syncer.sync("sheet");
 

@@ -220,7 +220,22 @@ export class GoogleSheetBuilder<T extends Record<string, unknown>> {
 
 		// 이미 테이블이 존재하는지 확인 (2024년 이후 Table API 지원)
 		const existingTableId = sheet.tables?.at(-1)?.tableId;
-		const tableName = existingTableId ? "updateTable" : "addTable";
+
+		if (existingTableId) {
+			// 이미 존재하면 기존 테이블 삭제
+			await apiClient.sheets.spreadsheets.batchUpdate({
+				spreadsheetId: env.GOOGLE_SHEET_ID,
+				requestBody: {
+					requests: [
+						{
+							deleteTable: {
+								tableId: existingTableId,
+							},
+						},
+					],
+				},
+			});
+		}
 
 		// 3. 테이블 객체 생성 (공식 Table API)
 		await apiClient.sheets.spreadsheets.batchUpdate({
@@ -228,15 +243,15 @@ export class GoogleSheetBuilder<T extends Record<string, unknown>> {
 			requestBody: {
 				requests: [
 					{
-						[tableName]: {
-							...(tableName === "updateTable" && existingTableId
-								? { fields: "*" }
-								: {}),
+						addTable: {
+							// ...(tableName === "updateTable" && existingTableId
+							// 	? { fields: "*" }
+							// 	: {}),
 							table: {
 								name: this.sheetName,
-								...(tableName === "updateTable" && existingTableId
-									? { tableId: existingTableId }
-									: {}),
+								// ...(tableName === "updateTable" && existingTableId
+								// 	? { tableId: existingTableId }
+								// 	: {}),
 								range: {
 									sheetId,
 									startRowIndex: 0,
