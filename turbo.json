@@ -1,82 +1,83 @@
 {
-  "$schema": "https://turborepo.org/schema.json",
-  "ui": "tui",
-  "tasks": {
-    "topo": {
-      "dependsOn": ["^topo"]
-    },
-    "build": {
-      "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "next-env.d.ts"]
-    },
-    "format": {
-      "outputLogs": "new-only"
-    },
-    "lint": {
-      "dependsOn": ["^topo", "^build"]
-    },
-    "typecheck": {
-      "dependsOn": ["^topo", "^build"],
-      "outputs": [".cache/tsbuildinfo.json"]
-    },
-    "sort": {
-      "cache": false
-    },
-    "generate:types": {
-      "cache": false
-    },
-    "generate:importmap": {
-      "cache": false
-    },
-    "clean": {
-      "cache": false
-    },
-    "//#clean": {
-      "cache": false
-    },
-    "migrate": {
-      "cache": false,
-      "interactive": true
-    },
-    "migrate:create": {
-      "cache": false,
-      "interactive": true
-    },
-    "migrate:fresh": {
-      "cache": false,
-      "persistent": true
-    },
-    "codegen": {
-      "cache": false
-    },
-    "ui-add": {
-      "cache": false,
-      "interactive": true
-    }
-  },
-  "globalEnv": [
-    "SENTRY_AUTH_TOKEN",
-    "SENTRY_ORG",
-    "SENTRY_PROJECT",
-    "AES_KEY",
-    "SKIP_ENV_VALIDATION",
-    "GOOGLE_CLIENT_EMAIL",
-    "GOOGLE_PRIVATE_KEY",
-    "GOOGLE_SHEET_ID",
-    "PAYLOAD_PRIVATE_SECRET",
-    "PAYLOAD_PRIVATE_REVALIDATION_KEY",
-    "NEXT_PUBLIC_SENTRY_DSN",
-    "NEXT_PUBLIC_PAID_ACCOUNT_NUMBER",
-    "NEXT_PUBLIC_APP_URL",
-    "DATABASE_ENGINE",
-    "DATABASE_URL"
-  ],
-  "globalPassThroughEnv": [
-    "NODE_ENV",
-    "CI",
-    "VERCEL",
-    "VERCEL_ENV",
-    "VERCEL_URL",
-    "npm_lifecycle_event"
-  ]
+	"$schema": "https://turborepo.org/schema.json",
+	"ui": "tui",
+	"tasks": {
+		"topo": {
+			"dependsOn": ["^topo"]
+		},
+		"build": {
+			"dependsOn": ["^build"],
+			"outputs": [".next/**", "!.next/cache/**", "next-env.d.ts"]
+		},
+		"format": {
+			"outputLogs": "new-only"
+		},
+		"lint": {
+			"dependsOn": ["^topo", "^build"]
+		},
+		"typecheck": {
+			"dependsOn": ["^topo", "^build"],
+			"outputs": [".cache/tsbuildinfo.json"]
+		},
+		"sort": {
+			"cache": false
+		},
+		"generate:types": {
+			"cache": false
+		},
+		"generate:importmap": {
+			"cache": false
+		},
+		"clean": {
+			"cache": false
+		},
+		"//#clean": {
+			"cache": false
+		},
+		"migrate": {
+			"cache": false,
+			"interactive": true
+		},
+		"migrate:create": {
+			"cache": false,
+			"interactive": true
+		},
+		"migrate:fresh": {
+			"cache": false,
+			"persistent": true
+		},
+		"codegen": {
+			"cache": false
+		},
+		"ui-add": {
+			"cache": false,
+			"interactive": true
+		}
+	},
+	"globalEnv": [
+		"SENTRY_AUTH_TOKEN",
+		"SENTRY_ORG",
+		"SENTRY_PROJECT",
+		"AES_KEY",
+		"SKIP_ENV_VALIDATION",
+		"GOOGLE_CLIENT_EMAIL",
+		"GOOGLE_PRIVATE_KEY",
+		"GOOGLE_SHEET_TITLE",
+		"GOOGLE_SHEET_ID",
+		"PAYLOAD_PRIVATE_SECRET",
+		"PAYLOAD_PRIVATE_REVALIDATION_KEY",
+		"NEXT_PUBLIC_SENTRY_DSN",
+		"NEXT_PUBLIC_PAID_ACCOUNT_NUMBER",
+		"NEXT_PUBLIC_APP_URL",
+		"DATABASE_ENGINE",
+		"DATABASE_URL"
+	],
+	"globalPassThroughEnv": [
+		"NODE_ENV",
+		"CI",
+		"VERCEL",
+		"VERCEL_ENV",
+		"VERCEL_URL",
+		"npm_lifecycle_event"
+	]
 }
