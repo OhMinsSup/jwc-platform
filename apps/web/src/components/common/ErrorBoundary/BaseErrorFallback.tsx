@@ -45,7 +45,7 @@ export default function BaseErrorFallback<TError>({
 								홈으로 돌아가기
 							</Button>
 							<Button type="button" onClick={props.resetError}>
-								초기화
+								새로고침
 							</Button>
 						</div>
 					</div>

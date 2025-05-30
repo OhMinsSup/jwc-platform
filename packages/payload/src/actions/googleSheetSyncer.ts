@@ -1,13 +1,8 @@
 import { configurePayload } from "@jwc/payload/configurePayload";
-import {
-	type Form,
-	GoogleSheetBuilder,
-	type Permission,
-	type Sheet,
-	gapi,
-} from "@jwc/payload/helpers/google";
+import { GoogleSheetBuilder, gapi } from "@jwc/payload/helpers/google";
 import type { drive_v3 } from "googleapis";
 import { type BasePayload, getPayload } from "payload";
+import type { Form, Permission, Sheet } from "../types";
 
 /**
  * GoogleSheetSyncer는 GoogleSheetBuilder를 활용하여
@@ -52,10 +47,24 @@ export class GoogleSheetSyncer {
 	 * Google Drive Sheet를 생성 또는 업데이트하고, Payload DB에 반영합니다.
 	 * @returns 생성/업데이트 결과
 	 */
-	async sync(): Promise<{
-		file: drive_v3.Schema$File | undefined;
-		created: boolean;
-	}> {
+	async sync(mode: "drive" | "sheet" = "drive") {
+		switch (mode) {
+			case "drive":
+				return this.syncDrive();
+			case "sheet":
+				return this.syncSheet();
+			default:
+				throw new Error("Invalid sync mode. Use 'drive' or 'sheet'.");
+		}
+	}
+
+	async syncSheet() {
+		const builder = gapi.setDocs(this.forms);
+		// await builder.syncGoogleSpreadsheet();
+		await builder.createGoogleSheetTable();
+	}
+
+	async syncDrive() {
 		await this.getPayload();
 
 		let file: drive_v3.Schema$File | undefined;
@@ -65,23 +74,18 @@ export class GoogleSheetSyncer {
 			// 기존 시트가 있으면 업데이트
 			const builder = gapi.setDocs(this.forms).setFileId(this.sheet.fileId);
 			const data = await builder.updateByGoogleDriveSheet();
-			console.log("GoogleSheetSyncer sync data", data);
 			await this.updateSheet(this.sheet.fileId, data.file);
 			file = data.file;
 		} else {
 			// 없으면 새로 생성
 			const builder = gapi.setDocs(this.forms);
 			const data = await builder.createByGoogleDriveSheet();
-			const map = await GoogleSheetBuilder.shareFile(data.file.id, [
-				"mins5190@gmail.com",
-			]);
+			const map = await GoogleSheetBuilder.shareFile(data.file.id, []);
 			const permissions = Array.from(map.values());
 			await this.createSheet(data.file, Array.from(permissions.values()));
 			file = data.file;
 			created = true;
 		}
-
-		return { file, created };
 	}
 
 	private async getPayload(): Promise<BasePayload> {

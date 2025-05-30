@@ -4,53 +4,83 @@ import { env } from "@jwc/payload/env";
 import { JWT } from "google-auth-library";
 import { GoogleSpreadsheet } from "google-spreadsheet";
 import { type drive_v3, google } from "googleapis";
-import type {
-	Form as PayloadForm,
-	Sheet as PayloadSheet,
-} from "../payload.types";
+import type { Form, Permission, PickDeepNonNullable } from "../types";
 import { buildExcelFileBuffer } from "./excel";
 
-const DEFAULT_SHEET_NAME = "청년부_연합_여름_수련회_참가자_명단";
+/**
+ * 구글 인증 및 API 클라이언트 관리 클래스
+ */
+class GoogleApiClient {
+	public readonly auth: JWT;
+	public readonly sheets: ReturnType<typeof google.sheets>;
+	public readonly drive: ReturnType<typeof google.drive>;
+
+	constructor() {
+		this.auth = new JWT({
+			email: env.GOOGLE_CLIENT_EMAIL,
+			key: env.GOOGLE_PRIVATE_KEY,
+			scopes: [
+				"https://www.googleapis.com/auth/spreadsheets",
+				"https://www.googleapis.com/auth/drive",
+			],
+		});
+		this.sheets = google.sheets({ version: "v4", auth: this.auth });
+		this.drive = google.drive({ version: "v3", auth: this.auth });
+	}
+}
+
+const apiClient = new GoogleApiClient();
+
 const GOOGLE_SHEET_MIME_TYPE = "application/vnd.google-apps.spreadsheet";
 const FILE_MIME_TYPE =
 	"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 const SELECT_FIELDS = "id, kind, name, mimeType, webViewLink, webContentLink";
 
-const auth = new JWT({
-	email: env.GOOGLE_CLIENT_EMAIL,
-	key: env.GOOGLE_PRIVATE_KEY,
-	scopes: [
-		"https://www.googleapis.com/auth/spreadsheets",
-		"https://www.googleapis.com/auth/drive",
-	],
-});
-
-const drive = google.drive({ version: "v3", auth });
-
-export type PickDeepNonNullable<T, K extends keyof T> = {
-	[P in K]-?: NonNullable<T[P]>;
-} & {
-	[P in Exclude<keyof T, K>]?: T[P];
-};
-
-export type Permission = Pick<
-	drive_v3.Schema$Permission,
-	"type" | "role" | "emailAddress"
-> & {
-	permissionId: string;
-	[key: string]: unknown;
+/**
+ * 구글 시트 스타일 유틸리티
+ */
+export const GoogleSheetStyle = {
+	headerFormat: {
+		backgroundColor: { red: 0.9, green: 0.9, blue: 0.9 },
+		horizontalAlignment: "CENTER",
+		textFormat: { bold: true },
+		borders: {
+			top: { style: "SOLID", width: 1, color: { red: 0, green: 0, blue: 0 } },
+			bottom: {
+				style: "SOLID",
+				width: 1,
+				color: { red: 0, green: 0, blue: 0 },
+			},
+			left: { style: "SOLID", width: 1, color: { red: 0, green: 0, blue: 0 } },
+			right: { style: "SOLID", width: 1, color: { red: 0, green: 0, blue: 0 } },
+		},
+	},
+	borderFormat: {
+		top: { style: "SOLID", width: 1, color: { red: 0, green: 0, blue: 0 } },
+		bottom: { style: "SOLID", width: 1, color: { red: 0, green: 0, blue: 0 } },
+		left: { style: "SOLID", width: 1, color: { red: 0, green: 0, blue: 0 } },
+		right: { style: "SOLID", width: 1, color: { red: 0, green: 0, blue: 0 } },
+		innerHorizontal: {
+			style: "SOLID",
+			width: 1,
+			color: { red: 0, green: 0, blue: 0 },
+		},
+		innerVertical: {
+			style: "SOLID",
+			width: 1,
+			color: { red: 0, green: 0, blue: 0 },
+		},
+	},
 };
 
 /**
- * GoogleSheetBuilder는 구글 드라이브 및 구글 스프레드시트와의 연동을 Builder 패턴으로 제공합니다.
+ * 구글 시트 데이터 빌더 (Builder 패턴)
+ * @template T 데이터 타입
  */
-export class GoogleSheetBuilder<
-	Data extends Record<string, unknown> = Record<string, unknown>,
-> {
-	private sheetName: string = DEFAULT_SHEET_NAME;
-	private docs: Data[] = [];
+export class GoogleSheetBuilder<T extends Record<string, unknown>> {
+	private sheetName: string = env.GOOGLE_SHEET_TITLE;
+	private docs: T[] = [];
 	private fileId?: string;
-	// private targetUserEmail?: string[];
 
 	/**
 	 * 시트 이름을 설정합니다.
@@ -63,11 +93,11 @@ export class GoogleSheetBuilder<
 	}
 
 	/**
-	 * 엑셀에 기록할 데이터를 설정합니다.
+	 * 시트에 입력할 데이터를 설정합니다.
 	 * @param docs 데이터 배열
 	 * @returns this
 	 */
-	setDocs(docs: Data[]): this {
+	setDocs(docs: T[]): this {
 		this.docs = docs;
 		return this;
 	}
@@ -82,44 +112,160 @@ export class GoogleSheetBuilder<
 		return this;
 	}
 
-	// /**
-	//  * 공유할 사용자 이메일을 설정합니다.
-	//  * @param email 사용자 이메일
-	//  * @returns this
-	//  */
-	// setTargetUserEmail(email: string | string[]): this {
-	// 	this.targetUserEmail = Array.isArray(email) ? email : [email];
-	// 	return this;
-	// }
-
 	/**
-	 * 구글 스프레드시트에 데이터를 동기화합니다.
-	 * @returns 생성 또는 업데이트된 GoogleSpreadsheetWorksheet
+	 * 구글 시트에 데이터를 입력하고 스타일을 적용합니다.
+	 * @returns Promise<void>
 	 */
-	async syncGoogleSpreadsheet() {
+	async syncGoogleSpreadsheet(): Promise<void> {
 		const $excel = new ExcelManager();
-		const doc = new GoogleSpreadsheet(env.GOOGLE_SHEET_ID, auth);
+		const headers = Array.from(
+			new Set($excel.head.createFormGoogleSheetHeaders())
+		);
+		const rows = $excel.rowData.generateExcelFormRows(this.docs);
 
-		await doc.loadInfo();
-		let sheet = doc.sheetsByTitle[this.sheetName];
+		const spreadsheet = new GoogleSpreadsheet(
+			env.GOOGLE_SHEET_ID,
+			apiClient.auth
+		);
+		await spreadsheet.loadInfo();
 
+		let sheet = spreadsheet.sheetsByTitle[this.sheetName];
+		let isNewSheet = false;
 		if (!sheet) {
-			sheet = await doc.addSheet({
+			isNewSheet = true;
+			sheet = await spreadsheet.addSheet({
 				title: this.sheetName,
-				headerValues: $excel.head
-					.createFormSheetHeaders()
-					.filter((header) => header.name !== "순서")
-					.map((header) => header.name),
+				headerValues: headers.map((header) => header.name),
 			});
 		}
 
-		await sheet?.clearRows();
-
-		const rows = $excel.rowData.generateExcelFormRows(this.docs);
-
+		await sheet.clearRows();
+		if (!isNewSheet) {
+			await sheet.setHeaderRow(headers.map((header) => header.name));
+		}
 		await sheet.addRows(rows);
 
-		return sheet;
+		const columnCount = headers.length;
+		const rowCount = rows.length + 1;
+
+		await apiClient.sheets.spreadsheets.batchUpdate({
+			spreadsheetId: env.GOOGLE_SHEET_ID,
+			requestBody: {
+				requests: [
+					{
+						repeatCell: {
+							range: {
+								sheetId: sheet.sheetId,
+								startRowIndex: 0,
+								endRowIndex: 1,
+								startColumnIndex: 0,
+								endColumnIndex: columnCount,
+							},
+							cell: { userEnteredFormat: GoogleSheetStyle.headerFormat },
+							fields:
+								"userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,borders)",
+						},
+					},
+					{
+						updateBorders: {
+							range: {
+								sheetId: sheet.sheetId,
+								startRowIndex: 0,
+								endRowIndex: rowCount,
+								startColumnIndex: 0,
+								endColumnIndex: columnCount,
+							},
+							...GoogleSheetStyle.borderFormat,
+						},
+					},
+				],
+			},
+		});
+	}
+
+	/**
+	 * 구글 시트에 표(테이블) 객체를 생성합니다.
+	 * @returns Promise<void>
+	 */
+	async createGoogleSheetTable(): Promise<void> {
+		const $excel = new ExcelManager();
+		const headerValues = $excel.head.createFormGoogleSheetHeaders();
+		const rowValues = $excel.rowData.generateExcelFormRows(this.docs);
+		const headers = headerValues.map((header) => header.name);
+		const rows = rowValues.map((row) =>
+			headers.map((header) => row[header as keyof typeof row] ?? "")
+		);
+
+		// 1. 데이터 입력
+		await apiClient.sheets.spreadsheets.values.update({
+			spreadsheetId: env.GOOGLE_SHEET_ID,
+			range: `A1:${String.fromCharCode(65 + headers.length - 1)}${rows.length + 1}`,
+			valueInputOption: "RAW",
+			requestBody: {
+				values: [headers, ...rows],
+			},
+		});
+
+		// 2. 시트 ID 조회
+		const meta = await apiClient.sheets.spreadsheets.get({
+			spreadsheetId: env.GOOGLE_SHEET_ID,
+		});
+		const sheet = meta.data.sheets?.find(
+			(s) => s.properties?.title === this.sheetName
+		);
+		if (!sheet || sheet.properties?.sheetId === undefined) {
+			throw new Error(`시트 "${this.sheetName}"을 찾을 수 없습니다.`);
+		}
+		const sheetId = sheet.properties.sheetId;
+
+		// 이미 테이블이 존재하는지 확인 (2024년 이후 Table API 지원)
+		const existingTableId = sheet.tables?.at(-1)?.tableId;
+		const tableName = existingTableId ? "updateTable" : "addTable";
+
+		// 3. 테이블 객체 생성 (공식 Table API)
+		await apiClient.sheets.spreadsheets.batchUpdate({
+			spreadsheetId: env.GOOGLE_SHEET_ID,
+			requestBody: {
+				requests: [
+					{
+						[tableName]: {
+							...(tableName === "updateTable" && existingTableId
+								? { fields: "*" }
+								: {}),
+							table: {
+								name: this.sheetName,
+								...(tableName === "updateTable" && existingTableId
+									? { tableId: existingTableId }
+									: {}),
+								range: {
+									sheetId,
+									startRowIndex: 0,
+									endRowIndex: rows.length + 1,
+									startColumnIndex: 0,
+									endColumnIndex: headers.length,
+								},
+								columnProperties: headerValues.map((header, idx) => ({
+									columnName: header.name,
+									columnType: header.columnType,
+									columnIndex: idx,
+									...(header.columnType === "DROPDOWN" &&
+										header.options && {
+											dataValidationRule: {
+												condition: {
+													type: "ONE_OF_LIST",
+													values: header.options.map((option) => ({
+														userEnteredValue: option,
+													})),
+												},
+											},
+										}),
+								})),
+							},
+						},
+					},
+				],
+			},
+		});
 	}
 
 	/**
@@ -145,7 +291,7 @@ export class GoogleSheetBuilder<
 			body,
 		};
 
-		const file = await drive.files.create({
+		const file = await apiClient.drive.files.create({
 			requestBody,
 			fields: SELECT_FIELDS,
 			media,
@@ -181,7 +327,7 @@ export class GoogleSheetBuilder<
 			body,
 		};
 
-		const file = await drive.files.update({
+		const file = await apiClient.drive.files.update({
 			fileId: this.fileId,
 			fields: SELECT_FIELDS,
 			media,
@@ -205,7 +351,7 @@ export class GoogleSheetBuilder<
 	static async getGoogleDriveSheet(
 		fileId: string
 	): Promise<drive_v3.Schema$File | null> {
-		const file = await drive.files.get({
+		const file = await apiClient.drive.files.get({
 			fileId,
 			fields: SELECT_FIELDS,
 		});
@@ -215,7 +361,7 @@ export class GoogleSheetBuilder<
 	/**
 	 * 구글 드라이브 파일에 권한을 추가합니다.
 	 * @param fileId 파일 ID
-	 * @param targetUserEmail 사용자 이메일 (없으면 anyone만 적용)
+	 * @param targetUserEmails 사용자 이메일 배열 (없으면 anyone만 적용)
 	 * @param anyoneRole anyone 권한 ("reader" 또는 "writer"), 없으면 anyone 권한 미적용
 	 * @returns 추가된 permission id 리스트
 	 */
@@ -245,15 +391,8 @@ export class GoogleSheetBuilder<
 		const map: Map<string, Permission> = new Map();
 		for (const permission of permissions) {
 			try {
-				const createPermission = (
-					params?: drive_v3.Params$Resource$Permissions$Create
-				) =>
-					drive.permissions.create(
-						params
-					) as PromiseLike<drive_v3.Schema$Permission>;
-
-				const result = await createPermission({
-					// @ts-expect-error 왜 발생하는 에러지?
+				const result = await apiClient.drive.permissions.create({
+					// @ts-expect-error
 					resource: permission,
 					fileId: fileId,
 					fields: "id",
@@ -283,12 +422,7 @@ export class GoogleSheetBuilder<
 	}
 }
 
-export interface Form extends PayloadForm {
-	[key: string]: unknown;
-}
-
-export interface Sheet extends PayloadSheet {
-	[key: string]: unknown;
-}
-
+/**
+ * Form 타입에 특화된 GoogleSheetBuilder 인스턴스
+ */
 export const gapi = new GoogleSheetBuilder<Form>();

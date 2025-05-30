@@ -1,27 +1,21 @@
 import { GoogleSheetSyncer } from "@jwc/payload/actions/googleSheetSyncer";
 import { env } from "@jwc/payload/env";
-import type { Form } from "@jwc/payload/helpers/google";
 import * as Sentry from "@sentry/nextjs";
-import { type CollectionAfterChangeHook, getPayload } from "payload";
+import type { CollectionAfterChangeHook } from "payload";
+import type { Form } from "../../types";
 
 export const syncGoogleSheet: CollectionAfterChangeHook<Form> = async ({
 	doc,
 	req,
 }) => {
 	try {
-		const [forms, sheets] = await Promise.all([
-			GoogleSheetSyncer.getForms(req.payload),
-			GoogleSheetSyncer.getSheets(req.payload),
-		]);
-
-		const sheet = sheets.at(-1);
+		const forms = await GoogleSheetSyncer.getForms(req.payload);
 
 		const syncer = new GoogleSheetSyncer()
 			.setForms(forms.concat(doc))
-			.setSheet(sheet)
 			.setPayload(req.payload);
 
-		await syncer.sync();
+		await syncer.sync("sheet");
 	} catch (error) {
 		if (env.NODE_ENV === "development") {
 			req.payload.logger.error(error);

@@ -102,7 +102,7 @@ export default function FormPaid({ idx }: LazyComponentProps) {
 				label="회비를 납부하셨나요? 납부 하셨다면 체크해주세요."
 				afterLabel={
 					<div className="flex flex-row gap-2">
-						<InfoPopover />
+						{/* <InfoPopover /> */}
 						<CopyButton />
 					</div>
 				}

@@ -15,36 +15,42 @@ export async function serverAction(_: State): Promise<NonNullable<State>> {
 	const payloadPromise = await getPayload({ config: configurePayload() });
 
 	try {
-		const forms = await GoogleSheetSyncer.getForms(payloadPromise);
+		const [forms, sheets] = await Promise.all([
+			GoogleSheetSyncer.getForms(payloadPromise),
+			GoogleSheetSyncer.getSheets(payloadPromise),
+		]);
 
 		if (!forms.length) {
 			return {
 				success: false,
-				message: "No forms found to sync with Google Sheets.",
+				message: "No forms found to sync with Google Drive.",
 			} as const;
 		}
 
+		const sheet = sheets.at(-1);
+
 		const syncer = new GoogleSheetSyncer()
 			.setForms(forms)
+			.setSheet(sheet)
 			.setPayload(payloadPromise);
 
-		await syncer.sync("sheet");
+		await syncer.sync();
 
 		return {
 			success: true,
-			message: "Google Sheet Sync Success",
+			message: "Google Drive Sync Success",
 		};
 	} catch (error) {
 		if (env.NODE_ENV === "development") {
 			console.error(error);
 		} else if (error instanceof Error) {
 			Sentry.logger.error(error.message, {
-				name: "syncGoogleSheet",
+				name: "syncGooleDrive",
 				action: "serverAction",
 			});
 			Sentry.captureException(error, {
 				tags: {
-					name: "syncGoogleSheet",
+					name: "syncGooleDrive",
 					action: "serverAction",
 				},
 			});
@@ -56,9 +62,9 @@ export async function serverAction(_: State): Promise<NonNullable<State>> {
 	}
 }
 
-export async function syncGoogleSheet(state: State) {
+export async function syncGooleDrive(state: State) {
 	return await Sentry.withServerActionInstrumentation(
-		"syncGoogleSheetAction",
+		"syncGooleDriveAction",
 		{
 			headers: await headers(),
 			recordResponse: true,
