@@ -29,9 +29,19 @@ export class ExcelRowData<
 
 	// 배열형태로 된 신청서 데이터를 엑셀 형태로 변환
 	generateExcelFormRows(data: Data[]) {
+		// const rawData: RowFormData[] = [];
+		// for (const item of data) {
+		// 	rawData.push(this.generateExcelFormRow(item));
+		// }
+		// return rawData;
+		const seen = new Set<string>();
 		const rawData: RowFormData[] = [];
 		for (const item of data) {
-			rawData.push(this.generateExcelFormRow(item));
+			const id = (item as Record<string, unknown>).id as string | undefined;
+			if (!id || !seen.has(id)) {
+				rawData.push(this.generateExcelFormRow(item));
+				if (id) seen.add(id);
+			}
 		}
 		return rawData;
 	}

@@ -11,6 +11,7 @@ export const syncGoogleSheet: CollectionAfterChangeHook<Form> = async ({
 	try {
 		const forms = await GoogleSheetSyncer.getForms(req.payload);
 
+		console.log("syncGoogleSheet: forms", forms.concat(doc));
 		const syncer = new GoogleSheetSyncer()
 			.setForms(forms.concat(doc))
 			.setPayload(req.payload);

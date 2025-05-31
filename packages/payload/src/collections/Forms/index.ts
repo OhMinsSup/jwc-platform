@@ -82,6 +82,7 @@ export const Forms: CollectionConfig = {
 					ko: "이름을 입력해주세요",
 					en: "Please enter your name",
 				},
+				readOnly: true,
 			},
 			hooks: {
 				afterRead: [formatFormUserFullName],
