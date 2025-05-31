@@ -197,14 +197,14 @@ export class GoogleSheetBuilder<T extends Record<string, unknown>> {
 		);
 
 		// 1. 데이터 입력
-		await apiClient.sheets.spreadsheets.values.update({
-			spreadsheetId: env.GOOGLE_SHEET_ID,
-			range: `A1:${String.fromCharCode(65 + headers.length - 1)}${rows.length + 1}`,
-			valueInputOption: "RAW",
-			requestBody: {
-				values: [headers, ...rows],
-			},
-		});
+		// await apiClient.sheets.spreadsheets.values.update({
+		// 	spreadsheetId: env.GOOGLE_SHEET_ID,
+		// 	range: `A1:${String.fromCharCode(65 + headers.length - 1)}${rows.length + 1}`,
+		// 	valueInputOption: "RAW",
+		// 	requestBody: {
+		// 		values: [headers, ...rows],
+		// 	},
+		// });
 
 		// 2. 시트 ID 조회
 		const meta = await apiClient.sheets.spreadsheets.get({
@@ -225,64 +225,82 @@ export class GoogleSheetBuilder<T extends Record<string, unknown>> {
 
 		if (existingTableId) {
 			// 이미 존재하면 기존 테이블 삭제
+			// await apiClient.sheets.spreadsheets.batchUpdate({
+			// 	spreadsheetId: env.GOOGLE_SHEET_ID,
+			// 	requestBody: {
+			// 		requests: [
+			// 			{
+			// 				deleteTable: {
+			// 					tableId: existingTableId,
+			// 				},
+			// 			},
+			// 			{
+			// 				updateCells: {},
+			// 			},
+			// 		],
+			// 	},
+			// });
+			// 테이블이 이미 존재하면 데이터만 교체
+			// 1) 기존 데이터 영역 비우기
+			await apiClient.sheets.spreadsheets.values.clear({
+				spreadsheetId: env.GOOGLE_SHEET_ID,
+				range: `A1:${String.fromCharCode(65 + headers.length - 1)}`,
+			});
+			// 2) 새 데이터 입력
+			await apiClient.sheets.spreadsheets.values.update({
+				spreadsheetId: env.GOOGLE_SHEET_ID,
+				range: `A1:${String.fromCharCode(65 + headers.length - 1)}${rows.length + 1}`,
+				valueInputOption: "RAW",
+				requestBody: {
+					values: [headers, ...rows],
+				},
+			});
+		} else {
+			// 3. 테이블 객체 생성 (공식 Table API)
 			await apiClient.sheets.spreadsheets.batchUpdate({
 				spreadsheetId: env.GOOGLE_SHEET_ID,
 				requestBody: {
 					requests: [
 						{
-							deleteTable: {
-								tableId: existingTableId,
+							addTable: {
+								// ...(tableName === "updateTable" && existingTableId
+								// 	? { fields: "*" }
+								// 	: {}),
+								table: {
+									name: this.sheetName,
+									// ...(tableName === "updateTable" && existingTableId
+									// 	? { tableId: existingTableId }
+									// 	: {}),
+									range: {
+										sheetId,
+										startRowIndex: 0,
+										endRowIndex: rows.length + 1,
+										startColumnIndex: 0,
+										endColumnIndex: headers.length,
+									},
+									columnProperties: headerValues.map((header, idx) => ({
+										columnName: header.name,
+										columnType: header.columnType,
+										columnIndex: idx,
+										...(header.columnType === "DROPDOWN" &&
+											header.options && {
+												dataValidationRule: {
+													condition: {
+														type: "ONE_OF_LIST",
+														values: header.options.map((option) => ({
+															userEnteredValue: option,
+														})),
+													},
+												},
+											}),
+									})),
+								},
 							},
 						},
 					],
 				},
 			});
 		}
-
-		// 3. 테이블 객체 생성 (공식 Table API)
-		await apiClient.sheets.spreadsheets.batchUpdate({
-			spreadsheetId: env.GOOGLE_SHEET_ID,
-			requestBody: {
-				requests: [
-					{
-						addTable: {
-							// ...(tableName === "updateTable" && existingTableId
-							// 	? { fields: "*" }
-							// 	: {}),
-							table: {
-								name: this.sheetName,
-								// ...(tableName === "updateTable" && existingTableId
-								// 	? { tableId: existingTableId }
-								// 	: {}),
-								range: {
-									sheetId,
-									startRowIndex: 0,
-									endRowIndex: rows.length + 1,
-									startColumnIndex: 0,
-									endColumnIndex: headers.length,
-								},
-								columnProperties: headerValues.map((header, idx) => ({
-									columnName: header.name,
-									columnType: header.columnType,
-									columnIndex: idx,
-									...(header.columnType === "DROPDOWN" &&
-										header.options && {
-											dataValidationRule: {
-												condition: {
-													type: "ONE_OF_LIST",
-													values: header.options.map((option) => ({
-														userEnteredValue: option,
-													})),
-												},
-											},
-										}),
-								})),
-							},
-						},
-					},
-				],
-			},
-		});
 	}
 
 	/**
