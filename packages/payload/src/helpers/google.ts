@@ -214,7 +214,9 @@ export class GoogleSheetBuilder<T extends Record<string, unknown>> {
 			(s) => s.properties?.title === this.sheetName
 		);
 		if (!sheet || sheet.properties?.sheetId === undefined) {
-			throw new Error(`시트 "${this.sheetName}"을 찾을 수 없습니다.`);
+			throw new Error(
+				`Sheet with name "${this.sheetName}" not found in spreadsheet.`
+			);
 		}
 		const sheetId = sheet.properties.sheetId;
 
