@@ -34,7 +34,7 @@ export async function serverAction(_: State): Promise<NonNullable<State>> {
 		};
 	} catch (error) {
 		if (env.NODE_ENV === "development") {
-			console.error(error);
+			payload.logger.error(error);
 		} else if (error instanceof Error) {
 			Sentry.logger.error(error.message, {
 				name: "syncGoogleSheet",

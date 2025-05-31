@@ -12,12 +12,12 @@ export type State = {
 } | null;
 
 export async function serverAction(_: State): Promise<NonNullable<State>> {
-	const payloadPromise = await getPayload({ config: configurePayload() });
+	const payload = await getPayload({ config: configurePayload() });
 
 	try {
 		const [forms, sheets] = await Promise.all([
-			GoogleSheetSyncer.getForms(payloadPromise),
-			GoogleSheetSyncer.getSheets(payloadPromise),
+			GoogleSheetSyncer.getForms(payload),
+			GoogleSheetSyncer.getSheets(payload),
 		]);
 
 		if (!forms.length) {
@@ -32,7 +32,7 @@ export async function serverAction(_: State): Promise<NonNullable<State>> {
 		const syncer = new GoogleSheetSyncer()
 			.setForms(forms)
 			.setSheet(sheet)
-			.setPayload(payloadPromise);
+			.setPayload(payload);
 
 		await syncer.sync();
 
@@ -42,7 +42,7 @@ export async function serverAction(_: State): Promise<NonNullable<State>> {
 		};
 	} catch (error) {
 		if (env.NODE_ENV === "development") {
-			console.error(error);
+			payload.logger.error(error);
 		} else if (error instanceof Error) {
 			Sentry.logger.error(error.message, {
 				name: "syncGooleDrive",

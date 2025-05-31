@@ -6,7 +6,8 @@ export const formatFormUserFullName: FieldHook<Form> = ({
 	operation,
 	value,
 }) => {
-	if (operation === "read")
+	if (operation === "read") {
 		return `${data?.name} (${data?.department ?? "미입력"} - ${data?.ageGroup ?? "미입력"})`;
+	}
 	return value || "알수없음";
 };
