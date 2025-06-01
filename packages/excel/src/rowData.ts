@@ -1,10 +1,20 @@
 import type { RowFormData } from "./types";
 
+/**
+ * Excel 행 데이터 유틸리티 클래스
+ *
+ * 신청서 데이터를 Excel/Google Sheets에 맞는 행 데이터로 변환하는 기능을 제공합니다.
+ */
 export class ExcelRowData<
 	Data extends Record<string, unknown> = Record<string, unknown>,
 > {
-	// 신청서 시트의 행을 생성
-	generateExcelFormRow(doc: Data) {
+	/**
+	 * 단일 신청서 객체를 Excel 행 데이터로 변환합니다.
+	 *
+	 * @param doc - 신청서 데이터 객체
+	 * @returns 변환된 Excel 행 데이터(RowFormData)
+	 */
+	generateExcelFormRow(doc: Data): RowFormData {
 		return {
 			타임스탬프:
 				typeof doc.createdAt === "string" || typeof doc.createdAt === "number"
@@ -17,7 +27,7 @@ export class ExcelRowData<
 			연락처: doc.phone || "",
 			성별: doc.gender,
 			부서: doc.department,
-			...(doc.tshirtSize ? { "단체티 사이즈": doc.tshirtSize } : {}),
+			"단체티 사이즈": doc.tshirtSize || "",
 			"참석 날짜": doc.attendanceDay ?? "",
 			"참석 시간": doc.attendanceTime ?? "",
 			"픽업 가능 시간": doc.pickupTimeDesc ?? "",
@@ -29,8 +39,14 @@ export class ExcelRowData<
 		} as RowFormData;
 	}
 
-	// 배열형태로 된 신청서 데이터를 엑셀 형태로 변환
-	generateExcelFormRows(data: Data[]) {
+	/**
+	 * 신청서 데이터 배열을 Excel 행 데이터 배열로 변환합니다.
+	 * id 필드를 기준으로 중복을 제거합니다.
+	 *
+	 * @param data - 신청서 데이터 객체 배열
+	 * @returns 중복이 제거된 Excel 행 데이터 배열
+	 */
+	generateExcelFormRows(data: Data[]): RowFormData[] {
 		const seen = new Set<string>();
 		const rawData: RowFormData[] = [];
 		for (const item of data) {

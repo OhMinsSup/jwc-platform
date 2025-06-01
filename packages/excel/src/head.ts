@@ -1,50 +1,15 @@
+import type { ExcelHeader, ExcelHeaders } from "./types";
+
 /**
- * Google Sheets Table Column Type Enum
- * - COLUMN_TYPE_UNSPECIFIED: 지정되지 않은 열 유형입니다.
- * - DOUBLE: 숫자 열 유형입니다.
- * - CURRENCY: 통화 열 유형입니다.
- * - PERCENT: 퍼센트 열 유형입니다.
- * - DATE: 날짜 열 유형입니다.
- * - TIME: 시간 열 유형입니다.
- * - DATE_TIME: 날짜 및 시간 열 유형입니다.
- * - TEXT: 텍스트 열 유형입니다.
- * - BOOLEAN: 불리언 열 유형입니다.
- * - DROPDOWN: 드롭다운 열 유형입니다.
- * - FILES_CHIP: 파일 칩 열 유형입니다.
- * - PEOPLE_CHIP: 사용자 칩 열 유형입니다.
- * - FINANCE_CHIP: 금융 칩 열 유형입니다.
- * - PLACE_CHIP: 장소 칩 열 유형입니다.
- * - RATINGS_CHIP: 평점 칩 열 유형입니다.
+ * Excel 및 Google Sheets용 헤더 생성 유틸리티 클래스
+ * @remarks
+ * - 신청서 시트의 헤더 정보를 관리하고, Excel/Google Sheets에 맞는 형태로 변환합니다.
  */
-export type GoogleSheetColumnType =
-	| "COLUMN_TYPE_UNSPECIFIED"
-	| "DOUBLE"
-	| "CURRENCY"
-	| "PERCENT"
-	| "DATE"
-	| "TIME"
-	| "DATE_TIME"
-	| "TEXT"
-	| "BOOLEAN"
-	| "DROPDOWN"
-	| "FILES_CHIP"
-	| "PEOPLE_CHIP"
-	| "FINANCE_CHIP"
-	| "PLACE_CHIP"
-	| "RATINGS_CHIP";
-
-type ExcelHeader = {
-	name: string;
-	key?: string;
-	width: number;
-	hidden?: boolean;
-	columnType?: GoogleSheetColumnType;
-	options?: string[];
-};
-
-type ExcelHeaders = ExcelHeader[];
-
 export class ExcelHead {
+	/**
+	 * 내부적으로 사용하는 헤더 정의 배열
+	 * @private
+	 */
 	private _headers: ExcelHeaders = [
 		{
 			name: "순서",
@@ -153,7 +118,12 @@ export class ExcelHead {
 		},
 	];
 
-	// _headers 배열에 저장된 픽셀 단위 너비를 Excel의 너비 기준으로 변환
+	/**
+	 * 픽셀 단위의 너비를 Excel 열 너비로 변환합니다.
+	 * @param pxWidth - 픽셀 단위 너비
+	 * @returns Excel 열 너비
+	 * @private
+	 */
 	private _pixelToExcelWidth(pxWidth: number): number {
 		// Calibri 11pt 기준으로 1 열 너비는 대략 7 픽셀에 해당
 		// 이는 근사치이며, 정확한 비율은 사용 환경에 따라 다를 수 있음
@@ -161,7 +131,12 @@ export class ExcelHead {
 		return pxWidth / approximateRatio;
 	}
 
-	// ExcelHeader 객체를 Excel에 적합한 형태로 변환
+	/**
+	 * ExcelHeader 객체를 Excel에 적합한 형태로 변환합니다.
+	 * @param header - ExcelHeader 객체
+	 * @returns 변환된 ExcelHeader 객체
+	 * @private
+	 */
 	private _formatter(header: ExcelHeader): ExcelHeader {
 		return {
 			name: header.name,
@@ -169,14 +144,21 @@ export class ExcelHead {
 		};
 	}
 
-	// 신청서 시트의 헤더를 생성
-	createFormSheetHeaders() {
+	/**
+	 * 신청서 시트의 헤더 배열을 생성합니다.
+	 * @returns ExcelHeaders 배열 (숨김 컬럼 제외, Excel용 너비 변환)
+	 */
+	createFormSheetHeaders(): ExcelHeaders {
 		return this._headers
 			.filter((header) => !header.hidden)
 			.map((header) => this._formatter(header));
 	}
 
-	createFormGoogleSheetHeaders() {
+	/**
+	 * Google Sheets용 헤더 객체 배열을 생성합니다.
+	 * @returns ExcelHeader[] (순서 컬럼 제외)
+	 */
+	createFormGoogleSheetHeaders(): ExcelHeaders {
 		return this._headers.filter((h) => h.name !== "순서");
 	}
 }
