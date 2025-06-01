@@ -40,6 +40,12 @@ const FormAgeGroup = React.lazy(() =>
 	}))
 );
 
+const FormTshirtSize = React.lazy(() =>
+	import("~/components/main/FormTshirtSize").then((module) => ({
+		default: module.FormTshirtSize,
+	}))
+);
+
 const FormTFTeam = React.lazy(() =>
 	import("~/components/main/FormTFTeam").then((module) => ({
 		default: module.FormTFTeam,
@@ -133,55 +139,61 @@ export const STEP_COMPONENTS = [
 	},
 	{
 		idx: 6,
+		key: "tshirtSize",
+		name: "FormTshirtSize",
+		component: FormTshirtSize,
+	},
+	{
+		idx: 7,
 		key: "tfTeam",
 		name: "FormTFTeam",
 		component: FormTFTeam,
 	},
 	{
-		idx: 7,
+		idx: 8,
 		key: "numberOfStays",
 		name: "FormNumberOfStays",
 		component: FormNumberOfStays,
 	},
 	{
-		idx: 8,
+		idx: 9,
 		key: "attendanceDay",
 		name: "FormAttendanceDay",
 		component: FormAttendanceDay,
 	},
 	{
-		idx: 9,
+		idx: 10,
 		key: "attendanceTime",
 		name: "FormAttendanceTime",
 		component: FormAttendanceTime,
 	},
 	{
-		idx: 10,
+		idx: 11,
 		key: "pickup",
 		name: "FormPickupDescription",
 		component: FormPickupDescription,
 	},
 	{
-		idx: 11,
+		idx: 12,
 		key: "carSupport",
 		name: "FormCarSupport",
 		component: FormCarSupport,
 	},
 	{
-		idx: 12,
+		idx: 13,
 		key: "carSupportContent",
 		name: "FormCarSupportContent",
 		component: FormCarSupportContent,
 	},
 	{
-		idx: 13,
+		idx: 14,
 		key: "paid",
 		name: "FormPaid",
 		component: FormPaid,
 	},
 ] as const;
 
-export const TOTAL_STEP_COUNT = 13;
+export const TOTAL_STEP_COUNT = 14;
 
 const CONFIRM_STEP = TOTAL_STEP_COUNT + 1;
 const COMPLETED_STEP = TOTAL_STEP_COUNT + 2;

@@ -115,20 +115,22 @@ export const getIdxToText = (idx: number) => {
 		case 5:
 			return "또래";
 		case 6:
-			return "지원하고 싶은 TF팀";
+			return "티셔츠 사이즈";
 		case 7:
-			return "참석하고 싶은 수련회 일정";
+			return "지원하고 싶은 TF팀";
 		case 8:
-			return "참석 날짜";
+			return "참석하고 싶은 수련회 일정";
 		case 9:
-			return "참석 시간";
+			return "참석 날짜";
 		case 10:
-			return "픽업 상세내용";
+			return "참석 시간";
 		case 11:
-			return "차량 지원 여부";
+			return "픽업 상세내용";
 		case 12:
-			return "차량 지원 상세내용";
+			return "차량 지원 여부";
 		case 13:
+			return "차량 지원 상세내용";
+		case 14:
 			return "회비 납부";
 		default:
 			return "알수없음";
@@ -155,9 +157,13 @@ export const getDisplayValueByTitle = (
 		case "참석하고 싶은 수련회 일정":
 			return data || "입력된 정보가 없습니다.";
 		case "참석 날짜":
-			return formatAttendanceDay(data) as string;
+			return data
+				? (formatAttendanceDay(data) as string)
+				: "입력된 정보가 없습니다.";
 		case "참석 시간":
-			return formatAttendanceTime(data) as string;
+			return data
+				? (formatAttendanceTime(data) as string)
+				: "입력된 정보가 없습니다.";
 		case "픽업 상세내용":
 			return data || "입력된 정보가 없습니다.";
 		case "차량 지원 여부":
@@ -166,6 +172,10 @@ export const getDisplayValueByTitle = (
 			return data || "입력된 정보가 없습니다.";
 		case "회비 납부":
 			return data || "입력된 정보가 없습니다.";
+		case "티셔츠 사이즈":
+			return data
+				? (formatTshirtSize(data) as string)
+				: "입력된 정보가 없습니다.";
 		default:
 			return data || "입력된 정보가 없습니다.";
 	}
@@ -194,6 +204,25 @@ export function formatAttendanceTime(value: unknown) {
 			return "오후";
 		case "EVENING":
 			return "저녁";
+		default:
+			return value || "";
+	}
+}
+
+export function formatTshirtSize(value: unknown) {
+	switch (value) {
+		case "s":
+			return "S 사이즈";
+		case "m":
+			return "M 사이즈";
+		case "l":
+			return "L 사이즈";
+		case "xl":
+			return "XL 사이즈";
+		case "2xl":
+			return "XXL 사이즈";
+		case "3xl":
+			return "XXXL 사이즈";
 		default:
 			return value || "";
 	}
