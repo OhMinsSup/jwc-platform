@@ -9,6 +9,8 @@ export type RowFormData = {
 	"픽업 가능 시간": string;
 	"회비 납입 여부": string;
 	"참석 형태": string;
+	"참석 날짜"?: string;
+	"참석 시간"?: string;
 	"TF팀 지원": string;
 	"차량 지원 여부": string;
 	"차량 지원 내용": string;

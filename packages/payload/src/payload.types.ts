@@ -164,6 +164,8 @@ export interface Form {
     };
     [k: string]: unknown;
   } | null;
+  attendanceDay?: string | null;
+  attendanceTime?: ('AM' | 'PM' | 'EVENING') | null;
   tshirtSize?: ('s' | 'm' | 'l' | 'xl' | '2xl' | '3xl') | null;
   ageGroup: string;
   updatedAt: string;
@@ -295,6 +297,8 @@ export interface FormsSelect<T extends boolean = true> {
   carSupport?: T;
   carSupportContent?: T;
   memo?: T;
+  attendanceDay?: T;
+  attendanceTime?: T;
   tshirtSize?: T;
   ageGroup?: T;
   updatedAt?: T;

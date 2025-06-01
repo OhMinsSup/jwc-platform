@@ -60,6 +60,8 @@ export const FormSchema = z.object({
 				message: "또래를 숫자 2자리로 입력해주세요. (예시: 00또래)",
 			}
 		),
+	attendanceDay: z.string().optional(),
+	attendanceTime: z.enum(["AM", "PM", "EVENING"]).optional(),
 });
 
 export type Form = z.infer<typeof FormSchema>;

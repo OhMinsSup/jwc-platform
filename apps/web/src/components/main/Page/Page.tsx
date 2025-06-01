@@ -52,6 +52,18 @@ const FormNumberOfStays = React.lazy(() =>
 	}))
 );
 
+const FormAttendanceDay = React.lazy(() =>
+	import("~/components/main/FormAttendanceDay").then((module) => ({
+		default: module.FormAttendanceDay,
+	}))
+);
+
+const FormAttendanceTime = React.lazy(() =>
+	import("~/components/main/FormAttendanceTime").then((module) => ({
+		default: module.FormAttendanceTime,
+	}))
+);
+
 const FormPickupDescription = React.lazy(() =>
 	import("~/components/main/FormPickupDescription").then((module) => ({
 		default: module.FormPickupDescription,
@@ -133,31 +145,43 @@ export const STEP_COMPONENTS = [
 	},
 	{
 		idx: 8,
+		key: "attendanceDay",
+		name: "FormAttendanceDay",
+		component: FormAttendanceDay,
+	},
+	{
+		idx: 9,
+		key: "attendanceTime",
+		name: "FormAttendanceTime",
+		component: FormAttendanceTime,
+	},
+	{
+		idx: 10,
 		key: "pickup",
 		name: "FormPickupDescription",
 		component: FormPickupDescription,
 	},
 	{
-		idx: 9,
+		idx: 11,
 		key: "carSupport",
 		name: "FormCarSupport",
 		component: FormCarSupport,
 	},
 	{
-		idx: 10,
+		idx: 12,
 		key: "carSupportContent",
 		name: "FormCarSupportContent",
 		component: FormCarSupportContent,
 	},
 	{
-		idx: 11,
+		idx: 13,
 		key: "paid",
 		name: "FormPaid",
 		component: FormPaid,
 	},
 ] as const;
 
-export const TOTAL_STEP_COUNT = 11;
+export const TOTAL_STEP_COUNT = 13;
 
 const CONFIRM_STEP = TOTAL_STEP_COUNT + 1;
 const COMPLETED_STEP = TOTAL_STEP_COUNT + 2;

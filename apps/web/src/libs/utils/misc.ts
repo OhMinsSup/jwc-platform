@@ -117,14 +117,46 @@ export const getIdxToText = (idx: number) => {
 		case 7:
 			return "참석하고 싶은 수련회 일정";
 		case 8:
-			return "픽업 상세내용";
+			return "참석 날짜";
 		case 9:
-			return "차량 지원 여부";
+			return "참석 시간";
 		case 10:
-			return "차량 지원 상세내용";
+			return "픽업 상세내용";
 		case 11:
+			return "차량 지원 여부";
+		case 12:
+			return "차량 지원 상세내용";
+		case 13:
 			return "회비 납부";
 		default:
 			return "알수없음";
 	}
 };
+
+export function formatAttendanceDay(value: unknown) {
+	switch (value) {
+		case "19":
+			return "6월 19일";
+		case "20":
+			return "6월 20일";
+		case "21":
+			return "6월 21일";
+		case "22":
+			return "6월 22일";
+		default:
+			return value || "";
+	}
+}
+
+export function formatAttendanceTime(value: unknown) {
+	switch (value) {
+		case "AM":
+			return "오전";
+		case "PM":
+			return "오후";
+		case "EVENING":
+			return "저녁";
+		default:
+			return value || "";
+	}
+}

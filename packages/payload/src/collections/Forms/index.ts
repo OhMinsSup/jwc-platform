@@ -294,6 +294,46 @@ export const Forms: CollectionConfig = {
 			type: "richText",
 		},
 		{
+			name: "attendanceDay",
+			type: "text",
+			label: {
+				ko: "참석 날짜",
+				en: "Attendance Day",
+			},
+		},
+		{
+			name: "attendanceTime",
+			type: "select",
+			defaultValue: "PM",
+			label: {
+				ko: "오전/오후",
+				en: "AM/PM",
+			},
+			options: [
+				{
+					value: "AM",
+					label: {
+						ko: "오전",
+						en: "AM",
+					},
+				},
+				{
+					value: "PM",
+					label: {
+						ko: "오후",
+						en: "PM",
+					},
+				},
+				{
+					value: "EVENING",
+					label: {
+						ko: "저녁",
+						en: "Evening",
+					},
+				},
+			],
+		},
+		{
 			name: "tshirtSize",
 			type: "select",
 			required: false,

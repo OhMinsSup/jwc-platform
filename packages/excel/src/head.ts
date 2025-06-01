@@ -103,6 +103,20 @@ export class ExcelHead {
 			options: ["3박4일", "2박3일", "1박2일", "무박"],
 		},
 		{
+			name: "참석 날짜",
+			key: "attendanceDay",
+			width: 100,
+			columnType: "DROPDOWN",
+			options: ["6월 19일", "6월 20일", "6월 21일", "6월 22일"],
+		},
+		{
+			name: "참석 시간",
+			key: "attendanceTime",
+			width: 100,
+			columnType: "DROPDOWN",
+			options: ["오전", "오후", "저녁"],
+		},
+		{
 			name: "TF팀 지원",
 			key: "tfTeam",
 			width: 80,
