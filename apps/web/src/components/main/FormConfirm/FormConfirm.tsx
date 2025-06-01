@@ -5,7 +5,7 @@ import { useStepAtomValue } from "~/atoms/stepAtom";
 import { type State, upsert } from "~/libs/actions/upsert.actions";
 import { useStepNavigation } from "~/libs/hooks/useStepNavigation";
 import { formatMaskPhoneNumber } from "~/libs/utils/formatMaskPhoneNumber";
-import { getIdxToText } from "~/libs/utils/misc";
+import { getDisplayValueByTitle, getIdxToText } from "~/libs/utils/misc";
 
 export default function FormConfirm() {
 	const { stepMap } = useStepAtomValue();
@@ -63,11 +63,7 @@ export default function FormConfirm() {
 										{key}. {title}
 									</div>
 									<div className="text-muted-foreground">
-										{title === "연락처"
-											? data
-												? formatMaskPhoneNumber(data)
-												: "입력된 정보가 없습니다."
-											: data || "입력된 정보가 없습니다."}
+										{getDisplayValueByTitle(title, data)}
 									</div>
 									<div className="mt-2 flex justify-end">
 										<Button

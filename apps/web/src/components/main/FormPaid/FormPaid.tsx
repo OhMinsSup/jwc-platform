@@ -126,8 +126,6 @@ export default function FormPaid({ idx }: LazyComponentProps) {
 				}
 				onSubmitAction={onSubmitAction}
 			/>
-			<br />
-			<Info />
 		</FormPaidContext>
 	);
 }

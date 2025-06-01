@@ -1,3 +1,5 @@
+import { formatMaskPhoneNumber } from "./formatMaskPhoneNumber";
+
 /**
  * 브라우저에서 DOM을 사용할 수 있는지 확인하는 함수입니다.
  */
@@ -130,6 +132,42 @@ export const getIdxToText = (idx: number) => {
 			return "회비 납부";
 		default:
 			return "알수없음";
+	}
+};
+
+export const getDisplayValueByTitle = (
+	title: ReturnType<typeof getIdxToText>,
+	data: string | undefined
+) => {
+	switch (title) {
+		case "이름":
+			return data || "입력된 정보가 없습니다.";
+		case "연락처":
+			return data ? formatMaskPhoneNumber(data) : "입력된 정보가 없습니다.";
+		case "성별":
+			return data || "입력된 정보가 없습니다.";
+		case "부서":
+			return data || "입력된 정보가 없습니다.";
+		case "또래":
+			return data || "입력된 정보가 없습니다.";
+		case "지원하고 싶은 TF팀":
+			return data || "입력된 정보가 없습니다.";
+		case "참석하고 싶은 수련회 일정":
+			return data || "입력된 정보가 없습니다.";
+		case "참석 날짜":
+			return formatAttendanceDay(data) as string;
+		case "참석 시간":
+			return formatAttendanceTime(data) as string;
+		case "픽업 상세내용":
+			return data || "입력된 정보가 없습니다.";
+		case "차량 지원 여부":
+			return data || "입력된 정보가 없습니다.";
+		case "차량 지원 상세내용":
+			return data || "입력된 정보가 없습니다.";
+		case "회비 납부":
+			return data || "입력된 정보가 없습니다.";
+		default:
+			return data || "입력된 정보가 없습니다.";
 	}
 };
 
