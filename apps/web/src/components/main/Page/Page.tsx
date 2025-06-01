@@ -220,7 +220,7 @@ export default function Page() {
 				exit={{ opacity: 0, y: 50 }}
 				transition={{ duration: 0.5 }}
 			>
-				{isFirstStep && <Welcome />}
+				{isFirstStep && <Welcome.Anmation />}
 				{!isFirstStep && !isConfirm && !isCompleted && (
 					<ConditionLazyRenderer
 						conditions={conditions}
