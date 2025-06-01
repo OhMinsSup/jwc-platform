@@ -31,6 +31,12 @@ export default withSentryConfig(
 
 		tunnelRoute: "/monitoring",
 
+		sourcemaps: {
+			disable: true,
+		},
+		// Automatically tree-shake Sentry logger statements to reduce bundle size
+		disableLogger: true,
+
 		reactComponentAnnotation: {
 			enabled: true,
 		},
