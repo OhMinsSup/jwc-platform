@@ -40,9 +40,8 @@ export default function ScrollSection({
 			<motion.div style={{ opacity, x }} className="flex-1 p-6">
 				<div className="mb-6">{icon}</div>
 				<h2 className="mb-4 font-bold text-3xl">{title}</h2>
-				<p className="text-gray-600 text-xl">{description}</p>
+				<p className="text-muted-foreground text-xl">{description}</p>
 			</motion.div>
-
 			{/* <motion.div style={{ opacity, x: x.get() * -1 }} className="flex-1 p-6">
 				<div className="overflow-hidden rounded-xl shadow-2xl">
 					<img

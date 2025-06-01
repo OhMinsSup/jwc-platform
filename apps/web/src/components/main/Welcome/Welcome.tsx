@@ -1,8 +1,8 @@
+"use client";
 import { Button, Icons, cn } from "@jwc/ui";
 import { motion } from "framer-motion";
 import React, { useRef } from "react";
 import { ScrollSection } from "~/components/common/ScrollSection";
-import Spotlight from "~/components/common/Spotlight/Spotight";
 import { useStepNavigation } from "~/libs/hooks/useStepNavigation";
 
 export default function Welcome() {
@@ -57,11 +57,6 @@ Welcome.Anmation = function WelcomeAnimation() {
 							"pointer-events-none absolute inset-0 select-none [background-size:40px_40px]"
 						)}
 					/>
-
-					<Spotlight
-						className="-top-40 md:-top-20 left-0 md:left-60"
-						fill="white"
-					/>
 					<motion.div
 						initial={{ opacity: 0, y: 20 }}
 						animate={{ opacity: 1, y: 0 }}
@@ -70,7 +65,9 @@ Welcome.Anmation = function WelcomeAnimation() {
 					>
 						<h1 className="bg-gradient-to-b bg-opacity-50 from-neutral-50 to-neutral-400 bg-clip-text text-center font-bold text-4xl text-transparent md:text-7xl">
 							돌돌갓 <br />
-							죽전우리교회 여름 수련회
+							죽전 우리 교회
+							<br />
+							여름 수련회
 						</h1>
 						<div className="mx-auto mt-4 flex max-w-lg items-center justify-center">
 							<Button type="button" onClick={goToNextStep}>
