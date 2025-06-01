@@ -60,7 +60,6 @@ export class GoogleSheetSyncer {
 
 	async syncSheet() {
 		const builder = gapi.setDocs(this.forms);
-		// await builder.syncGoogleSpreadsheet();
 		await builder.createGoogleSheetTable();
 	}
 

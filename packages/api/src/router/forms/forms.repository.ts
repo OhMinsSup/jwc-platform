@@ -78,15 +78,4 @@ export class FormsRepository {
 
 		return exists.at(-1) as unknown as Promise<(TypeWithID & Form) | undefined>;
 	}
-
-	/**
-	 * 폼 목록을 가져옵니다.
-	 * @param options - 검색 조건
-	 */
-	async findForms(options?: Where) {
-		return await this.payload.find({
-			collection: "forms",
-			where: options,
-		});
-	}
 }

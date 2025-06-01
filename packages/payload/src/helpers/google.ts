@@ -2,7 +2,6 @@ import { Readable } from "node:stream";
 import { ExcelManager } from "@jwc/excel";
 import { env } from "@jwc/payload/env";
 import { JWT } from "google-auth-library";
-import { GoogleSpreadsheet } from "google-spreadsheet";
 import { type drive_v3, google } from "googleapis";
 import type { Form, Permission, PickDeepNonNullable } from "../types";
 import { buildExcelFileBuffer } from "./excel";
@@ -169,16 +168,6 @@ export class GoogleSheetBuilder<T extends Record<string, unknown>> {
 			range: `${this.sheetName}`,
 		});
 
-		// 데이터 입력
-		// await apiClient.sheets.spreadsheets.values.update({
-		// 	spreadsheetId: env.GOOGLE_SHEET_ID,
-		// 	range: `${this.sheetName}!A1`,
-		// 	valueInputOption: "USER_ENTERED",
-		// 	resource: {
-		// 		values: [headers, ...rows],
-		// 	},
-		// });
-
 		await apiClient.sheets.spreadsheets.values.update({
 			spreadsheetId: env.GOOGLE_SHEET_ID,
 			range: `${this.sheetName}!A1`,
@@ -261,160 +250,6 @@ export class GoogleSheetBuilder<T extends Record<string, unknown>> {
 
 	async createGoogleSheetTable() {
 		await this.upsertGoogleSheetTable();
-	}
-
-	// /**
-	//  * 구글 시트에 표(테이블) 객체를 생성합니다.
-	//  * @returns Promise<void>
-	//  */
-	// async createGoogleSheetTable(): Promise<void> {
-	// 	const $excel = new ExcelManager();
-	// 	const headerValues = $excel.head.createFormGoogleSheetHeaders();
-	// 	const rowValues = $excel.rowData.generateExcelFormRows(this.docs);
-	// 	const headers = headerValues.map((header) => header.name);
-	// 	const rows = rowValues.map((row) =>
-	// 		headers.map((header) => row[header as keyof typeof row] ?? "")
-	// 	);
-
-	// 	// 1. 데이터 입력
-	// 	await apiClient.sheets.spreadsheets.values.update({
-	// 		spreadsheetId: env.GOOGLE_SHEET_ID,
-	// 		range: `A1:${String.fromCharCode(65 + headers.length - 1)}${rows.length + 1}`,
-	// 		valueInputOption: "RAW",
-	// 		requestBody: {
-	// 			values: [headers, ...rows],
-	// 		},
-	// 	});
-
-	// 	// 2. 시트 ID 조회
-	// 	const meta = await apiClient.sheets.spreadsheets.get({
-	// 		spreadsheetId: env.GOOGLE_SHEET_ID,
-	// 	});
-	// 	const sheet = meta.data.sheets?.find(
-	// 		(s) => s.properties?.title === this.sheetName
-	// 	);
-	// 	if (!sheet || sheet.properties?.sheetId === undefined) {
-	// 		throw new Error(`시트 "${this.sheetName}"을 찾을 수 없습니다.`);
-	// 	}
-	// 	const sheetId = sheet.properties.sheetId;
-
-	// 	// 이미 테이블이 존재하는지 확인 (2024년 이후 Table API 지원)
-	// 	const tableId = sheet.tables?.at(-1)?.tableId;
-	// 	const tableName = tableId ? "updateTable" : "addTable";
-
-	// 	// 3. 테이블 객체 생성 (공식 Table API)
-	// 	await apiClient.sheets.spreadsheets.batchUpdate({
-	// 		spreadsheetId: env.GOOGLE_SHEET_ID,
-	// 		requestBody: {
-	// 			requests: [
-	// 				{
-	// 					[tableName]: {
-	// 						...(tableName === "updateTable" && tableId
-	// 							? { fields: "*" }
-	// 							: {}),
-	// 						table: {
-	// 							name: this.sheetName,
-	// 							...(tableName === "updateTable" && tableId ? { tableId } : {}),
-	// 							range: {
-	// 								sheetId,
-	// 								startRowIndex: 0,
-	// 								endRowIndex: rows.length + 1,
-	// 								startColumnIndex: 0,
-	// 								endColumnIndex: headers.length,
-	// 							},
-	// 							columnProperties: headerValues.map((header, idx) => ({
-	// 								columnName: header.name,
-	// 								columnType: header.columnType,
-	// 								columnIndex: idx,
-	// 								...(header.columnType === "DROPDOWN" &&
-	// 									header.options && {
-	// 										dataValidationRule: {
-	// 											condition: {
-	// 												type: "ONE_OF_LIST",
-	// 												values: header.options.map((option) => ({
-	// 													userEnteredValue: option,
-	// 												})),
-	// 											},
-	// 										},
-	// 									}),
-	// 							})),
-	// 						},
-	// 					},
-	// 				},
-	// 			],
-	// 		},
-	// 	});
-	// }
-
-	/**
-	 * 구글 시트에 데이터를 입력하고 스타일을 적용합니다.
-	 * @returns Promise<void>
-	 */
-	async syncGoogleSpreadsheet(): Promise<void> {
-		const $excel = new ExcelManager();
-		const headers = Array.from(
-			new Set($excel.head.createFormGoogleSheetHeaders())
-		);
-		const rows = $excel.rowData.generateExcelFormRows(this.docs);
-
-		const spreadsheet = new GoogleSpreadsheet(
-			env.GOOGLE_SHEET_ID,
-			apiClient.auth
-		);
-		await spreadsheet.loadInfo();
-
-		let sheet = spreadsheet.sheetsByTitle[this.sheetName];
-		let isNewSheet = false;
-		if (!sheet) {
-			isNewSheet = true;
-			sheet = await spreadsheet.addSheet({
-				title: this.sheetName,
-				headerValues: headers.map((header) => header.name),
-			});
-		}
-
-		await sheet.clearRows();
-		if (!isNewSheet) {
-			await sheet.setHeaderRow(headers.map((header) => header.name));
-		}
-		await sheet.addRows(rows);
-
-		const columnCount = headers.length;
-		const rowCount = rows.length + 1;
-
-		await apiClient.sheets.spreadsheets.batchUpdate({
-			spreadsheetId: env.GOOGLE_SHEET_ID,
-			requestBody: {
-				requests: [
-					{
-						repeatCell: {
-							range: {
-								sheetId: sheet.sheetId,
-								startRowIndex: 0,
-								endRowIndex: 1,
-								startColumnIndex: 0,
-								endColumnIndex: columnCount,
-							},
-							cell: { userEnteredFormat: GoogleSheetStyle.headerFormat },
-							fields:
-								"userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,borders)",
-						},
-					},
-					{
-						updateBorders: {
-							range: {
-								sheetId: sheet.sheetId,
-								startRowIndex: 0,
-								endRowIndex: rowCount,
-								startColumnIndex: 0,
-								endColumnIndex: columnCount,
-							},
-							...GoogleSheetStyle.borderFormat,
-						},
-					},
-				],
-			},
-		});
 	}
 
 	/**
