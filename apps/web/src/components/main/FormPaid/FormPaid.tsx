@@ -17,6 +17,32 @@ import { env } from "~/env";
 import { useCopyToClipboard } from "~/libs/hooks/useCopyToClipboard";
 import { useStepSubmitAction } from "~/libs/hooks/useStepSubmitAction";
 
+function Info() {
+	return (
+		<div className="mt-3 grid gap-3">
+			<div className="font-semibold">회비</div>
+			<dl className="grid gap-3">
+				<div className="flex items-center justify-between">
+					<dt className="text-muted-foreground">전체참여(3박4일)</dt>
+					<dd>6만원</dd>
+				</div>
+				<div className="flex items-center justify-between">
+					<dt className="text-muted-foreground">부분참석(2박3일)</dt>
+					<dd>5만원</dd>
+				</div>
+				<div className="flex items-center justify-between">
+					<dt className="text-muted-foreground">부분참석(1박2일)</dt>
+					<dd>4만원</dd>
+				</div>
+				<div className="flex items-center justify-between">
+					<dt className="text-muted-foreground">부분참석(무박)</dt>
+					<dd>3만원</dd>
+				</div>
+			</dl>
+		</div>
+	);
+}
+
 function InfoPopover() {
 	return (
 		<Popover>
@@ -26,23 +52,7 @@ function InfoPopover() {
 				</Button>
 			</PopoverTrigger>
 			<PopoverContent className="w-80">
-				<div className="mt-3 grid gap-3">
-					<div className="font-semibold">회비</div>
-					<dl className="grid gap-3">
-						<div className="flex items-center justify-between">
-							<dt className="text-muted-foreground">전체참여(3박4일)</dt>
-							<dd>6만원</dd>
-						</div>
-						<div className="flex items-center justify-between">
-							<dt className="text-muted-foreground">부분참석(2박3일)</dt>
-							<dd>5만원</dd>
-						</div>
-						<div className="flex items-center justify-between">
-							<dt className="text-muted-foreground">부분참석(1박2일)</dt>
-							<dd>4만원</dd>
-						</div>
-					</dl>
-				</div>
+				<Info />
 			</PopoverContent>
 		</Popover>
 	);
@@ -102,7 +112,7 @@ export default function FormPaid({ idx }: LazyComponentProps) {
 				label="회비를 납부하셨나요? 납부 하셨다면 체크해주세요."
 				afterLabel={
 					<div className="flex flex-row gap-2">
-						{/* <InfoPopover /> */}
+						<InfoPopover />
 						<CopyButton />
 					</div>
 				}
@@ -116,6 +126,8 @@ export default function FormPaid({ idx }: LazyComponentProps) {
 				}
 				onSubmitAction={onSubmitAction}
 			/>
+			<br />
+			<Info />
 		</FormPaidContext>
 	);
 }

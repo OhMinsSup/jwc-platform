@@ -19,7 +19,7 @@ export default function FormPickupDescription({ idx }: LazyComponentProps) {
 				description={
 					<>
 						부분참일 경우 참석 가능한 시간 혹은 픽업을 원하는 시간을 구체적으로
-						적어주세요. <br />
+						적어주세요.
 						<strong>
 							<br />
 							예시) 28일 12시에 교회 도착
