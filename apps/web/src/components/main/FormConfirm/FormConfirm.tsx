@@ -4,7 +4,6 @@ import React, { useActionState, useEffect } from "react";
 import { useStepAtomValue } from "~/atoms/stepAtom";
 import { type State, upsert } from "~/libs/actions/upsert.actions";
 import { useStepNavigation } from "~/libs/hooks/useStepNavigation";
-import { formatMaskPhoneNumber } from "~/libs/utils/formatMaskPhoneNumber";
 import { getDisplayValueByTitle, getIdxToText } from "~/libs/utils/misc";
 
 export default function FormConfirm() {

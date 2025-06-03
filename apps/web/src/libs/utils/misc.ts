@@ -1,3 +1,8 @@
+import {
+	formatAttendanceDay,
+	formatAttendanceTime,
+	formatTshirtSizeText,
+} from "@jwc/utils/format";
 import { formatMaskPhoneNumber } from "./formatMaskPhoneNumber";
 
 /**
@@ -137,6 +142,41 @@ export const getIdxToText = (idx: number) => {
 	}
 };
 
+export const getKeyToText = (key: string) => {
+	switch (key) {
+		case "name":
+			return "이름";
+		case "phone":
+			return "연락처";
+		case "gender":
+			return "성별";
+		case "department":
+			return "부서";
+		case "ageGroup":
+			return "또래";
+		case "tshirtSize":
+			return "티셔츠 사이즈";
+		case "tfTeam":
+			return "지원하고 싶은 TF팀";
+		case "numberOfStays":
+			return "참석하고 싶은 수련회 일정";
+		case "attendanceDay":
+			return "참석 날짜";
+		case "attendanceTime":
+			return "참석 시간";
+		case "pickup":
+			return "픽업 상세내용";
+		case "carSupport":
+			return "차량 지원 여부";
+		case "carSupportContent":
+			return "차량 지원 상세내용";
+		case "paid":
+			return "회비 납부";
+		default:
+			return "알수없음";
+	}
+};
+
 export const getDisplayValueByTitle = (
 	title: ReturnType<typeof getIdxToText>,
 	data: string | undefined
@@ -174,56 +214,9 @@ export const getDisplayValueByTitle = (
 			return data || "입력된 정보가 없습니다.";
 		case "티셔츠 사이즈":
 			return data
-				? (formatTshirtSize(data) as string)
+				? (formatTshirtSizeText(data) as string)
 				: "입력된 정보가 없습니다.";
 		default:
 			return data || "입력된 정보가 없습니다.";
 	}
 };
-
-export function formatAttendanceDay(value: unknown) {
-	switch (value) {
-		case "19":
-			return "6월 19일";
-		case "20":
-			return "6월 20일";
-		case "21":
-			return "6월 21일";
-		case "22":
-			return "6월 22일";
-		default:
-			return value || "";
-	}
-}
-
-export function formatAttendanceTime(value: unknown) {
-	switch (value) {
-		case "AM":
-			return "오전";
-		case "PM":
-			return "오후";
-		case "EVENING":
-			return "저녁";
-		default:
-			return value || "";
-	}
-}
-
-export function formatTshirtSize(value: unknown) {
-	switch (value) {
-		case "s":
-			return "S 사이즈";
-		case "m":
-			return "M 사이즈";
-		case "l":
-			return "L 사이즈";
-		case "xl":
-			return "XL 사이즈";
-		case "2xl":
-			return "XXL 사이즈";
-		case "3xl":
-			return "XXXL 사이즈";
-		default:
-			return value || "";
-	}
-}

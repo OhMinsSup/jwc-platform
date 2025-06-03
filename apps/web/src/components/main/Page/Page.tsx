@@ -1,6 +1,7 @@
 "use client";
 import { AnimatePresence, motion } from "framer-motion";
 import React, { Suspense, useMemo } from "react";
+import { Show } from "react-smart-conditional";
 import { useStepAtomValue } from "~/atoms/stepAtom";
 import { ConditionLazyRenderer } from "~/components/common/ConditionLazyRenderer";
 import {
@@ -232,39 +233,43 @@ export default function Page() {
 				exit={{ opacity: 0, y: 50 }}
 				transition={{ duration: 0.5 }}
 			>
-				{isFirstStep && <Welcome.Anmation />}
-				{!isFirstStep && !isConfirm && !isCompleted && (
-					<ConditionLazyRenderer
-						conditions={conditions}
-						componentMap={componentMap}
-					/>
-				)}
-				{isConfirm && (
-					<ErrorBoundary
-						fallback={BaseErrorFallback}
-						beforeCapture={(scope) => {
-							scope.setTag("conditionLazyRendererKey", "confirm");
-							scope.setTag("conditionLazyRendererIdx", CONFIRM_STEP);
-						}}
-					>
-						<Suspense fallback={<FormSkeleton />}>
-							<FormConfirm />
-						</Suspense>
-					</ErrorBoundary>
-				)}
-				{isCompleted && (
-					<ErrorBoundary
-						fallback={BaseErrorFallback}
-						beforeCapture={(scope) => {
-							scope.setTag("conditionLazyRendererKey", "completed");
-							scope.setTag("conditionLazyRendererIdx", COMPLETED_STEP);
-						}}
-					>
-						<Suspense fallback={<FormSkeleton />}>
-							<Completed />
-						</Suspense>
-					</ErrorBoundary>
-				)}
+				<Show>
+					<Show.If condition={isFirstStep}>
+						<Welcome.Anmation />
+					</Show.If>
+					<Show.If condition={isConfirm}>
+						<ErrorBoundary
+							fallback={BaseErrorFallback}
+							beforeCapture={(scope) => {
+								scope.setTag("conditionLazyRendererKey", "confirm");
+								scope.setTag("conditionLazyRendererIdx", CONFIRM_STEP);
+							}}
+						>
+							<Suspense fallback={<FormSkeleton />}>
+								<FormConfirm />
+							</Suspense>
+						</ErrorBoundary>
+					</Show.If>
+					<Show.If condition={isCompleted}>
+						<ErrorBoundary
+							fallback={BaseErrorFallback}
+							beforeCapture={(scope) => {
+								scope.setTag("conditionLazyRendererKey", "completed");
+								scope.setTag("conditionLazyRendererIdx", COMPLETED_STEP);
+							}}
+						>
+							<Suspense fallback={<FormSkeleton />}>
+								<Completed />
+							</Suspense>
+						</ErrorBoundary>
+					</Show.If>
+					<Show.Else>
+						<ConditionLazyRenderer
+							conditions={conditions}
+							componentMap={componentMap}
+						/>
+					</Show.Else>
+				</Show>
 			</motion.div>
 		</AnimatePresence>
 	);

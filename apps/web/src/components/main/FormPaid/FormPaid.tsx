@@ -7,14 +7,11 @@ import {
 	PopoverTrigger,
 } from "@jwc/ui";
 import type React from "react";
-import { useCallback, useTransition } from "react";
-import { toast } from "sonner";
 import type { LazyComponentProps } from "~/components/common/ConditionLazyRenderer/ConditionLazyRenderer";
 import { FormPaidContext } from "~/components/forms/FormContext";
 import type { FormFieldSchema } from "~/components/forms/FormContext/FormPaidContext";
 import { SwitchFieldForm } from "~/components/forms/SwitchFieldForm";
-import { env } from "~/env";
-import { useCopyToClipboard } from "~/libs/hooks/useCopyToClipboard";
+import { useCopyAccountNumber } from "~/libs/hooks/useCopyAddress";
 import { useStepSubmitAction } from "~/libs/hooks/useStepSubmitAction";
 
 function Info() {
@@ -59,23 +56,7 @@ function InfoPopover() {
 }
 
 function CopyButton() {
-	const [isPending, startTransition] = useTransition();
-
-	const { copy, copiedText } = useCopyToClipboard({
-		onSuccess: () => {
-			toast(
-				<p className="leading-7 [&:not(:first-child)]:mt-6">
-					✅ 회비 납입 계좌번호가 복사되었습니다.
-				</p>
-			);
-		},
-	});
-
-	const onCopy = useCallback(() => {
-		startTransition(async () => {
-			await copy(env.NEXT_PUBLIC_PAID_ACCOUNT_NUMBER);
-		});
-	}, [copy]);
+	const { isPending, copiedText, onCopy } = useCopyAccountNumber();
 
 	return (
 		<Button
