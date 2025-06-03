@@ -1,3 +1,4 @@
+import { getDepartmentOptions } from "@jwc/utils/options";
 import React from "react";
 import type { LazyComponentProps } from "~/components/common/ConditionLazyRenderer/ConditionLazyRenderer";
 import { FormDepartmentContext } from "~/components/forms/FormContext";
@@ -17,20 +18,7 @@ export default function FormDepartment({ idx }: LazyComponentProps) {
 				isLoading={isLoading}
 				required
 				onSubmitAction={onSubmitAction}
-				options={[
-					{
-						name: "청년 1부",
-						value: "청년1부",
-					},
-					{
-						name: "청년 2부",
-						value: "청년2부",
-					},
-					{
-						name: "기타",
-						value: "기타",
-					},
-				]}
+				options={getDepartmentOptions()}
 			/>
 		</FormDepartmentContext>
 	);

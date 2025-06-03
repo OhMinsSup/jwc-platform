@@ -1,10 +1,10 @@
 "use server";
+import { gapi } from "@jwc/google";
 import { configurePayload } from "@jwc/payload/configurePayload";
 import { env } from "@jwc/payload/env";
 import * as Sentry from "@sentry/nextjs";
 import { headers } from "next/headers";
 import { getPayload } from "payload";
-import { GoogleSheetSyncer } from "./googleSheetSyncer";
 
 export type State = {
 	readonly success: boolean;
@@ -15,22 +15,16 @@ export async function serverAction(_: State): Promise<NonNullable<State>> {
 	const payload = await getPayload({ config: configurePayload() });
 
 	try {
-		const forms = await GoogleSheetSyncer.getForms(payload);
+		const { docs } = await payload.find({
+			collection: "forms",
+			limit: 100,
+		});
 
-		if (!forms.length) {
-			return {
-				success: false,
-				message: "No forms found to sync with Google Sheets.",
-			} as const;
-		}
-
-		const syncer = new GoogleSheetSyncer().setForms(forms).setPayload(payload);
-
-		await syncer.sync("sheet");
+		await gapi.setDocs(docs).upsertGoogleSheetTable();
 
 		return {
 			success: true,
-			message: "Google Sheet Sync Success",
+			message: `Successfully synced ${docs.length} forms to Google Sheets.`,
 		};
 	} catch (error) {
 		if (env.NODE_ENV === "development") {

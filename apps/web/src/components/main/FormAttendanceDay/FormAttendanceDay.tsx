@@ -1,3 +1,4 @@
+import { getAttendanceDayOptions } from "@jwc/utils/options";
 import React from "react";
 import type { LazyComponentProps } from "~/components/common/ConditionLazyRenderer/ConditionLazyRenderer";
 import { FormAttendanceDayContext } from "~/components/forms/FormContext";
@@ -16,24 +17,7 @@ export default function FormAttendanceDay({ idx }: LazyComponentProps) {
 				label="참석하고 싶은 수련회 참석 가능 일정은 언제인가요?"
 				isLoading={isLoading}
 				onSubmitAction={onSubmitAction}
-				options={[
-					{
-						name: "6월 19일",
-						value: "19",
-					},
-					{
-						name: "6월 20일",
-						value: "20",
-					},
-					{
-						name: "6월 21일",
-						value: "21",
-					},
-					{
-						name: "6월 22일",
-						value: "22",
-					},
-				]}
+				options={getAttendanceDayOptions()}
 			/>
 		</FormAttendanceDayContext>
 	);

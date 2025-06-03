@@ -1,26 +1,27 @@
 {
-	"name": "@jwc/utils",
+	"name": "@jwc/google",
 	"private": true,
 	"version": "0.1.0",
 	"type": "module",
 	"exports": {
 		"./package.json": "./package.json",
-		"./date": "./src/date/index.ts",
-		"./format": "./src/format/index.ts",
-		"./options": "./src/options/index.ts"
+		".": "./src/index.ts"
 	},
 	"license": "MIT",
 	"scripts": {
 		"clean": "git clean -xdf .cache .turbo dist node_modules",
-		"format": "biome format --write ./src",
-		"lint": "biome lint --error-on-warnings ./src",
+		"format": "biome format --write *.ts",
+		"lint": "biome lint --error-on-warnings *.ts",
 		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@jwc/env": "workspace:*",
+		"@jwc/excel": "workspace:*",
+		"google-auth-library": "^9.15.1",
+		"googleapis": "^149.0.0"
 	},
 	"devDependencies": {
 		"@jwc/tsconfig": "workspace:*",
 		"typescript": "catalog:"
-	},
-	"dependencies": {
-		"dayjs": "^1.11.13"
 	}
 }

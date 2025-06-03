@@ -30,6 +30,7 @@
 	"dependencies": {
 		"@jwc/env": "workspace:*",
 		"@jwc/excel": "workspace:*",
+		"@jwc/google": "workspace:*",
 		"@jwc/utils": "workspace:*",
 		"@payloadcms/db-postgres": "catalog:payload",
 		"@payloadcms/live-preview-react": "catalog:payload",

@@ -1,3 +1,4 @@
+import { getGenderOptions } from "@jwc/utils/options";
 import React from "react";
 import type { LazyComponentProps } from "~/components/common/ConditionLazyRenderer/ConditionLazyRenderer";
 import { FormGenderContext } from "~/components/forms/FormContext";
@@ -17,16 +18,7 @@ export default function FormGender({ idx }: LazyComponentProps) {
 				isLoading={isLoading}
 				required
 				onSubmitAction={onSubmitAction}
-				options={[
-					{
-						name: "남성",
-						value: "남성",
-					},
-					{
-						name: "여성",
-						value: "여성",
-					},
-				]}
+				options={getGenderOptions()}
 			/>
 		</FormGenderContext>
 	);

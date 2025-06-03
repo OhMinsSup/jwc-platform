@@ -1,6 +1,6 @@
 import * as R from "remeda";
 
-import { GoogleSheetSyncer } from "@jwc/payload/actions/googleSheetSyncer";
+import { gapi } from "@jwc/google";
 import { env } from "@jwc/payload/env";
 import * as Sentry from "@sentry/nextjs";
 import type { CollectionAfterChangeHook } from "payload";
@@ -11,11 +11,14 @@ export const syncGoogleSheet: CollectionAfterChangeHook<Form> = async ({
 	req,
 }) => {
 	try {
-		const forms = await GoogleSheetSyncer.getForms(req.payload);
+		const { docs } = await req.payload.find({
+			collection: "forms",
+			limit: 100,
+		});
 
 		// id가 같은 항목이 있으면 값이 다를 때만 교체, 없으면 추가
-		const newForms = R.pipe(
-			forms,
+		const meredDocs = R.pipe(
+			docs as Form[],
 			R.mapToObj((f) => [f.id, f]),
 			(obj) => {
 				const prev = obj[doc.id];
@@ -31,11 +34,7 @@ export const syncGoogleSheet: CollectionAfterChangeHook<Form> = async ({
 			R.sortBy((f) => new Date(f.createdAt).getTime()) // 타임스탬프 내림차순 정렬
 		);
 
-		const syncer = new GoogleSheetSyncer()
-			.setForms(newForms)
-			.setPayload(req.payload);
-
-		await syncer.sync("sheet");
+		await gapi.setDocs(meredDocs).upsertGoogleSheetTable();
 	} catch (error) {
 		if (env.NODE_ENV === "development") {
 			req.payload.logger.error(error);

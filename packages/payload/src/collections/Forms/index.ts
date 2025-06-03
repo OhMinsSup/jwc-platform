@@ -1,10 +1,7 @@
+import { ExcelManager } from "@jwc/excel";
 import { authenticated } from "@jwc/payload/access/authenticated";
-import { buildExcelFileBuffer } from "@jwc/payload/helpers/excel";
 import { decryptFieldValue } from "@jwc/payload/hooks/decryptFieldValue";
 import { encryptFieldValue } from "@jwc/payload/hooks/encryptFieldValue";
-import { formatAttendanceDay } from "@jwc/payload/hooks/formatAttendanceDay";
-import { formatAttendanceTime } from "@jwc/payload/hooks/formatAttendanceTime";
-import { formatFormUserFullName } from "@jwc/payload/hooks/formatFormUserFullName";
 import { syncGoogleSheet } from "@jwc/payload/hooks/syncGoogleSheet";
 import type { CollectionConfig } from "payload";
 
@@ -48,7 +45,7 @@ export const Forms: CollectionConfig = {
 						req,
 					});
 
-					const buffer = await buildExcelFileBuffer(
+					const buffer = await ExcelManager.buildExcelFileBuffer(
 						"청년부 연합 여름 수련회 참가자 명단",
 						docs
 					);
@@ -84,9 +81,6 @@ export const Forms: CollectionConfig = {
 					en: "Please enter your name",
 				},
 				readOnly: true,
-			},
-			hooks: {
-				afterRead: [formatFormUserFullName],
 			},
 			required: true,
 			maxLength: 100,
@@ -302,9 +296,6 @@ export const Forms: CollectionConfig = {
 				ko: "참석 날짜",
 				en: "Attendance Day",
 			},
-			hooks: {
-				afterRead: [formatAttendanceDay],
-			},
 		},
 		{
 			name: "attendanceTime",
@@ -337,9 +328,6 @@ export const Forms: CollectionConfig = {
 					},
 				},
 			],
-			hooks: {
-				afterRead: [formatAttendanceTime],
-			},
 		},
 		{
 			name: "tshirtSize",

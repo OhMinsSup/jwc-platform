@@ -3,7 +3,7 @@ import * as Excel from "exceljs";
 import { ExcelHead } from "./head";
 import { ExcelRowData } from "./rowData";
 import { ExcelStyle } from "./style";
-import type { GenerateExcelOptions } from "./types";
+import type { ExcelHeaders, GenerateExcelOptions } from "./types";
 
 /**
  * Excel 파일 생성 및 관리 유틸리티 클래스
@@ -123,5 +123,60 @@ export class ExcelManager {
 	 */
 	get style(): ExcelStyle {
 		return this._style;
+	}
+
+	/**
+	 * 주어진 데이터 배열을 기반으로 Excel 파일을 생성하고, 파일 버퍼(Buffer)를 반환합니다.
+	 *
+	 * @static
+	 * @typeParam Data - Excel에 기록할 데이터 객체 타입 (Record<string, unknown> 기본값)
+	 * @param name - 시트 이름(Excel 파일 내 시트명)
+	 * @param docs - Excel로 변환할 데이터 객체 배열
+	 * @returns 생성된 Excel 파일의 Buffer
+	 *
+	 * @example
+	 * const buffer = await ExcelManager.buildExcelFileBuffer("Sheet1", dataArray);
+	 */
+	static async buildExcelFileBuffer<
+		Data extends Record<string, unknown> = Record<string, unknown>,
+	>(name: string, docs: Data[]): Promise<Buffer> {
+		const excelManager = new ExcelManager();
+
+		try {
+			const workbook = excelManager.createWorkbook();
+			const sheet = excelManager.createSheet(workbook, name);
+
+			const headers = excelManager.head.createFormSheetHeaders();
+			const rows = excelManager.rowData.generateExcelFormRows(docs);
+
+			excelManager.generateExcel({
+				workbook,
+				sheet,
+				headers,
+				rows,
+			});
+
+			const buffer = await workbook.xlsx.writeBuffer();
+
+			return buffer as Buffer;
+		} finally {
+			excelManager.destroyWorkbook();
+		}
+	}
+
+	/**
+	 * Google Sheets용 헤더 객체 배열을 생성합니다.
+	 *
+	 * 신청서 시트의 헤더 정보를 기반으로 Google Sheets에 적합한 헤더 배열을 반환합니다.
+	 * (순서 컬럼 제외)
+	 *
+	 * @static
+	 * @returns Google Sheets용 ExcelHeaders 배열
+	 *
+	 * @example
+	 * const headers = ExcelManager.createFormGoogleSheetHeaders();
+	 */
+	static createFormGoogleSheetHeaders(): ExcelHeaders {
+		return new ExcelHead().createFormGoogleSheetHeaders();
 	}
 }

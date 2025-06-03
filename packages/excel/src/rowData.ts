@@ -1,3 +1,9 @@
+import {
+	formatAttendanceDay,
+	formatAttendanceTime,
+	formatName,
+	formatTshirtSizeText,
+} from "@jwc/utils/format";
 import type { RowFormData } from "./types";
 
 /**
@@ -14,22 +20,17 @@ export class ExcelRowData<
 	 * @param doc - 신청서 데이터 객체
 	 * @returns 변환된 Excel 행 데이터(RowFormData)
 	 */
-	generateExcelFormRow(doc: Data): RowFormData {
+	generateExcelFormRow(doc: Data, index: number): RowFormData {
 		return {
-			타임스탬프:
-				typeof doc.createdAt === "string" || typeof doc.createdAt === "number"
-					? new Date(doc.createdAt).toLocaleString("ko-KR", {
-							timeZone: "Asia/Seoul",
-						})
-					: "",
-			이름: doc.name || "",
+			...(index !== undefined ? { 순서: index } : {}),
+			이름: formatName(doc),
 			또래모임: doc.ageGroup || "",
 			연락처: doc.phone || "",
 			성별: doc.gender,
 			부서: doc.department,
-			"단체티 사이즈": doc.tshirtSize || "",
-			"참석 날짜": doc.attendanceDay ?? "",
-			"참석 시간": doc.attendanceTime ?? "",
+			"단체티 사이즈": formatTshirtSizeText(doc.tshirtSize),
+			"참석 날짜": formatAttendanceDay(doc.attendanceDay),
+			"참석 시간": formatAttendanceTime(doc.attendanceTime),
 			"픽업 가능 시간": doc.pickupTimeDesc ?? "",
 			"회비 납입 여부": doc.isPaid ? "납입" : "미납",
 			"참석 형태": doc.numberOfStays,
@@ -52,7 +53,8 @@ export class ExcelRowData<
 		for (const item of data) {
 			const id = (item as Record<string, unknown>).id as string | undefined;
 			if (!id || !seen.has(id)) {
-				rawData.push(this.generateExcelFormRow(item));
+				const index = rawData.length + 1; // 순서
+				rawData.push(this.generateExcelFormRow(item, index));
 				if (id) seen.add(id);
 			}
 		}
