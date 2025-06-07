@@ -5,6 +5,7 @@ import type * as Excel from "exceljs";
  * 각 필드는 시트의 컬럼명과 1:1로 매핑됩니다.
  */
 export type RowFormData = {
+	ID: string | number;
 	타임스탬프: string;
 	이름: string;
 	또래모임: string;

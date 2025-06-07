@@ -18,6 +18,7 @@ export async function serverAction(_: State): Promise<NonNullable<State>> {
 		const { docs } = await payload.find({
 			collection: "forms",
 			limit: 100,
+			sort: "-createdAt",
 		});
 
 		await gapi.setDocs(docs).upsertGoogleSheetTable();

@@ -12,6 +12,7 @@ import { buildConfig, deepMerge } from "payload";
 
 import { en } from "payload/i18n/en";
 import { ko } from "payload/i18n/ko";
+// import { syncGoogleSheetEndpoints } from "./endpoints/syncGoogleSheet.endpoints";
 import { env } from "./env";
 
 const filename = fileURLToPath(import.meta.url);
@@ -45,6 +46,13 @@ const baseConfig: Config = {
 		}),
 	],
 	secret: env.PAYLOAD_PRIVATE_SECRET,
+	// endpoints: [
+	// 	{
+	// 		path: "/sync/google-sheet",
+	// 		method: "post",
+	// 		handler: syncGoogleSheetEndpoints,
+	// 	},
+	// ],
 };
 
 export const configurePayload = (overrides?: Partial<Config>) => {

@@ -21,6 +21,12 @@ export class ExcelHead {
 	 */
 	private _headers: ExcelHeaders = [
 		{
+			name: "ID",
+			key: "id",
+			width: 50,
+			columnType: "DOUBLE",
+		},
+		{
 			name: "순서",
 			width: 50,
 			columnType: "DOUBLE",
@@ -158,6 +164,22 @@ export class ExcelHead {
 			name: header.name,
 			width: this._pixelToExcelWidth(header.width),
 		};
+	}
+
+	/**
+	 * 주어진 이름(name)에 해당하는 ExcelHeader 객체를 반환합니다.
+	 *
+	 * @param name - 찾고자 하는 헤더의 이름
+	 * @returns 일치하는 ExcelHeader 객체 또는 undefined
+	 *
+	 * @example
+	 * const header = excelHead.findHeaderByName("이름");
+	 * if (header) {
+	 *   console.log(header.key); // "name"
+	 * }
+	 */
+	findHeaderByName(name: string): ExcelHeader | undefined {
+		return this._headers.find((header) => header.name === name);
 	}
 
 	/**

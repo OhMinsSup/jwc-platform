@@ -23,6 +23,7 @@ export class ExcelRowData<
 	generateExcelFormRow(doc: Data, index: number): RowFormData {
 		return {
 			...(index !== undefined ? { 순서: index } : {}),
+			ID: doc.id || "",
 			이름: formatName(doc),
 			또래모임: doc.ageGroup || "",
 			연락처: doc.phone || "",
@@ -48,10 +49,13 @@ export class ExcelRowData<
 	 * @returns 중복이 제거된 Excel 행 데이터 배열
 	 */
 	generateExcelFormRows(data: Data[]): RowFormData[] {
-		const seen = new Set<string>();
+		const seen = new Set<string | number>();
 		const rawData: RowFormData[] = [];
 		for (const item of data) {
-			const id = (item as Record<string, unknown>).id as string | undefined;
+			const id = (item as Record<string, unknown>).id as
+				| string
+				| number
+				| undefined;
 			if (!id || !seen.has(id)) {
 				const index = rawData.length + 1; // 순서
 				rawData.push(this.generateExcelFormRow(item, index));
