@@ -1,6 +1,11 @@
 import { ExcelManager } from "@jwc/excel";
 import { gapi } from "@jwc/google";
 import { env } from "@jwc/payload/env";
+import {
+	parseAttendanceDay,
+	parseAttendanceTime,
+	parseTshirtSizeText,
+} from "@jwc/utils/format";
 import * as Sentry from "@sentry/nextjs";
 import type { PayloadRequest } from "payload";
 
@@ -18,6 +23,29 @@ type Body = {
 	timestamp: string;
 	[key: string]: unknown;
 };
+
+function paredValue(key: string, value: unknown) {
+	switch (key) {
+		case "tshirtSize": {
+			return parseTshirtSizeText(value as string);
+		}
+		case "attendanceDay": {
+			return parseAttendanceDay(value as string);
+		}
+		case "attendanceTime": {
+			return parseAttendanceTime(value as string);
+		}
+		case "carSupport": {
+			return value === "지원";
+		}
+		case "isPaid": {
+			return value === "납입";
+		}
+		default: {
+			return value;
+		}
+	}
+}
 
 export const syncGoogleSheetEndpoints = async (request: PayloadRequest) => {
 	try {
@@ -50,11 +78,12 @@ export const syncGoogleSheetEndpoints = async (request: PayloadRequest) => {
 
 		const { key } = headerValue;
 		if (key) {
+			const newValue = paredValue(key, data.newValue);
 			await request.payload.update({
 				collection: "forms",
 				id: data.id,
 				data: {
-					[key as string]: data.newValue,
+					[key as string]: newValue,
 				},
 				req: request,
 			});

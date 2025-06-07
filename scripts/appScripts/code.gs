@@ -1,4 +1,4 @@
-const WEBHOOK_URL = 'YOUR_WEBHOOK_URL_HERE';
+const WEBHOOK_URL = 'https://jwc-form-web.vercel.app/api/webhooks/google-sheet';
 
 /** 시트 수정 시 실행되는 함수 */
 function onEdit(e) {
@@ -29,14 +29,13 @@ function onEdit(e) {
     row: range.getRow(),
     column: range.getColumn(),
     header: headerValue,
-    id: idValue, // ← id 값 추가
+    id: idValue,
     oldValue: e.oldValue,
     newValue: e.value,
     timestamp: new Date().toISOString(),
   };
 
-  console.log(payload);
-  // sendWebhook(payload);
+  sendWebhook(payload);
 }
 
 /** 웹훅 전송 함수 */
@@ -48,7 +47,11 @@ function sendWebhook(payload) {
       'payload': JSON.stringify(payload),
       'muteHttpExceptions': true
     };
+    
+    console.log(payload);
     const response = UrlFetchApp.fetch(WEBHOOK_URL, options);
+    const code = response.getResponseCode()
+    console.log('Webhook Response code', code)
     console.log('Webhook Response:', response.getContentText());
   } catch (error) {
     console.error('Error sending webhook:', error.message);

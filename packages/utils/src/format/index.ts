@@ -24,6 +24,31 @@ export function formatTshirtSizeText(value: unknown): string {
 }
 
 /**
+ * 한글 텍스트로 된 단체티 사이즈 값을 영문 코드로 변환합니다.
+ *
+ * @param text - 한글 사이즈 문자열 (예: "S 사이즈", "XXL 사이즈" 등)
+ * @returns 영문 코드 값 (예: "s", "2xl" 등), 일치하지 않으면 빈 문자열 반환
+ */
+export function parseTshirtSizeText(text: string): string {
+	switch (text) {
+		case "S 사이즈":
+			return "s";
+		case "M 사이즈":
+			return "m";
+		case "L 사이즈":
+			return "l";
+		case "XL 사이즈":
+			return "xl";
+		case "XXL 사이즈":
+			return "2xl";
+		case "XXXL 사이즈":
+			return "3xl";
+		default:
+			return "";
+	}
+}
+
+/**
  * 참석 날짜 값을 한글 날짜 문자열로 변환합니다.
  *
  * @param value - 참석 날짜 값 (예: "19", "20", "21", "22")
@@ -45,6 +70,27 @@ export function formatAttendanceDay(value: unknown): string {
 }
 
 /**
+ * 한글 날짜 문자열을 참석 날짜 코드로 변환합니다.
+ *
+ * @param text - 한글 날짜 문자열 (예: "6월 19일" 등)
+ * @returns 참석 날짜 코드 (예: "19", "20" 등), 일치하지 않으면 빈 문자열 반환
+ */
+export function parseAttendanceDay(text: string): string {
+	switch (text) {
+		case "6월 19일":
+			return "19";
+		case "6월 20일":
+			return "20";
+		case "6월 21일":
+			return "21";
+		case "6월 22일":
+			return "22";
+		default:
+			return "";
+	}
+}
+
+/**
  * 참석 시간 값을 한글 시간 문자열로 변환합니다.
  *
  * @param value - 참석 시간 값 (예: "AM", "PM", "EVENING")
@@ -60,6 +106,25 @@ export function formatAttendanceTime(value: unknown): string {
 			return "저녁";
 		default:
 			return (value as string) || "";
+	}
+}
+
+/**
+ * 한글 시간 문자열을 참석 시간 코드로 변환합니다.
+ *
+ * @param text - 한글 시간 문자열 (예: "오전", "오후", "저녁")
+ * @returns 참석 시간 코드 (예: "AM", "PM", "EVENING"), 일치하지 않으면 빈 문자열 반환
+ */
+export function parseAttendanceTime(text: string): string {
+	switch (text) {
+		case "오전":
+			return "AM";
+		case "오후":
+			return "PM";
+		case "저녁":
+			return "EVENING";
+		default:
+			return "";
 	}
 }
 
