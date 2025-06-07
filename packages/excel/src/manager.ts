@@ -3,7 +3,7 @@ import * as Excel from "exceljs";
 import { ExcelHead } from "./head";
 import { ExcelRowData } from "./rowData";
 import { ExcelStyle } from "./style";
-import type { ExcelHeaders, GenerateExcelOptions } from "./types";
+import type { ExcelHeader, ExcelHeaders, GenerateExcelOptions } from "./types";
 
 /**
  * Excel 파일 생성 및 관리 유틸리티 클래스
@@ -178,5 +178,21 @@ export class ExcelManager {
 	 */
 	static createFormGoogleSheetHeaders(): ExcelHeaders {
 		return new ExcelHead().createFormGoogleSheetHeaders();
+	}
+
+	/**
+	 * 주어진 이름(name)에 해당하는 ExcelHeader 객체를 반환합니다.
+	 *
+	 * @param name - 찾고자 하는 헤더의 이름
+	 * @returns 일치하는 ExcelHeader 객체 또는 undefined
+	 *
+	 * @example
+	 * const header = ExcelManager.findHeaderByName("이름");
+	 * if (header) {
+	 *   console.log(header.key); // "name"
+	 * }
+	 */
+	static findHeaderByName(name: string): ExcelHeader | undefined {
+		return new ExcelHead().findHeaderByName(name);
 	}
 }

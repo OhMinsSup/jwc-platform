@@ -3,16 +3,15 @@ import { fileURLToPath } from "node:url";
 import { Forms } from "@jwc/payload/collections/Forms";
 import { Sheets } from "@jwc/payload/collections/Sheets";
 import { Users } from "@jwc/payload/collections/Users";
+import { syncGoogleSheetEndpoints } from "@jwc/payload/endpoints/syncGoogleSheet.endpoints";
 import { postgresAdapter } from "@payloadcms/db-postgres";
 import { sentryPlugin } from "@payloadcms/plugin-sentry";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import * as Sentry from "@sentry/nextjs";
 import type { Config } from "payload";
 import { buildConfig, deepMerge } from "payload";
-
 import { en } from "payload/i18n/en";
 import { ko } from "payload/i18n/ko";
-// import { syncGoogleSheetEndpoints } from "./endpoints/syncGoogleSheet.endpoints";
 import { env } from "./env";
 
 const filename = fileURLToPath(import.meta.url);
@@ -46,13 +45,13 @@ const baseConfig: Config = {
 		}),
 	],
 	secret: env.PAYLOAD_PRIVATE_SECRET,
-	// endpoints: [
-	// 	{
-	// 		path: "/sync/google-sheet",
-	// 		method: "post",
-	// 		handler: syncGoogleSheetEndpoints,
-	// 	},
-	// ],
+	endpoints: [
+		{
+			path: "/webhooks/google-sheet",
+			method: "post",
+			handler: syncGoogleSheetEndpoints,
+		},
+	],
 };
 
 export const configurePayload = (overrides?: Partial<Config>) => {

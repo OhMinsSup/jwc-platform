@@ -1,5 +1,7 @@
 import { ExcelManager } from "@jwc/excel";
-import { ExcelHead } from "node_modules/@jwc/excel/src/head";
+import { gapi } from "@jwc/google";
+import { env } from "@jwc/payload/env";
+import * as Sentry from "@sentry/nextjs";
 import type { PayloadRequest } from "payload";
 
 type Body = {
@@ -21,54 +23,94 @@ export const syncGoogleSheetEndpoints = async (request: PayloadRequest) => {
 	try {
 		// @ts-expect-error request.payload is not defined in the type
 		const data: Awaited<Body> = await request.json();
+		if (!data.id) {
+			return Response.json(
+				{
+					ok: false,
+					error: "ID is required",
+				},
+				{
+					status: 404,
+				}
+			);
+		}
 
-		const head = new ExcelHead();
-		const headerValue = head.findHeaderByName(data.header);
+		const headerValue = ExcelManager.findHeaderByName(data.header);
 		if (!headerValue) {
-			return new Response("Header not found", { status: 404 });
+			return Response.json(
+				{
+					ok: false,
+					error: `Header "${data.header}" not found`,
+				},
+				{
+					status: 404,
+				}
+			);
 		}
 
 		const { key } = headerValue;
+		if (key) {
+			await request.payload.update({
+				collection: "forms",
+				id: data.id,
+				data: {
+					[key as string]: data.newValue,
+				},
+				req: request,
+			});
 
-		await request.payload.update({
-			collection: "forms",
-			id: data.id,
-			data: {
-				[key as string]: data.newValue,
+			const { docs } = await request.payload.find({
+				collection: "forms",
+				limit: 100,
+				req: request,
+			});
+
+			await gapi.setDocs(docs).upsertGoogleSheetTable();
+
+			return Response.json(
+				{
+					ok: true,
+					message: `Successfully google sheet synced for header "${data.header}"`,
+				},
+				{
+					status: 200,
+				}
+			);
+		}
+
+		return Response.json(
+			{
+				ok: false,
+				error: `Header "${data.header}" not found in the ExcelHead`,
 			},
-			req: request,
-		});
-
-		const { docs } = await request.payload.find({
-			collection: "forms",
-			limit: 100,
-			req: request,
-		});
-
-		console.log("Syncing Google Sheets with the following documents:", docs);
-		// Assuming you have a function to sync with Google Sheets
-		// await syncWithGoogleSheets(docs);
-
-		return new Response("Google Sheets synced successfully", {
-			status: 200,
-		});
+			{
+				status: 404,
+			}
+		);
 	} catch (error) {
-		// if (env.NODE_ENV === "development") {
-		// 	request.payload.logger.error(error);
-		// } else if (error instanceof Error) {
-		// 	Sentry.logger.error(error.message, {
-		// 		name: "syncGoogleSheetEndpoints",
-		// 		action: "endpoints",
-		// 	});
-		// 	Sentry.captureException(error, {
-		// 		tags: {
-		// 			name: "syncGoogleSheetEndpoints",
-		// 			action: "endpoints",
-		// 		},
-		// 	});
-		// }
-		return new Response("Internal Server Error", {
-			status: 500,
-		});
+		if (env.NODE_ENV === "development") {
+			request.payload.logger.error(error);
+		} else if (error instanceof Error) {
+			Sentry.logger.error(error.message, {
+				name: "syncGoogleSheetEndpoints",
+				action: "endpoints",
+			});
+			Sentry.captureException(error, {
+				tags: {
+					name: "syncGoogleSheetEndpoints",
+					action: "endpoints",
+				},
+			});
+		}
+
+		return Response.json(
+			{
+				ok: false,
+				error: "Internal Server Error",
+			},
+			{
+				status: 500,
+			}
+		);
 	}
 };

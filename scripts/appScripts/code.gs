@@ -1,0 +1,63 @@
+const WEBHOOK_URL = 'YOUR_WEBHOOK_URL_HERE';
+
+/** 시트 수정 시 실행되는 함수 */
+function onEdit(e) {
+  const range = e.range;
+  const sheet = range.getSheet();
+
+  // 변경한 값의 헤더를 가져온다.
+  // 1행(헤더)에서 전체 헤더 배열을 가져온다.
+  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+
+  // 현재 변경한 셀의 컬럼 번호에 해당하는 헤더 값을 가져온다.
+  const headerValue = headers[range.getColumn() - 1];
+  
+  // 1행(헤더)에서 "id" 컬럼의 인덱스 찾기
+  const idColIdx = headers.findIndex(h => String(h).toLowerCase() === "id");
+  let idValue = null;
+
+  if (idColIdx !== -1) {
+    // 현재 수정된 행(row)에서 id 컬럼의 값을 가져옴
+    idValue = sheet.getRange(range.getRow(), idColIdx + 1).getValue();
+  }
+
+  const payload = {
+    eventType: 'EDIT',
+    spreadsheetId: e.source.getId(),
+    sheetName: sheet.getName(),
+    range: range.getA1Notation(),
+    row: range.getRow(),
+    column: range.getColumn(),
+    header: headerValue,
+    id: idValue, // ← id 값 추가
+    oldValue: e.oldValue,
+    newValue: e.value,
+    timestamp: new Date().toISOString(),
+  };
+
+  console.log(payload);
+  // sendWebhook(payload);
+}
+
+/** 웹훅 전송 함수 */
+function sendWebhook(payload) {
+  try {
+    const options = {
+      'method': 'post',
+      'contentType': 'application/json',
+      'payload': JSON.stringify(payload),
+      'muteHttpExceptions': true
+    };
+    const response = UrlFetchApp.fetch(WEBHOOK_URL, options);
+    console.log('Webhook Response:', response.getContentText());
+  } catch (error) {
+    console.error('Error sending webhook:', error.message);
+  }
+}
+
+/** 트리거 생성 함수 */
+function createTriggers() {
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  ScriptApp.newTrigger('onEdit').forSpreadsheet(spreadsheet).onEdit().create();
+  console.log('Triggers created successfully!');
+}
