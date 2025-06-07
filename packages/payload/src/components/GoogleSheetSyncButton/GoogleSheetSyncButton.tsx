@@ -1,10 +1,10 @@
 "use client";
-import { Button } from "@payloadcms/ui";
-import React, { useActionState } from "react";
 import {
 	type State,
 	syncGoogleSheet,
-} from "../../actions/syncGooleSheet.actions";
+} from "@jwc/payload/actions/syncGooleSheet.actions";
+import { Button } from "@payloadcms/ui";
+import React, { useActionState } from "react";
 
 export function GoogleSheetSyncButton() {
 	const [, formAction, isPending] = useActionState(async (state: State) => {

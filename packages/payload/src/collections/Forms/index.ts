@@ -1,5 +1,5 @@
-import { ExcelManager } from "@jwc/excel";
 import { authenticated } from "@jwc/payload/access/authenticated";
+import { exportExcelEndpoints } from "@jwc/payload/endpoints/exportExcel.endpoints";
 import { decryptFieldValue } from "@jwc/payload/hooks/decryptFieldValue";
 import { encryptFieldValue } from "@jwc/payload/hooks/encryptFieldValue";
 import { syncGoogleSheet } from "@jwc/payload/hooks/syncGoogleSheet";
@@ -37,34 +37,7 @@ export const Forms: CollectionConfig = {
 		{
 			path: "/excel/export",
 			method: "get",
-			handler: async (req) => {
-				try {
-					const { docs } = await req.payload.find({
-						collection: "forms",
-						limit: 100,
-						req,
-					});
-
-					const buffer = await ExcelManager.buildExcelFileBuffer(
-						"청년부 연합 여름 수련회 참가자 명단",
-						docs
-					);
-
-					const arrayBufferLike = new Uint8Array(buffer);
-
-					return new Response(arrayBufferLike, {
-						headers: {
-							"Content-Type":
-								"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-							"Content-Disposition": 'attachment; filename="forms.xlsx"',
-						},
-					});
-				} catch (error) {
-					return new Response("Internal Server Error", {
-						status: 500,
-					});
-				}
-			},
+			handler: exportExcelEndpoints,
 		},
 	],
 	fields: [
