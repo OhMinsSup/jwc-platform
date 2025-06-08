@@ -1,9 +1,13 @@
-const WEBHOOK_URL = 'https://jwc-form-web.vercel.app/api/webhooks/google-sheet';
+const WEBHOOK_URL = '';
+const SHEET_ID = '';
 
 /** 시트 수정 시 실행되는 함수 */
 function onEdit(e) {
   const range = e.range;
   const sheet = range.getSheet();
+  if (e.source.getId() !== SHEET_ID) {
+    return;
+  }
 
   // 변경한 값의 헤더를 가져온다.
   // 1행(헤더)에서 전체 헤더 배열을 가져온다.
