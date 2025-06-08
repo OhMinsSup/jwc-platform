@@ -56,6 +56,13 @@ export const syncGoogleSheetEndpoints = async (request: PayloadRequest) => {
 		// @ts-expect-error request.payload is not defined in the type
 		const data: Body = await request.json();
 
+		if (data.spreadsheetId !== env.GOOGLE_SHEET_ID) {
+			return Response.json(
+				{ ok: false, error: "Invalid spreadsheet ID" },
+				{ status: 400 }
+			);
+		}
+
 		if (!data.id) {
 			return Response.json(
 				{ ok: false, error: "ID is required" },
