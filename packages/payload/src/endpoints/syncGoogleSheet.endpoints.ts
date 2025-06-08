@@ -4,6 +4,7 @@ import { env } from "@jwc/payload/env";
 import {
 	parseAttendanceDay,
 	parseAttendanceTime,
+	parseName,
 	parseTshirtSizeText,
 } from "@jwc/utils/format";
 import * as Sentry from "@sentry/nextjs";
@@ -24,7 +25,7 @@ type Body = {
 	[key: string]: unknown;
 };
 
-function paredValue(key: string, value: unknown) {
+function parseValueByKey(key: string, value: unknown) {
 	switch (key) {
 		case "tshirtSize": {
 			return parseTshirtSizeText(value as string);
@@ -41,6 +42,9 @@ function paredValue(key: string, value: unknown) {
 		case "isPaid": {
 			return value === "납입";
 		}
+		case "name": {
+			return parseName(value as string);
+		}
 		default: {
 			return value;
 		}
@@ -50,71 +54,63 @@ function paredValue(key: string, value: unknown) {
 export const syncGoogleSheetEndpoints = async (request: PayloadRequest) => {
 	try {
 		// @ts-expect-error request.payload is not defined in the type
-		const data: Awaited<Body> = await request.json();
+		const data: Body = await request.json();
+
 		if (!data.id) {
 			return Response.json(
-				{
-					ok: false,
-					error: "ID is required",
-				},
-				{
-					status: 404,
-				}
+				{ ok: false, error: "ID is required" },
+				{ status: 404 }
 			);
 		}
 
-		const headerValue = ExcelManager.findHeaderByName(data.header);
-		if (!headerValue) {
+		const header = ExcelManager.findHeaderByName(data.header);
+		if (!header) {
+			return Response.json(
+				{ ok: false, error: `Header "${data.header}" not found` },
+				{ status: 404 }
+			);
+		}
+
+		const { key } = header;
+		if (!key) {
 			return Response.json(
 				{
 					ok: false,
-					error: `Header "${data.header}" not found`,
+					error: `Header "${data.header}" not found in the ExcelHead`,
 				},
-				{
-					status: 404,
-				}
+				{ status: 404 }
 			);
 		}
-
-		const { key } = headerValue;
-		if (key) {
-			const newValue = paredValue(key, data.newValue);
-			await request.payload.update({
-				collection: "forms",
-				id: data.id,
-				data: {
-					[key as string]: newValue,
-				},
-				req: request,
-			});
-
-			const { docs } = await request.payload.find({
-				collection: "forms",
-				limit: 100,
-				req: request,
-			});
-
-			await gapi.setDocs(docs).upsertGoogleSheetTable();
-
+		if (key === "id") {
 			return Response.json(
-				{
-					ok: true,
-					message: `Successfully google sheet synced for header "${data.header}"`,
-				},
-				{
-					status: 200,
-				}
+				{ ok: false, error: 'Cannot sync "id" header' },
+				{ status: 400 }
 			);
 		}
+
+		const newValue = parseValueByKey(key, data.newValue);
+
+		await request.payload.update({
+			collection: "forms",
+			id: data.id,
+			data: { [key]: newValue },
+			req: request,
+		});
+
+		const { docs } = await request.payload.find({
+			collection: "forms",
+			limit: 100,
+			req: request,
+		});
+
+		await gapi.setDocs(docs).upsertGoogleSheetTable();
 
 		return Response.json(
 			{
-				ok: false,
-				error: `Header "${data.header}" not found in the ExcelHead`,
+				ok: true,
+				message: `Successfully google sheet synced for header "${data.header}"`,
 			},
-			{
-				status: 404,
-			}
+			{ status: 200 }
 		);
 	} catch (error) {
 		if (env.NODE_ENV === "development") {
@@ -133,13 +129,8 @@ export const syncGoogleSheetEndpoints = async (request: PayloadRequest) => {
 		}
 
 		return Response.json(
-			{
-				ok: false,
-				error: "Internal Server Error",
-			},
-			{
-				status: 500,
-			}
+			{ ok: false, error: "Internal Server Error" },
+			{ status: 500 }
 		);
 	}
 };

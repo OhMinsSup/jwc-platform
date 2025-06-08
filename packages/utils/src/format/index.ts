@@ -152,3 +152,14 @@ export function formatName(doc: unknown): string {
 
 	return typeof doc === "string" ? doc : "미입력";
 }
+
+/**
+ * "이름 (부서 - 또래모임)" 형식의 문자열에서 이름만 추출합니다.
+ *
+ * @param text - "이름 (부서 - 또래모임)" 형식의 문자열 또는 이름만 있는 문자열
+ * @returns 이름 문자열, 형식이 맞지 않으면 원본 텍스트 반환
+ */
+export function parseName(text: string): string {
+	const match = /^(.+?)\s*\((.+?)\s*-\s*(.+?)\)$/.exec(text);
+	return match ? (match.at(1)?.trim() ?? text) : text;
+}
