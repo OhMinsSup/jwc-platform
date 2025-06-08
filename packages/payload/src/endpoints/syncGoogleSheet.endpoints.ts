@@ -101,6 +101,7 @@ export const syncGoogleSheetEndpoints = async (request: PayloadRequest) => {
 			collection: "forms",
 			limit: 100,
 			req: request,
+			sort: "-createdAt",
 		});
 
 		await gapi.setDocs(docs).upsertGoogleSheetTable();
