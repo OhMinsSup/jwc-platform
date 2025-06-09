@@ -14,6 +14,7 @@ function onEdit(e) {
   }
 
   if (e.source.getId() !== SHEET_ID) {
+    console.log(`onEdit: Spreadsheet ID "${e.source.getId()}" does not match "${SHEET_ID}". Skipping...`);
     return;
   }
 
