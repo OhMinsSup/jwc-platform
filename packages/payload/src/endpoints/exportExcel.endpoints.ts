@@ -6,10 +6,22 @@ import type { PayloadRequest } from "payload";
 
 export const exportExcelEndpoints = async (request: PayloadRequest) => {
 	try {
+		const result = await request.payload.auth({
+			headers: request.headers,
+		});
+
+		if (!result.user) {
+			throw new APIError("Unauthorized", 401, {
+				name: "exportExcelEndpoints",
+				action: "endpoints",
+			});
+		}
+
 		const { docs } = await request.payload.find({
 			collection: "forms",
 			limit: 100,
 			req: request,
+			sort: "-createdAt",
 		});
 
 		const buffer = await ExcelManager.buildExcelFileBuffer(
@@ -24,7 +36,8 @@ export const exportExcelEndpoints = async (request: PayloadRequest) => {
 				headers: new Headers({
 					"Content-Type":
 						"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-					"Content-Disposition": 'attachment; filename="forms.xlsx"',
+					"Content-Disposition":
+						'attachment; filename="청년부_연합_여름_수련회_참가자_명단.xlsx"',
 				}),
 				req: request,
 			}),
