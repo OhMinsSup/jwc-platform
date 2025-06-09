@@ -8,6 +8,7 @@ import {
 	parseTshirtSizeText,
 } from "@jwc/utils/format";
 import * as Sentry from "@sentry/nextjs";
+import { APIError } from "payload";
 import type { PayloadRequest } from "payload";
 
 type Body = {
@@ -57,41 +58,68 @@ export const syncGoogleSheetEndpoints = async (request: PayloadRequest) => {
 		const data: Body = await request.json();
 
 		if (data.spreadsheetId !== env.GOOGLE_SHEET_ID) {
-			return Response.json(
-				{ ok: false, error: "Invalid spreadsheet ID" },
-				{ status: 400 }
+			throw new APIError(
+				"Invalid spreadsheet ID",
+				400,
+				{
+					name: "syncGoogleSheetEndpoints",
+					action: "endpoints",
+					error: "Invalid spreadsheet ID",
+				},
+				true
 			);
 		}
 
 		if (!data.id) {
-			return Response.json(
-				{ ok: false, error: "ID is required" },
-				{ status: 404 }
+			throw new APIError(
+				"ID is required",
+				404,
+				{
+					name: "syncGoogleSheetEndpoints",
+					action: "endpoints",
+					error: "ID is required",
+				},
+				true
 			);
 		}
 
 		const header = ExcelManager.findHeaderByName(data.header);
 		if (!header) {
-			return Response.json(
-				{ ok: false, error: `Header "${data.header}" not found` },
-				{ status: 404 }
+			throw new APIError(
+				`Header "${data.header}" not found in the ExcelHead`,
+				404,
+				{
+					name: "syncGoogleSheetEndpoints",
+					action: "endpoints",
+					error: `Header "${data.header}" not found in the ExcelHead`,
+				},
+				true
 			);
 		}
 
 		const { key } = header;
 		if (!key) {
-			return Response.json(
+			throw new APIError(
+				`Header "${data.header}" not found in the ExcelHead`,
+				404,
 				{
-					ok: false,
+					name: "syncGoogleSheetEndpoints",
+					action: "endpoints",
 					error: `Header "${data.header}" not found in the ExcelHead`,
 				},
-				{ status: 404 }
+				true
 			);
 		}
 		if (key === "id") {
-			return Response.json(
-				{ ok: false, error: 'Cannot sync "id" header' },
-				{ status: 400 }
+			throw new APIError(
+				'Cannot sync "id" header',
+				400,
+				{
+					name: "syncGoogleSheetEndpoints",
+					action: "endpoints",
+					error: 'Cannot sync "id" header',
+				},
+				true
 			);
 		}
 
@@ -136,9 +164,15 @@ export const syncGoogleSheetEndpoints = async (request: PayloadRequest) => {
 			});
 		}
 
-		return Response.json(
-			{ ok: false, error: "Internal Server Error" },
-			{ status: 500 }
+		throw new APIError(
+			"Failed to sync Google Sheet",
+			500,
+			{
+				name: "syncGoogleSheetEndpoints",
+				action: "endpoints",
+				error: error instanceof Error ? error.name : "Unknown error",
+			},
+			true
 		);
 	}
 };

@@ -1,6 +1,7 @@
 import { ExcelManager } from "@jwc/excel";
 import { env } from "@jwc/payload/env";
 import * as Sentry from "@sentry/nextjs";
+import { APIError, headersWithCors } from "payload";
 import type { PayloadRequest } from "payload";
 
 export const exportExcelEndpoints = async (request: PayloadRequest) => {
@@ -19,11 +20,14 @@ export const exportExcelEndpoints = async (request: PayloadRequest) => {
 		const arrayBufferLike = new Uint8Array(buffer);
 
 		return new Response(arrayBufferLike, {
-			headers: {
-				"Content-Type":
-					"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-				"Content-Disposition": 'attachment; filename="forms.xlsx"',
-			},
+			headers: headersWithCors({
+				headers: new Headers({
+					"Content-Type":
+						"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+					"Content-Disposition": 'attachment; filename="forms.xlsx"',
+				}),
+				req: request,
+			}),
 		});
 	} catch (error) {
 		if (env.NODE_ENV === "development") {
@@ -40,8 +44,16 @@ export const exportExcelEndpoints = async (request: PayloadRequest) => {
 				},
 			});
 		}
-		return new Response("Internal Server Error", {
-			status: 500,
-		});
+
+		throw new APIError(
+			"Failed to export Excel file",
+			500,
+			{
+				name: "exportExcelEndpoints",
+				action: "endpoints",
+				error: error instanceof Error ? error.name : "Unknown error",
+			},
+			true
+		);
 	}
 };
