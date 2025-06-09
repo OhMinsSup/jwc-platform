@@ -1,10 +1,18 @@
 const WEBHOOK_URL = '';
 const SHEET_ID = '';
+const SHEET_TITLE = '';
 
 /** 시트 수정 시 실행되는 함수 */
 function onEdit(e) {
   const range = e.range;
   const sheet = range.getSheet();
+  const sheetName = sheet.getName();
+
+  if (sheetName !== SHEET_TITLE) {
+    console.log(`onEdit: Sheet name "${sheetName}" does not match "${SHEET_TITLE}". Skipping...`);
+    return;
+  }
+
   if (e.source.getId() !== SHEET_ID) {
     return;
   }
@@ -28,7 +36,7 @@ function onEdit(e) {
   const payload = {
     eventType: 'EDIT',
     spreadsheetId: e.source.getId(),
-    sheetName: sheet.getName(),
+    sheetName: sheetName,
     range: range.getA1Notation(),
     row: range.getRow(),
     column: range.getColumn(),
@@ -58,12 +66,13 @@ function sendWebhook(payload) {
     console.log('Webhook Response code', code)
     console.log('Webhook Response:', response.getContentText());
   } catch (error) {
-    console.error('Error sending webhook:', error.message);
+    console.error('Error sending webhook:', error);
   }
 }
 
 /** 트리거 생성 함수 */
 function createTriggers() {
+  SpreadsheetApp.get
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   ScriptApp.newTrigger('onEdit').forSpreadsheet(spreadsheet).onEdit().create();
   console.log('Triggers created successfully!');
