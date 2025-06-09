@@ -189,6 +189,7 @@ export class ExcelHead {
 	createFormSheetHeaders(): ExcelHeaders {
 		return this._headers
 			.filter((header) => !header.hidden)
+			.filter((h) => h.name !== "타임스탬프")
 			.map((header) => this._formatter(header));
 	}
 
