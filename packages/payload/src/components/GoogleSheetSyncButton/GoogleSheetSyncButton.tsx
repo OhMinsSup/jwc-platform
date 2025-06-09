@@ -13,7 +13,7 @@ export function GoogleSheetSyncButton() {
 
 	return (
 		<form action={formAction} aria-disabled={isPending}>
-			<Button type="submit" disabled={isPending}>
+			<Button type="submit" disabled={isPending} aria-disabled={isPending}>
 				{isPending ? "구글 시트 동기화 중..." : "구글 시트 동기화"}
 			</Button>
 		</form>

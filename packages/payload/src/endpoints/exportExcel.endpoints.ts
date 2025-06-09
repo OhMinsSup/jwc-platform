@@ -1,14 +1,27 @@
 import { ExcelManager } from "@jwc/excel";
 import { env } from "@jwc/payload/env";
 import * as Sentry from "@sentry/nextjs";
+import { APIError, headersWithCors } from "payload";
 import type { PayloadRequest } from "payload";
 
 export const exportExcelEndpoints = async (request: PayloadRequest) => {
 	try {
+		const result = await request.payload.auth({
+			headers: request.headers,
+		});
+
+		if (!result.user) {
+			throw new APIError("Unauthorized", 401, {
+				name: "exportExcelEndpoints",
+				action: "endpoints",
+			});
+		}
+
 		const { docs } = await request.payload.find({
 			collection: "forms",
 			limit: 100,
 			req: request,
+			sort: "-createdAt",
 		});
 
 		const buffer = await ExcelManager.buildExcelFileBuffer(
@@ -19,11 +32,15 @@ export const exportExcelEndpoints = async (request: PayloadRequest) => {
 		const arrayBufferLike = new Uint8Array(buffer);
 
 		return new Response(arrayBufferLike, {
-			headers: {
-				"Content-Type":
-					"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-				"Content-Disposition": 'attachment; filename="forms.xlsx"',
-			},
+			headers: headersWithCors({
+				headers: new Headers({
+					"Content-Type":
+						"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+					"Content-Disposition":
+						'attachment; filename="청년부_연합_여름_수련회_참가자_명단.xlsx"',
+				}),
+				req: request,
+			}),
 		});
 	} catch (error) {
 		if (env.NODE_ENV === "development") {
@@ -40,8 +57,20 @@ export const exportExcelEndpoints = async (request: PayloadRequest) => {
 				},
 			});
 		}
-		return new Response("Internal Server Error", {
-			status: 500,
-		});
+
+		if (error instanceof APIError) {
+			throw error;
+		}
+
+		throw new APIError(
+			"Failed to export Excel file",
+			500,
+			{
+				name: "exportExcelEndpoints",
+				action: "endpoints",
+				error: error instanceof Error ? error.name : "Unknown error",
+			},
+			true
+		);
 	}
 };
