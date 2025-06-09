@@ -164,6 +164,10 @@ export const syncGoogleSheetEndpoints = async (request: PayloadRequest) => {
 			});
 		}
 
+		if (error instanceof APIError) {
+			throw error;
+		}
+
 		throw new APIError(
 			"Failed to sync Google Sheet",
 			500,
