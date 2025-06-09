@@ -70,6 +70,19 @@ export const syncGoogleSheetEndpoints = async (request: PayloadRequest) => {
 			);
 		}
 
+		if (data.sheetName !== env.GOOGLE_SHEET_TITLE) {
+			throw new APIError(
+				"Invalid spreadsheet ID",
+				400,
+				{
+					name: "syncGoogleSheetEndpoints",
+					action: "endpoints",
+					error: "Invalid spreadsheet ID",
+				},
+				true
+			);
+		}
+
 		if (!data.id) {
 			throw new APIError(
 				"ID is required",
