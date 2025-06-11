@@ -3,7 +3,6 @@ import { withSentry } from "@jwc/observability/next-config";
 import { withPayload } from "@payloadcms/next/withPayload";
 import createJiti from "jiti";
 import type { NextConfig } from "next";
-import { env } from "~/env";
 
 // Import env files to validate at build time. Use jiti so we can load .ts files in here.
 createJiti(fileURLToPath(import.meta.url))("./src/env");
@@ -29,7 +28,10 @@ let nextConfig: NextConfig = withPayload(config, {
 	devBundleServerPackages: false,
 });
 
-if (env.NODE_ENV === "production" && env.NEXT_PUBLIC_SENTRY_DSN) {
+if (
+	process.env.NODE_ENV === "production" &&
+	process.env.NEXT_PUBLIC_SENTRY_DSN
+) {
 	nextConfig = withSentry(nextConfig);
 }
 

@@ -5,7 +5,6 @@
  */
 
 import {
-	captureRouterTransitionStart,
 	consoleLoggingIntegration,
 	init,
 	replayIntegration,
@@ -43,10 +42,4 @@ export const initializeSentry = (): ReturnType<typeof init> => {
 
 		_experiments: { enableLogs: true },
 	});
-};
-
-export const onRouterTransitionStartSentry = (
-	...args: Parameters<typeof captureRouterTransitionStart>
-) => {
-	return captureRouterTransitionStart(...args);
 };
