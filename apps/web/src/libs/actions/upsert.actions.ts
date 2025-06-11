@@ -1,10 +1,10 @@
 "use server";
 import { appRouter } from "@jwc/api";
-import { env } from "@jwc/payload/env";
+import { log } from "@jwc/observability/log";
 import type { Form } from "@jwc/schema";
 import { call } from "@orpc/server";
 import payloadConfig from "@payload-config";
-import * as Sentry from "@sentry/nextjs";
+import { withServerActionInstrumentation } from "@sentry/nextjs";
 import { headers } from "next/headers";
 
 export type State = {
@@ -27,21 +27,10 @@ export async function serverAction(
 			},
 		});
 	} catch (error) {
-		if (env.NODE_ENV === "development") {
-			console.error(error);
-		} else if (error instanceof Error) {
-			Sentry.logger.error(error.message, {
-				name: "upsert",
-				action: "serverAction",
-			});
-			Sentry.captureException(error, {
-				tags: {
-					name: "upsert",
-					action: "serverAction",
-				},
-			});
-		}
-
+		log.error("serverActions", error as Error, {
+			name: "upsert",
+			action: "serverAction",
+		});
 		return {
 			success: false,
 			message: "An error occurred while processing the form.",
@@ -51,8 +40,7 @@ export async function serverAction(
 }
 
 export async function upsert(state: State, body: Form) {
-	// const func = serverAction.bind(null, state, body);
-	return await Sentry.withServerActionInstrumentation(
+	return await withServerActionInstrumentation(
 		"upsertAction",
 		{
 			headers: await headers(),

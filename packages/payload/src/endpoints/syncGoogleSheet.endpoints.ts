@@ -1,5 +1,6 @@
 import { ExcelManager } from "@jwc/excel";
 import { gapi } from "@jwc/google";
+import { log } from "@jwc/observability/log";
 import { env } from "@jwc/payload/env";
 import {
 	parseAttendanceDay,
@@ -7,7 +8,6 @@ import {
 	parseName,
 	parseTshirtSizeText,
 } from "@jwc/utils/format";
-import * as Sentry from "@sentry/nextjs";
 import { APIError } from "payload";
 import type { PayloadRequest } from "payload";
 
@@ -175,20 +175,10 @@ export const syncGoogleSheetEndpoints = async (request: PayloadRequest) => {
 			{ status: 200 }
 		);
 	} catch (error) {
-		if (env.NODE_ENV === "development") {
-			request.payload.logger.error(error);
-		} else if (error instanceof Error) {
-			Sentry.logger.error(error.message, {
-				name: "syncGoogleSheetEndpoints",
-				action: "endpoints",
-			});
-			Sentry.captureException(error, {
-				tags: {
-					name: "syncGoogleSheetEndpoints",
-					action: "endpoints",
-				},
-			});
-		}
+		log.error("endpoints", error as Error, {
+			name: "syncGoogleSheetEndpoints",
+			action: "payload.endpoints.syncGoogleSheet",
+		});
 
 		if (error instanceof APIError) {
 			throw error;

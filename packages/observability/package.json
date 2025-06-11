@@ -1,20 +1,14 @@
 {
-	"name": "@jwc/logger",
+	"name": "@jwc/observability",
 	"private": true,
 	"version": "0.1.0",
 	"type": "module",
 	"exports": {
 		"./package.json": "./package.json",
-		".": {
-			"import": {
-				"types": "./dist/index.d.ts",
-				"default": "./dist/index.js"
-			},
-			"require": {
-				"types": "./dist/index.d.cts",
-				"default": "./dist/index.cjs"
-			}
-		}
+		"./log": "./src/log.ts",
+		"./client": "./src/client.ts",
+		"./instrumentation": "./src/instrumentation.ts",
+		"./next-config": "./src/next-config.ts"
 	},
 	"license": "MIT",
 	"scripts": {
@@ -26,5 +20,10 @@
 	"devDependencies": {
 		"@jwc/tsconfig": "workspace:*",
 		"typescript": "catalog:"
+	},
+	"dependencies": {
+		"@jwc/env": "workspace:*",
+		"@sentry/nextjs": "catalog:",
+		"consola": "^3.4.2"
 	}
 }

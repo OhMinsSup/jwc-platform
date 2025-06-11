@@ -1,13 +1,14 @@
 import { fileURLToPath } from "node:url";
+import { withSentry } from "@jwc/observability/next-config";
 import { withPayload } from "@payloadcms/next/withPayload";
-import { withSentryConfig } from "@sentry/nextjs";
 import createJiti from "jiti";
 import type { NextConfig } from "next";
+import { env } from "~/env";
 
 // Import env files to validate at build time. Use jiti so we can load .ts files in here.
 createJiti(fileURLToPath(import.meta.url))("./src/env");
 
-const nextConfig: NextConfig = {
+const config: NextConfig = {
 	/** Enables hot reloading for local packages without a build step */
 	transpilePackages: [
 		"@jwc/payload",
@@ -16,6 +17,7 @@ const nextConfig: NextConfig = {
 		"@jwc/api",
 		"@jwc/ui",
 		"@jwc/utils",
+		"@sentry/nextjs",
 	],
 
 	/** We already do linting and typechecking as separate tasks in CI */
@@ -23,22 +25,12 @@ const nextConfig: NextConfig = {
 	typescript: { ignoreBuildErrors: true },
 };
 
-export default withSentryConfig(
-	withPayload(nextConfig, { devBundleServerPackages: false }),
-	{
-		org: process.env.SENTRY_ORG,
-		project: process.env.SENTRY_PROJECT,
+let nextConfig: NextConfig = withPayload(config, {
+	devBundleServerPackages: false,
+});
 
-		tunnelRoute: "/monitoring",
+if (env.NODE_ENV === "production" && env.NEXT_PUBLIC_SENTRY_DSN) {
+	nextConfig = withSentry(nextConfig);
+}
 
-		sourcemaps: {
-			disable: true,
-		},
-		// Automatically tree-shake Sentry logger statements to reduce bundle size
-		disableLogger: true,
-
-		reactComponentAnnotation: {
-			enabled: true,
-		},
-	}
-);
+export default nextConfig;

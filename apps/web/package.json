@@ -19,6 +19,7 @@
 		"@hookform/resolvers": "^4.1.0",
 		"@jwc/api": "workspace:*",
 		"@jwc/env": "workspace:*",
+		"@jwc/observability": "workspace:*",
 		"@jwc/payload": "workspace:*",
 		"@jwc/schema": "workspace:*",
 		"@jwc/ui": "workspace:*",
