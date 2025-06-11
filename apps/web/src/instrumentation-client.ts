@@ -1,10 +1,8 @@
-import {
-	initializeSentry,
-	onRouterTransitionStartSentry,
-} from "@jwc/observability/client";
+import { initializeSentry } from "@jwc/observability/client";
+import { captureRouterTransitionStart } from "@sentry/nextjs";
 
 initializeSentry();
 
 // This export will instrument router navigations, and is only relevant if you enable tracing.
 // `captureRouterTransitionStart` is available from SDK version 9.12.0 onwards
-export const onRouterTransitionStart = onRouterTransitionStartSentry;
+export const onRouterTransitionStart = captureRouterTransitionStart;
