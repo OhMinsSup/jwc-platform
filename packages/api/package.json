@@ -12,7 +12,6 @@
 		"clean": "git clean -xdf .cache .turbo dist node_modules",
 		"format": "biome format --write ./src",
 		"lint": "biome lint --error-on-warnings ./src",
-		"sort": "pnpm dlx sort-package-json@latest",
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {

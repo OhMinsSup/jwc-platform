@@ -24,9 +24,6 @@
 			"dependsOn": ["^topo", "^build"],
 			"outputs": [".cache/tsbuildinfo.json"]
 		},
-		"sort": {
-			"cache": false
-		},
 		"generate:types": {
 			"cache": false
 		},

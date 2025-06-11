@@ -10,7 +10,6 @@
 		"format": "biome format --write ./src",
 		"generate:importmap": "pnpm with-env payload generate:importmap",
 		"lint": "biome lint --error-on-warnings ./src",
-		"sort": "pnpm dlx sort-package-json@latest",
 		"start": "pnpm with-env next start",
 		"typecheck": "tsc --noEmit",
 		"with-env": "dotenv -e ../../.env --"
