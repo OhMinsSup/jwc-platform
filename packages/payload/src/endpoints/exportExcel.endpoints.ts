@@ -25,7 +25,7 @@ export const exportExcelEndpoints = async (request: PayloadRequest) => {
 		});
 
 		const buffer = await ExcelManager.buildExcelFileBuffer(
-			"청년부 연합 여름 수련회 참가자 명단",
+			env.GOOGLE_SHEET_TITLE,
 			docs
 		);
 
@@ -36,8 +36,7 @@ export const exportExcelEndpoints = async (request: PayloadRequest) => {
 				headers: new Headers({
 					"Content-Type":
 						"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-					"Content-Disposition":
-						'attachment; filename="청년부_연합_여름_수련회_참가자_명단.xlsx"',
+					"Content-Disposition": `attachment; filename*=UTF-8''${encodeURIComponent("청년부_연합_여름_수련회_참가자_명단.xlsx")}`,
 				}),
 				req: request,
 			}),
