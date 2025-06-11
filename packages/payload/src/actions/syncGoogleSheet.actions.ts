@@ -1,8 +1,8 @@
 "use server";
 import { gapi } from "@jwc/google";
+import { log } from "@jwc/observability/log";
 import { configurePayload } from "@jwc/payload/configurePayload";
-import { env } from "@jwc/payload/env";
-import * as Sentry from "@sentry/nextjs";
+import { withServerActionInstrumentation } from "@sentry/nextjs";
 import { headers } from "next/headers";
 import { getPayload } from "payload";
 
@@ -28,20 +28,10 @@ export async function serverAction(_: State): Promise<NonNullable<State>> {
 			message: `Successfully synced ${docs.length} forms to Google Sheets.`,
 		};
 	} catch (error) {
-		if (env.NODE_ENV === "development") {
-			payload.logger.error(error);
-		} else if (error instanceof Error) {
-			Sentry.logger.error(error.message, {
-				name: "syncGoogleSheet",
-				action: "serverAction",
-			});
-			Sentry.captureException(error, {
-				tags: {
-					name: "syncGoogleSheet",
-					action: "serverAction",
-				},
-			});
-		}
+		log.error("serverActions", error as Error, {
+			name: "syncGoogleSheet",
+			action: "payload.actions.syncGoogleSheet",
+		});
 		return {
 			success: false,
 			message: "An error occurred while processing the form.",
@@ -50,7 +40,7 @@ export async function serverAction(_: State): Promise<NonNullable<State>> {
 }
 
 export async function syncGoogleSheet(state: State) {
-	return await Sentry.withServerActionInstrumentation(
+	return await withServerActionInstrumentation(
 		"syncGoogleSheetAction",
 		{
 			headers: await headers(),

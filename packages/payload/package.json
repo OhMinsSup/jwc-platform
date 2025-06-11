@@ -23,7 +23,6 @@
 		"migrate:create": "pnpm with-env payload migrate:create",
 		"migrate:fresh": "pnpm with-env payload migrate:fresh",
 		"migrate:reset": "pnpm with-env payload migrate:reset",
-		"sort": "pnpm dlx sort-package-json@latest",
 		"typecheck": "tsc --noEmit",
 		"with-env": "dotenv -e ../../.env --"
 	},
@@ -31,6 +30,7 @@
 		"@jwc/env": "workspace:*",
 		"@jwc/excel": "workspace:*",
 		"@jwc/google": "workspace:*",
+		"@jwc/observability": "workspace:*",
 		"@jwc/utils": "workspace:*",
 		"@payloadcms/db-postgres": "catalog:payload",
 		"@payloadcms/live-preview-react": "catalog:payload",

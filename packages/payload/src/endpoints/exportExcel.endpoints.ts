@@ -1,6 +1,6 @@
 import { ExcelManager } from "@jwc/excel";
+import { log } from "@jwc/observability/log";
 import { env } from "@jwc/payload/env";
-import * as Sentry from "@sentry/nextjs";
 import { APIError, headersWithCors } from "payload";
 import type { PayloadRequest } from "payload";
 
@@ -42,20 +42,10 @@ export const exportExcelEndpoints = async (request: PayloadRequest) => {
 			}),
 		});
 	} catch (error) {
-		if (env.NODE_ENV === "development") {
-			request.payload.logger.error(error);
-		} else if (error instanceof Error) {
-			Sentry.logger.error(error.message, {
-				name: "exportExcelEndpoints",
-				action: "endpoints",
-			});
-			Sentry.captureException(error, {
-				tags: {
-					name: "exportExcelEndpoints",
-					action: "endpoints",
-				},
-			});
-		}
+		log.error("endpoints", error as Error, {
+			name: "exportExcelEndpoints",
+			action: "payload.endpoints.exportExcel",
+		});
 
 		if (error instanceof APIError) {
 			throw error;
