@@ -5,9 +5,6 @@ export const sentryConfig: Parameters<typeof withSentryConfig>[1] = {
 	org: env.SENTRY_ORG,
 	project: env.SENTRY_PROJECT,
 
-	// Only print logs for uploading source maps in CI
-	silent: !env.CI,
-
 	/*
 	 * For all available options, see:
 	 * https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
