@@ -13,10 +13,10 @@ const config: NextConfig = {
 		"@jwc/payload",
 		"@jwc/env",
 		"@jwc/schema",
-		"@jwc/api",
 		"@jwc/ui",
 		"@jwc/utils",
 		"@sentry/nextjs",
+		"@jwc/observability",
 	],
 
 	/** We already do linting and typechecking as separate tasks in CI */

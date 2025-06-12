@@ -1,7 +1,7 @@
 import type { InferRouterInputs, InferRouterOutputs } from "@orpc/server";
 
-import { createORPCContext } from "./orpc";
-import { router as appRouter } from "./router";
+import { createORPCContext } from "~/api/orpc";
+import { router as appRouter } from "~/api/router";
 
 /**
  * Export type definition of API

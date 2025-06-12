@@ -10,8 +10,8 @@
 import { os } from "@orpc/server";
 import type { SanitizedConfig } from "payload";
 
-import { $auth } from "./middlewares/auth";
-import { $payload } from "./middlewares/payload";
+import { $auth } from "~/api/middlewares/auth";
+import { $payload } from "~/api/middlewares/payload";
 
 /**
  * 1. CONTEXT

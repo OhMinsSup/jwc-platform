@@ -1,9 +1,10 @@
+import type { Form } from "@jwc/schema";
 import {
 	formatAttendanceDay,
 	formatAttendanceTime,
+	formatMaskPhoneNumber,
 	formatTshirtSizeText,
 } from "@jwc/utils/format";
-import { formatMaskPhoneNumber } from "./formatMaskPhoneNumber";
 
 /**
  * 브라우저에서 DOM을 사용할 수 있는지 확인하는 함수입니다.
@@ -219,4 +220,15 @@ export const getDisplayValueByTitle = (
 		default:
 			return data || "입력된 정보가 없습니다.";
 	}
+};
+
+export const getFormDataFromStepMap = (stepMap: Map<number, unknown>) => {
+	const values = Object.values(Object.fromEntries(stepMap)) as Record<
+		string,
+		string
+	>[];
+	const formData = values.reduce((acc, curr) => {
+		return Object.assign(acc, curr);
+	}, {} as Form);
+	return formData;
 };

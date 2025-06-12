@@ -1,6 +1,5 @@
 "use client";
 
-import type { AppRouter } from "@jwc/api";
 import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
 import type { RouterUtils } from "@orpc/react-query";
@@ -9,6 +8,7 @@ import type { RouterClient } from "@orpc/server";
 import type { QueryClient } from "@tanstack/react-query";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { createContext, use, useState } from "react";
+import type { AppRouter } from "~/api";
 
 import { createQueryClient } from "~/libs/orpc/queryClient";
 

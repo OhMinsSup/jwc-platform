@@ -1,7 +1,7 @@
 import { os, ORPCError } from "@orpc/server";
 import type { User } from "payload";
-import type { ORPCCOntextType } from "../orpc";
-import type { PayloadMiddlewareContext } from "./payload";
+import type { PayloadMiddlewareContext } from "~/api/middlewares/payload";
+import type { ORPCCOntextType } from "~/api/orpc";
 
 export type AuthMiddlewareContext = ORPCCOntextType &
 	PayloadMiddlewareContext & {

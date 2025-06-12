@@ -1,8 +1,8 @@
-import { appRouter, createORPCContext } from "@jwc/api";
 import { onError } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fetch";
 import { BatchHandlerPlugin } from "@orpc/server/plugins";
 import type { NextRequest } from "next/server";
+import { appRouter, createORPCContext } from "~/api";
 
 import config from "~/payload.config";
 
