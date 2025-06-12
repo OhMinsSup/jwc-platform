@@ -41,7 +41,7 @@ class Logger {
 	public error(label: LogCategory, error: string | Error, extra?: Extra) {
 		if (env.NODE_ENV === "production" && env.NEXT_PUBLIC_SENTRY_DSN) {
 			const err = error instanceof Error ? error : new Error(error);
-			const extra2 = this.sanitize(extra);
+			const sanitizeExtra = this.sanitize(extra);
 			const tags = {
 				name: extra?.name ?? "Logger",
 				action: extra?.action ?? "error",
@@ -50,14 +50,15 @@ class Logger {
 			sentryLogger.error(
 				err.message,
 				Object.assign({}, tags, {
-					extra: extra2,
+					extra: sanitizeExtra,
 				})
 			);
 			sentryCaptureException(err, {
 				tags,
-				extra: extra2,
+				extra: sanitizeExtra,
 				level: "error",
 			});
+			this.output.error(error, label, sanitizeExtra);
 		} else {
 			this.output.error(error, label, this.sanitize(extra));
 		}
