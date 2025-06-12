@@ -26,8 +26,8 @@ type Extra = {
 class Logger {
 	output: ReturnType<typeof createConsola>;
 
-	public constructor() {
-		this.output = createConsola().withTag("Observability");
+	public constructor(tag = "JWC-FORM") {
+		this.output = createConsola().withTag(tag);
 	}
 
 	public info(label: LogCategory, error: string | Error, extra?: Extra) {
@@ -47,18 +47,16 @@ class Logger {
 				action: extra?.action ?? "error",
 				label,
 			};
-			sentryLogger.error(
-				err.message,
-				Object.assign({}, tags, {
-					extra: sanitizeExtra,
-				})
-			);
-			sentryCaptureException(err, {
+
+			const opts = {
 				tags,
 				extra: sanitizeExtra,
-				level: "error",
-			});
-			this.output.error(error, label, sanitizeExtra);
+				level: "error" as const,
+			};
+
+			sentryLogger.error(err.message, opts);
+			sentryCaptureException(err, opts);
+			this.output.error(error, label, opts);
 		} else {
 			this.output.error(error, label, this.sanitize(extra));
 		}
