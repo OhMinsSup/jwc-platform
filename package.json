@@ -1,16 +1,10 @@
 {
 	"name": "jwc-forms",
 	"private": true,
-	"keywords": [
-		"jwc"
-	],
+	"keywords": ["jwc"],
 	"license": "ISC",
 	"author": "OhMinsSup",
-	"workspaces": [
-		"apps/*",
-		"packages/*",
-		"tooling/*"
-	],
+	"workspaces": ["apps/*", "packages/*", "tooling/*"],
 	"scripts": {
 		"bootstrap": "husky",
 		"build": "turbo run build",
@@ -23,6 +17,7 @@
 		"generate:importmap": "turbo run generate:importmap",
 		"generate:types": "turbo run generate:types",
 		"postinstall": "pnpm lint:ws",
+		"lint-staged": "lint-staged",
 		"lint": "turbo run lint && manypkg check",
 		"lint:ws": "pnpm dlx sherif@latest",
 		"lint:syncpack": "syncpack lint",
@@ -48,5 +43,8 @@
 	"engines": {
 		"bun": ">=1.0",
 		"node": ">=20.16.0"
+	},
+	"lint-staged": {
+		"*": ["pnpm run lint", "pnpm run format", "pnpm run typecheck"]
 	}
 }
