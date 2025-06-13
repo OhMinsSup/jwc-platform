@@ -1,5 +1,5 @@
 import { os } from "@orpc/server";
-import { type Payload, type SanitizedConfig, getPayload } from "payload";
+import { type Payload, getPayload } from "payload";
 import type { ORPCCOntextType } from "../orpc";
 
 export type PayloadMiddlewareContext = ORPCCOntextType & {

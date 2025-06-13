@@ -1,7 +1,4 @@
-import {
-	captureException as sentryCaptureException,
-	logger as sentryLogger,
-} from "@sentry/nextjs";
+import * as Sentry from "@sentry/nextjs";
 import { createConsola } from "consola";
 import { env } from "./env";
 
@@ -54,8 +51,8 @@ class Logger {
 				level: "error" as const,
 			};
 
-			sentryLogger.error(err.message, opts);
-			sentryCaptureException(err, opts);
+			Sentry.logger.error(err.message, opts);
+			Sentry.captureException(err, opts);
 			this.output.error(error, label, opts);
 		} else {
 			this.output.error(error, label, this.sanitize(extra));

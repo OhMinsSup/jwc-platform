@@ -1,10 +1,15 @@
-import type { Form } from "@jwc/schema";
 import { Button, Icons, ScrollArea } from "@jwc/ui";
-import React, { useActionState, useEffect } from "react";
+import { onSuccess } from "@orpc/client";
+import { useServerAction } from "@orpc/react/hooks";
+import React from "react";
+import { upsertForm } from "~/api/actions/forms";
 import { useStepAtomValue } from "~/atoms/stepAtom";
-import { type State, upsert } from "~/libs/actions/upsert.actions";
 import { useStepNavigation } from "~/libs/hooks/useStepNavigation";
-import { getDisplayValueByTitle, getIdxToText } from "~/libs/utils/misc";
+import {
+	getDisplayValueByTitle,
+	getFormDataFromStepMap,
+	getIdxToText,
+} from "~/libs/utils/misc";
 
 export default function FormConfirm() {
 	const { stepMap } = useStepAtomValue();
@@ -13,30 +18,21 @@ export default function FormConfirm() {
 
 	const list = Array.from(stepMap.entries());
 
-	const [state, formAction, isPending] = useActionState(
-		async (state: State, formData: Form) => {
-			return await upsert(state, formData);
-		},
-		null
-	);
+	const { execute, status } = useServerAction(upsertForm, {
+		interceptors: [
+			onSuccess((ctx) => {
+				if (ctx.success && typeof ctx.data === "number") {
+					goToNextStep();
+				}
+			}),
+		],
+	});
 
-	const action = async (_: FormData) => {
-		const values = Object.values(Object.fromEntries(stepMap)) as Record<
-			string,
-			string
-		>[];
-		const formData = values.reduce((acc, curr) => {
-			return Object.assign(acc, curr);
-		}, {} as Form);
-		formAction(formData);
+	const isPending = status === "pending";
+
+	const action = (_: FormData) => {
+		execute(getFormDataFromStepMap(stepMap));
 	};
-
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-	useEffect(() => {
-		if (state?.success && typeof state?.data === "number") {
-			goToNextStep();
-		}
-	}, [state?.success, state?.data]);
 
 	return (
 		<form className="space-y-8" action={action}>

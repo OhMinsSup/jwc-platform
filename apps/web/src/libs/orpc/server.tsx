@@ -1,12 +1,12 @@
 "server only";
 
-import { appRouter, createORPCContext } from "@jwc/api";
 import type { QueryOptionsBase } from "@orpc/react-query";
 import { createRouterUtils } from "@orpc/react-query";
 import { createRouterClient } from "@orpc/server";
 import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
 import { headers } from "next/headers";
 import { cache } from "react";
+import { appRouter, createORPCContext } from "~/api";
 
 import { createQueryClient } from "~/libs/orpc/queryClient";
 import config from "~/payload.config";

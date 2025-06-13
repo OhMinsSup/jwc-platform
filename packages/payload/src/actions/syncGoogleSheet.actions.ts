@@ -2,7 +2,7 @@
 import { gapi } from "@jwc/google";
 import { log } from "@jwc/observability/log";
 import { configurePayload } from "@jwc/payload/configurePayload";
-import { withServerActionInstrumentation } from "@sentry/nextjs";
+import * as Sentry from "@sentry/nextjs";
 import { headers } from "next/headers";
 import { getPayload } from "payload";
 
@@ -40,7 +40,7 @@ export async function serverAction(_: State): Promise<NonNullable<State>> {
 }
 
 export async function syncGoogleSheet(state: State) {
-	return await withServerActionInstrumentation(
+	return await Sentry.withServerActionInstrumentation(
 		"syncGoogleSheetAction",
 		{
 			headers: await headers(),
