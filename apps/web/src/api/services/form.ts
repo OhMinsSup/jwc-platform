@@ -14,7 +14,7 @@ export async function createForm(payload: Payload, data: Form) {
 		collection: "forms",
 		data,
 	});
-	return created as unknown as Promise<TypeWithID & Form>;
+	return created;
 }
 
 /**
@@ -33,7 +33,7 @@ export async function updateForm(
 		id,
 		data,
 	});
-	return updated as unknown as Promise<TypeWithID & Form>;
+	return updated;
 }
 
 /**
@@ -70,7 +70,7 @@ export async function findFormByUser(
 		);
 	}
 
-	return exists.at(-1) as unknown as Promise<(TypeWithID & Form) | undefined>;
+	return exists.at(-1);
 }
 
 /**
