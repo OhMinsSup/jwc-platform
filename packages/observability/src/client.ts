@@ -4,15 +4,11 @@
  * https://docs.sentry.io/platforms/javascript/guides/nextjs/
  */
 
-import {
-	consoleLoggingIntegration,
-	init,
-	replayIntegration,
-} from "@sentry/nextjs";
+import * as Sentry from "@sentry/nextjs";
 import { env } from "./env";
 
-export const initializeSentry = (): ReturnType<typeof init> => {
-	return init({
+export const initializeSentry = (): ReturnType<typeof Sentry.init> => {
+	return Sentry.init({
 		enabled: !!env.NEXT_PUBLIC_SENTRY_DSN,
 		dsn: env.NEXT_PUBLIC_SENTRY_DSN,
 
@@ -32,12 +28,12 @@ export const initializeSentry = (): ReturnType<typeof init> => {
 
 		// You can remove this option if you're not planning to use the Sentry Session Replay feature:
 		integrations: [
-			replayIntegration({
+			Sentry.replayIntegration({
 				// Additional Replay configuration goes in here, for example:
 				maskAllText: true,
 				blockAllMedia: true,
 			}),
-			consoleLoggingIntegration({ levels: ["error"] }),
+			Sentry.consoleLoggingIntegration({ levels: ["error"] }),
 		],
 
 		_experiments: { enableLogs: true },

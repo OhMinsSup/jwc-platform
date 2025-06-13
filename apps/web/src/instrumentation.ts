@@ -1,4 +1,4 @@
-import { captureRequestError } from "@sentry/nextjs";
+import * as Sentry from "@sentry/nextjs";
 import type { Instrumentation } from "next";
 
 export async function register() {
@@ -12,5 +12,5 @@ export async function register() {
 }
 
 export const onRequestError: Instrumentation.onRequestError = (...args) => {
-	captureRequestError(...args);
+	Sentry.captureRequestError(...args);
 };

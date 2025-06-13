@@ -1,8 +1,8 @@
-import { consoleLoggingIntegration, init } from "@sentry/nextjs";
+import * as Sentry from "@sentry/nextjs";
 import { env } from "./env";
 
-export const initializeSentry = (): ReturnType<typeof init> => {
-	return init({
+export const initializeSentry = (): ReturnType<typeof Sentry.init> => {
+	return Sentry.init({
 		enabled: !!env.NEXT_PUBLIC_SENTRY_DSN,
 		dsn: env.NEXT_PUBLIC_SENTRY_DSN,
 
@@ -18,6 +18,6 @@ export const initializeSentry = (): ReturnType<typeof init> => {
 
 		_experiments: { enableLogs: true },
 
-		integrations: [consoleLoggingIntegration({ levels: ["error"] })],
+		integrations: [Sentry.consoleLoggingIntegration({ levels: ["error"] })],
 	});
 };
