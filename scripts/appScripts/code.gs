@@ -7,14 +7,15 @@ function onEdit(e) {
   const range = e.range;
   const sheet = range.getSheet();
   const sheetName = sheet.getName();
+  const spreadsheetId = e.source.getId();
 
   if (sheetName !== SHEET_TITLE) {
     console.log(`onEdit: Sheet name "${sheetName}" does not match "${SHEET_TITLE}". Skipping...`);
     return;
   }
 
-  if (e.source.getId() !== SHEET_ID) {
-    console.log(`onEdit: Spreadsheet ID "${e.source.getId()}" does not match "${SHEET_ID}". Skipping...`);
+  if (spreadsheetId !== SHEET_ID) {
+    console.log(`onEdit: Spreadsheet ID "${spreadsheetId}" does not match "${SHEET_ID}". Skipping...`);
     return;
   }
 
@@ -24,6 +25,11 @@ function onEdit(e) {
 
   // 현재 변경한 셀의 컬럼 번호에 해당하는 헤더 값을 가져온다.
   const headerValue = headers[range.getColumn() - 1];
+
+  if (!headerValue) {
+    console.log('onEdit: headerValue is required Skipping...')
+    return;
+  }
   
   // 1행(헤더)에서 "id" 컬럼의 인덱스 찾기
   const idColIdx = headers.findIndex(h => String(h).toLowerCase() === "id");
@@ -34,9 +40,14 @@ function onEdit(e) {
     idValue = sheet.getRange(range.getRow(), idColIdx + 1).getValue();
   }
 
+  if (!idColIdx) {
+    console.log('onEdit: ID is required Skipping...')
+    return;
+  }
+
   const payload = {
     eventType: 'EDIT',
-    spreadsheetId: e.source.getId(),
+    spreadsheetId: spreadsheetId,
     sheetName: sheetName,
     range: range.getA1Notation(),
     row: range.getRow(),
@@ -73,7 +84,6 @@ function sendWebhook(payload) {
 
 /** 트리거 생성 함수 */
 function createTriggers() {
-  SpreadsheetApp.get
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   ScriptApp.newTrigger('onEdit').forSpreadsheet(spreadsheet).onEdit().create();
   console.log('Triggers created successfully!');
