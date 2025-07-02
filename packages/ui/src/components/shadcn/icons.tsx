@@ -6,12 +6,14 @@ import {
 	Book,
 	BookOpen,
 	Calendar,
+	CalendarIcon,
 	Check,
 	ChevronDown,
 	ChevronLeft,
 	ChevronRight,
 	ChevronUp,
 	Church,
+	Clock,
 	Copy,
 	CopyCheck,
 	CornerDownLeft,
@@ -44,6 +46,8 @@ import {
 import React from "react";
 
 export const Icons = {
+	CalendarIcon: (props: LucideProps) => <CalendarIcon {...props} />,
+	Clock: (props: LucideProps) => <Clock {...props} />,
 	ArrowUpDown: (props: LucideProps) => <ArrowUpDown {...props} />,
 	MoreHorizontal: (props: LucideProps) => <MoreHorizontal {...props} />,
 	ChevronLeft: (props: LucideProps) => <ChevronLeft {...props} />,

@@ -1,0 +1,30 @@
+{
+	"name": "@jwc/auth",
+	"version": "0.1.0",
+	"private": true,
+	"license": "MIT",
+	"type": "module",
+	"exports": {
+		"./package.json": "./package.json",
+		".": "./src/index.ts"
+	},
+	"scripts": {
+		"clean": "git clean -xdf .cache .turbo dist node_modules",
+		"format": "biome format --write ./src",
+		"lint": "biome lint --error-on-warnings ./src",
+		"typecheck": "tsc --noEmit",
+		"auth:generate": "pnpm with-env pnpm dlx @better-auth/cli@latest generate --output ../database/prisma/next-schemas/auth.schema --y",
+		"with-env": "dotenv -e ../../.env --"
+	},
+	"dependencies": {
+		"@jwc/database": "workspace:*",
+		"@jwc/env": "workspace:*",
+		"better-auth": "catalog:auth",
+		"zod": "catalog:"
+	},
+	"devDependencies": {
+		"@better-auth/cli": "catalog:auth",
+		"@jwc/tsconfig": "workspace:*",
+		"typescript": "catalog:"
+	}
+}

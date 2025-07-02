@@ -1,0 +1,12 @@
+{
+	"name": "@jwc/supabase",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"reset": "supabase db reset",
+		"dev": "supabase start",
+		"login": "supabase login",
+		"stop": "supabase stop"
+	}
+}

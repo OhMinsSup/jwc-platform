@@ -37,10 +37,23 @@ catalogs:
     "@orpc/server": "^1.2.0"
     "@orpc/zod": "^1.2.0"
   payload:
-    "@payloadcms/db-postgres": "^3.40.0"
-    "@payloadcms/live-preview-react": "^3.40.0"
-    "@payloadcms/next": "^3.40.0"
-    "@payloadcms/plugin-sentry": "^3.40.0"
-    "@payloadcms/richtext-lexical": "^3.40.0"
-    "@payloadcms/ui": "^3.40.0"
-    "payload": "^3.40.0"
+    "@payloadcms/db-postgres": "^3.44.0"
+    "@payloadcms/live-preview-react": "^3.44.0"
+    "@payloadcms/next": "^3.44.0"
+    "@payloadcms/plugin-sentry": "^3.44.0"
+    "@payloadcms/richtext-lexical": "^3.44.0"
+    "@payloadcms/ui": "^3.44.0"
+    "payload": "^3.44.0"
+  prisma6:
+    '@prisma/client': ^6.10.1
+    "@prisma/adapter-d1": ^6.10.1
+    prisma: ^6.10.1
+  auth:
+    better-auth: ^1.2.12
+    '@better-auth/cli': ^1.2.12
+
+onlyBuiltDependencies:
+  - '@prisma/client'
+  - '@prisma/engines'
+  - esbuild
+  - prisma

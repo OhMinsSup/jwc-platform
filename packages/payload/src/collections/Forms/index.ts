@@ -255,52 +255,12 @@ export const Forms: CollectionConfig = {
 			type: "text",
 		},
 		{
-			name: "memo",
-			label: {
-				ko: "메모",
-				en: "Memo",
-			},
-			type: "richText",
-		},
-		{
-			name: "attendanceDay",
-			type: "text",
+			name: "attendanceTime",
+			type: "date",
 			label: {
 				ko: "참석 날짜",
-				en: "Attendance Day",
+				en: "Attendance Date",
 			},
-		},
-		{
-			name: "attendanceTime",
-			type: "select",
-			defaultValue: "PM",
-			label: {
-				ko: "오전/오후",
-				en: "AM/PM",
-			},
-			options: [
-				{
-					value: "AM",
-					label: {
-						ko: "오전",
-						en: "AM",
-					},
-				},
-				{
-					value: "PM",
-					label: {
-						ko: "오후",
-						en: "PM",
-					},
-				},
-				{
-					value: "EVENING",
-					label: {
-						ko: "저녁",
-						en: "Evening",
-					},
-				},
-			],
 		},
 		{
 			name: "tshirtSize",

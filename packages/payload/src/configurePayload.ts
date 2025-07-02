@@ -1,7 +1,6 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { Forms } from "@jwc/payload/collections/Forms";
-import { Sheets } from "@jwc/payload/collections/Sheets";
 import { Users } from "@jwc/payload/collections/Users";
 import { syncGoogleSheetEndpoints } from "@jwc/payload/endpoints/syncGoogleSheet.endpoints";
 import { postgresAdapter } from "@payloadcms/db-postgres";
@@ -24,7 +23,7 @@ const baseConfig: Config = {
 			baseDir: path.resolve(dirname),
 		},
 	},
-	collections: [Users, Forms, Sheets],
+	collections: [Users, Forms],
 	typescript: {
 		outputFile: path.resolve(dirname, "payload.types.ts"),
 		declare: false,
@@ -35,7 +34,7 @@ const baseConfig: Config = {
 		},
 		migrationDir: path.resolve(dirname, "migrations"),
 	}),
-	editor: lexicalEditor({}),
+	editor: lexicalEditor(),
 	i18n: {
 		supportedLanguages: { en, ko },
 	},

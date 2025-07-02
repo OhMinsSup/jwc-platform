@@ -69,7 +69,6 @@ export interface Config {
   collections: {
     users: User;
     forms: Form;
-    sheets: Sheet;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -78,7 +77,6 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
-    sheets: SheetsSelect<false> | SheetsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -131,6 +129,13 @@ export interface User {
   hash?: string | null;
   loginAttempts?: number | null;
   lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
   password?: string | null;
 }
 /**
@@ -149,58 +154,9 @@ export interface Form {
   tfTeam?: ('없음' | '찬양팀' | '프로그램팀' | '미디어팀') | null;
   carSupport?: boolean | null;
   carSupportContent?: string | null;
-  memo?: {
-    root: {
-      type: string;
-      children: {
-        type: string;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  attendanceDay?: string | null;
-  attendanceTime?: ('AM' | 'PM' | 'EVENING') | null;
+  attendanceTime?: string | null;
   tshirtSize?: ('s' | 'm' | 'l' | 'xl' | '2xl' | '3xl') | null;
   ageGroup: string;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "sheets".
- */
-export interface Sheet {
-  id: number;
-  fileId?: string | null;
-  kind?: string | null;
-  mimeType?: string | null;
-  name?: string | null;
-  webContentLink?: string | null;
-  webViewLink?: string | null;
-  schemaFile:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  permissions?:
-    | {
-        permissionId?: string | null;
-        type?: string | null;
-        role?: string | null;
-        emailAddress?: string | null;
-        id?: string | null;
-      }[]
-    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -218,10 +174,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'forms';
         value: number | Form;
-      } | null)
-    | ({
-        relationTo: 'sheets';
-        value: number | Sheet;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -280,6 +232,13 @@ export interface UsersSelect<T extends boolean = true> {
   hash?: T;
   loginAttempts?: T;
   lockUntil?: T;
+  sessions?:
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -296,35 +255,9 @@ export interface FormsSelect<T extends boolean = true> {
   tfTeam?: T;
   carSupport?: T;
   carSupportContent?: T;
-  memo?: T;
-  attendanceDay?: T;
   attendanceTime?: T;
   tshirtSize?: T;
   ageGroup?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "sheets_select".
- */
-export interface SheetsSelect<T extends boolean = true> {
-  fileId?: T;
-  kind?: T;
-  mimeType?: T;
-  name?: T;
-  webContentLink?: T;
-  webViewLink?: T;
-  schemaFile?: T;
-  permissions?:
-    | T
-    | {
-        permissionId?: T;
-        type?: T;
-        role?: T;
-        emailAddress?: T;
-        id?: T;
-      };
   updatedAt?: T;
   createdAt?: T;
 }

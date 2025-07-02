@@ -1,0 +1,11 @@
+generator client {
+    provider        = "prisma-client"
+    output          = "../../generated"
+    moduleFormat    = "esm"
+    previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+    provider = "sqlite"
+    url      = env("DATABASE_URL")
+}
