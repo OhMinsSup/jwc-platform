@@ -1,57 +1,6 @@
 import type { Options } from "./types";
 
 /**
- * 참석 날짜 옵션 목록을 반환합니다.
- *
- * @returns 참석 날짜 옵션 배열
- */
-export const getAttendanceDayOptions = (): Options => {
-	return [
-		{
-			name: "6월 19일",
-			value: "19",
-		},
-		{
-			name: "6월 20일",
-			value: "20",
-		},
-		{
-			name: "6월 21일",
-			value: "21",
-		},
-		{
-			name: "6월 22일",
-			value: "22",
-		},
-	];
-};
-
-/**
- * 참석 시간 옵션 목록을 반환합니다.
- *
- * @returns 참석 시간 옵션 배열
- */
-export const getAttendanceTimeOptions = (): Options => {
-	return [
-		{
-			name: "오전",
-			value: "AM",
-			description: "오전 9시부터 12시까지",
-		},
-		{
-			name: "오후",
-			value: "PM",
-			description: "오후 1시부터 6시까지",
-		},
-		{
-			name: "저녁",
-			value: "EVENING",
-			description: "오후 7시부터 10시까지",
-		},
-	];
-};
-
-/**
  * 부서 옵션 목록을 반환합니다.
  *
  * @returns 부서 옵션 배열

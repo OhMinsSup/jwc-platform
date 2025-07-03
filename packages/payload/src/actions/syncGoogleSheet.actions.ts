@@ -14,7 +14,8 @@ export type State = {
 	readonly sheetUrl?: string;
 	readonly format?: "excel" | "google" | "both";
 	readonly filename?: string;
-	readonly data?: ArrayBuffer;
+	readonly downloadUrl?: string;
+	readonly data?: ArrayBuffer; // 다른 액션에서 사용할 수도 있으므로 유지
 } | null;
 
 export async function serverAction(
@@ -100,93 +101,88 @@ export async function syncBothFormats(state: State) {
 }
 
 /**
- * 스프레드시트 액션 헬퍼 함수들
+ * 데이터 개수 조회
  */
-export namespace SpreadsheetActions {
-	/**
-	 * 데이터 개수 조회
-	 */
-	export async function getFormCount(): Promise<number> {
-		try {
-			const result = await SpreadsheetApi.getSpreadsheetStatus();
-			if (result.success && result.data) {
-				return result.data.recordCount || 0;
-			}
-			return 0;
-		} catch (error) {
-			log.error("serverActions", error as Error, {
-				name: "getFormCount",
-				action: "get-form-count",
-			});
-			return 0;
+export async function getFormCountAction(): Promise<number> {
+	try {
+		const result = await SpreadsheetApi.getSpreadsheetStatus();
+		if (result.success && result.data) {
+			return result.data.recordCount || 0;
 		}
+		return 0;
+	} catch (error) {
+		log.error("serverActions", error as Error, {
+			name: "getFormCount",
+			action: "get-form-count",
+		});
+		return 0;
 	}
+}
 
-	/**
-	 * 스프레드시트 상태 확인
-	 */
-	export async function checkSpreadsheetStatus(): Promise<{
-		totalRecords: number;
-		googleSheetsUrl?: string;
-		lastSync?: string;
-	}> {
-		try {
-			const result = await SpreadsheetApi.getSpreadsheetStatus();
+/**
+ * 스프레드시트 상태 확인
+ */
+export async function checkSpreadsheetStatusAction(): Promise<{
+	totalRecords: number;
+	googleSheetsUrl?: string;
+	lastSync?: string;
+}> {
+	try {
+		const result = await SpreadsheetApi.getSpreadsheetStatus();
 
-			if (result.success && result.data) {
-				return {
-					totalRecords: result.data.recordCount || 0,
-					googleSheetsUrl: result.data.sheetUrl,
-					lastSync: new Date().toISOString(),
-				};
-			}
-
+		if (result.success && result.data) {
 			return {
-				totalRecords: 0,
-				lastSync: new Date().toISOString(),
-			};
-		} catch (error) {
-			log.error("serverActions", error as Error, {
-				name: "checkSpreadsheetStatus",
-				action: "check-spreadsheet-status",
-			});
-			return {
-				totalRecords: 0,
+				totalRecords: result.data.recordCount || 0,
+				googleSheetsUrl: result.data.sheetUrl,
 				lastSync: new Date().toISOString(),
 			};
 		}
+
+		return {
+			totalRecords: 0,
+			lastSync: new Date().toISOString(),
+		};
+	} catch (error) {
+		log.error("serverActions", error as Error, {
+			name: "checkSpreadsheetStatus",
+			action: "check-spreadsheet-status",
+		});
+		return {
+			totalRecords: 0,
+			lastSync: new Date().toISOString(),
+		};
 	}
+}
 
-	/**
-	 * Excel 파일 생성 및 다운로드
-	 */
-	export async function downloadExcel(): Promise<NonNullable<State>> {
-		try {
-			const result = await SpreadsheetApi.downloadExcel();
+/**
+ * Excel 파일 생성 및 다운로드
+ */
+export async function downloadExcelFileAction(): Promise<NonNullable<State>> {
+	try {
+		// 서버 액션에서는 직접 blob 데이터를 반환할 수 없으므로
+		// 다운로드 URL을 반환합니다
+		const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, "-");
+		const filename = `청년부_연합_여름_수련회_참가자_명단_${timestamp}.xlsx`;
 
-			if (result.success) {
-				return {
-					success: true,
-					message: "Excel file generated successfully",
-					format: "excel",
-				};
-			}
+		// 다운로드 URL 생성 (클라이언트에서 fetch로 호출)
+		const downloadUrl = "/api/spreadsheet?format=excel&download=true&limit=100";
 
-			return {
-				success: false,
-				message: result.message || "Failed to generate Excel file",
-				format: "excel",
-			};
-		} catch (error) {
-			log.error("serverActions", error as Error, {
-				name: "downloadExcel",
-				action: "download-excel",
-			});
-			return {
-				success: false,
-				message: "An error occurred while generating Excel file",
-				format: "excel",
-			};
-		}
+		return {
+			success: true,
+			message: "Excel download URL generated successfully",
+			downloadUrl,
+			filename,
+			format: "excel",
+		};
+	} catch (error) {
+		log.error("serverActions", error as Error, {
+			name: "downloadExcel",
+			action: "download-excel",
+		});
+		return {
+			success: false,
+			message: "An error occurred while generating Excel file",
+			format: "excel",
+		};
 	}
 }

@@ -1,17 +1,19 @@
 import React from "react";
+import { useStepAtomValue } from "~/atoms/stepAtom";
 import type { LazyComponentProps } from "~/components/common/ConditionLazyRenderer/ConditionLazyRenderer";
 import { FormPhoneContext } from "~/components/forms/FormContext";
 import type { FormFieldSchema } from "~/components/forms/FormContext/FormPhoneContext";
 import { InputFieldForm } from "~/components/forms/InputFieldForm";
 import { useStepSubmitAction } from "~/libs/hooks/useStepSubmitAction";
 
-export default function FormPhone({ idx }: LazyComponentProps) {
+export default function FormPhone(_: LazyComponentProps) {
 	const { onSubmitAction, isLoading } = useStepSubmitAction<FormFieldSchema>();
+	const { step } = useStepAtomValue();
 
 	return (
 		<FormPhoneContext>
 			<InputFieldForm<FormFieldSchema>
-				idx={idx}
+				idx={step}
 				isLoading={isLoading}
 				name="phone"
 				required

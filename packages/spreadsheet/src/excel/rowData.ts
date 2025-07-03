@@ -13,24 +13,7 @@ export class ExcelRowDataManager {
 	generateExcelFormRows<T extends Record<string, unknown>>(
 		docs: T[]
 	): RowFormData[] {
-		return docs.map((doc, index) => ({
-			ID: index + 1,
-			타임스탬프: this.formatTimestamp(doc.createdAt as string),
-			이름: String(doc.name || ""),
-			또래모임: String(doc.ageGroup || ""),
-			연락처: String(doc.phone || ""),
-			성별: String(doc.gender || ""),
-			부서: String(doc.department || ""),
-			"단체티 사이즈": String(doc.tshirtSize || ""),
-			"픽업 가능 시간": String(doc.pickupTimeDesc || ""),
-			"회비 납입 여부": doc.isPaid ? "예" : "아니오",
-			"참석 형태": String(doc.numberOfStays || ""),
-			"참석 날짜": this.formatDate(doc.attendanceTime as string),
-			"참석 시간": this.formatTime(doc.attendanceTime as string),
-			"TF팀 지원": String(doc.tfTeam || "없음"),
-			"차량 지원 여부": doc.carSupport ? "예" : "아니오",
-			"차량 지원 내용": String(doc.carSupportContent || ""),
-		}));
+		return docs;
 	}
 
 	/**

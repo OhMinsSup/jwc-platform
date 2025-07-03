@@ -1,5 +1,5 @@
+import { dayjs, getDateFormat } from "@jwc/utils/date";
 import type { RowFormData, SpreadsheetData } from "../core/types";
-
 /**
  * 데이터 변환 유틸리티
  * 다양한 형식의 데이터를 스프레드시트 형식으로 변환하는 기능을 제공합니다.
@@ -45,8 +45,7 @@ export namespace DataConverter {
 			),
 			"회비 납입 여부": formatBoolean(data.isPaid || data["회비 납입 여부"]),
 			"참석 형태": formatValue(data.numberOfStays || data["참석 형태"] || ""),
-			"참석 날짜": formatDate(data.attendanceTime || data["참석 날짜"]),
-			"참석 시간": formatTime(data.attendanceTime || data["참석 시간"]),
+			"참석 날짜": formatDateTime(data.attendanceTime || data["참석 날짜"]),
 			"TF팀 지원": formatValue(data.tfTeam || data["TF팀 지원"] || "없음"),
 			"차량 지원 여부": formatBoolean(
 				data.carSupport || data["차량 지원 여부"]
@@ -112,17 +111,21 @@ export namespace DataConverter {
 		if (!value) return "";
 
 		try {
-			const date = new Date(value as string);
-			if (Number.isNaN(date.getTime())) return String(value);
-
-			return date.toLocaleDateString("ko-KR", {
-				year: "numeric",
-				month: "2-digit",
-				day: "2-digit",
-			});
-		} catch {
+			return getDateFormat(value);
+		} catch (e) {
+			console.error("Error formatting date:", e);
 			return String(value);
 		}
+	}
+
+	function formatDateTime(value: unknown): string {
+		const date = dayjs(value);
+		if (!date.isValid()) return String(value);
+
+		// MM/dd/yyyy HH:mm
+		const formattedDate = date.tz("Asia/Seoul").format("DD/MM/YYYY");
+		const formattedTime = date.tz("Asia/Seoul").format("HH:mm");
+		return `${formattedDate} ${formattedTime}`;
 	}
 
 	/**
@@ -167,7 +170,6 @@ export namespace DataConverter {
 			{ key: "isPaid", displayName: "회비 납입 여부" },
 			{ key: "numberOfStays", displayName: "참석 형태" },
 			{ key: "attendanceTime", displayName: "참석 날짜" },
-			{ key: "attendanceTime", displayName: "참석 시간" },
 			{ key: "tfTeam", displayName: "TF팀 지원" },
 			{ key: "carSupport", displayName: "차량 지원" },
 			{ key: "note", displayName: "기타 내용" },

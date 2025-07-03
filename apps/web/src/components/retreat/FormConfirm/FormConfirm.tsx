@@ -18,6 +18,8 @@ export default function FormConfirm() {
 
 	const list = Array.from(stepMap.entries());
 
+	console.log("FormConfirm stepMap", stepMap);
+
 	const { execute, status } = useServerAction(upsertForm, {
 		interceptors: [
 			onSuccess((ctx) => {

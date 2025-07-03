@@ -1,3 +1,5 @@
+import { dayjs, getDateFormat } from "../date";
+
 /**
  * 단체티 사이즈 값을 한글 텍스트로 변환합니다.
  *
@@ -51,62 +53,11 @@ export function parseTshirtSizeText(text: string): string {
 /**
  * 참석 날짜 값을 한글 날짜 문자열로 변환합니다.
  *
- * @param value - 참석 날짜 값 (예: "19", "20", "21", "22")
- * @returns 변환된 한글 날짜 문자열 (예: "6월 19일" 등)
+ * @param value - 참석 날짜 값 (예: "2023-10-01T00:00:00Z")
+ * @returns 변환된 한글 날짜 문자열 (예: "2023년 10월 1일")
  */
-export function formatAttendanceDay(value: unknown): string {
-	switch (value) {
-		case "19":
-			return "6월 19일";
-		case "20":
-			return "6월 20일";
-		case "21":
-			return "6월 21일";
-		case "22":
-			return "6월 22일";
-		default:
-			return (value as string) || "";
-	}
-}
-
-/**
- * 한글 날짜 문자열을 참석 날짜 코드로 변환합니다.
- *
- * @param text - 한글 날짜 문자열 (예: "6월 19일" 등)
- * @returns 참석 날짜 코드 (예: "19", "20" 등), 일치하지 않으면 빈 문자열 반환
- */
-export function parseAttendanceDay(text: string): string {
-	switch (text) {
-		case "6월 19일":
-			return "19";
-		case "6월 20일":
-			return "20";
-		case "6월 21일":
-			return "21";
-		case "6월 22일":
-			return "22";
-		default:
-			return "";
-	}
-}
-
-/**
- * 참석 시간 값을 한글 시간 문자열로 변환합니다.
- *
- * @param value - 참석 시간 값 (예: "AM", "PM", "EVENING")
- * @returns 변환된 한글 시간 문자열 (예: "오전", "오후", "저녁")
- */
-export function formatAttendanceTime(value: unknown): string {
-	switch (value) {
-		case "AM":
-			return "오전";
-		case "PM":
-			return "오후";
-		case "EVENING":
-			return "저녁";
-		default:
-			return (value as string) || "";
-	}
+export function formatAttendanceDate(value: unknown): string {
+	return getDateFormat(value as string | Date);
 }
 
 /**
@@ -115,17 +66,8 @@ export function formatAttendanceTime(value: unknown): string {
  * @param text - 한글 시간 문자열 (예: "오전", "오후", "저녁")
  * @returns 참석 시간 코드 (예: "AM", "PM", "EVENING"), 일치하지 않으면 빈 문자열 반환
  */
-export function parseAttendanceTime(text: string): string {
-	switch (text) {
-		case "오전":
-			return "AM";
-		case "오후":
-			return "PM";
-		case "저녁":
-			return "EVENING";
-		default:
-			return "";
-	}
+export function parseAttendanceTime(text: string): Date {
+	return dayjs(text).toDate();
 }
 
 /**

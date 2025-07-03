@@ -2,7 +2,7 @@
 
 import {
 	type State,
-	downloadExcelAction,
+	downloadExcelFileAction,
 } from "@jwc/payload/actions/syncGoogleSheet.actions";
 import { Button, toast } from "@payloadcms/ui";
 import * as Sentry from "@sentry/nextjs";
@@ -29,7 +29,7 @@ export function ExcelExportButton({
 			if (showToast) {
 				toast.info("📊 엑셀 파일을 생성하고 있습니다...");
 			}
-			return await downloadExcelAction(prevState);
+			return await downloadExcelFileAction();
 		},
 		null
 	);
@@ -39,19 +39,41 @@ export function ExcelExportButton({
 		if (state) {
 			if (state.success) {
 				// Excel 파일 다운로드 처리
-				if (state.format === "excel" && state.data && state.filename) {
+				if (state.format === "excel" && state.downloadUrl && state.filename) {
 					try {
-						// ArrayBuffer를 Blob으로 변환
-						const blob = new Blob([state.data], {
-							type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+						// 다운로드 URL로 파일 다운로드
+						const downloadFile = async () => {
+							if (!state.downloadUrl || !state.filename) {
+								throw new Error("Download URL or filename is missing");
+							}
+
+							const response = await fetch(state.downloadUrl);
+							if (!response.ok) {
+								throw new Error(`HTTP error! status: ${response.status}`);
+							}
+
+							const blob = await response.blob();
+							FileSaver.saveAs(blob, state.filename);
+
+							if (showToast) {
+								toast.success("✅ 엑셀 파일이 성공적으로 다운로드되었습니다!");
+							}
+						};
+
+						downloadFile().catch((error) => {
+							console.error("File download error:", error);
+							if (showToast) {
+								toast.error("❌ 파일 다운로드 중 오류가 발생했습니다");
+							}
+
+							Sentry.captureException(error, {
+								tags: {
+									component: "ExcelExportButton",
+									action: "fileDownload",
+									type: "client-side",
+								},
+							});
 						});
-
-						// 파일 다운로드
-						FileSaver.saveAs(blob, state.filename);
-
-						if (showToast) {
-							toast.success("✅ 엑셀 파일이 성공적으로 다운로드되었습니다!");
-						}
 					} catch (error) {
 						console.error("File download error:", error);
 						if (showToast) {

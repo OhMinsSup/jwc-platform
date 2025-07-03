@@ -1,13 +1,15 @@
 import { getTfTeamOptions } from "@jwc/utils/options";
 import React, { useMemo } from "react";
+import { useStepAtomValue } from "~/atoms/stepAtom";
 import type { LazyComponentProps } from "~/components/common/ConditionLazyRenderer/ConditionLazyRenderer";
 import { FormTFTeamContext } from "~/components/forms/FormContext";
 import type { FormFieldSchema } from "~/components/forms/FormContext/FormTFTeamContext";
 import { SelectFieldForm } from "~/components/forms/SelectFieldForm";
 import { useStepSubmitAction } from "~/libs/hooks/useStepSubmitAction";
 
-export default function FormTFTeam({ idx }: LazyComponentProps) {
+export default function FormTFTeam(_: LazyComponentProps) {
 	const { onSubmitAction, isLoading } = useStepSubmitAction<FormFieldSchema>();
+	const { step } = useStepAtomValue();
 
 	const options = useMemo(() => {
 		return getTfTeamOptions().map((option) => {
@@ -49,7 +51,7 @@ export default function FormTFTeam({ idx }: LazyComponentProps) {
 	return (
 		<FormTFTeamContext>
 			<SelectFieldForm<FormFieldSchema>
-				idx={idx}
+				idx={step}
 				name="tfTeam"
 				label="지원하고 싶은 TF팀이 있으신가요?"
 				isLoading={isLoading}

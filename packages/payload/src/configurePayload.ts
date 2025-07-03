@@ -46,12 +46,12 @@ const baseConfig: Config = {
 	secret: env.PAYLOAD_PRIVATE_SECRET,
 	endpoints: [
 		{
-			path: "/api/spreadsheet",
+			path: "/spreadsheet",
 			method: "get",
 			handler: spreadsheetEndpoints,
 		},
 		{
-			path: "/api/spreadsheet",
+			path: "/spreadsheet",
 			method: "post",
 			handler: spreadsheetEndpoints,
 		},

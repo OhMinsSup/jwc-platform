@@ -1,17 +1,19 @@
 import React from "react";
+import { useStepAtomValue } from "~/atoms/stepAtom";
 import type { LazyComponentProps } from "~/components/common/ConditionLazyRenderer/ConditionLazyRenderer";
 import { FormCarSupportContentContext } from "~/components/forms/FormContext";
 import type { FormFieldSchema } from "~/components/forms/FormContext/FormCarSupportContentContext";
 import { TextareaFieldForm } from "~/components/forms/TextareaFieldForm";
 import { useStepSubmitAction } from "~/libs/hooks/useStepSubmitAction";
 
-export default function FormCarSupportContent({ idx }: LazyComponentProps) {
+export default function FormCarSupportContent(_: LazyComponentProps) {
 	const { onSubmitAction, isLoading } = useStepSubmitAction<FormFieldSchema>();
+	const { step } = useStepAtomValue();
 
 	return (
 		<FormCarSupportContentContext>
 			<TextareaFieldForm<FormFieldSchema>
-				idx={idx}
+				idx={step}
 				isLoading={isLoading}
 				name="carSupportContent"
 				label="차량 지원이 가능하시다면 추가적인 내용을 적어주세요."

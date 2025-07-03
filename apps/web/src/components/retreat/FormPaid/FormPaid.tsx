@@ -7,6 +7,7 @@ import {
 	PopoverTrigger,
 } from "@jwc/ui";
 import type React from "react";
+import { useStepAtomValue } from "~/atoms/stepAtom";
 import type { LazyComponentProps } from "~/components/common/ConditionLazyRenderer/ConditionLazyRenderer";
 import { FormPaidContext } from "~/components/forms/FormContext";
 import type { FormFieldSchema } from "~/components/forms/FormContext/FormPaidContext";
@@ -81,13 +82,14 @@ function CopyButton() {
 	);
 }
 
-export default function FormPaid({ idx }: LazyComponentProps) {
+export default function FormPaid(_: LazyComponentProps) {
 	const { onSubmitAction, isLoading } = useStepSubmitAction<FormFieldSchema>();
+	const { step } = useStepAtomValue();
 
 	return (
 		<FormPaidContext>
 			<SwitchFieldForm<FormFieldSchema>
-				idx={idx}
+				idx={step}
 				isLoading={isLoading}
 				name="isPaid"
 				label="회비를 납부하셨나요? 납부 하셨다면 체크해주세요."

@@ -1,5 +1,4 @@
-import * as Excel from "exceljs";
-import type { RowFormData, SpreadsheetHeaders } from "../core/types";
+import type { SpreadsheetHeaders } from "../core/types";
 
 /**
  * Excel 헤더 관리 클래스
@@ -47,8 +46,7 @@ export class ExcelHeaderManager {
 				columnType: "DROPDOWN",
 				options: ["3박4일", "2박3일", "1박2일", "무박"],
 			},
-			{ name: "참석 날짜", width: 20, columnType: "DATE" },
-			{ name: "참석 시간", width: 15, columnType: "TIME" },
+			{ name: "참석 날짜", width: 20, columnType: "DATE_TIME" },
 			{
 				name: "TF팀 지원",
 				width: 15,

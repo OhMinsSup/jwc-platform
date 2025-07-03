@@ -49,11 +49,7 @@ export type SpreadsheetApiResponse = InternalApiResponse<SpreadsheetApiData>;
  * 베이스 URL 가져오기
  */
 function getBaseUrl(): string {
-	return (
-		process.env.NEXTAUTH_URL ||
-		process.env.PAYLOAD_PUBLIC_SERVER_URL ||
-		"http://localhost:3000"
-	);
+	return process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3001";
 }
 
 /**

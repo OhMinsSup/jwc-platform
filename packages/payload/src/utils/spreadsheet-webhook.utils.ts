@@ -1,7 +1,6 @@
 import { env } from "@jwc/payload/env";
 import { DataConverter } from "@jwc/spreadsheet";
 import {
-	parseAttendanceDay,
 	parseAttendanceTime,
 	parseName,
 	parseTshirtSizeText,
@@ -33,9 +32,6 @@ export function parseValueByKey(key: string, value: unknown): unknown {
 	switch (key) {
 		case "tshirtSize": {
 			return parseTshirtSizeText(value as string);
-		}
-		case "attendanceDay": {
-			return parseAttendanceDay(value as string);
 		}
 		case "attendanceTime": {
 			return parseAttendanceTime(value as string);
