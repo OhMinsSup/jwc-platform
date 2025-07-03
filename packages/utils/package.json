@@ -7,8 +7,7 @@
 		"./package.json": "./package.json",
 		"./date": "./src/date/index.ts",
 		"./format": "./src/format/index.ts",
-		"./options": "./src/options/index.ts",
-		"./buffer": "./src/buffer/index.ts"
+		"./options": "./src/options/index.ts"
 	},
 	"license": "MIT",
 	"scripts": {

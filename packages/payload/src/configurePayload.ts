@@ -1,5 +1,8 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { ClubForms } from "@jwc/payload/collections/ClubForms";
+import { Clubs } from "@jwc/payload/collections/Clubs"; // Importing Clubs collection for side effects
+import { Components } from "@jwc/payload/collections/Components"; // Importing Clubs collection for side effects
 import { Forms } from "@jwc/payload/collections/Forms";
 import { Users } from "@jwc/payload/collections/Users";
 import { spreadsheetEndpoints } from "@jwc/payload/endpoints/spreadsheet-integrated.endpoints";
@@ -23,7 +26,7 @@ const baseConfig: Config = {
 			baseDir: path.resolve(dirname),
 		},
 	},
-	collections: [Users, Forms],
+	collections: [Users, Forms, Clubs, Components, ClubForms],
 	typescript: {
 		outputFile: path.resolve(dirname, "payload.types.ts"),
 		declare: false,

@@ -13,7 +13,7 @@ export class ExcelRowDataManager {
 	generateExcelFormRows<T extends Record<string, unknown>>(
 		docs: T[]
 	): RowFormData[] {
-		return docs;
+		return docs as unknown as RowFormData[]; // 타입 캐스팅을 통해 RowFormData로 변환
 	}
 
 	/**

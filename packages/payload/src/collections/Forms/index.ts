@@ -49,6 +49,10 @@ export const Forms: CollectionConfig = {
 			},
 			required: true,
 			maxLength: 100,
+			hooks: {
+				afterRead: [decryptFieldValue],
+				beforeChange: [encryptFieldValue],
+			},
 		},
 		{
 			name: "phone",

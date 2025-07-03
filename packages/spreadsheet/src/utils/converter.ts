@@ -1,5 +1,5 @@
 import { dayjs, getDateFormat } from "@jwc/utils/date";
-import type { RowFormData, SpreadsheetData } from "../core/types";
+import type { RowFormData } from "../core/types";
 /**
  * 데이터 변환 유틸리티
  * 다양한 형식의 데이터를 스프레드시트 형식으로 변환하는 기능을 제공합니다.
@@ -111,7 +111,7 @@ export namespace DataConverter {
 		if (!value) return "";
 
 		try {
-			return getDateFormat(value);
+			return getDateFormat(value as string);
 		} catch (e) {
 			console.error("Error formatting date:", e);
 			return String(value);
@@ -119,7 +119,7 @@ export namespace DataConverter {
 	}
 
 	function formatDateTime(value: unknown): string {
-		const date = dayjs(value);
+		const date = dayjs(value as string);
 		if (!date.isValid()) return String(value);
 
 		// MM/dd/yyyy HH:mm
