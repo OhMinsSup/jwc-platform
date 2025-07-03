@@ -8,7 +8,7 @@ export const authConfig = {
 	appName: "Jwc",
 	baseURL: `${env.NEXT_PUBLIC_API_URL}/api/v1/auth`,
 	database: prismaAdapter(prisma, {
-		provider: "sqlite",
+		provider: "postgresql",
 	}),
 	trustedOrigins: [env.NEXT_PUBLIC_APP_URL],
 	emailAndPassword: {

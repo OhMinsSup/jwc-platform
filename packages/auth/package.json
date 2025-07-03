@@ -19,7 +19,9 @@
 	"dependencies": {
 		"@jwc/database": "workspace:*",
 		"@jwc/env": "workspace:*",
+		"@payload-auth/better-auth-plugin": "^1.1.8",
 		"better-auth": "catalog:auth",
+		"payload-auth": "^1.6.4",
 		"zod": "catalog:"
 	},
 	"devDependencies": {

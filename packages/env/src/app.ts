@@ -15,9 +15,13 @@ export const app = () =>
 			NEXT_PUBLIC_SENTRY_DSN: isProduction
 				? z.string().min(1)
 				: z.string().optional(),
+			NEXT_PUBLIC_FORM_APP_URL: z.string().url(),
+			NEXT_PUBLIC_BACKEND_URL: z.string().url(),
 		},
 		emptyStringAsUndefined: true,
 		runtimeEnv: {
+			NEXT_PUBLIC_FORM_APP_URL: process.env.NEXT_PUBLIC_FORM_APP_URL,
+			NEXT_PUBLIC_BACKEND_URL: process.env.NEXT_PUBLIC_BACKEND_URL,
 			NEXT_PUBLIC_PAID_ACCOUNT_NUMBER:
 				process.env.NEXT_PUBLIC_PAID_ACCOUNT_NUMBER,
 			NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
