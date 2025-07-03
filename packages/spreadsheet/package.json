@@ -1,5 +1,5 @@
 {
-	"name": "@jwc/google",
+	"name": "@jwc/spreadsheet",
 	"private": true,
 	"version": "0.1.0",
 	"type": "module",
@@ -16,7 +16,8 @@
 	},
 	"dependencies": {
 		"@jwc/env": "workspace:*",
-		"@jwc/excel": "workspace:*",
+		"@jwc/utils": "workspace:*",
+		"exceljs": "^4.4.0",
 		"google-auth-library": "^9.15.1",
 		"googleapis": "^149.0.0"
 	},

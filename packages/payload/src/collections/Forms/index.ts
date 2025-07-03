@@ -1,5 +1,4 @@
 import { authenticated } from "@jwc/payload/access/authenticated";
-import { exportExcelEndpoints } from "@jwc/payload/endpoints/exportExcel.endpoints";
 import { decryptFieldValue } from "@jwc/payload/hooks/decryptFieldValue";
 import { encryptFieldValue } from "@jwc/payload/hooks/encryptFieldValue";
 import { syncGoogleSheet } from "@jwc/payload/hooks/syncGoogleSheet";
@@ -33,13 +32,6 @@ export const Forms: CollectionConfig = {
 			],
 		},
 	},
-	endpoints: [
-		{
-			path: "/excel/export",
-			method: "get",
-			handler: exportExcelEndpoints,
-		},
-	],
 	fields: [
 		{
 			name: "name",

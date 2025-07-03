@@ -1,90 +1,110 @@
 "use client";
 
+import {
+	type State,
+	downloadExcelAction,
+} from "@jwc/payload/actions/syncGoogleSheet.actions";
 import { Button, toast } from "@payloadcms/ui";
 import * as Sentry from "@sentry/nextjs";
 import FileSaver from "file-saver";
-import React, { useCallback, useTransition } from "react";
+import type React from "react";
+import { useActionState, useEffect } from "react";
 
-function getFilename(contentDisposition: string | null): string {
-	if (!contentDisposition) return "download.xlsx";
+/**
+ * ExcelExportButton 컴포넌트 props
+ */
+interface ExcelExportButtonProps {
+	/** 버튼 스타일 */
+	buttonStyle?: "primary" | "secondary" | "danger";
+	/** 커스텀 버튼 텍스트 */
+	children?: React.ReactNode;
+	/** 토스트 메시지 표시 여부 (기본값: true) */
+	showToast?: boolean;
+}
 
-	// filename*=UTF-8''encodedName 우선 처리
-	const filenameStarMatch = contentDisposition.match(
-		/filename\*\s*=\s*UTF-8''([^;\n]*)/i
+export function ExcelExportButton({
+	buttonStyle = "primary",
+	children,
+	showToast = true,
+}: ExcelExportButtonProps = {}) {
+	const [state, formAction, isPending] = useActionState(
+		async (prevState: State) => {
+			if (showToast) {
+				toast.info("📊 엑셀 파일을 생성하고 있습니다...");
+			}
+			return await downloadExcelAction(prevState);
+		},
+		null
 	);
-	if (filenameStarMatch?.[1]) {
-		try {
-			return decodeURIComponent(filenameStarMatch[1]);
-		} catch {
-			return filenameStarMatch[1];
+
+	// 서버 액션 실행 후 결과 처리
+	useEffect(() => {
+		if (state) {
+			if (state.success) {
+				// Excel 파일 다운로드 처리
+				if (state.format === "excel" && state.data && state.filename) {
+					try {
+						// ArrayBuffer를 Blob으로 변환
+						const blob = new Blob([state.data], {
+							type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+						});
+
+						// 파일 다운로드
+						FileSaver.saveAs(blob, state.filename);
+
+						if (showToast) {
+							toast.success("✅ 엑셀 파일이 성공적으로 다운로드되었습니다!");
+						}
+					} catch (error) {
+						console.error("File download error:", error);
+						if (showToast) {
+							toast.error("❌ 파일 다운로드 중 오류가 발생했습니다");
+						}
+
+						Sentry.captureException(error, {
+							tags: {
+								component: "ExcelExportButton",
+								action: "fileDownload",
+								type: "client-side",
+							},
+						});
+					}
+				} else {
+					if (showToast) {
+						toast.success(state.message);
+					}
+				}
+			} else {
+				// 에러 처리
+				if (showToast) {
+					toast.error(
+						state.message || "❌ 엑셀 파일 생성 중 오류가 발생했습니다"
+					);
+				}
+
+				Sentry.captureMessage(state.message || "Excel export failed", {
+					level: "error",
+					tags: {
+						component: "ExcelExportButton",
+						action: "serverAction",
+						type: "server-side",
+					},
+				});
+			}
 		}
-	}
-
-	// filename="name.xlsx" 또는 filename=name.xlsx
-	const filenameMatch = contentDisposition.match(
-		/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
-	);
-	if (filenameMatch?.[1]) {
-		return filenameMatch[1].replace(/^['"]|['"]$/g, "");
-	}
-
-	return "download.xlsx";
-}
-
-async function getFormExcelDataApi() {
-	const url = new URL("/api/forms/excel/export", window.location.origin);
-	const response = await fetch(url.toString(), {
-		method: "GET",
-		credentials: "include",
-	});
-
-	if (!response.ok) {
-		throw new Error("Failed to fetch Excel data");
-	}
-	// Content-Disposition 헤더를 통해 파일 이름을 추출할 수 있습니다.
-	const contentDisposition = response.headers.get("Content-Disposition");
-	const filename = getFilename(contentDisposition);
-
-	return {
-		filename,
-		blob: await response.blob(),
-	};
-}
-
-async function downloadExcel() {
-	try {
-		const { blob, filename } = await getFormExcelDataApi();
-		FileSaver.saveAs(blob, filename);
-	} catch (error) {
-		toast.error("❌ 엑셀 파일을 생성하는 중 오류가 발생했습니다");
-		Sentry.captureException(error, {
-			tags: {
-				component: "ExcelExportButton",
-				action: "downloadExcel",
-			},
-		});
-	}
-}
-
-export function ExcelExportButton() {
-	const [isPending, startTransition] = useTransition();
-
-	const onClick = useCallback(() => {
-		startTransition(async () => {
-			await downloadExcel();
-		});
-	}, []);
+	}, [state, showToast]);
 
 	return (
-		<>
+		<form action={formAction} aria-disabled={isPending}>
 			<Button
+				type="submit"
 				disabled={isPending}
 				aria-disabled={isPending}
-				type="button"
-				onClick={onClick}
+				buttonStyle={buttonStyle}
 			>
-				{isPending ? "엑셀 파일 생성 중..." : "액셀 다운로드"}
+				{children ||
+					(isPending ? "📊 엑셀 파일 생성 중..." : "📊 엑셀 다운로드")}
 			</Button>
-		</>
+		</form>
 	);
 }

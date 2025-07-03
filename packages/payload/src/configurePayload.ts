@@ -2,7 +2,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { Forms } from "@jwc/payload/collections/Forms";
 import { Users } from "@jwc/payload/collections/Users";
-import { syncGoogleSheetEndpoints } from "@jwc/payload/endpoints/syncGoogleSheet.endpoints";
+import { spreadsheetEndpoints } from "@jwc/payload/endpoints/spreadsheet-integrated.endpoints";
 import { postgresAdapter } from "@payloadcms/db-postgres";
 import { sentryPlugin } from "@payloadcms/plugin-sentry";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
@@ -46,9 +46,9 @@ const baseConfig: Config = {
 	secret: env.PAYLOAD_PRIVATE_SECRET,
 	endpoints: [
 		{
-			path: "/webhooks/google-sheet",
-			method: "post",
-			handler: syncGoogleSheetEndpoints,
+			path: "/api/spreadsheet",
+			method: ["get", "post"],
+			handler: spreadsheetEndpoints,
 		},
 	],
 };
