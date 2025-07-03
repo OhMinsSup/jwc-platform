@@ -1,23 +1,23 @@
 {
-	"extends": "@jwc/tsconfig/internal-package.json",
-	"compilerOptions": {
-		"baseUrl": ".",
-		"jsx": "preserve",
-		"lib": ["dom", "dom.iterable", "ES2022"],
-		"paths": {
-			"@jwc/payload/*": ["./src/*"],
-			"@jwc/payload/access/*": ["./src/access/*"],
-			"@jwc/payload/actions/*": ["./src/actions/*"],
-			"@jwc/payload/endpoints/*": ["./src/endpoints/*"],
-			"@jwc/payload/components/*": ["./src/components/*"],
-			"@jwc/payload/collections/*": ["./src/collections/*"],
-			"@jwc/payload/helpers/*": ["./src/helpers/*"],
-			"@jwc/payload/hooks/*": ["./src/hooks/*"],
-			"@jwc/payload/utils/*": ["./src/utils/*"],
-			"@jwc/payload/payload-config": ["./src/payload.config"],
-			"@jwc/payload/payload-types": ["./src/payload.types"]
-		}
-	},
-	"include": ["*.ts", "src"],
-	"exclude": ["node_modules", "src/payload.types.ts", ".next"]
+  "extends": "@jwc/tsconfig/internal-package.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "jsx": "preserve",
+    "lib": ["dom", "dom.iterable", "ES2022"],
+    "paths": {
+      "@jwc/payload/*": ["./src/*"],
+      "@jwc/payload/access/*": ["./src/access/*"],
+      "@jwc/payload/actions/*": ["./src/actions/*"],
+      "@jwc/payload/endpoints/*": ["./src/endpoints/*"],
+      "@jwc/payload/components/*": ["./src/components/*"],
+      "@jwc/payload/collections/*": ["./src/collections/*"],
+      "@jwc/payload/helpers/*": ["./src/helpers/*"],
+      "@jwc/payload/hooks/*": ["./src/hooks/*"],
+      "@jwc/payload/utils/*": ["./src/utils/*"],
+      "@jwc/payload/payload-config": ["./src/payload.config"],
+      "@jwc/payload/payload-types": ["./src/payload.types"]
+    }
+  },
+  "include": ["*.ts", "src"],
+  "exclude": ["node_modules", "src/payload.types.ts", ".next"]
 }

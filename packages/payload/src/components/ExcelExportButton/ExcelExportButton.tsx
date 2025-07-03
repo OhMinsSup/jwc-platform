@@ -14,8 +14,6 @@ import { useActionState, useEffect } from "react";
  * ExcelExportButton 컴포넌트 props
  */
 interface ExcelExportButtonProps {
-	/** 버튼 스타일 */
-	buttonStyle?: "primary" | "secondary" | "danger";
 	/** 커스텀 버튼 텍스트 */
 	children?: React.ReactNode;
 	/** 토스트 메시지 표시 여부 (기본값: true) */
@@ -23,7 +21,6 @@ interface ExcelExportButtonProps {
 }
 
 export function ExcelExportButton({
-	buttonStyle = "primary",
 	children,
 	showToast = true,
 }: ExcelExportButtonProps = {}) {
@@ -96,14 +93,8 @@ export function ExcelExportButton({
 
 	return (
 		<form action={formAction} aria-disabled={isPending}>
-			<Button
-				type="submit"
-				disabled={isPending}
-				aria-disabled={isPending}
-				buttonStyle={buttonStyle}
-			>
-				{children ||
-					(isPending ? "📊 엑셀 파일 생성 중..." : "📊 엑셀 다운로드")}
+			<Button type="submit" disabled={isPending} aria-disabled={isPending}>
+				{children || (isPending ? "엑셀 파일 생성 중..." : "엑셀 다운로드")}
 			</Button>
 		</form>
 	);

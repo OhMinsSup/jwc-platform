@@ -20,6 +20,14 @@ const config: NextConfig = {
 	/** We already do linting and typechecking as separate tasks in CI */
 	eslint: { ignoreDuringBuilds: true },
 	typescript: { ignoreBuildErrors: true },
+
+	webpack: (config) => {
+		// OpenTelemetry 관련 경고 메시지를 무시하도록 설정합니다.
+		// 이는 Sentry와 같은 라이브러리에서 발생하는 알려진 문제입니다.
+		config.ignoreWarnings = [{ module: /@opentelemetry\/instrumentation/ }];
+
+		return config;
+	},
 };
 
 let nextConfig: NextConfig = withPayload(config, {

@@ -1,1 +1,1 @@
-export { default as Page } from "./Page";
+export { default as Page, TOTAL_STEP_COUNT } from "./Page";

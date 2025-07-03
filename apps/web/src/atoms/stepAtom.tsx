@@ -1,6 +1,6 @@
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useCallback, useMemo } from "react";
-import { TOTAL_STEP_COUNT } from "~/components/main/Page/Page";
+import { TOTAL_STEP_COUNT } from "~/components/retreat/Page";
 
 // 현재 step을 관리하는 atom
 const stepAtom = atom(0);

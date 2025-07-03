@@ -114,7 +114,7 @@ export namespace SpreadsheetActions {
 			}
 			return 0;
 		} catch (error) {
-			log.error("SpreadsheetActions.getFormCount", error as Error, {
+			log.error("serverActions", error as Error, {
 				name: "getFormCount",
 				action: "get-form-count",
 			});
@@ -146,7 +146,7 @@ export namespace SpreadsheetActions {
 				lastSync: new Date().toISOString(),
 			};
 		} catch (error) {
-			log.error("SpreadsheetActions.checkSpreadsheetStatus", error as Error, {
+			log.error("serverActions", error as Error, {
 				name: "checkSpreadsheetStatus",
 				action: "check-spreadsheet-status",
 			});
@@ -178,7 +178,7 @@ export namespace SpreadsheetActions {
 				format: "excel",
 			};
 		} catch (error) {
-			log.error("SpreadsheetActions.downloadExcel", error as Error, {
+			log.error("serverActions", error as Error, {
 				name: "downloadExcel",
 				action: "download-excel",
 			});

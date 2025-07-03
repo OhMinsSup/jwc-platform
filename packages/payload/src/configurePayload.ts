@@ -47,7 +47,12 @@ const baseConfig: Config = {
 	endpoints: [
 		{
 			path: "/api/spreadsheet",
-			method: ["get", "post"],
+			method: "get",
+			handler: spreadsheetEndpoints,
+		},
+		{
+			path: "/api/spreadsheet",
+			method: "post",
 			handler: spreadsheetEndpoints,
 		},
 	],

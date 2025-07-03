@@ -9,94 +9,94 @@ import {
 	ErrorBoundary,
 } from "~/components/common/ErrorBoundary";
 import { FormSkeleton } from "~/components/forms/FormSkeleton";
-import { Welcome } from "~/components/main/Welcome";
+import { Welcome } from "~/components/retreat/Welcome";
 
 const FormName = React.lazy(() =>
-	import("~/components/main/FormName").then((module) => ({
+	import("~/components/retreat/FormName").then((module) => ({
 		default: module.FormName,
 	}))
 );
 
 const FormPhone = React.lazy(() =>
-	import("~/components/main/FormPhone").then((module) => ({
+	import("~/components/retreat/FormPhone").then((module) => ({
 		default: module.FormPhone,
 	}))
 );
 
 const FormGender = React.lazy(() =>
-	import("~/components/main/FormGender").then((module) => ({
+	import("~/components/retreat/FormGender").then((module) => ({
 		default: module.FormGender,
 	}))
 );
 
 const FormDepartment = React.lazy(() =>
-	import("~/components/main/FormDepartment").then((module) => ({
+	import("~/components/retreat/FormDepartment").then((module) => ({
 		default: module.FormDepartment,
 	}))
 );
 
 const FormAgeGroup = React.lazy(() =>
-	import("~/components/main/FormAgeGroup").then((module) => ({
+	import("~/components/retreat/FormAgeGroup").then((module) => ({
 		default: module.FormAgeGroup,
 	}))
 );
 
 const FormTshirtSize = React.lazy(() =>
-	import("~/components/main/FormTshirtSize").then((module) => ({
+	import("~/components/retreat/FormTshirtSize").then((module) => ({
 		default: module.FormTshirtSize,
 	}))
 );
 
 const FormTFTeam = React.lazy(() =>
-	import("~/components/main/FormTFTeam").then((module) => ({
+	import("~/components/retreat/FormTFTeam").then((module) => ({
 		default: module.FormTFTeam,
 	}))
 );
 
 const FormNumberOfStays = React.lazy(() =>
-	import("~/components/main/FormNumberOfStays").then((module) => ({
+	import("~/components/retreat/FormNumberOfStays").then((module) => ({
 		default: module.FormNumberOfStays,
 	}))
 );
 
 const FormAttendanceTime = React.lazy(() =>
-	import("~/components/main/FormAttendanceTime").then((module) => ({
+	import("~/components/retreat/FormAttendanceTime").then((module) => ({
 		default: module.FormAttendanceTime,
 	}))
 );
 
 const FormPickupDescription = React.lazy(() =>
-	import("~/components/main/FormPickupDescription").then((module) => ({
+	import("~/components/retreat/FormPickupDescription").then((module) => ({
 		default: module.FormPickupDescription,
 	}))
 );
 
 const FormCarSupport = React.lazy(() =>
-	import("~/components/main/FormCarSupport").then((module) => ({
+	import("~/components/retreat/FormCarSupport").then((module) => ({
 		default: module.FormCarSupport,
 	}))
 );
 
 const FormCarSupportContent = React.lazy(() =>
-	import("~/components/main/FormCarSupportContent").then((module) => ({
+	import("~/components/retreat/FormCarSupportContent").then((module) => ({
 		default: module.FormCarSupportContent,
 	}))
 );
 
 const FormPaid = React.lazy(() =>
-	import("~/components/main/FormPaid").then((module) => ({
+	import("~/components/retreat/FormPaid").then((module) => ({
 		default: module.FormPaid,
 	}))
 );
 
 const FormConfirm = React.lazy(() =>
-	import("~/components/main/FormConfirm").then((module) => ({
+	import("~/components/retreat/FormConfirm").then((module) => ({
 		default: module.FormConfirm,
 	}))
 );
 
 const Completed = React.lazy(() =>
-	import("~/components/main/Completed").then((module) => ({
+	import("~/components/retreat/Completed").then((module) => ({
 		default: module.Completed,
 	}))
 );
