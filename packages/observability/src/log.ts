@@ -1,6 +1,13 @@
 import * as Sentry from "@sentry/nextjs";
 import { createConsola } from "consola";
 
+type Platform =
+	| "web-platform"
+	| "admin-platform"
+	| "server"
+	| "client"
+	| "platform";
+
 type LogCategory =
 	| "endpoints"
 	| "rpc"
@@ -23,7 +30,7 @@ type Extra = {
 class Logger {
 	output: ReturnType<typeof createConsola>;
 
-	public constructor(tag = "JWC-FORM") {
+	public constructor(tag: Platform = "platform") {
 		this.output = createConsola().withTag(tag);
 	}
 
@@ -106,4 +113,4 @@ class Logger {
 
 const logger = new Logger();
 
-export { logger as log, type LogCategory, type Extra };
+export { logger as log, Logger, type LogCategory, type Extra, type Platform };
