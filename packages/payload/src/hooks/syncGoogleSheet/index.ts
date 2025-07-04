@@ -1,8 +1,12 @@
 import { log } from "@jwc/observability/log";
 import { mergedDocs } from "@jwc/payload/helpers/mergedDocs";
+import type { Form } from "@jwc/payload/payload.types";
 import { DataConverter, GoogleSheetsSyncManager } from "@jwc/spreadsheet";
 import type { CollectionAfterChangeHook } from "payload";
-import type { Form } from "../../types";
+
+interface FormSchema extends Form {
+	[key: string]: unknown;
+}
 
 export const syncGoogleSheet: CollectionAfterChangeHook<Form> = async ({
 	doc,
@@ -16,7 +20,10 @@ export const syncGoogleSheet: CollectionAfterChangeHook<Form> = async ({
 		});
 
 		// 기존 문서들과 새 문서를 병합
-		const mergedFormDocs = mergedDocs(docs as Form[], doc);
+		const mergedFormDocs = mergedDocs<FormSchema>(
+			docs as FormSchema[],
+			doc as FormSchema
+		);
 
 		// 데이터를 RowFormData 형식으로 변환
 		const formData = mergedFormDocs.map((formDoc) =>

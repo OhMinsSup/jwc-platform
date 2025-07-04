@@ -1,5 +1,0 @@
-model Book {
-    id String @id @default(cuid())
-
-    @@map("book")
-}

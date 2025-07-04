@@ -3,7 +3,7 @@ import { log } from "@jwc/observability/log";
 import {
 	SpreadsheetApi,
 	type SpreadsheetApiData,
-} from "@jwc/payload/utils/internal-api.utils";
+} from "@jwc/payload/helpers/internal-api.utils";
 import * as Sentry from "@sentry/nextjs";
 import { headers } from "next/headers";
 

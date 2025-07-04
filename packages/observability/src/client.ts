@@ -5,7 +5,6 @@
  */
 
 import * as Sentry from "@sentry/nextjs";
-import { env } from "./env";
 
 export const initializeSentry = (): ReturnType<typeof Sentry.init> => {
 	return Sentry.init({

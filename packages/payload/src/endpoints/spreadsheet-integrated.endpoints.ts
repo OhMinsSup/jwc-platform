@@ -3,7 +3,7 @@ import { env } from "@jwc/payload/env";
 import {
 	SpreadsheetWebhookUtils,
 	type WebhookBody,
-} from "@jwc/payload/utils/spreadsheet-webhook.utils";
+} from "@jwc/payload/helpers/spreadsheet-webhook.utils";
 import {
 	DataConverter,
 	GoogleSheetsSyncManager,

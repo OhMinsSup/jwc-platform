@@ -13,7 +13,6 @@
       "@jwc/payload/collections/*": ["./src/collections/*"],
       "@jwc/payload/helpers/*": ["./src/helpers/*"],
       "@jwc/payload/hooks/*": ["./src/hooks/*"],
-      "@jwc/payload/utils/*": ["./src/utils/*"],
       "@jwc/payload/payload-config": ["./src/payload.config"],
       "@jwc/payload/payload-types": ["./src/payload.types"]
     }
