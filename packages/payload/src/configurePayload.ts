@@ -1,9 +1,11 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { ClubForms } from "@jwc/payload/collections/ClubForms";
+import { Clubs } from "@jwc/payload/collections/Clubs"; // Importing Clubs collection for side effects
+import { Components } from "@jwc/payload/collections/Components"; // Importing Clubs collection for side effects
 import { Forms } from "@jwc/payload/collections/Forms";
-import { Sheets } from "@jwc/payload/collections/Sheets";
 import { Users } from "@jwc/payload/collections/Users";
-import { syncGoogleSheetEndpoints } from "@jwc/payload/endpoints/syncGoogleSheet.endpoints";
+import { spreadsheetEndpoints } from "@jwc/payload/endpoints/spreadsheet-integrated.endpoints";
 import { postgresAdapter } from "@payloadcms/db-postgres";
 import { sentryPlugin } from "@payloadcms/plugin-sentry";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
@@ -24,7 +26,7 @@ const baseConfig: Config = {
 			baseDir: path.resolve(dirname),
 		},
 	},
-	collections: [Users, Forms, Sheets],
+	collections: [Users, Forms, Clubs, Components, ClubForms],
 	typescript: {
 		outputFile: path.resolve(dirname, "payload.types.ts"),
 		declare: false,
@@ -35,7 +37,7 @@ const baseConfig: Config = {
 		},
 		migrationDir: path.resolve(dirname, "migrations"),
 	}),
-	editor: lexicalEditor({}),
+	editor: lexicalEditor(),
 	i18n: {
 		supportedLanguages: { en, ko },
 	},
@@ -47,9 +49,14 @@ const baseConfig: Config = {
 	secret: env.PAYLOAD_PRIVATE_SECRET,
 	endpoints: [
 		{
-			path: "/webhooks/google-sheet",
+			path: "/spreadsheet",
+			method: "get",
+			handler: spreadsheetEndpoints,
+		},
+		{
+			path: "/spreadsheet",
 			method: "post",
-			handler: syncGoogleSheetEndpoints,
+			handler: spreadsheetEndpoints,
 		},
 	],
 };

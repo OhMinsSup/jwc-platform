@@ -1,5 +1,4 @@
 import { authenticated } from "@jwc/payload/access/authenticated";
-import { exportExcelEndpoints } from "@jwc/payload/endpoints/exportExcel.endpoints";
 import { decryptFieldValue } from "@jwc/payload/hooks/decryptFieldValue";
 import { encryptFieldValue } from "@jwc/payload/hooks/encryptFieldValue";
 import { syncGoogleSheet } from "@jwc/payload/hooks/syncGoogleSheet";
@@ -33,13 +32,6 @@ export const Forms: CollectionConfig = {
 			],
 		},
 	},
-	endpoints: [
-		{
-			path: "/excel/export",
-			method: "get",
-			handler: exportExcelEndpoints,
-		},
-	],
 	fields: [
 		{
 			name: "name",
@@ -57,6 +49,10 @@ export const Forms: CollectionConfig = {
 			},
 			required: true,
 			maxLength: 100,
+			hooks: {
+				afterRead: [decryptFieldValue],
+				beforeChange: [encryptFieldValue],
+			},
 		},
 		{
 			name: "phone",
@@ -255,52 +251,12 @@ export const Forms: CollectionConfig = {
 			type: "text",
 		},
 		{
-			name: "memo",
-			label: {
-				ko: "메모",
-				en: "Memo",
-			},
-			type: "richText",
-		},
-		{
-			name: "attendanceDay",
-			type: "text",
+			name: "attendanceTime",
+			type: "date",
 			label: {
 				ko: "참석 날짜",
-				en: "Attendance Day",
+				en: "Attendance Date",
 			},
-		},
-		{
-			name: "attendanceTime",
-			type: "select",
-			defaultValue: "PM",
-			label: {
-				ko: "오전/오후",
-				en: "AM/PM",
-			},
-			options: [
-				{
-					value: "AM",
-					label: {
-						ko: "오전",
-						en: "AM",
-					},
-				},
-				{
-					value: "PM",
-					label: {
-						ko: "오후",
-						en: "PM",
-					},
-				},
-				{
-					value: "EVENING",
-					label: {
-						ko: "저녁",
-						en: "Evening",
-					},
-				},
-			],
 		},
 		{
 			name: "tshirtSize",

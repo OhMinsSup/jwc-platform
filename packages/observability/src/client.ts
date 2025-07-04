@@ -5,12 +5,13 @@
  */
 
 import * as Sentry from "@sentry/nextjs";
-import { env } from "./env";
 
 export const initializeSentry = (): ReturnType<typeof Sentry.init> => {
 	return Sentry.init({
-		enabled: !!env.NEXT_PUBLIC_SENTRY_DSN,
-		dsn: env.NEXT_PUBLIC_SENTRY_DSN,
+		enabled:
+			process.env.NEXT_PUBLIC_SENTRY_DSN !== undefined &&
+			process.env.NODE_ENV === "production",
+		dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
 
 		// Adds request headers and IP for users, for more info visit:
 		// https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#sendDefaultPii

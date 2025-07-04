@@ -22,7 +22,6 @@
 		"typescript": "catalog:"
 	},
 	"dependencies": {
-		"@jwc/env": "workspace:*",
 		"@sentry/nextjs": "catalog:",
 		"consola": "^3.4.2"
 	}

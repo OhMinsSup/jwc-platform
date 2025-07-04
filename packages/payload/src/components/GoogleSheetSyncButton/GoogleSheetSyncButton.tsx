@@ -8,7 +8,7 @@ import React, { useActionState } from "react";
 
 export function GoogleSheetSyncButton() {
 	const [, formAction, isPending] = useActionState(async (state: State) => {
-		return await syncGoogleSheet(state);
+		return await syncGoogleSheet(state, "google");
 	}, null);
 
 	return (

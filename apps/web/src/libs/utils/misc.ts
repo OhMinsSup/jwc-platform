@@ -1,7 +1,6 @@
 import type { Form } from "@jwc/schema";
 import {
-	formatAttendanceDay,
-	formatAttendanceTime,
+	formatAttendanceDate,
 	formatMaskPhoneNumber,
 	formatTshirtSizeText,
 } from "@jwc/utils/format";
@@ -197,13 +196,9 @@ export const getDisplayValueByTitle = (
 			return data || "입력된 정보가 없습니다.";
 		case "참석하고 싶은 수련회 일정":
 			return data || "입력된 정보가 없습니다.";
-		case "참석 날짜":
-			return data
-				? (formatAttendanceDay(data) as string)
-				: "입력된 정보가 없습니다.";
 		case "참석 시간":
 			return data
-				? (formatAttendanceTime(data) as string)
+				? (formatAttendanceDate(data) as string)
 				: "입력된 정보가 없습니다.";
 		case "픽업 상세내용":
 			return data || "입력된 정보가 없습니다.";

@@ -1,6 +1,5 @@
 import * as Sentry from "@sentry/nextjs";
 import { createConsola } from "consola";
-import { env } from "./env";
 
 type LogCategory =
 	| "endpoints"
@@ -12,6 +11,7 @@ type LogCategory =
 	| "components"
 	| "observability"
 	| "instrumentation"
+	| "internalApi"
 	| "misc";
 
 type Extra = {
@@ -36,7 +36,10 @@ class Logger {
 	}
 
 	public error(label: LogCategory, error: string | Error, extra?: Extra) {
-		if (env.NODE_ENV === "production" && env.NEXT_PUBLIC_SENTRY_DSN) {
+		if (
+			process.env.NODE_ENV === "production" &&
+			process.env.NEXT_PUBLIC_SENTRY_DSN
+		) {
 			const err = error instanceof Error ? error : new Error(error);
 			const sanitizeExtra = this.sanitize(extra);
 			const tags = {
@@ -60,7 +63,7 @@ class Logger {
 	}
 
 	private sanitize = <T>(input: T, level = 0): T => {
-		if (env.NODE_ENV !== "production") {
+		if (process.env.NODE_ENV !== "production") {
 			return input;
 		}
 

@@ -21,11 +21,14 @@ export default function FormAttendanceTimeContext({ children }: Props) {
 	const { step, stepMap } = useStepAtomValue();
 
 	const initialData = stepMap.get(step) as FormFieldSchema | undefined;
+	const initialDate = initialData?.attendanceTime
+		? new Date(initialData.attendanceTime)
+		: undefined;
 
 	const form = useForm<FormFieldSchema>({
 		resolver: zodResolver(schema),
 		defaultValues: {
-			attendanceTime: initialData?.attendanceTime ?? "AM",
+			attendanceTime: initialData?.attendanceTime,
 		},
 		reValidateMode: "onSubmit",
 		criteriaMode: "firstError",

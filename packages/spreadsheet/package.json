@@ -1,0 +1,28 @@
+{
+	"name": "@jwc/spreadsheet",
+	"private": true,
+	"version": "0.1.0",
+	"type": "module",
+	"exports": {
+		"./package.json": "./package.json",
+		".": "./src/index.ts"
+	},
+	"license": "MIT",
+	"scripts": {
+		"clean": "git clean -xdf .cache .turbo dist node_modules",
+		"format": "biome format --write ./src",
+		"lint": "biome lint --error-on-warnings ./src",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@jwc/env": "workspace:*",
+		"@jwc/utils": "workspace:*",
+		"exceljs": "^4.4.0",
+		"google-auth-library": "^9.15.1",
+		"googleapis": "^149.0.0"
+	},
+	"devDependencies": {
+		"@jwc/tsconfig": "workspace:*",
+		"typescript": "catalog:"
+	}
+}

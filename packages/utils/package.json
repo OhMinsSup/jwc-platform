@@ -8,7 +8,7 @@
 		"./date": "./src/date/index.ts",
 		"./format": "./src/format/index.ts",
 		"./options": "./src/options/index.ts",
-		"./buffer": "./src/buffer/index.ts"
+		".": "./src/index.ts"
 	},
 	"license": "MIT",
 	"scripts": {

@@ -69,7 +69,9 @@ export interface Config {
   collections: {
     users: User;
     forms: Form;
-    sheets: Sheet;
+    clubs: Club;
+    components: Component;
+    clubForms: ClubForm;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -78,7 +80,9 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
-    sheets: SheetsSelect<false> | SheetsSelect<true>;
+    clubs: ClubsSelect<false> | ClubsSelect<true>;
+    components: ComponentsSelect<false> | ComponentsSelect<true>;
+    clubForms: ClubFormsSelect<false> | ClubFormsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -131,6 +135,13 @@ export interface User {
   hash?: string | null;
   loginAttempts?: number | null;
   lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
   password?: string | null;
 }
 /**
@@ -149,7 +160,22 @@ export interface Form {
   tfTeam?: ('없음' | '찬양팀' | '프로그램팀' | '미디어팀') | null;
   carSupport?: boolean | null;
   carSupportContent?: string | null;
-  memo?: {
+  attendanceTime?: string | null;
+  tshirtSize?: ('s' | 'm' | 'l' | 'xl' | '2xl' | '3xl') | null;
+  ageGroup: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "clubs".
+ */
+export interface Club {
+  id: number;
+  title: string;
+  components?: (number | Component)[] | null;
+  clubForms?: (number | ClubForm)[] | null;
+  content?: {
     root: {
       type: string;
       children: {
@@ -164,26 +190,19 @@ export interface Form {
     };
     [k: string]: unknown;
   } | null;
-  attendanceDay?: string | null;
-  attendanceTime?: ('AM' | 'PM' | 'EVENING') | null;
-  tshirtSize?: ('s' | 'm' | 'l' | 'xl' | '2xl' | '3xl') | null;
-  ageGroup: string;
   updatedAt: string;
   createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "sheets".
+ * via the `definition` "components".
  */
-export interface Sheet {
+export interface Component {
   id: number;
-  fileId?: string | null;
-  kind?: string | null;
-  mimeType?: string | null;
-  name?: string | null;
-  webContentLink?: string | null;
-  webViewLink?: string | null;
-  schemaFile:
+  title: string;
+  type: 'text' | 'select' | 'richText' | 'description' | 'checkbox' | 'radio';
+  description?: string | null;
+  data?:
     | {
         [k: string]: unknown;
       }
@@ -192,14 +211,42 @@ export interface Sheet {
     | number
     | boolean
     | null;
-  permissions?:
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "clubForms".
+ */
+export interface ClubForm {
+  id: number;
+  name: string;
+  phone: string;
+  department: '청년1부' | '청년2부' | '기타';
+  ageGroup: string;
+  data?:
     | {
-        permissionId?: string | null;
-        type?: string | null;
-        role?: string | null;
-        emailAddress?: string | null;
-        id?: string | null;
-      }[]
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
     | null;
   updatedAt: string;
   createdAt: string;
@@ -220,8 +267,16 @@ export interface PayloadLockedDocument {
         value: number | Form;
       } | null)
     | ({
-        relationTo: 'sheets';
-        value: number | Sheet;
+        relationTo: 'clubs';
+        value: number | Club;
+      } | null)
+    | ({
+        relationTo: 'components';
+        value: number | Component;
+      } | null)
+    | ({
+        relationTo: 'clubForms';
+        value: number | ClubForm;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -280,6 +335,13 @@ export interface UsersSelect<T extends boolean = true> {
   hash?: T;
   loginAttempts?: T;
   lockUntil?: T;
+  sessions?:
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -296,8 +358,6 @@ export interface FormsSelect<T extends boolean = true> {
   tfTeam?: T;
   carSupport?: T;
   carSupportContent?: T;
-  memo?: T;
-  attendanceDay?: T;
   attendanceTime?: T;
   tshirtSize?: T;
   ageGroup?: T;
@@ -306,25 +366,39 @@ export interface FormsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "sheets_select".
+ * via the `definition` "clubs_select".
  */
-export interface SheetsSelect<T extends boolean = true> {
-  fileId?: T;
-  kind?: T;
-  mimeType?: T;
+export interface ClubsSelect<T extends boolean = true> {
+  title?: T;
+  components?: T;
+  clubForms?: T;
+  content?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "components_select".
+ */
+export interface ComponentsSelect<T extends boolean = true> {
+  title?: T;
+  type?: T;
+  description?: T;
+  data?: T;
+  content?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "clubForms_select".
+ */
+export interface ClubFormsSelect<T extends boolean = true> {
   name?: T;
-  webContentLink?: T;
-  webViewLink?: T;
-  schemaFile?: T;
-  permissions?:
-    | T
-    | {
-        permissionId?: T;
-        type?: T;
-        role?: T;
-        emailAddress?: T;
-        id?: T;
-      };
+  phone?: T;
+  department?: T;
+  ageGroup?: T;
+  data?: T;
   updatedAt?: T;
   createdAt?: T;
 }
