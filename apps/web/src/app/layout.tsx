@@ -11,7 +11,6 @@ import type { Viewport } from "next";
 
 import { Toaster, cn } from "@jwc/ui";
 import { ThemeProvider } from "~/components/common/Theme";
-import { AppLayout } from "~/components/layouts/AppLayout";
 import { ORPCReactProvider } from "~/libs/orpc/react";
 
 interface LayoutProps {
@@ -40,7 +39,7 @@ export default function Layout({ children }: LayoutProps) {
 			>
 				<ORPCReactProvider>
 					<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-						<AppLayout>{children}</AppLayout>
+						{children}
 						<Toaster />
 					</ThemeProvider>
 				</ORPCReactProvider>

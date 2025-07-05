@@ -1,6 +1,13 @@
 import * as Sentry from "@sentry/nextjs";
 import { createConsola } from "consola";
 
+type Platform =
+	| "web-platform"
+	| "admin-platform"
+	| "server"
+	| "client"
+	| "platform";
+
 type LogCategory =
 	| "endpoints"
 	| "rpc"
@@ -23,7 +30,7 @@ type Extra = {
 class Logger {
 	output: ReturnType<typeof createConsola>;
 
-	public constructor(tag = "JWC-FORM") {
+	public constructor(tag: Platform = "platform") {
 		this.output = createConsola().withTag(tag);
 	}
 
@@ -35,12 +42,16 @@ class Logger {
 		this.output.debug(error, { ...this.sanitize(extra), label });
 	}
 
-	public error(label: LogCategory, error: string | Error, extra?: Extra) {
+	public error(
+		label: LogCategory,
+		error: string | Error | unknown,
+		extra?: Extra
+	) {
 		if (
 			process.env.NODE_ENV === "production" &&
 			process.env.NEXT_PUBLIC_SENTRY_DSN
 		) {
-			const err = error instanceof Error ? error : new Error(error);
+			const err = error instanceof Error ? error : new Error(String(error));
 			const sanitizeExtra = this.sanitize(extra);
 			const tags = {
 				name: extra?.name ?? "Logger",
@@ -106,4 +117,4 @@ class Logger {
 
 const logger = new Logger();
 
-export { logger as log, type LogCategory, type Extra };
+export { logger as log, Logger, type LogCategory, type Extra, type Platform };
