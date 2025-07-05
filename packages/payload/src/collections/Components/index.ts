@@ -49,42 +49,42 @@ export const Components: CollectionConfig = {
 			options: [
 				{
 					label: {
-						ko: "input 컴포넌트",
+						ko: "Input 컴포넌트",
 						en: "Input Component",
 					},
 					value: "text",
 				},
 				{
 					label: {
-						ko: "select 컴포넌트",
+						ko: "Select 컴포넌트",
 						en: "Select Component",
 					},
 					value: "select",
 				},
 				{
 					label: {
-						ko: "리치 텍스트 컴포넌트",
+						ko: "Rich Text 컴포넌트",
 						en: "Rich Text Component",
 					},
 					value: "richText",
 				},
 				{
 					label: {
-						ko: "설명 컴포넌트",
+						ko: "Description 컴포넌트",
 						en: "Description Component",
 					},
 					value: "description",
 				},
 				{
 					label: {
-						ko: "체크박스 컴포넌트",
+						ko: "Checkbox 컴포넌트",
 						en: "Checkbox Component",
 					},
 					value: "checkbox",
 				},
 				{
 					label: {
-						ko: "라디오 컴포넌트",
+						ko: "Radio 컴포넌트",
 						en: "Radio Component",
 					},
 					value: "radio",
