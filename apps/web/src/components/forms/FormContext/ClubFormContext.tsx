@@ -7,9 +7,10 @@ import type React from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import type { z } from "zod";
 
-const schema = ClubFormSchema;
+// 기본 스키마와 동적 스키마 모두 지원
+type AnyClubFormSchema = typeof ClubFormSchema | z.ZodSchema;
 
-export type FormFieldSchema = z.infer<typeof schema>;
+export type FormFieldSchema = z.infer<typeof ClubFormSchema>;
 
 // =============================================================================
 // 🎯 ClubFormProvider (React Hook Form 기반)
@@ -18,11 +19,13 @@ export type FormFieldSchema = z.infer<typeof schema>;
 interface ClubFormProviderProps {
 	children: React.ReactNode;
 	defaultValues?: Partial<FormFieldSchema>;
+	schema?: AnyClubFormSchema; // 동적 스키마 지원
 }
 
 export function ClubFormProvider({
 	children,
 	defaultValues = {},
+	schema = ClubFormSchema, // 기본값은 정적 스키마
 }: ClubFormProviderProps) {
 	// 안전한 기본값 설정으로 controlled input 보장
 	const safeDefaultValues: Partial<FormFieldSchema> = {

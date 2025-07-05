@@ -1,15 +1,16 @@
 "use client";
 
-import { Skeleton } from "@jwc/ui";
-import { Badge } from "@jwc/ui/components/shadcn/badge";
-import { Button } from "@jwc/ui/components/shadcn/button";
 import {
+	Badge,
+	Button,
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
-} from "@jwc/ui/components/shadcn/card";
+	Icons,
+	Skeleton,
+} from "@jwc/ui";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useTransition } from "react";
 import type { Club } from "~/types/club";
@@ -17,34 +18,6 @@ import type { Club } from "~/types/club";
 interface ClubProps {
 	data: Club;
 }
-
-// 아이콘 컴포넌트를 메모이제이션
-const ClubIcon = React.memo(() => (
-	<svg
-		className="h-5 w-5"
-		fill="currentColor"
-		viewBox="0 0 24 24"
-		aria-hidden="true"
-	>
-		<title>동아리 아이콘</title>
-		<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-	</svg>
-));
-
-const CheckIcon = React.memo(() => (
-	<svg
-		className="mr-1 h-3 w-3"
-		fill="currentColor"
-		viewBox="0 0 24 24"
-		aria-hidden="true"
-	>
-		<title>체크 아이콘</title>
-		<path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
-	</svg>
-));
-
-ClubIcon.displayName = "ClubIcon";
-CheckIcon.displayName = "CheckIcon";
 
 export default function ClubCard({ data }: ClubProps) {
 	const router = useRouter();
@@ -113,18 +86,12 @@ export default function ClubCard({ data }: ClubProps) {
 				<div className="flex items-start justify-between">
 					<div className="flex items-center gap-3">
 						<div className={iconContainerClassName}>
-							<ClubIcon />
+							<Icons.User className="size-5" />
 						</div>
 						<div>
 							<CardTitle className="text-lg">{data.title}</CardTitle>
 						</div>
 					</div>
-					{isPending && (
-						<Badge variant="default" className="shrink-0">
-							<CheckIcon />
-							선택됨
-						</Badge>
-					)}
 				</div>
 				<CardDescription className="text-left">{data.title}</CardDescription>
 			</CardHeader>
@@ -135,12 +102,12 @@ export default function ClubCard({ data }: ClubProps) {
 					className="w-full"
 					onClick={handleButtonClick}
 					disabled={isPending}
-					aria-label={isPending ? "선택됨" : `${data.title} 동아리 선택하기`}
+					aria-label={isPending ? "이동중..." : `${data.title} 동아리 선택하기`}
 				>
 					{isPending ? (
 						<>
-							<CheckIcon />
-							선택됨
+							<Icons.Loader2 className="h-4 w-4 animate-spin" />
+							이동중...
 						</>
 					) : (
 						"선택하기"

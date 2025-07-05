@@ -25,6 +25,7 @@ export interface Component {
 export interface ComponentData {
 	id: number;
 	name: string;
+	value?: boolean | string; // radio 타입을 위한 value 필드
 }
 
 export interface ClubForm {

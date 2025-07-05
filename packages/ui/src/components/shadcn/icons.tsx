@@ -26,6 +26,7 @@ import {
 	Home,
 	Info,
 	Instagram,
+	ListTodo,
 	Loader2,
 	Mail,
 	MapPinHouse,
@@ -42,6 +43,7 @@ import {
 	Phone,
 	Search,
 	Send,
+	SendHorizontal,
 	Shell,
 	SlidersHorizontal,
 	Star,
@@ -106,4 +108,6 @@ export const Icons = {
 	Send: (props: LucideProps) => <Send {...props} />,
 	Star: (props: LucideProps) => <Star {...props} />,
 	User: (props: LucideProps) => <User {...props} />,
+	SendHorizontal: (props: LucideProps) => <SendHorizontal {...props} />,
+	ListTodo: (props: LucideProps) => <ListTodo {...props} />,
 };
