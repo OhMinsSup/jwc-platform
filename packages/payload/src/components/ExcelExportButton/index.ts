@@ -1,1 +1,1 @@
-export * from "./ExcelExportButton";
+export { default as ExcelExportButton } from "./ExcelExportButton";
