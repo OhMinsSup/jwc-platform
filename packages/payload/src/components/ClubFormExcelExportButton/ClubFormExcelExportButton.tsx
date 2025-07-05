@@ -1,9 +1,9 @@
 "use client";
 
 import {
-	type State,
-	downloadExcelFileAction,
-} from "@jwc/payload/actions/forms.actions";
+	type ClubFormState,
+	downloadClubFormExcelAction,
+} from "@jwc/payload/actions/clubForms.actions";
 import { Button, toast } from "@payloadcms/ui";
 import * as Sentry from "@sentry/nextjs";
 import FileSaver from "file-saver";
@@ -11,25 +11,25 @@ import type React from "react";
 import { useActionState, useEffect } from "react";
 
 /**
- * ExcelExportButton 컴포넌트 props
+ * ClubFormExcelExportButton 컴포넌트 props
  */
-interface ExcelExportButtonProps {
+interface ClubFormExcelExportButtonProps {
 	/** 커스텀 버튼 텍스트 */
 	children?: React.ReactNode;
 	/** 토스트 메시지 표시 여부 (기본값: true) */
 	showToast?: boolean;
 }
 
-export default function ExcelExportButton({
+export default function ClubFormExcelExportButton({
 	children,
 	showToast = true,
-}: ExcelExportButtonProps = {}) {
+}: ClubFormExcelExportButtonProps = {}) {
 	const [state, formAction, isPending] = useActionState(
-		async (prevState: State) => {
+		async (prevState: ClubFormState) => {
 			if (showToast) {
-				toast.info("📊 엑셀 파일을 생성하고 있습니다...");
+				toast.info("📊 동아리 신청서 엑셀 파일을 생성하고 있습니다...");
 			}
-			return await downloadExcelFileAction();
+			return await downloadClubFormExcelAction();
 		},
 		null
 	);
@@ -56,7 +56,9 @@ export default function ExcelExportButton({
 							FileSaver.saveAs(blob, state.filename);
 
 							if (showToast) {
-								toast.success("✅ 엑셀 파일이 성공적으로 다운로드되었습니다!");
+								toast.success(
+									"✅ 동아리 신청서 엑셀 파일이 성공적으로 다운로드되었습니다!"
+								);
 							}
 						};
 
@@ -68,7 +70,7 @@ export default function ExcelExportButton({
 
 							Sentry.captureException(error, {
 								tags: {
-									component: "ExcelExportButton",
+									component: "ClubFormExcelExportButton",
 									action: "fileDownload",
 									type: "client-side",
 								},
@@ -82,7 +84,7 @@ export default function ExcelExportButton({
 
 						Sentry.captureException(error, {
 							tags: {
-								component: "ExcelExportButton",
+								component: "ClubFormExcelExportButton",
 								action: "fileDownload",
 								type: "client-side",
 							},
@@ -97,18 +99,22 @@ export default function ExcelExportButton({
 				// 에러 처리
 				if (showToast) {
 					toast.error(
-						state.message || "❌ 엑셀 파일 생성 중 오류가 발생했습니다"
+						state.message ||
+							"❌ 동아리 신청서 엑셀 파일 생성 중 오류가 발생했습니다"
 					);
 				}
 
-				Sentry.captureMessage(state.message || "Excel export failed", {
-					level: "error",
-					tags: {
-						component: "ExcelExportButton",
-						action: "serverAction",
-						type: "server-side",
-					},
-				});
+				Sentry.captureMessage(
+					state.message || "Club form Excel export failed",
+					{
+						level: "error",
+						tags: {
+							component: "ClubFormExcelExportButton",
+							action: "serverAction",
+							type: "server-side",
+						},
+					}
+				);
 			}
 		}
 	}, [state, showToast]);
@@ -116,7 +122,10 @@ export default function ExcelExportButton({
 	return (
 		<form action={formAction} aria-disabled={isPending}>
 			<Button type="submit" disabled={isPending} aria-disabled={isPending}>
-				{children || (isPending ? "엑셀 파일 생성 중..." : "엑셀 다운로드")}
+				{children ||
+					(isPending
+						? "동아리 신청서 엑셀 파일 생성 중..."
+						: "동아리 신청서 엑셀 다운로드")}
 			</Button>
 		</form>
 	);

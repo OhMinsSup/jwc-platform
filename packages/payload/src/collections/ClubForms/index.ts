@@ -23,6 +23,13 @@ export const ClubForms: CollectionConfig = {
 	},
 	admin: {
 		useAsTitle: "name",
+		components: {
+			beforeListTable: [
+				{
+					path: "@jwc/payload/components/ClubFormBeforeListTable#ClubFormBeforeListTable",
+				},
+			],
+		},
 	},
 	fields: [
 		{

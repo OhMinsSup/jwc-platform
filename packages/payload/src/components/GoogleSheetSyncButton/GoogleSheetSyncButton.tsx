@@ -2,7 +2,7 @@
 import {
 	type State,
 	syncGoogleSheet,
-} from "@jwc/payload/actions/syncGoogleSheet.actions";
+} from "@jwc/payload/actions/forms.actions";
 import { Button } from "@payloadcms/ui";
 import React, { useActionState } from "react";
 

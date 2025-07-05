@@ -180,14 +180,20 @@ export namespace SpreadsheetApi {
 		format?: "excel" | "google" | "both";
 		limit?: number;
 		download?: boolean;
+		type?: "forms" | "clubForms";
 	}): Promise<SpreadsheetApiResponse | InternalApiResponse<ArrayBuffer>> {
-		const { format = "google", limit = 100, download = false } = options;
+		const {
+			format = "google",
+			limit = 100,
+			download = false,
+			type = "forms",
+		} = options;
 
 		// Excel 다운로드인 경우 blob 형태로 받음
 		if (format === "excel" && download) {
 			return await callInternalApi<ArrayBuffer>("/api/spreadsheet", {
 				method: "GET",
-				params: { format, limit, download },
+				params: { format, limit, download, type },
 				responseType: "blob",
 			});
 		}
@@ -195,7 +201,7 @@ export namespace SpreadsheetApi {
 		// 일반적인 경우
 		return await callInternalApi<SpreadsheetApiData>("/api/spreadsheet", {
 			method: "GET",
-			params: { format, limit, download },
+			params: { format, limit, download, type },
 		});
 	}
 
