@@ -1,6 +1,5 @@
 "use client";
 import {
-	Badge,
 	Button,
 	Card,
 	CardContent,
@@ -56,15 +55,6 @@ export default function ClubSuccess({ id }: SuccessPageProps) {
 						>
 							<Icons.ListTodo className="h-4 w-4" />
 							동아리 목록으로
-						</Button>
-
-						<Button
-							type="button"
-							onClick={() => router.push("/")}
-							className="flex items-center gap-2"
-						>
-							<Icons.Home className="h-4 w-4" />
-							홈으로 이동
 						</Button>
 					</div>
 				</CardContent>
