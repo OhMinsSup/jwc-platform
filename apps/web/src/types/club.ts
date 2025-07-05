@@ -1,7 +1,7 @@
 export interface Club {
-	id: string;
+	id: string | number;
 	title: string;
-	content?: string;
+	content?: unknown; // Rich text content
 	components: Component[];
 	clubForms: ClubForm[];
 	createdAt?: string;
@@ -9,12 +9,22 @@ export interface Club {
 }
 
 export interface Component {
-	id: string;
-	name: string;
-	type: string;
-	props?: Record<string, unknown>;
+	id: string | number;
+	title: string;
+	type: "select" | "radio" | "description";
+	description?: string;
+	data?: {
+		data?: ComponentData[];
+		required: boolean;
+	};
+	content?: unknown;
 	createdAt?: string;
 	updatedAt?: string;
+}
+
+export interface ComponentData {
+	id: number;
+	name: string;
 }
 
 export interface ClubForm {

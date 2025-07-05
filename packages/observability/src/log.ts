@@ -42,12 +42,16 @@ class Logger {
 		this.output.debug(error, { ...this.sanitize(extra), label });
 	}
 
-	public error(label: LogCategory, error: string | Error, extra?: Extra) {
+	public error(
+		label: LogCategory,
+		error: string | Error | unknown,
+		extra?: Extra
+	) {
 		if (
 			process.env.NODE_ENV === "production" &&
 			process.env.NEXT_PUBLIC_SENTRY_DSN
 		) {
-			const err = error instanceof Error ? error : new Error(error);
+			const err = error instanceof Error ? error : new Error(String(error));
 			const sanitizeExtra = this.sanitize(extra);
 			const tags = {
 				name: extra?.name ?? "Logger",

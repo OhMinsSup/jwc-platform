@@ -11,3 +11,4 @@ export { default as FormCarSupportContentContext } from "./FormCarSupportContent
 export { default as FormPaidContext } from "./FormPaidContext";
 export { default as FormTshirtSizeContext } from "./FormTshirtSizeContext";
 export { default as FormAttendanceTimeContext } from "./FormAttendanceTimeContext";
+export { default as ClubFormContext } from "./ClubFormContext";

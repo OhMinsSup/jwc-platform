@@ -99,6 +99,16 @@ export const ClubForms: CollectionConfig = {
 			required: true,
 		},
 		{
+			name: "club",
+			label: {
+				ko: "동아리",
+				en: "Club",
+			},
+			type: "relationship",
+			relationTo: "clubs",
+			required: true,
+		},
+		{
 			name: "ageGroup",
 			label: {
 				ko: "또래",

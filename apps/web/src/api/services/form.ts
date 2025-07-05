@@ -29,10 +29,6 @@ interface ServiceResponse<T = unknown> {
 	error?: string;
 }
 
-interface FormWithId extends Form {
-	id: string | number;
-}
-
 interface UpsertFormServiceResponse extends ServiceResponse<string | number> {
 	isNew: boolean;
 }

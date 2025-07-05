@@ -238,6 +238,7 @@ export interface ClubForm {
   name: string;
   phone: string;
   department: '청년1부' | '청년2부' | '기타';
+  club: number | Club;
   ageGroup: string;
   data?:
     | {
@@ -397,6 +398,7 @@ export interface ClubFormsSelect<T extends boolean = true> {
   name?: T;
   phone?: T;
   department?: T;
+  club?: T;
   ageGroup?: T;
   data?: T;
   updatedAt?: T;
