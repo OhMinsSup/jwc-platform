@@ -95,6 +95,13 @@ export function formatName(doc: unknown): string {
 	return typeof doc === "string" ? doc : "미입력";
 }
 
+const NAME_PATTERN = /^(.+?)\s*\((.+?)\s*-\s*(.+?)\)$/;
+const PHONE_PATTERN = /^\d{2,3}-\d{3,4}-\d{4}$/;
+const SEOUL_PHONE_PATTERN = /^02\d+$/;
+const HYPHEN_PHONE_PATTERN = /^(\d{2,3})-(\d{3,4})-(\d{4})$/;
+const SEOUL_PHONE_REPLACE_PATTERN = /^02(\d{3,4})(\d{4})/;
+const GENERAL_PHONE_PATTERN = /^(\d{3})(\d{3,4})(\d{4})/;
+
 /**
  * "이름 (부서 - 또래모임)" 형식의 문자열에서 이름만 추출합니다.
  *
@@ -102,7 +109,7 @@ export function formatName(doc: unknown): string {
  * @returns 이름 문자열, 형식이 맞지 않으면 원본 텍스트 반환
  */
 export function parseName(text: string): string {
-	const match = /^(.+?)\s*\((.+?)\s*-\s*(.+?)\)$/.exec(text);
+	const match = NAME_PATTERN.exec(text);
 	return match ? (match.at(1)?.trim() ?? text) : text;
 }
 
@@ -112,7 +119,7 @@ export function parseName(text: string): string {
  * @returns 마스킹된 전화번호
  */
 function isHyphenSeparated(phoneNumber: string) {
-	return /^\d{2,3}-\d{3,4}-\d{4}$/.test(phoneNumber);
+	return PHONE_PATTERN.test(phoneNumber);
 }
 
 /**
@@ -121,7 +128,7 @@ function isHyphenSeparated(phoneNumber: string) {
  * @returns 서울 지역번호로 시작하면 true, 아니면 false
  */
 function isSeoulPhoneNumber(phoneNumber: string) {
-	return /^02\d+$/.test(phoneNumber);
+	return SEOUL_PHONE_PATTERN.test(phoneNumber);
 }
 
 /**
@@ -133,28 +140,28 @@ function maskAll(str: string) {
 	return str.replace(/./g, "*");
 }
 
-/**
- * 전화번호를 마스킹하는 함수입니다.
- * @param phoneNumber - 마스킹할 전화번호
- * @returns 마스킹된 전화번호
+/** * 전화번호의 가운데 숫자들을 마스킹 처리합니다.
+ *
+ * @param phoneNumber - 마스킹할 전화번호 문자열
+ * @returns 마스킹된 전화번호 문자열
  */
 export const formatMaskPhoneNumber = (phoneNumber: string) => {
 	if (isHyphenSeparated(phoneNumber)) {
 		return phoneNumber.replace(
-			/^(\d{2,3})-(\d{3,4})-(\d{4})$/,
+			HYPHEN_PHONE_PATTERN,
 			(_, p1, p2, p3) => `${p1}-${maskAll(p2)}-${p3}`
 		);
 	}
 
 	if (isSeoulPhoneNumber(phoneNumber)) {
 		return phoneNumber.replace(
-			/^02(\d{3,4})(\d{4})/,
+			SEOUL_PHONE_REPLACE_PATTERN,
 			(_, p1, p2) => `02${maskAll(p1)}${p2}`
 		);
 	}
 
 	return phoneNumber.replace(
-		/^(\d{3})(\d{3,4})(\d{4})/,
+		GENERAL_PHONE_PATTERN,
 		(_, p1, p2, p3) => `${p1}${maskAll(p2)}${p3}`
 	);
 };

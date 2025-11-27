@@ -1,27 +1,28 @@
 {
-	"name": "@jwc/utils",
-	"private": true,
-	"version": "0.1.0",
-	"type": "module",
-	"exports": {
-		"./package.json": "./package.json",
-		"./date": "./src/date/index.ts",
-		"./format": "./src/format/index.ts",
-		"./options": "./src/options/index.ts",
-		".": "./src/index.ts"
-	},
-	"license": "MIT",
-	"scripts": {
-		"clean": "git clean -xdf .cache .turbo dist node_modules",
-		"format": "biome format --write ./src",
-		"lint": "biome lint --error-on-warnings ./src",
-		"typecheck": "tsc --noEmit"
-	},
-	"devDependencies": {
-		"@jwc/tsconfig": "workspace:*",
-		"typescript": "catalog:"
-	},
-	"dependencies": {
-		"dayjs": "^1.11.13"
-	}
+  "name": "@jwc/utils",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    "./date": "./src/date/index.ts",
+    "./format": "./src/format/index.ts",
+    "./options": "./src/options/index.ts",
+    ".": "./src/index.ts"
+  },
+  "license": "MIT",
+  "scripts": {
+    "build": "tsdown",
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "format": "biome format --write ./src",
+    "lint": "biome lint --error-on-warnings ./src",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@jwc/tsconfig": "workspace:*",
+    "tsdown": "catalog:",
+    "typescript": "catalog:"
+  },
+  "dependencies": {
+    "dayjs": "^1.11.13"
+  }
 }
