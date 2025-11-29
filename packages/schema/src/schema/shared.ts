@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 
 export const SharedPaginationSchema = z.object({
 	limit: z.number().min(1).max(500).nullish(),

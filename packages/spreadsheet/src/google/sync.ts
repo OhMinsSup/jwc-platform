@@ -1,297 +1,272 @@
-import type { SpreadsheetHeaders } from "../core/types";
-import { env } from "../env";
-import { ExcelHeaderManager } from "../excel/headers";
-import { ExcelRowDataManager } from "../excel/rowData";
-import { googleApiClient } from "./client";
-
 /**
- * Google Sheets Table 타입 정의
+ * @fileoverview Google Sheets 동기화 관리자
+ *
+ * 스키마 기반으로 Google Sheets에 데이터를 동기화합니다.
  */
-interface GoogleSheetsTable {
-	tableId?: string | null;
-	name?: string | null;
-	range?: {
-		sheetId?: number | null;
-		startRowIndex?: number | null;
-		endRowIndex?: number | null;
-		startColumnIndex?: number | null;
-		endColumnIndex?: number | null;
-	} | null;
+
+import type { sheets_v4 } from "googleapis";
+import type {
+	IGoogleSheetsConfig,
+	IGoogleSheetsSyncer,
+	ISpreadsheetSchema,
+} from "../core/interfaces";
+import { SchemaBasedTransformer } from "../core/transformer";
+import { GoogleSheetsClient, type GoogleSheetsTable } from "./client";
+
+// ============================================================================
+// Google Sheets 동기화 결과 타입
+// ============================================================================
+
+export interface GoogleSheetsSyncResult {
+	success: boolean;
+	rowCount: number;
+	sheetId?: number;
+	error?: string;
 }
 
+// ============================================================================
+// 스키마 기반 Google Sheets 동기화 관리자
+// ============================================================================
+
 /**
- * Google Sheets 동기화 관리자 클래스
- * Google Sheets에 데이터를 생성/업데이트하는 기능을 제공합니다.
+ * 스키마 기반 Google Sheets 동기화 관리자
  */
-export class GoogleSheetsSyncManager<T extends Record<string, unknown>> {
-	/** 시트 이름 */
+export class GoogleSheetsSyncer<T = Record<string, unknown>>
+	implements IGoogleSheetsSyncer<T>
+{
+	private readonly client: GoogleSheetsClient;
+	private schema: ISpreadsheetSchema<T> | null = null;
+	private transformer: SchemaBasedTransformer<T> | null = null;
+	private data: T[] = [];
+	private spreadsheetId: string;
 	private sheetName: string;
 
-	/** 스프레드시트 ID */
-	private spreadsheetId: string;
-
-	/** 시트에 입력할 데이터 배열 */
-	private docs: T[] = [];
-
-	/** 헤더 관리자 */
-	private headerManager = new ExcelHeaderManager();
-
-	/** 행 데이터 관리자 */
-	private rowDataManager = new ExcelRowDataManager();
-
-	/**
-	 * Google Sheets 동기화 관리자를 생성합니다.
-	 * @param options - 초기 설정 옵션
-	 */
-	constructor(options?: {
-		sheetName?: string;
-		spreadsheetId?: string;
-	}) {
-		this.sheetName = options?.sheetName || env.GOOGLE_SHEET_TITLE;
-		this.spreadsheetId = options?.spreadsheetId || env.GOOGLE_SHEET_ID;
+	constructor(config?: Partial<IGoogleSheetsConfig>) {
+		this.client = new GoogleSheetsClient(config);
+		const clientConfig = this.client.getConfig();
+		this.spreadsheetId = clientConfig.spreadsheetId;
+		this.sheetName = clientConfig.sheetName;
 	}
 
 	/**
-	 * 시트 이름을 설정합니다.
-	 * @param name - 시트 이름
-	 * @returns this (체이닝 지원)
+	 * 스키마 설정
 	 */
-	setSheetName(name: string): this {
-		this.sheetName = name;
+	withSchema(schema: ISpreadsheetSchema<T>): this {
+		this.schema = schema;
+		this.transformer = new SchemaBasedTransformer(schema);
+		// 스키마에 기본 시트명이 있으면 사용
+		if (schema.defaultSheetName) {
+			this.sheetName = schema.defaultSheetName;
+		}
 		return this;
 	}
 
 	/**
-	 * 스프레드시트 ID를 설정합니다.
-	 * @param id - 스프레드시트 ID
-	 * @returns this (체이닝 지원)
+	 * 데이터 설정
 	 */
-	setSpreadsheetId(id: string): this {
+	withData(data: T[]): this {
+		this.data = data;
+		return this;
+	}
+
+	/**
+	 * 스프레드시트 ID 설정
+	 */
+	withSpreadsheetId(id: string): this {
 		this.spreadsheetId = id;
 		return this;
 	}
 
 	/**
-	 * 시트에 입력할 데이터를 설정합니다.
-	 * @param docs - 데이터 배열
-	 * @returns this (체이닝 지원)
+	 * 시트명 설정
 	 */
-	setDocs(docs: T[]): this {
-		this.docs = docs;
+	withSheetName(name: string): this {
+		this.sheetName = name;
 		return this;
 	}
 
 	/**
-	 * 시트의 메타데이터(시트 ID, 테이블 정보)를 조회합니다.
-	 * @returns 시트 ID와 테이블 정보 객체
-	 * @private
+	 * Google Sheets에 동기화
 	 */
-	private async getSheetMeta() {
-		const res = await googleApiClient.sheets.spreadsheets.get({
-			spreadsheetId: this.spreadsheetId,
-			fields: "sheets.properties,sheets.tables",
-		});
-
-		const sheet = res.data.sheets?.find(
-			(s) => s.properties?.title === this.sheetName
-		);
-
-		return {
-			sheetId: sheet?.properties?.sheetId ?? null,
-			table: sheet?.tables?.[0] ?? null,
-		};
-	}
-
-	/**
-	 * 시트가 없으면 새로 생성하고, 있으면 시트 ID를 반환합니다.
-	 * @returns 시트 ID
-	 * @private
-	 */
-	private async ensureSheet(): Promise<number> {
-		const { sheetId } = await this.getSheetMeta();
-		if (sheetId !== null) return sheetId;
-
-		const res = await googleApiClient.sheets.spreadsheets.batchUpdate({
-			spreadsheetId: this.spreadsheetId,
-			requestBody: {
-				requests: [
-					{
-						addSheet: {
-							properties: {
-								title: this.sheetName,
-								gridProperties: {
-									rowCount: 1000,
-									columnCount: 26,
-								},
-							},
-						},
-					},
-				],
-			},
-		});
-
-		return res.data.replies?.[0]?.addSheet?.properties?.sheetId as number;
-	}
-
-	/**
-	 * 시트 데이터를 클리어합니다.
-	 * @private
-	 */
-	private async clearSheetData(): Promise<void> {
-		await googleApiClient.sheets.spreadsheets.values.clear({
-			spreadsheetId: this.spreadsheetId,
-			range: `${this.sheetName}`,
-		});
-	}
-
-	/**
-	 * 시트에 데이터를 업데이트합니다.
-	 * @param headers - 헤더 배열
-	 * @param rows - 데이터 행 배열
-	 * @private
-	 */
-	private async updateSheetData(
-		headers: string[],
-		rows: string[][]
-	): Promise<void> {
-		await googleApiClient.sheets.spreadsheets.values.update({
-			spreadsheetId: this.spreadsheetId,
-			range: `${this.sheetName}!A1`,
-			valueInputOption: "USER_ENTERED",
-			requestBody: {
-				values: [headers, ...rows],
-			},
-		});
-	}
-
-	/**
-	 * Google Sheets 테이블을 생성하거나 업데이트합니다.
-	 * @param sheetId - 시트 ID
-	 * @param headerValues - 헤더 정보
-	 * @param rowCount - 행 개수
-	 * @param table - 기존 테이블 정보 (선택사항)
-	 * @private
-	 */
-	private async upsertTable(
-		sheetId: number,
-		headerValues: SpreadsheetHeaders,
-		rowCount: number,
-		table?: GoogleSheetsTable
-	): Promise<void> {
-		const tableRequest = table
-			? {
-					updateTable: {
-						table: {
-							tableId: table.tableId,
-							name: this.sheetName,
-							range: {
-								sheetId,
-								startRowIndex: 0,
-								endRowIndex: rowCount + 1,
-								startColumnIndex: 0,
-								endColumnIndex: headerValues.length,
-							},
-							columnProperties: headerValues.map((header, idx) => ({
-								columnName: header.name,
-								columnType: header.columnType,
-								columnIndex: idx,
-								...(header.columnType === "DROPDOWN" &&
-									header.options && {
-										dataValidationRule: {
-											condition: {
-												type: "ONE_OF_LIST",
-												values: header.options.map((option) => ({
-													userEnteredValue: option,
-												})),
-											},
-										},
-									}),
-							})),
-						},
-						fields: "*",
-					},
-				}
-			: {
-					addTable: {
-						table: {
-							name: this.sheetName,
-							range: {
-								sheetId,
-								startRowIndex: 0,
-								endRowIndex: rowCount + 1,
-								startColumnIndex: 0,
-								endColumnIndex: headerValues.length,
-							},
-							columnProperties: headerValues.map((header, idx) => ({
-								columnName: header.name,
-								columnType: header.columnType,
-								columnIndex: idx,
-								...(header.columnType === "DROPDOWN" &&
-									header.options && {
-										dataValidationRule: {
-											condition: {
-												type: "ONE_OF_LIST",
-												values: header.options.map((option) => ({
-													userEnteredValue: option,
-												})),
-											},
-										},
-									}),
-							})),
-						},
-					},
-				};
-
-		await googleApiClient.sheets.spreadsheets.batchUpdate({
-			spreadsheetId: this.spreadsheetId,
-			requestBody: { requests: [tableRequest] },
-		});
-	}
-
-	/**
-	 * Google Sheets에 테이블(표) 데이터를 생성 또는 업데이트합니다.
-	 * 시트가 없으면 생성하고, 기존 데이터는 모두 삭제 후 새 데이터로 덮어씁니다.
-	 */
-	async syncToGoogleSheets(): Promise<void> {
-		if (this.docs.length === 0) {
+	async sync(): Promise<GoogleSheetsSyncResult> {
+		if (!this.schema) {
 			throw new Error(
-				"동기화할 데이터가 없습니다. setDocs()를 먼저 호출하세요."
+				"스키마가 설정되지 않았습니다. withSchema()를 먼저 호출하세요."
+			);
+		}
+
+		if (!this.transformer) {
+			throw new Error(
+				"스키마가 설정되지 않았습니다. withSchema()를 먼저 호출하세요."
+			);
+		}
+
+		if (this.data.length === 0) {
+			throw new Error(
+				"동기화할 데이터가 없습니다. withData()를 먼저 호출하세요."
 			);
 		}
 
 		try {
-			// 헤더와 행 데이터 생성
-			const headerValues = this.headerManager.createGoogleSheetHeaders();
-			const headers = headerValues.map((header) => header.name);
-			const rowValues = this.rowDataManager.generateExcelFormRows(this.docs);
-			const rows = rowValues.map((row) =>
-				headers.map((header) => String(row[header as keyof typeof row] ?? ""))
+			// 헤더와 데이터 준비
+			const headers = this.transformer.getHeaders();
+			const rows = this.transformer.toRows(this.data);
+
+			// 시트 확인/생성
+			const sheetId = await this.client.ensureSheet(
+				this.spreadsheetId,
+				this.sheetName
 			);
 
-			// 시트 생성 또는 조회
-			const { sheetId, table } = await this.getSheetMeta();
-			let realSheetId = sheetId;
+			// 기존 데이터 클리어
+			await this.client.clearData(this.spreadsheetId, this.sheetName);
 
-			if (realSheetId === null) {
-				realSheetId = await this.ensureSheet();
-			}
+			// 새 데이터 쓰기
+			await this.client.writeData(this.spreadsheetId, `${this.sheetName}!A1`, [
+				headers,
+				...rows,
+			]);
 
-			// 데이터 클리어 후 업데이트
-			await this.clearSheetData();
-			await this.updateSheetData(headers, rows);
+			// 테이블 업데이트 (옵션)
+			await this.updateTable(sheetId, headers, rows.length);
 
-			// 테이블 생성 또는 업데이트
-			await this.upsertTable(
-				realSheetId,
-				headerValues,
-				rows.length,
-				table || undefined
-			);
+			return {
+				success: true,
+				rowCount: rows.length,
+				sheetId,
+			};
 		} catch (error) {
+			const errorMessage =
+				error instanceof Error ? error.message : String(error);
 			console.error("Google Sheets 동기화 오류:", error);
-			throw new Error(
-				`Google Sheets 동기화에 실패했습니다: ${error instanceof Error ? error.message : String(error)}`
-			);
+			return {
+				success: false,
+				rowCount: 0,
+				error: errorMessage,
+			};
 		}
 	}
+
+	/**
+	 * Google Sheets 테이블 업데이트
+	 */
+	private async updateTable(
+		sheetId: number,
+		headers: string[],
+		rowCount: number
+	): Promise<void> {
+		if (!this.schema) {
+			return;
+		}
+
+		const metadata = await this.client.getSheetMetadata(
+			this.spreadsheetId,
+			this.sheetName
+		);
+
+		const columnProperties = this.schema.columns.map((col, idx) => {
+			const columnDef: sheets_v4.Schema$TableColumnProperties = {
+				columnName: col.header,
+				columnIndex: idx,
+			};
+
+			// 드롭다운 타입인 경우 데이터 검증 규칙 추가
+			if (col.type === "dropdown" && col.options) {
+				columnDef.dataValidationRule = {
+					condition: {
+						type: "ONE_OF_LIST",
+						values: col.options.map((option) => ({
+							userEnteredValue: option,
+						})),
+					},
+				};
+			}
+
+			return columnDef;
+		});
+
+		const tableRequest = this.buildTableRequest({
+			sheetId,
+			columnCount: headers.length,
+			rowCount,
+			columnProperties,
+			existingTable: metadata.table,
+		});
+
+		await this.client.batchUpdate(this.spreadsheetId, [tableRequest]);
+	}
+
+	/**
+	 * 테이블 요청 빌드
+	 */
+	private buildTableRequest(options: {
+		sheetId: number;
+		columnCount: number;
+		rowCount: number;
+		columnProperties: sheets_v4.Schema$TableColumnProperties[];
+		existingTable?: GoogleSheetsTable | null;
+	}): sheets_v4.Schema$Request {
+		const { sheetId, columnCount, rowCount, columnProperties, existingTable } =
+			options;
+		const tableRange = {
+			sheetId,
+			startRowIndex: 0,
+			endRowIndex: rowCount + 1,
+			startColumnIndex: 0,
+			endColumnIndex: columnCount,
+		};
+
+		if (existingTable?.tableId) {
+			return {
+				updateTable: {
+					table: {
+						tableId: existingTable.tableId,
+						name: this.sheetName,
+						range: tableRange,
+						columnProperties,
+					},
+					fields: "*",
+				},
+			};
+		}
+
+		return {
+			addTable: {
+				table: {
+					name: this.sheetName,
+					range: tableRange,
+					columnProperties,
+				},
+			},
+		};
+	}
 }
+
+// ============================================================================
+// 팩토리 함수
+// ============================================================================
+
+/**
+ * Google Sheets 동기화 관리자 생성
+ */
+export function createGoogleSheetsSyncer<T = Record<string, unknown>>(
+	config?: Partial<IGoogleSheetsConfig>
+): GoogleSheetsSyncer<T> {
+	return new GoogleSheetsSyncer<T>(config);
+}
+
+/**
+ * 스키마와 데이터로 Google Sheets에 빠르게 동기화
+ */
+export async function syncToGoogleSheets<T = Record<string, unknown>>(
+	schema: ISpreadsheetSchema<T>,
+	data: T[],
+	config?: Partial<IGoogleSheetsConfig>
+): Promise<GoogleSheetsSyncResult> {
+	const syncer = new GoogleSheetsSyncer<T>(config);
+	const result = await syncer.withSchema(schema).withData(data).sync();
+	return result;
+}
+
+// 하위 호환성을 위한 별칭
+export { GoogleSheetsSyncer as GoogleSheetsSyncManager };

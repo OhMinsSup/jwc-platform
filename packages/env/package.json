@@ -1,26 +1,27 @@
 {
-	"name": "@jwc/env",
-	"version": "0.1.0",
-	"private": true,
-	"license": "MIT",
-	"type": "module",
-	"exports": {
-		"./package.json": "./package.json",
-		"./helpers/*": "./src/helpers/*.ts",
-		"./*": "./src/*.ts"
-	},
-	"scripts": {
-		"clean": "git clean -xdf .cache .turbo dist node_modules",
-		"format": "biome format --write ./src",
-		"lint": "biome lint --error-on-warnings ./src",
-		"typecheck": "tsc --noEmit"
-	},
-	"dependencies": {
-		"@t3-oss/env-nextjs": "^0.13.4",
-		"zod": "catalog:"
-	},
-	"devDependencies": {
-		"@jwc/tsconfig": "workspace:*",
-		"typescript": "catalog:"
-	}
+  "name": "@jwc/env",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    "./helpers/*": "./src/helpers/*.ts",
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "format": "biome format --write ./src",
+    "lint": "biome lint --error-on-warnings ./src",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@t3-oss/env-nextjs": "^0.13.8",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@jwc/tsconfig": "workspace:*",
+    "tsdown": "catalog:",
+    "typescript": "catalog:"
+  }
 }

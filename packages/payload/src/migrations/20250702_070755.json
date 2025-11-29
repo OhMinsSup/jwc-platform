@@ -71,12 +71,8 @@
           "name": "users_roles_parent_fk",
           "tableFrom": "users_roles",
           "tableTo": "users",
-          "columnsFrom": [
-            "parent_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["parent_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -566,12 +562,8 @@
           "name": "payload_locked_documents_rels_parent_fk",
           "tableFrom": "payload_locked_documents_rels",
           "tableTo": "payload_locked_documents",
-          "columnsFrom": [
-            "parent_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["parent_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -579,12 +571,8 @@
           "name": "payload_locked_documents_rels_users_fk",
           "tableFrom": "payload_locked_documents_rels",
           "tableTo": "users",
-          "columnsFrom": [
-            "users_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["users_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -592,12 +580,8 @@
           "name": "payload_locked_documents_rels_forms_fk",
           "tableFrom": "payload_locked_documents_rels",
           "tableTo": "forms",
-          "columnsFrom": [
-            "forms_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["forms_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -801,12 +785,8 @@
           "name": "payload_preferences_rels_parent_fk",
           "tableFrom": "payload_preferences_rels",
           "tableTo": "payload_preferences",
-          "columnsFrom": [
-            "parent_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["parent_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -814,12 +794,8 @@
           "name": "payload_preferences_rels_users_fk",
           "tableFrom": "payload_preferences_rels",
           "tableTo": "users",
-          "columnsFrom": [
-            "users_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["users_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -911,59 +887,32 @@
     "public.enum_users_roles": {
       "name": "enum_users_roles",
       "schema": "public",
-      "values": [
-        "admin",
-        "user"
-      ]
+      "values": ["admin", "user"]
     },
     "public.enum_forms_gender": {
       "name": "enum_forms_gender",
       "schema": "public",
-      "values": [
-        "남성",
-        "여성"
-      ]
+      "values": ["남성", "여성"]
     },
     "public.enum_forms_department": {
       "name": "enum_forms_department",
       "schema": "public",
-      "values": [
-        "청년1부",
-        "청년2부",
-        "기타"
-      ]
+      "values": ["청년1부", "청년2부", "기타"]
     },
     "public.enum_forms_number_of_stays": {
       "name": "enum_forms_number_of_stays",
       "schema": "public",
-      "values": [
-        "3박4일",
-        "2박3일",
-        "1박2일",
-        "무박"
-      ]
+      "values": ["3박4일", "2박3일", "1박2일", "무박"]
     },
     "public.enum_forms_tf_team": {
       "name": "enum_forms_tf_team",
       "schema": "public",
-      "values": [
-        "없음",
-        "찬양팀",
-        "프로그램팀",
-        "미디어팀"
-      ]
+      "values": ["없음", "찬양팀", "프로그램팀", "미디어팀"]
     },
     "public.enum_forms_tshirt_size": {
       "name": "enum_forms_tshirt_size",
       "schema": "public",
-      "values": [
-        "s",
-        "m",
-        "l",
-        "xl",
-        "2xl",
-        "3xl"
-      ]
+      "values": ["s", "m", "l", "xl", "2xl", "3xl"]
     }
   },
   "schemas": {},

@@ -1,5 +1,7 @@
 import { AsYouType } from "libphonenumber-js";
-import { z } from "zod";
+import { z } from "zod/v4";
+
+export const AGE_GROUP_REGEX = /^[0-9]{2}또래$/;
 
 export const FormSchema = z.object({
 	name: z
@@ -50,8 +52,7 @@ export const FormSchema = z.object({
 		.refine(
 			(value) => {
 				// (숫자)또래 형식 예시 (00또래)
-				const regex = /^[0-9]{2}또래$/;
-				if (!regex.test(value)) {
+				if (!AGE_GROUP_REGEX.test(value)) {
 					return false;
 				}
 				return true;
@@ -61,7 +62,7 @@ export const FormSchema = z.object({
 			}
 		),
 	attendanceTime: z
-		.union([z.string().datetime(), z.date(), z.instanceof(Date)])
+		.union([z.iso.datetime(), z.date(), z.instanceof(Date)])
 		.optional()
 		.transform((val) => (val instanceof Date ? val.toISOString() : val)),
 });

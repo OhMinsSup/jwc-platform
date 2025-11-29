@@ -1,6 +1,6 @@
 import { createEnv } from "@t3-oss/env-nextjs";
 import { vercel } from "@t3-oss/env-nextjs/presets-zod";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { skipValidation } from "./helpers/skipValidation";
 import { node as nodeEnv } from "./node";
 import { payload as payloadEnv } from "./payload";
@@ -15,8 +15,8 @@ export const app = () =>
 			NEXT_PUBLIC_SENTRY_DSN: isProduction
 				? z.string().min(1)
 				: z.string().optional(),
-			NEXT_PUBLIC_FORM_APP_URL: z.string().url(),
-			NEXT_PUBLIC_BACKEND_URL: z.string().url(),
+			NEXT_PUBLIC_FORM_APP_URL: z.url(),
+			NEXT_PUBLIC_BACKEND_URL: z.url(),
 		},
 		emptyStringAsUndefined: true,
 		runtimeEnv: {

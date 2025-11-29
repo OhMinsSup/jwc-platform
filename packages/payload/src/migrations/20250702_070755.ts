@@ -1,7 +1,7 @@
-import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
+import { MigrateUpArgs, MigrateDownArgs, sql } from "@payloadcms/db-postgres";
 
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
-  await db.execute(sql`
+	await db.execute(sql`
    CREATE TYPE "public"."enum_users_roles" AS ENUM('admin', 'user');
   CREATE TYPE "public"."enum_forms_gender" AS ENUM('남성', '여성');
   CREATE TYPE "public"."enum_forms_department" AS ENUM('청년1부', '청년2부', '기타');
@@ -146,11 +146,15 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX IF NOT EXISTS "payload_preferences_rels_path_idx" ON "payload_preferences_rels" USING btree ("path");
   CREATE INDEX IF NOT EXISTS "payload_preferences_rels_users_id_idx" ON "payload_preferences_rels" USING btree ("users_id");
   CREATE INDEX IF NOT EXISTS "payload_migrations_updated_at_idx" ON "payload_migrations" USING btree ("updated_at");
-  CREATE INDEX IF NOT EXISTS "payload_migrations_created_at_idx" ON "payload_migrations" USING btree ("created_at");`)
+  CREATE INDEX IF NOT EXISTS "payload_migrations_created_at_idx" ON "payload_migrations" USING btree ("created_at");`);
 }
 
-export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
-  await db.execute(sql`
+export async function down({
+	db,
+	payload,
+	req,
+}: MigrateDownArgs): Promise<void> {
+	await db.execute(sql`
    DROP TABLE "users_roles" CASCADE;
   DROP TABLE "users" CASCADE;
   DROP TABLE "forms" CASCADE;
@@ -164,5 +168,5 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "public"."enum_forms_department";
   DROP TYPE "public"."enum_forms_number_of_stays";
   DROP TYPE "public"."enum_forms_tf_team";
-  DROP TYPE "public"."enum_forms_tshirt_size";`)
+  DROP TYPE "public"."enum_forms_tshirt_size";`);
 }

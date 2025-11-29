@@ -1,5 +1,5 @@
 import { createEnv } from "@t3-oss/env-nextjs";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 interface NodeServerEnv {
 	NODE_ENV: "development" | "production" | "test";
@@ -25,7 +25,7 @@ export const node = (): Readonly<NodeServerEnv> =>
 				.enum(["development", "production", "test"])
 				.default("development"),
 			DATABASE_ENGINE: z.enum(["postgres"]).default("postgres"),
-			DATABASE_URL: z.string().url(),
+			DATABASE_URL: z.url(),
 			GOOGLE_CLIENT_EMAIL: z.string().min(1),
 			GOOGLE_PRIVATE_KEY: z
 				.string()

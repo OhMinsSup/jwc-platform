@@ -1,4 +1,4 @@
-import * as Sentry from "@sentry/nextjs";
+import Sentry from "@sentry/nextjs";
 import { createConsola } from "consola";
 
 type Platform =
@@ -73,7 +73,7 @@ class Logger {
 		}
 	}
 
-	private sanitize = <T>(input: T, level = 0): T => {
+	private readonly readonly sanitize = <T>(input: T, level = 0): T => {
 		if (process.env.NODE_ENV !== "production") {
 			return input;
 		}

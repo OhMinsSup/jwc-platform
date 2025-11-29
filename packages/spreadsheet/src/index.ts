@@ -1,44 +1,115 @@
-// 핵심 타입과 인터페이스
+/**
+ * @fileoverview 스프레드시트 패키지 진입점
+ *
+ * Excel 파일 생성과 Google Sheets 동기화 기능을 제공합니다.
+ *
+ * @example
+ * ```typescript
+ * import { createExcelBuffer, clubFormSchema } from "@jwc/spreadsheet";
+ *
+ * const buffer = await createExcelBuffer(clubFormSchema, data);
+ * ```
+ */
+
+// ============================================================================
+// 핵심 인터페이스와 타입
+// ============================================================================
+
 export type {
-	RowFormData,
-	SpreadsheetHeader,
-	SpreadsheetHeaders,
-	GoogleSheetColumnType,
-	ExcelGenerateOptions,
-	GoogleSheetsConfig,
-	ExcelExportConfig,
-	SpreadsheetConfig,
-	SpreadsheetData,
-} from "./core/types";
+	// 기본 타입
+	ColumnType,
+	// 스키마 관련
+	IColumnDefinition,
+	// 데이터 변환
+	IDataTransformer,
+	// Excel 관련
+	IExcelBuilder,
+	IExcelStyleConfig,
+	IExcelStyler,
+	// Google Sheets 관련
+	IGoogleSheetsClient,
+	IGoogleSheetsConfig,
+	IGoogleSheetsSyncer,
+	ISchemaRegistry,
+	// 통합 빌더
+	ISpreadsheetBuilder,
+	ISpreadsheetOptions,
+	ISpreadsheetResult,
+	ISpreadsheetSchema,
+	IValueFormatter,
+} from "./core/interfaces";
 
-// 핵심 클래스들
-export { SpreadsheetManager } from "./core/manager";
-export { SpreadsheetBuilder } from "./core/builder";
+// ============================================================================
+// 스키마 정의
+// ============================================================================
 
-// 팩토리 함수들
-import { createFormSpreadsheet, createSpreadsheet } from "./core/builder";
-export { createSpreadsheet, createFormSpreadsheet };
-
-// Excel 관련 클래스들
-export { ExcelManager } from "./excel/manager";
-export { ExcelHeaderManager } from "./excel/headers";
-export { ExcelRowDataManager } from "./excel/rowData";
-export { ExcelStyleManager } from "./excel/styler";
-
-// Google Sheets 관련 클래스들
-export { GoogleApiClient, googleApiClient } from "./google/client";
-export { GoogleSheetsSyncManager } from "./google/sync";
-
-// 유틸리티 함수들
-export { DataConverter } from "./utils/converter";
+// 스키마 빌더
+// 스키마 레지스트리
 export {
-	validateSpreadsheetConfig,
-	validateRowFormData,
+	ColumnBuilder,
+	column,
+	defineSchema,
+	SchemaBuilder,
+	schemaRegistry,
+} from "./core/schema";
+
+// 미리 정의된 스키마
+export type {
+	ClubFormData,
+	GenericFormData,
+	RetreatFormData,
+} from "./core/schemas";
+export {
+	// 스키마 유틸리티
+	addDynamicColumns,
+	clubFormSchema,
+	extendSchema,
+	omitColumns,
+	pickColumns,
+	retreatFormSchema,
+} from "./core/schemas";
+
+// ============================================================================
+// 데이터 변환
+// ============================================================================
+
+export {
+	DefaultValueFormatter,
+	// 유틸리티 함수
+	getValue,
 	isEmpty,
 	removeDuplicates,
+	SchemaBasedTransformer,
 	safeJsonParse,
-} from "./utils/validator";
+} from "./core/transformer";
 
-// 기본 인스턴스 (하위 호환성)
-export const spreadsheet = createSpreadsheet();
-export const formSpreadsheet = createFormSpreadsheet();
+// ============================================================================
+// Excel
+// ============================================================================
+
+export {
+	createExcelBuffer,
+	// 팩토리 함수
+	createExcelBuilder,
+	ExcelBuilder,
+	ExcelStyler,
+} from "./excel/builder";
+
+// ============================================================================
+// Google Sheets
+// ============================================================================
+
+export {
+	createGoogleSheetsClient,
+	GoogleSheetsClient,
+	type GoogleSheetsTable,
+	getDefaultGoogleSheetsClient,
+	type SheetMetadata,
+} from "./google/client";
+
+export {
+	createGoogleSheetsSyncer,
+	GoogleSheetsSyncer,
+	type GoogleSheetsSyncResult,
+	syncToGoogleSheets,
+} from "./google/sync";

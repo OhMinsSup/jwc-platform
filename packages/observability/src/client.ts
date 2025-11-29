@@ -4,7 +4,7 @@
  * https://docs.sentry.io/platforms/javascript/guides/nextjs/
  */
 
-import * as Sentry from "@sentry/nextjs";
+import Sentry from "@sentry/nextjs";
 
 export const initializeSentry = (): ReturnType<typeof Sentry.init> => {
 	return Sentry.init({

@@ -1,7 +1,7 @@
-import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
+import { MigrateUpArgs, MigrateDownArgs, sql } from "@payloadcms/db-postgres";
 
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
-  await db.execute(sql`
+	await db.execute(sql`
    CREATE TYPE "public"."enum_components_type" AS ENUM('text', 'select', 'richText', 'description', 'checkbox', 'radio');
   CREATE TYPE "public"."enum_club_forms_department" AS ENUM('청년1부', '청년2부', '기타');
   CREATE TABLE "users_sessions" (
@@ -76,11 +76,15 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_club_forms_fk" FOREIGN KEY ("club_forms_id") REFERENCES "public"."club_forms"("id") ON DELETE cascade ON UPDATE no action;
   CREATE INDEX "payload_locked_documents_rels_clubs_id_idx" ON "payload_locked_documents_rels" USING btree ("clubs_id");
   CREATE INDEX "payload_locked_documents_rels_components_id_idx" ON "payload_locked_documents_rels" USING btree ("components_id");
-  CREATE INDEX "payload_locked_documents_rels_club_forms_id_idx" ON "payload_locked_documents_rels" USING btree ("club_forms_id");`)
+  CREATE INDEX "payload_locked_documents_rels_club_forms_id_idx" ON "payload_locked_documents_rels" USING btree ("club_forms_id");`);
 }
 
-export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
-  await db.execute(sql`
+export async function down({
+	db,
+	payload,
+	req,
+}: MigrateDownArgs): Promise<void> {
+	await db.execute(sql`
    ALTER TABLE "users_sessions" DISABLE ROW LEVEL SECURITY;
   ALTER TABLE "clubs" DISABLE ROW LEVEL SECURITY;
   ALTER TABLE "clubs_rels" DISABLE ROW LEVEL SECURITY;
@@ -104,5 +108,5 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   ALTER TABLE "payload_locked_documents_rels" DROP COLUMN "components_id";
   ALTER TABLE "payload_locked_documents_rels" DROP COLUMN "club_forms_id";
   DROP TYPE "public"."enum_components_type";
-  DROP TYPE "public"."enum_club_forms_department";`)
+  DROP TYPE "public"."enum_club_forms_department";`);
 }
