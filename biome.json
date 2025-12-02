@@ -30,7 +30,8 @@
       "!**/.source",
       "!**/output",
       "!**/transformed",
-      "!**/logs"
+      "!**/logs",
+      "!**/_generated"
     ]
   },
   "formatter": {

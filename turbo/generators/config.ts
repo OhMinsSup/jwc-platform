@@ -27,10 +27,12 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
 		],
 		actions: [
 			(answers) => {
-				if ("name" in answers && typeof answers.name === "string") {
-					if (answers.name.startsWith("@jwc/")) {
-						answers.name = answers.name.replace("@jwc/", "");
-					}
+				if (
+					"name" in answers &&
+					typeof answers.name === "string" &&
+					answers.name.startsWith("@jwc/")
+				) {
+					answers.name = answers.name.replace("@jwc/", "");
 				}
 				return "Config sanitized";
 			},
@@ -66,7 +68,9 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
 							)
 								.then((res) => res.json())
 								.then((json) => json.latest);
-							if (!pkg.dependencies) pkg.dependencies = {};
+							if (!pkg.dependencies) {
+								pkg.dependencies = {};
+							}
 							pkg.dependencies[dep] = `^${version}`;
 						}
 						return JSON.stringify(pkg, null, 2);
@@ -74,7 +78,7 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
 					return content;
 				},
 			},
-			async (answers) => {
+			(answers) => {
 				/**
 				 * Install deps and format everything
 				 */
