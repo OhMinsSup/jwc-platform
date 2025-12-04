@@ -11,7 +11,7 @@
 import type * as auth from "../auth.js";
 import type * as healthCheck from "../healthCheck.js";
 import type * as http from "../http.js";
-import type * as retreatApplications from "../retreatApplications.js";
+import type * as onboarding from "../onboarding.js";
 import type * as users from "../users.js";
 
 import type {
@@ -24,7 +24,7 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   healthCheck: typeof healthCheck;
   http: typeof http;
-  retreatApplications: typeof retreatApplications;
+  onboarding: typeof onboarding;
   users: typeof users;
 }>;
 

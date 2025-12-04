@@ -49,7 +49,7 @@ const tshirtSizeValidator = v.union(
  * 모든 수련회 신청서 조회
  */
 export const getAll = query({
-	handler: async (ctx) => await ctx.db.query("retreatApplications").collect(),
+	handler: async (ctx) => await ctx.db.query("onboarding").collect(),
 });
 
 /**
@@ -57,7 +57,7 @@ export const getAll = query({
  */
 export const getById = query({
 	args: {
-		id: v.id("retreatApplications"),
+		id: v.id("onboarding"),
 	},
 	handler: async (ctx, args) => await ctx.db.get(args.id),
 });
@@ -71,7 +71,7 @@ export const getByDepartment = query({
 	},
 	handler: async (ctx, args) =>
 		await ctx.db
-			.query("retreatApplications")
+			.query("onboarding")
 			.withIndex("by_department", (q) => q.eq("department", args.department))
 			.collect(),
 });
@@ -85,7 +85,7 @@ export const getByPaymentStatus = query({
 	},
 	handler: async (ctx, args) =>
 		await ctx.db
-			.query("retreatApplications")
+			.query("onboarding")
 			.withIndex("by_isPaid", (q) => q.eq("isPaid", args.isPaid))
 			.collect(),
 });
@@ -99,7 +99,7 @@ export const getByStayType = query({
 	},
 	handler: async (ctx, args) =>
 		await ctx.db
-			.query("retreatApplications")
+			.query("onboarding")
 			.withIndex("by_stayType", (q) => q.eq("stayType", args.stayType))
 			.collect(),
 });
@@ -135,7 +135,7 @@ export const create = mutation({
 		tshirtSize: v.optional(tshirtSizeValidator),
 	},
 	handler: async (ctx, args) => {
-		const newId = await ctx.db.insert("retreatApplications", {
+		const newId = await ctx.db.insert("onboarding", {
 			name: args.name,
 			phone: args.phone,
 			gender: args.gender,
@@ -159,7 +159,7 @@ export const create = mutation({
  */
 export const update = mutation({
 	args: {
-		id: v.id("retreatApplications"),
+		id: v.id("onboarding"),
 
 		// 모든 필드를 optional로 설정하여 부분 업데이트 지원
 		name: v.optional(v.string()),
@@ -194,7 +194,7 @@ export const update = mutation({
  */
 export const togglePaymentStatus = mutation({
 	args: {
-		id: v.id("retreatApplications"),
+		id: v.id("onboarding"),
 		isPaid: v.boolean(),
 	},
 	handler: async (ctx, args) => {
@@ -208,7 +208,7 @@ export const togglePaymentStatus = mutation({
  */
 export const remove = mutation({
 	args: {
-		id: v.id("retreatApplications"),
+		id: v.id("onboarding"),
 	},
 	handler: async (ctx, args) => {
 		await ctx.db.delete(args.id);
@@ -221,7 +221,7 @@ export const remove = mutation({
  */
 export const bulkRemove = mutation({
 	args: {
-		ids: v.array(v.id("retreatApplications")),
+		ids: v.array(v.id("onboarding")),
 	},
 	handler: async (ctx, args) => {
 		for (const id of args.ids) {

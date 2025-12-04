@@ -54,7 +54,7 @@ export default defineSchema({
 	 * 수련회 신청서 테이블
 	 * - 청년부 수련회 참가 신청 정보를 저장
 	 */
-	retreatApplications: defineTable({
+	onboarding: defineTable({
 		// ──────────────────────────────────────────────────────
 		// 기본 개인 정보
 		// ──────────────────────────────────────────────────────

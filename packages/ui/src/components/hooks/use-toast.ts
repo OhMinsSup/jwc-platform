@@ -8,7 +8,7 @@ import type {
 import * as React from "react";
 
 const TOAST_LIMIT = 1;
-const TOAST_REMOVE_DELAY = 1000000;
+const TOAST_REMOVE_DELAY = 1_000_000;
 
 type ToasterToast = ToastProps & {
 	id: string;
@@ -66,7 +66,7 @@ const addToRemoveQueue = (toastId: string) => {
 		toastTimeouts.delete(toastId);
 		dispatch({
 			type: "REMOVE_TOAST",
-			toastId: toastId,
+			toastId,
 		});
 	}, TOAST_REMOVE_DELAY);
 
@@ -125,6 +125,8 @@ export const reducer = (state: State, action: Action): State => {
 				...state,
 				toasts: state.toasts.filter((t) => t.id !== action.toastId),
 			};
+		default:
+			return state;
 	}
 };
 
@@ -158,13 +160,15 @@ function toast({ ...props }: Toast) {
 			id,
 			open: true,
 			onOpenChange: (open) => {
-				if (!open) dismiss();
+				if (!open) {
+					dismiss();
+				}
 			},
 		},
 	});
 
 	return {
-		id: id,
+		id,
 		dismiss,
 		update,
 	};
@@ -173,7 +177,7 @@ function toast({ ...props }: Toast) {
 function useToast() {
 	const [state, setState] = React.useState<State>(memoryState);
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+	// biome-ignore lint/correctness/useExhaustiveDependencies: listeners array is intentionally managed outside React
 	React.useEffect(() => {
 		listeners.push(setState);
 		return () => {

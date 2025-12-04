@@ -18,8 +18,8 @@
     "lint": "biome lint --error-on-warnings ./src",
     "typecheck": "tsc --noEmit",
     "auth:generate": "pnpm with-env pnpx @better-auth/cli generate --output ./src/auth-schema.ts",
-    "convex:dev": "pnpm with-env convex dev",
-    "convex:setup": "pnpm with-env convex dev --until-success",
+    "convex:dev": "pnpm with-env convex dev --local",
+    "convex:setup": "pnpm with-env convex dev --local --until-success",
     "convex:deploy": "pnpm with-env convex deploy",
     "with-env": "dotenv -e ../../.env --"
   },
