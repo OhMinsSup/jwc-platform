@@ -41,6 +41,12 @@ const tshirtSizeValidator = v.union(
 	v.literal("3xl")
 );
 
+/** 암호화된 데이터 구조 */
+const encryptedDataValidator = v.object({
+	ciphertext: v.string(),
+	iv: v.string(),
+});
+
 // ============================================================
 // Query 함수
 // ============================================================
@@ -91,16 +97,17 @@ export const getByPaymentStatus = query({
 });
 
 /**
- * 전화번호로 수련회 신청서 조회
+ * 전화번호 해시로 수련회 신청서 조회
+ * - 클라이언트에서 해시를 계산해서 전달
  */
-export const getByPhone = query({
+export const getByPhoneHash = query({
 	args: {
-		phone: v.string(),
+		phoneHash: v.string(),
 	},
 	handler: async (ctx, args) =>
 		await ctx.db
 			.query("onboarding")
-			.withIndex("by_phone", (q) => q.eq("phone", args.phone))
+			.withIndex("by_phoneHash", (q) => q.eq("phoneHash", args.phoneHash))
 			.first(),
 });
 
@@ -124,12 +131,17 @@ export const getByStayType = query({
 
 /**
  * 수련회 신청서 생성
+ * - 이름, 전화번호는 클라이언트에서 암호화하여 전달
+ * - phoneHash는 검색/식별용으로 사용
  */
 export const create = mutation({
 	args: {
-		// 기본 개인 정보
-		name: v.string(),
-		phone: v.string(),
+		// 암호화된 개인 정보
+		encryptedName: encryptedDataValidator,
+		encryptedPhone: encryptedDataValidator,
+		phoneHash: v.string(),
+
+		// 기본 정보
 		gender: genderValidator,
 		department: departmentValidator,
 		ageGroup: v.string(),
@@ -150,8 +162,9 @@ export const create = mutation({
 	},
 	handler: async (ctx, args) => {
 		const newId = await ctx.db.insert("onboarding", {
-			name: args.name,
-			phone: args.phone,
+			name: JSON.stringify(args.encryptedName),
+			phone: JSON.stringify(args.encryptedPhone),
+			phoneHash: args.phoneHash,
 			gender: args.gender,
 			department: args.department,
 			ageGroup: args.ageGroup,
@@ -170,13 +183,17 @@ export const create = mutation({
 
 /**
  * 수련회 신청서 Upsert (생성 또는 수정)
- * - 전화번호를 기준으로 기존 신청서가 있으면 수정, 없으면 생성
+ * - phoneHash를 기준으로 기존 신청서가 있으면 수정, 없으면 생성
+ * - 다른 브라우저/환경에서도 같은 전화번호면 업데이트 가능
  */
 export const upsert = mutation({
 	args: {
-		// 기본 개인 정보
-		name: v.string(),
-		phone: v.string(),
+		// 암호화된 개인 정보
+		encryptedName: encryptedDataValidator,
+		encryptedPhone: encryptedDataValidator,
+		phoneHash: v.string(),
+
+		// 기본 정보
 		gender: genderValidator,
 		department: departmentValidator,
 		ageGroup: v.string(),
@@ -196,16 +213,17 @@ export const upsert = mutation({
 		tshirtSize: v.optional(tshirtSizeValidator),
 	},
 	handler: async (ctx, args) => {
-		// 전화번호로 기존 신청서 조회
+		// phoneHash로 기존 신청서 조회
 		const existing = await ctx.db
 			.query("onboarding")
-			.withIndex("by_phone", (q) => q.eq("phone", args.phone))
+			.withIndex("by_phoneHash", (q) => q.eq("phoneHash", args.phoneHash))
 			.first();
 
 		if (existing) {
 			// 기존 신청서가 있으면 수정 (회비 납입 상태는 유지)
 			await ctx.db.patch(existing._id, {
-				name: args.name,
+				name: JSON.stringify(args.encryptedName),
+				phone: JSON.stringify(args.encryptedPhone),
 				gender: args.gender,
 				department: args.department,
 				ageGroup: args.ageGroup,
@@ -222,8 +240,9 @@ export const upsert = mutation({
 
 		// 신규 생성
 		const newId = await ctx.db.insert("onboarding", {
-			name: args.name,
-			phone: args.phone,
+			name: JSON.stringify(args.encryptedName),
+			phone: JSON.stringify(args.encryptedPhone),
+			phoneHash: args.phoneHash,
 			gender: args.gender,
 			department: args.department,
 			ageGroup: args.ageGroup,
@@ -247,9 +266,12 @@ export const update = mutation({
 	args: {
 		id: v.id("onboarding"),
 
+		// 암호화된 개인 정보 (선택적)
+		encryptedName: v.optional(encryptedDataValidator),
+		encryptedPhone: v.optional(encryptedDataValidator),
+		phoneHash: v.optional(v.string()),
+
 		// 모든 필드를 optional로 설정하여 부분 업데이트 지원
-		name: v.optional(v.string()),
-		phone: v.optional(v.string()),
 		gender: v.optional(genderValidator),
 		department: v.optional(departmentValidator),
 		ageGroup: v.optional(v.string()),
@@ -263,12 +285,24 @@ export const update = mutation({
 		tshirtSize: v.optional(tshirtSizeValidator),
 	},
 	handler: async (ctx, args) => {
-		const { id, ...updateFields } = args;
+		const { id, encryptedName, encryptedPhone, phoneHash, ...updateFields } =
+			args;
 
 		// undefined 값 제거
-		const cleanedFields = Object.fromEntries(
+		const cleanedFields: Record<string, unknown> = Object.fromEntries(
 			Object.entries(updateFields).filter(([, value]) => value !== undefined)
 		);
+
+		// 암호화된 필드 처리
+		if (encryptedName) {
+			cleanedFields.name = JSON.stringify(encryptedName);
+		}
+		if (encryptedPhone) {
+			cleanedFields.phone = JSON.stringify(encryptedPhone);
+		}
+		if (phoneHash) {
+			cleanedFields.phoneHash = phoneHash;
+		}
 
 		await ctx.db.patch(id, cleanedFields);
 		return await ctx.db.get(id);

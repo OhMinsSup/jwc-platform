@@ -27,6 +27,7 @@ import {
 	Users,
 } from "lucide-react";
 import { useState } from "react";
+import { encryptPersonalInfoServer } from "@/lib/crypto-server";
 import { useOnboardingFormStore } from "@/lib/onboarding-form-store";
 
 interface ConfirmStepProps {
@@ -58,9 +59,24 @@ export function ConfirmStep({ onNext, onPrev }: ConfirmStepProps) {
 		setError(null);
 
 		try {
+			// 서버에서 개인정보 암호화
+			const encryptResult = await encryptPersonalInfoServer({
+				data: {
+					name: formData.name,
+					phone: formData.phone,
+				},
+			});
+
+			if (!encryptResult.success) {
+				throw new Error("개인정보 암호화에 실패했습니다.");
+			}
+
+			const encryptedInfo = encryptResult.data;
+
 			await upsertApplication({
-				name: formData.name,
-				phone: formData.phone,
+				encryptedName: encryptedInfo.encryptedName,
+				encryptedPhone: encryptedInfo.encryptedPhone,
+				phoneHash: encryptedInfo.phoneHash,
 				gender: formData.gender,
 				department: formData.department,
 				ageGroup: formData.ageGroup,

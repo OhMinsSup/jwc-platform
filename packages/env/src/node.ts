@@ -7,8 +7,10 @@ export const node = () =>
 			NODE_ENV: z
 				.enum(["development", "production", "test"])
 				.default("development"),
+			ENCRYPTION_KEY: z.string().min(32),
 		},
 		runtimeEnv: {
 			NODE_ENV: process.env.NODE_ENV,
+			ENCRYPTION_KEY: process.env.ENCRYPTION_KEY,
 		},
 	});
