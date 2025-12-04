@@ -1,10 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
-// ============================================================
-// 공통 Validator 정의
-// ============================================================
-
 /** 성별 */
 const genderValidator = v.union(v.literal("male"), v.literal("female"));
 

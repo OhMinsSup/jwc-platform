@@ -34,6 +34,7 @@
     "react-dom": "catalog:react19",
     "react-hook-form": "^7.67.0",
     "react-use": "^17.6.0",
+    "stable-hash": "^0.0.6",
     "tailwindcss": "catalog:",
     "vite-tsconfig-paths": "^5.1.4",
     "zod": "catalog:",

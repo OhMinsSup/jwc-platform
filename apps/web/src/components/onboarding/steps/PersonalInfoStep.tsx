@@ -24,13 +24,16 @@ import {
 	SelectValue,
 } from "@jwc/ui";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { getPhoneHashServer } from "@/lib/crypto-server";
 import { useOnboardingFormStore } from "@/lib/onboarding-form-store";
+import type { OnboardingSearchParams } from "@/routes/onboarding/route";
 
 interface PersonalInfoStepProps {
-	onNext: () => void;
+	onNext: (search?: Partial<OnboardingSearchParams>) => void;
 }
 
 const personalInfoSchema = z.object({
@@ -52,6 +55,7 @@ type PersonalInfoFormData = z.infer<typeof personalInfoSchema>;
 
 export function PersonalInfoStep({ onNext }: PersonalInfoStepProps) {
 	const { formData, updateFormData } = useOnboardingFormStore();
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const form = useForm<PersonalInfoFormData>({
 		resolver: zodResolver(personalInfoSchema),
@@ -64,9 +68,30 @@ export function PersonalInfoStep({ onNext }: PersonalInfoStepProps) {
 		},
 	});
 
-	const onSubmit = (data: PersonalInfoFormData) => {
-		updateFormData(data);
-		onNext();
+	const onSubmit = async (data: PersonalInfoFormData) => {
+		setIsSubmitting(true);
+		try {
+			// 폼 데이터 업데이트
+			updateFormData(data);
+
+			// 전화번호로 해시 생성
+			const result = await getPhoneHashServer({ data: { phone: data.phone } });
+
+			if (result.success) {
+				// phoneHash를 URL에 추가하여 다음 스텝으로 이동
+				onNext({ phoneHash: result.data });
+			} else {
+				// 해시 생성 실패해도 다음 스텝으로 이동 (저장 기능만 비활성화)
+				console.warn("[PersonalInfo] Failed to generate phone hash");
+				onNext();
+			}
+		} catch (error) {
+			console.error("[PersonalInfo] Error:", error);
+			// 에러가 나도 다음으로 진행 (UX 우선)
+			onNext();
+		} finally {
+			setIsSubmitting(false);
+		}
 	};
 
 	return (
@@ -195,9 +220,18 @@ export function PersonalInfoStep({ onNext }: PersonalInfoStepProps) {
 					/>
 
 					<div className="flex justify-end pt-4">
-						<Button className="gap-2" type="submit">
-							다음
-							<ArrowRight className="h-4 w-4" />
+						<Button className="gap-2" disabled={isSubmitting} type="submit">
+							{isSubmitting ? (
+								<>
+									<Loader2 className="h-4 w-4 animate-spin" />
+									처리 중...
+								</>
+							) : (
+								<>
+									다음
+									<ArrowRight className="h-4 w-4" />
+								</>
+							)}
 						</Button>
 					</div>
 				</form>

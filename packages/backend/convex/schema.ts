@@ -1,10 +1,6 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
-// ============================================================
-// 공통 타입 정의
-// ============================================================
-
 /** 성별 타입 */
 const genderType = v.union(v.literal("male"), v.literal("female"));
 
@@ -40,10 +36,6 @@ const tshirtSizeType = v.union(
 	v.literal("2xl"),
 	v.literal("3xl")
 );
-
-// ============================================================
-// 스키마 정의
-// ============================================================
 
 export default defineSchema({
 	users: defineTable({
@@ -121,4 +113,59 @@ export default defineSchema({
 		.index("by_department", ["department"])
 		.index("by_stayType", ["stayType"])
 		.index("by_isPaid", ["isPaid"]),
+
+	/**
+	 * 수련회 신청서 임시저장 테이블
+	 * - 작성 중인 신청서를 서버에 임시 저장
+	 * - 전화번호 해시로 식별 (로그인 불필요)
+	 * - 최종 제출 시 onboarding 테이블로 이동 후 삭제
+	 */
+	onboardingDrafts: defineTable({
+		/** 전화번호 해시 (식별자 - SHA-256) */
+		phoneHash: v.string(),
+
+		/** 현재 진행 중인 스텝 */
+		currentStep: v.string(),
+
+		/** 마지막 수정 시간 */
+		lastUpdatedAt: v.number(),
+
+		/** 이름 (평문 - 최종 제출 시에만 암호화) */
+		name: v.optional(v.string()),
+
+		/** 전화번호 (평문 - 최종 제출 시에만 암호화) */
+		phone: v.optional(v.string()),
+
+		/** 성별 */
+		gender: v.optional(genderType),
+
+		/** 소속 부서 */
+		department: v.optional(departmentType),
+
+		/** 또래 (나이대 그룹) */
+		ageGroup: v.optional(v.string()),
+
+		/** 숙박 형태 */
+		stayType: v.optional(stayType),
+
+		/** 참석 날짜 */
+		attendanceDate: v.optional(v.string()),
+
+		/** 픽업 가능 시간 설명 */
+		pickupTimeDescription: v.optional(v.string()),
+
+		/** TF팀 지원 */
+		tfTeam: v.optional(tfTeamType),
+
+		/** 차량 지원 가능 여부 */
+		canProvideRide: v.optional(v.boolean()),
+
+		/** 차량 지원 상세 내용 */
+		rideDetails: v.optional(v.string()),
+
+		/** 단체티 사이즈 */
+		tshirtSize: v.optional(tshirtSizeType),
+	})
+		.index("by_phoneHash", ["phoneHash"])
+		.index("by_lastUpdatedAt", ["lastUpdatedAt"]),
 });

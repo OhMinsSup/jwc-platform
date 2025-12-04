@@ -158,13 +158,30 @@ export function ConfirmStep({ onNext, onPrev }: ConfirmStepProps) {
 							<span className="font-medium">
 								{formData.stayType ? STAY_TYPE_LABELS[formData.stayType] : "-"}
 							</span>
+							{formData.stayType === "3nights4days" && (
+								<>
+									<span className="text-muted-foreground">참석 일정</span>
+									<span className="font-medium">전체 일정 참석</span>
+								</>
+							)}
 						</div>
-						{formData.pickupTimeDescription && (
-							<div className="mt-2 rounded-md bg-muted/50 p-2 text-sm">
-								<span className="text-muted-foreground">픽업/참석 시간: </span>
-								{formData.pickupTimeDescription}
-							</div>
-						)}
+						{formData.stayType &&
+							formData.stayType !== "3nights4days" &&
+							formData.pickupTimeDescription && (
+								<div className="mt-2 rounded-md bg-muted/50 p-2 text-sm">
+									<span className="text-muted-foreground">
+										참석/픽업 시간:{" "}
+									</span>
+									{formData.pickupTimeDescription}
+								</div>
+							)}
+						{formData.stayType &&
+							formData.stayType !== "3nights4days" &&
+							!formData.pickupTimeDescription && (
+								<div className="mt-2 text-muted-foreground text-sm">
+									부분 참석 (상세 시간 미입력)
+								</div>
+							)}
 					</CardContent>
 				</Card>
 

@@ -2,7 +2,7 @@ import { deriveKey, encryptPersonalInfo, hashPhone } from "@jwc/utils";
 import { createServerFn } from "@tanstack/react-start";
 
 // 서버에서만 접근 가능한 암호화 키
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
+const AES_KEY = process.env.AES_KEY;
 
 // 키 캐싱을 위한 변수
 let cachedKey: CryptoKey | null = null;
@@ -15,11 +15,11 @@ async function getEncryptionKey(): Promise<CryptoKey> {
 		return cachedKey;
 	}
 
-	if (!ENCRYPTION_KEY) {
-		throw new Error("ENCRYPTION_KEY is not configured on the server");
+	if (!AES_KEY) {
+		throw new Error("AES_KEY is not configured on the server");
 	}
 
-	cachedKey = await deriveKey(ENCRYPTION_KEY);
+	cachedKey = await deriveKey(AES_KEY);
 	return cachedKey;
 }
 
