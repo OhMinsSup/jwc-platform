@@ -1,5 +1,12 @@
 import { api } from "@jwc/backend/convex/_generated/api";
 import {
+	DEPARTMENT_LABELS,
+	GENDER_LABELS,
+	STAY_TYPE_LABELS,
+	TF_TEAM_LABELS,
+	TSHIRT_SIZE_LABELS,
+} from "@jwc/schema";
+import {
 	Button,
 	Card,
 	CardContent,
@@ -7,7 +14,6 @@ import {
 	CardTitle,
 	Separator,
 } from "@jwc/ui";
-import { useNavigate } from "@tanstack/react-router";
 import { useMutation } from "convex/react";
 import { motion } from "framer-motion";
 import {
@@ -23,49 +29,20 @@ import {
 import { useState } from "react";
 import { useOnboardingFormStore } from "@/lib/onboarding-form-store";
 
-const LABELS = {
-	gender: {
-		male: "남성",
-		female: "여성",
-	},
-	department: {
-		youth1: "청년1부",
-		youth2: "청년2부",
-		other: "기타",
-	},
-	stayType: {
-		"3nights4days": "3박 4일 (전체 참석)",
-		"2nights3days": "2박 3일",
-		"1night2days": "1박 2일",
-		dayTrip: "무박 (당일치기)",
-	},
-	tfTeam: {
-		none: "참여 안함",
-		praise: "찬양팀",
-		program: "프로그램팀",
-		media: "미디어팀",
-	},
-	tshirtSize: {
-		s: "S",
-		m: "M",
-		l: "L",
-		xl: "XL",
-		"2xl": "2XL",
-		"3xl": "3XL",
-	},
-} as const;
+interface ConfirmStepProps {
+	onNext: () => void;
+	onPrev: () => void;
+}
 
-export function ConfirmStep() {
-	const navigate = useNavigate();
-	const { formData, prevStep, nextStep } = useOnboardingFormStore();
+export function ConfirmStep({ onNext, onPrev }: ConfirmStepProps) {
+	const { formData } = useOnboardingFormStore();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
-	const createApplication = useMutation(api.retreatApplications.create);
+	const upsertApplication = useMutation(api.onboarding.upsert);
 
 	const handleGoBack = () => {
-		prevStep();
-		navigate({ to: "/onboarding" });
+		onPrev();
 	};
 
 	const handleSubmit = async () => {
@@ -81,7 +58,7 @@ export function ConfirmStep() {
 		setError(null);
 
 		try {
-			await createApplication({
+			await upsertApplication({
 				name: formData.name,
 				phone: formData.phone,
 				gender: formData.gender,
@@ -89,15 +66,14 @@ export function ConfirmStep() {
 				ageGroup: formData.ageGroup,
 				stayType: formData.stayType,
 				pickupTimeDescription: formData.pickupTimeDescription,
-				isPaid: false, // 초기값은 미납
+				isPaid: false, // 초기값은 미납 (기존 신청자는 isPaid 상태 유지됨)
 				tfTeam: formData.tfTeam,
 				canProvideRide: formData.canProvideRide,
 				rideDetails: formData.rideDetails,
 				tshirtSize: formData.tshirtSize ?? undefined,
 			});
 
-			nextStep();
-			navigate({ to: "/onboarding" });
+			onNext();
 		} catch (err) {
 			console.error("Failed to submit application:", err);
 			setError("신청 중 오류가 발생했습니다. 다시 시도해주세요.");
@@ -138,12 +114,12 @@ export function ConfirmStep() {
 							<span className="font-medium">{formData.phone}</span>
 							<span className="text-muted-foreground">성별</span>
 							<span className="font-medium">
-								{formData.gender ? LABELS.gender[formData.gender] : "-"}
+								{formData.gender ? GENDER_LABELS[formData.gender] : "-"}
 							</span>
 							<span className="text-muted-foreground">소속</span>
 							<span className="font-medium">
 								{formData.department
-									? LABELS.department[formData.department]
+									? DEPARTMENT_LABELS[formData.department]
 									: "-"}
 							</span>
 							<span className="text-muted-foreground">연령대</span>
@@ -164,7 +140,7 @@ export function ConfirmStep() {
 						<div className="grid grid-cols-2 gap-y-2 text-sm">
 							<span className="text-muted-foreground">숙박 형태</span>
 							<span className="font-medium">
-								{formData.stayType ? LABELS.stayType[formData.stayType] : "-"}
+								{formData.stayType ? STAY_TYPE_LABELS[formData.stayType] : "-"}
 							</span>
 						</div>
 						{formData.pickupTimeDescription && (
@@ -189,7 +165,7 @@ export function ConfirmStep() {
 							<span className="text-muted-foreground">TF팀</span>
 							<span className="font-medium">
 								{formData.tfTeam && formData.tfTeam !== "none"
-									? LABELS.tfTeam[formData.tfTeam]
+									? TF_TEAM_LABELS[formData.tfTeam]
 									: "참여 안함"}
 							</span>
 						</div>
@@ -224,7 +200,7 @@ export function ConfirmStep() {
 							<span className="text-muted-foreground">티셔츠 사이즈</span>
 							<span className="font-medium">
 								{formData.tshirtSize
-									? LABELS.tshirtSize[formData.tshirtSize]
+									? TSHIRT_SIZE_LABELS[formData.tshirtSize]
 									: "-"}
 							</span>
 						</div>
@@ -271,3 +247,5 @@ export function ConfirmStep() {
 		</motion.div>
 	);
 }
+
+export default ConfirmStep;

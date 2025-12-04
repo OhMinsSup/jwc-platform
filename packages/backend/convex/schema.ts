@@ -114,6 +114,7 @@ export default defineSchema({
 		tshirtSize: v.optional(tshirtSizeType),
 	})
 		// 인덱스 정의
+		.index("by_phone", ["phone"])
 		.index("by_department", ["department"])
 		.index("by_stayType", ["stayType"])
 		.index("by_isPaid", ["isPaid"]),

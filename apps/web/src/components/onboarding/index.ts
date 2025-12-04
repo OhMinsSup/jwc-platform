@@ -1,7 +1,7 @@
-// Steps
+// Error Boundary
+export * from "./OnboardingErrorBoundary";
 
-// Layout
-export * from "./OnboardingLayout";
+// Steps
 export * from "./steps/AdditionalInfoStep";
 export * from "./steps/AttendanceInfoStep";
 export * from "./steps/CompletedStep";

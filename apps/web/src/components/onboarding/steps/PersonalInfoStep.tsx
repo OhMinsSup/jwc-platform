@@ -1,5 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+	AGE_GROUP_REGEX,
+	DEPARTMENT_LABELS,
+	DepartmentEnum,
+	GENDER_LABELS,
+	GenderEnum,
+} from "@jwc/schema";
+import {
 	Button,
 	Form,
 	FormControl,
@@ -16,39 +23,35 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@jwc/ui";
-import { useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useOnboardingFormStore } from "@/lib/onboarding-form-store";
 
+interface PersonalInfoStepProps {
+	onNext: () => void;
+}
+
 const personalInfoSchema = z.object({
 	name: z.string().min(2, "이름은 2글자 이상이어야 합니다"),
 	phone: z
 		.string()
 		.regex(/^01[016789]-?\d{3,4}-?\d{4}$/, "올바른 전화번호를 입력해주세요"),
-	gender: z.enum(["male", "female"], {
-		message: "성별을 선택해주세요",
-	}),
-	department: z.enum(["youth1", "youth2", "other"], {
-		message: "소속 부서를 선택해주세요",
-	}),
-	ageGroup: z.string().min(1, "또래를 선택해주세요"),
+	gender: GenderEnum,
+	department: DepartmentEnum,
+	ageGroup: z
+		.string()
+		.min(1, "또래를 입력해주세요")
+		.refine((value) => AGE_GROUP_REGEX.test(value), {
+			message: "또래를 숫자 2자리로 입력해주세요. (예시: 00또래)",
+		}),
 });
 
 type PersonalInfoFormData = z.infer<typeof personalInfoSchema>;
 
-const AGE_GROUPS = [
-	{ value: "1997-1999", label: "97-99년생" },
-	{ value: "2000-2002", label: "00-02년생" },
-	{ value: "2003-2005", label: "03-05년생" },
-	{ value: "2006-2008", label: "06-08년생" },
-];
-
-export function PersonalInfoStep() {
-	const navigate = useNavigate();
-	const { formData, updateFormData, nextStep } = useOnboardingFormStore();
+export function PersonalInfoStep({ onNext }: PersonalInfoStepProps) {
+	const { formData, updateFormData } = useOnboardingFormStore();
 
 	const form = useForm<PersonalInfoFormData>({
 		resolver: zodResolver(personalInfoSchema),
@@ -63,8 +66,7 @@ export function PersonalInfoStep() {
 
 	const onSubmit = (data: PersonalInfoFormData) => {
 		updateFormData(data);
-		nextStep();
-		navigate({ to: "/onboarding" });
+		onNext();
 	};
 
 	return (
@@ -126,18 +128,19 @@ export function PersonalInfoStep() {
 										defaultValue={field.value}
 										onValueChange={field.onChange}
 									>
-										<div className="flex items-center space-x-2">
-											<RadioGroupItem id="male" value="male" />
-											<label className="cursor-pointer" htmlFor="male">
-												남성
-											</label>
-										</div>
-										<div className="flex items-center space-x-2">
-											<RadioGroupItem id="female" value="female" />
-											<label className="cursor-pointer" htmlFor="female">
-												여성
-											</label>
-										</div>
+										{(Object.entries(GENDER_LABELS) as [string, string][]).map(
+											([value, label]) => (
+												<div
+													className="flex items-center space-x-2"
+													key={value}
+												>
+													<RadioGroupItem id={value} value={value} />
+													<label className="cursor-pointer" htmlFor={value}>
+														{label}
+													</label>
+												</div>
+											)
+										)}
 									</RadioGroup>
 								</FormControl>
 								<FormMessage />
@@ -162,9 +165,13 @@ export function PersonalInfoStep() {
 										</SelectTrigger>
 									</FormControl>
 									<SelectContent>
-										<SelectItem value="youth1">청년1부</SelectItem>
-										<SelectItem value="youth2">청년2부</SelectItem>
-										<SelectItem value="other">기타</SelectItem>
+										{(
+											Object.entries(DEPARTMENT_LABELS) as [string, string][]
+										).map(([value, label]) => (
+											<SelectItem key={value} value={value}>
+												{label}
+											</SelectItem>
+										))}
 									</SelectContent>
 								</Select>
 								<FormMessage />
@@ -179,23 +186,9 @@ export function PersonalInfoStep() {
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>또래 *</FormLabel>
-								<Select
-									defaultValue={field.value}
-									onValueChange={field.onChange}
-								>
-									<FormControl>
-										<SelectTrigger>
-											<SelectValue placeholder="또래를 선택해주세요" />
-										</SelectTrigger>
-									</FormControl>
-									<SelectContent>
-										{AGE_GROUPS.map((group) => (
-											<SelectItem key={group.value} value={group.value}>
-												{group.label}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
+								<FormControl>
+									<Input placeholder="00또래" {...field} />
+								</FormControl>
 								<FormMessage />
 							</FormItem>
 						)}
@@ -212,3 +205,5 @@ export function PersonalInfoStep() {
 		</motion.div>
 	);
 }
+
+export default PersonalInfoStep;

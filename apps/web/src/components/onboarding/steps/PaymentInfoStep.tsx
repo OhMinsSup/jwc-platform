@@ -6,7 +6,6 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@jwc/ui";
-import { useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import {
 	ArrowRight,
@@ -30,9 +29,12 @@ const PAYMENT_INFO = {
 	} as const,
 };
 
-export function PaymentInfoStep() {
-	const navigate = useNavigate();
-	const { formData, nextStep } = useOnboardingFormStore();
+interface PaymentInfoStepProps {
+	onNext: () => void;
+}
+
+export function PaymentInfoStep({ onNext }: PaymentInfoStepProps) {
+	const { formData } = useOnboardingFormStore();
 	const [copied, setCopied] = useState(false);
 
 	const stayType = formData.stayType || "3nights4days";
@@ -45,8 +47,7 @@ export function PaymentInfoStep() {
 	};
 
 	const handleContinue = () => {
-		nextStep();
-		navigate({ to: "/onboarding" });
+		onNext();
 	};
 
 	return (
@@ -168,3 +169,5 @@ export function PaymentInfoStep() {
 		</motion.div>
 	);
 }
+
+export default PaymentInfoStep;

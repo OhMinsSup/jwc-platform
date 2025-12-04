@@ -1,5 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+	TSHIRT_SIZE_LABELS,
+	type TshirtSize,
+	TshirtSizeEnum,
+} from "@jwc/schema";
+import {
 	Button,
 	Form,
 	FormControl,
@@ -11,20 +16,14 @@ import {
 	RadioGroup,
 	RadioGroupItem,
 } from "@jwc/ui";
-import { useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { ArrowRight, Shirt } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import {
-	type TshirtSize,
-	useOnboardingFormStore,
-} from "@/lib/onboarding-form-store";
+import { useOnboardingFormStore } from "@/lib/onboarding-form-store";
 
 const additionalSchema = z.object({
-	tshirtSize: z.enum(["s", "m", "l", "xl", "2xl", "3xl"], {
-		message: "티셔츠 사이즈를 선택해주세요",
-	}),
+	tshirtSize: TshirtSizeEnum,
 });
 
 type AdditionalFormData = z.infer<typeof additionalSchema>;
@@ -34,17 +33,28 @@ const TSHIRT_SIZE_OPTIONS: {
 	label: string;
 	description: string;
 }[] = [
-	{ value: "s", label: "S", description: "가슴둘레 90cm" },
-	{ value: "m", label: "M", description: "가슴둘레 95cm" },
-	{ value: "l", label: "L", description: "가슴둘레 100cm" },
-	{ value: "xl", label: "XL", description: "가슴둘레 105cm" },
-	{ value: "2xl", label: "2XL", description: "가슴둘레 110cm" },
-	{ value: "3xl", label: "3XL", description: "가슴둘레 115cm" },
+	{ value: "s", label: TSHIRT_SIZE_LABELS.s, description: "가슴둘레 90cm" },
+	{ value: "m", label: TSHIRT_SIZE_LABELS.m, description: "가슴둘레 95cm" },
+	{ value: "l", label: TSHIRT_SIZE_LABELS.l, description: "가슴둘레 100cm" },
+	{ value: "xl", label: TSHIRT_SIZE_LABELS.xl, description: "가슴둘레 105cm" },
+	{
+		value: "2xl",
+		label: TSHIRT_SIZE_LABELS["2xl"],
+		description: "가슴둘레 110cm",
+	},
+	{
+		value: "3xl",
+		label: TSHIRT_SIZE_LABELS["3xl"],
+		description: "가슴둘레 115cm",
+	},
 ];
 
-export function AdditionalInfoStep() {
-	const navigate = useNavigate();
-	const { formData, updateFormData, nextStep } = useOnboardingFormStore();
+interface AdditionalInfoStepProps {
+	onNext: () => void;
+}
+
+export function AdditionalInfoStep({ onNext }: AdditionalInfoStepProps) {
+	const { formData, updateFormData } = useOnboardingFormStore();
 
 	const form = useForm<AdditionalFormData>({
 		resolver: zodResolver(additionalSchema),
@@ -55,8 +65,7 @@ export function AdditionalInfoStep() {
 
 	const onSubmit = (data: AdditionalFormData) => {
 		updateFormData(data);
-		nextStep();
-		navigate({ to: "/onboarding" });
+		onNext();
 	};
 
 	return (
@@ -149,3 +158,5 @@ export function AdditionalInfoStep() {
 		</motion.div>
 	);
 }
+
+export default AdditionalInfoStep;

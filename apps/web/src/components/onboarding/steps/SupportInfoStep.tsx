@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { TF_TEAM_LABELS, type TfTeam, TfTeamEnum } from "@jwc/schema";
 import {
 	Button,
 	Checkbox,
@@ -13,20 +14,16 @@ import {
 	RadioGroupItem,
 	Textarea,
 } from "@jwc/ui";
-import { useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { ArrowRight, Car, Users } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import {
-	type TfTeam,
-	useOnboardingFormStore,
-} from "@/lib/onboarding-form-store";
+import { useOnboardingFormStore } from "@/lib/onboarding-form-store";
 
 const supportSchema = z.object({
-	tfTeam: z.enum(["none", "praise", "program", "media"]).optional(),
+	tfTeam: TfTeamEnum.optional(),
 	canProvideRide: z.boolean().optional(),
-	rideDetails: z.string().optional(),
+	rideDetails: z.string().max(500).optional(),
 });
 
 type SupportFormData = z.infer<typeof supportSchema>;
@@ -35,29 +32,32 @@ const TF_TEAM_OPTIONS: { value: TfTeam; label: string; description: string }[] =
 	[
 		{
 			value: "none",
-			label: "참여 안함",
+			label: TF_TEAM_LABELS.none,
 			description: "TF팀에 참여하지 않습니다",
 		},
 		{
 			value: "praise",
-			label: "찬양팀",
+			label: TF_TEAM_LABELS.praise,
 			description: "예배 찬양 인도 및 반주",
 		},
 		{
 			value: "program",
-			label: "프로그램팀",
+			label: TF_TEAM_LABELS.program,
 			description: "레크레이션 및 친교 프로그램 진행",
 		},
 		{
 			value: "media",
-			label: "미디어팀",
+			label: TF_TEAM_LABELS.media,
 			description: "사진/영상 촬영 및 편집",
 		},
 	];
 
-export function SupportInfoStep() {
-	const navigate = useNavigate();
-	const { formData, updateFormData, nextStep } = useOnboardingFormStore();
+interface SupportInfoStepProps {
+	onNext: () => void;
+}
+
+export function SupportInfoStep({ onNext }: SupportInfoStepProps) {
+	const { formData, updateFormData } = useOnboardingFormStore();
 
 	const form = useForm<SupportFormData>({
 		resolver: zodResolver(supportSchema),
@@ -72,8 +72,7 @@ export function SupportInfoStep() {
 
 	const onSubmit = (data: SupportFormData) => {
 		updateFormData(data);
-		nextStep();
-		navigate({ to: "/onboarding" });
+		onNext();
 	};
 
 	return (
@@ -209,3 +208,5 @@ export function SupportInfoStep() {
 		</motion.div>
 	);
 }
+
+export default SupportInfoStep;

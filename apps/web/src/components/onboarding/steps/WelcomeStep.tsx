@@ -1,8 +1,11 @@
 import { Button } from "@jwc/ui";
-import { useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { ArrowRight, Church } from "lucide-react";
 import { useOnboardingFormStore } from "@/lib/onboarding-form-store";
+
+interface WelcomeStepProps {
+	onNext: () => void;
+}
 
 const containerVariants = {
 	hidden: { opacity: 0 },
@@ -25,14 +28,12 @@ const itemVariants = {
 	},
 };
 
-export function WelcomeStep() {
-	const navigate = useNavigate();
-	const { nextStep, resetForm } = useOnboardingFormStore();
+export function WelcomeStep({ onNext }: WelcomeStepProps) {
+	const { resetForm } = useOnboardingFormStore();
 
 	const handleStart = () => {
 		resetForm();
-		nextStep();
-		navigate({ to: "/onboarding" });
+		onNext();
 	};
 
 	return (
@@ -86,3 +87,5 @@ export function WelcomeStep() {
 		</motion.div>
 	);
 }
+
+export default WelcomeStep;

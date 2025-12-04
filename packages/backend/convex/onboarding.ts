@@ -91,6 +91,20 @@ export const getByPaymentStatus = query({
 });
 
 /**
+ * 전화번호로 수련회 신청서 조회
+ */
+export const getByPhone = query({
+	args: {
+		phone: v.string(),
+	},
+	handler: async (ctx, args) =>
+		await ctx.db
+			.query("onboarding")
+			.withIndex("by_phone", (q) => q.eq("phone", args.phone))
+			.first(),
+});
+
+/**
  * 숙박 형태별 조회
  */
 export const getByStayType = query({
@@ -151,6 +165,78 @@ export const create = mutation({
 			tshirtSize: args.tshirtSize,
 		});
 		return await ctx.db.get(newId);
+	},
+});
+
+/**
+ * 수련회 신청서 Upsert (생성 또는 수정)
+ * - 전화번호를 기준으로 기존 신청서가 있으면 수정, 없으면 생성
+ */
+export const upsert = mutation({
+	args: {
+		// 기본 개인 정보
+		name: v.string(),
+		phone: v.string(),
+		gender: genderValidator,
+		department: departmentValidator,
+		ageGroup: v.string(),
+
+		// 참석 정보
+		stayType: stayTypeValidator,
+		attendanceDate: v.optional(v.string()),
+		pickupTimeDescription: v.optional(v.string()),
+
+		// 회비 및 지원 정보
+		isPaid: v.boolean(),
+		tfTeam: v.optional(tfTeamValidator),
+		canProvideRide: v.optional(v.boolean()),
+		rideDetails: v.optional(v.string()),
+
+		// 기타 정보
+		tshirtSize: v.optional(tshirtSizeValidator),
+	},
+	handler: async (ctx, args) => {
+		// 전화번호로 기존 신청서 조회
+		const existing = await ctx.db
+			.query("onboarding")
+			.withIndex("by_phone", (q) => q.eq("phone", args.phone))
+			.first();
+
+		if (existing) {
+			// 기존 신청서가 있으면 수정 (회비 납입 상태는 유지)
+			await ctx.db.patch(existing._id, {
+				name: args.name,
+				gender: args.gender,
+				department: args.department,
+				ageGroup: args.ageGroup,
+				stayType: args.stayType,
+				attendanceDate: args.attendanceDate,
+				pickupTimeDescription: args.pickupTimeDescription,
+				tfTeam: args.tfTeam,
+				canProvideRide: args.canProvideRide,
+				rideDetails: args.rideDetails,
+				tshirtSize: args.tshirtSize,
+			});
+			return { isNew: false, data: await ctx.db.get(existing._id) };
+		}
+
+		// 신규 생성
+		const newId = await ctx.db.insert("onboarding", {
+			name: args.name,
+			phone: args.phone,
+			gender: args.gender,
+			department: args.department,
+			ageGroup: args.ageGroup,
+			stayType: args.stayType,
+			attendanceDate: args.attendanceDate,
+			pickupTimeDescription: args.pickupTimeDescription,
+			isPaid: args.isPaid,
+			tfTeam: args.tfTeam,
+			canProvideRide: args.canProvideRide,
+			rideDetails: args.rideDetails,
+			tshirtSize: args.tshirtSize,
+		});
+		return { isNew: true, data: await ctx.db.get(newId) };
 	},
 });
 

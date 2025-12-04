@@ -6,6 +6,8 @@ import Confetti from "react-confetti";
 import { useWindowSize } from "react-use";
 import { useOnboardingFormStore } from "@/lib/onboarding-form-store";
 
+// CompletedStep은 마지막 단계이므로 props가 필요 없음
+
 export function CompletedStep() {
 	const navigate = useNavigate();
 	const { formData, resetForm } = useOnboardingFormStore();
@@ -128,3 +130,5 @@ export function CompletedStep() {
 		</>
 	);
 }
+
+export default CompletedStep;

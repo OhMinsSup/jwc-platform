@@ -1,46 +1,74 @@
+import type {
+	Department,
+	Gender,
+	StayType,
+	TfTeam,
+	TshirtSize,
+} from "@jwc/schema";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-// ============================================================
-// 타입 정의 (Convex 스키마와 일치)
-// ============================================================
-
-export type Gender = "male" | "female";
-export type Department = "youth1" | "youth2" | "other";
-export type StayType =
-	| "3nights4days"
-	| "2nights3days"
-	| "1night2days"
-	| "dayTrip";
-export type TfTeam = "none" | "praise" | "program" | "media";
-export type TshirtSize = "s" | "m" | "l" | "xl" | "2xl" | "3xl";
+// Re-export types from schema
+export type { Department, Gender, StayType, TfTeam, TshirtSize };
 
 // ============================================================
-// 스텝 설정 (먼저 정의)
+// 스텝 URL 경로 정의
 // ============================================================
 
-export const STEP_CONFIG = {
-	WELCOME: 0,
-	PERSONAL_INFO: 1,
-	ATTENDANCE_INFO: 2,
-	SUPPORT_INFO: 3,
-	ADDITIONAL_INFO: 4,
-	PAYMENT_INFO: 5,
-	CONFIRM: 6,
-	COMPLETED: 7,
-	TOTAL_STEPS: 7,
+export const STEPS = [
+	"welcome",
+	"personal-info",
+	"attendance-info",
+	"support-info",
+	"additional-info",
+	"payment-info",
+	"confirm",
+	"completed",
+] as const;
+
+export type StepSlug = (typeof STEPS)[number];
+
+export const STEP_CONFIG: Record<Uppercase<StepSlug> | "TOTAL_STEPS", number> =
+	{
+		WELCOME: 0,
+		"PERSONAL-INFO": 1,
+		"ATTENDANCE-INFO": 2,
+		"SUPPORT-INFO": 3,
+		"ADDITIONAL-INFO": 4,
+		"PAYMENT-INFO": 5,
+		CONFIRM: 6,
+		COMPLETED: 7,
+		TOTAL_STEPS: 7,
+	} as const;
+
+export const STEP_LABELS: Record<StepSlug, string> = {
+	welcome: "시작",
+	"personal-info": "기본 정보",
+	"attendance-info": "참석 정보",
+	"support-info": "봉사 지원",
+	"additional-info": "추가 정보",
+	"payment-info": "회비 안내",
+	confirm: "확인",
+	completed: "완료",
 } as const;
 
-export const STEP_LABELS = [
-	"시작",
-	"기본 정보",
-	"참석 정보",
-	"봉사 지원",
-	"추가 정보",
-	"회비 안내",
-	"확인",
-	"완료",
-] as const;
+// 스텝 인덱스 <-> 슬러그 변환 헬퍼
+export const getStepIndex = (slug: StepSlug): number => STEPS.indexOf(slug);
+export const getStepSlug = (index: number): StepSlug =>
+	STEPS[index] ?? "welcome";
+export const isValidStep = (slug: string): slug is StepSlug =>
+	STEPS.includes(slug as StepSlug);
+
+// 다음/이전 스텝 슬러그 가져오기
+export const getNextStep = (currentSlug: StepSlug): StepSlug | null => {
+	const currentIndex = getStepIndex(currentSlug);
+	return currentIndex < STEPS.length - 1 ? STEPS[currentIndex + 1] : null;
+};
+
+export const getPrevStep = (currentSlug: StepSlug): StepSlug | null => {
+	const currentIndex = getStepIndex(currentSlug);
+	return currentIndex > 0 ? STEPS[currentIndex - 1] : null;
+};
 
 // ============================================================
 // 폼 데이터 인터페이스
@@ -72,22 +100,15 @@ export interface OnboardingFormData {
 }
 
 export interface OnboardingFormStore {
-	// 현재 스텝
-	currentStep: number;
-	totalSteps: number;
-
 	// 폼 데이터
 	formData: OnboardingFormData;
 
 	// 액션
-	setStep: (step: number) => void;
-	nextStep: () => void;
-	prevStep: () => void;
 	updateFormData: (data: Partial<OnboardingFormData>) => void;
 	resetForm: () => void;
 
-	// 유효성 검사
-	isStepValid: (step: number) => boolean;
+	// 유효성 검사 (URL 기반이므로 스텝 슬러그로 검사)
+	isStepValid: (step: StepSlug) => boolean;
 }
 
 // ============================================================
@@ -126,31 +147,7 @@ const initialFormData: OnboardingFormData = {
 export const useOnboardingFormStore = create<OnboardingFormStore>()(
 	persist(
 		(set, get) => ({
-			currentStep: 0,
-			totalSteps: STEP_CONFIG.TOTAL_STEPS,
-
 			formData: initialFormData,
-
-			setStep: (step) => {
-				const { totalSteps } = get();
-				if (step >= 0 && step <= totalSteps) {
-					set({ currentStep: step });
-				}
-			},
-
-			nextStep: () => {
-				const { currentStep, totalSteps } = get();
-				if (currentStep < totalSteps) {
-					set({ currentStep: currentStep + 1 });
-				}
-			},
-
-			prevStep: () => {
-				const { currentStep } = get();
-				if (currentStep > 0) {
-					set({ currentStep: currentStep - 1 });
-				}
-			},
 
 			updateFormData: (data) => {
 				set((state) => ({
@@ -159,17 +156,14 @@ export const useOnboardingFormStore = create<OnboardingFormStore>()(
 			},
 
 			resetForm: () => {
-				set({
-					currentStep: 0,
-					formData: initialFormData,
-				});
+				set({ formData: initialFormData });
 			},
 
-			isStepValid: (step) => {
+			isStepValid: (step: StepSlug) => {
 				const { formData } = get();
 
 				switch (step) {
-					case STEP_CONFIG.PERSONAL_INFO:
+					case "personal-info":
 						return !!(
 							formData.name &&
 							formData.phone &&
@@ -177,15 +171,15 @@ export const useOnboardingFormStore = create<OnboardingFormStore>()(
 							formData.department &&
 							formData.ageGroup
 						);
-					case STEP_CONFIG.ATTENDANCE_INFO:
+					case "attendance-info":
 						return !!formData.stayType;
-					case STEP_CONFIG.SUPPORT_INFO:
+					case "support-info":
 						return true; // Optional fields
-					case STEP_CONFIG.ADDITIONAL_INFO:
+					case "additional-info":
 						return !!formData.tshirtSize;
-					case STEP_CONFIG.PAYMENT_INFO:
+					case "payment-info":
 						return true; // Info only step
-					case STEP_CONFIG.CONFIRM:
+					case "confirm":
 						return true;
 					default:
 						return true;
@@ -195,7 +189,6 @@ export const useOnboardingFormStore = create<OnboardingFormStore>()(
 		{
 			name: "onboarding-form-storage",
 			partialize: (state) => ({
-				currentStep: state.currentStep,
 				formData: state.formData,
 			}),
 		}

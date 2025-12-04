@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { STAY_TYPE_LABELS, type StayType, StayTypeEnum } from "@jwc/schema";
 import {
 	Button,
 	Form,
@@ -12,21 +13,19 @@ import {
 	RadioGroupItem,
 	Textarea,
 } from "@jwc/ui";
-import { useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import {
-	type StayType,
-	useOnboardingFormStore,
-} from "@/lib/onboarding-form-store";
+import { useOnboardingFormStore } from "@/lib/onboarding-form-store";
+
+interface AttendanceInfoStepProps {
+	onNext: () => void;
+}
 
 const attendanceSchema = z.object({
-	stayType: z.enum(["3nights4days", "2nights3days", "1night2days", "dayTrip"], {
-		message: "숙박 형태를 선택해주세요",
-	}),
-	pickupTimeDescription: z.string().optional(),
+	stayType: StayTypeEnum,
+	pickupTimeDescription: z.string().max(500).optional(),
 });
 
 type AttendanceFormData = z.infer<typeof attendanceSchema>;
@@ -35,29 +34,28 @@ const STAY_OPTIONS: { value: StayType; label: string; description: string }[] =
 	[
 		{
 			value: "3nights4days",
-			label: "3박 4일 (전체 참석)",
+			label: STAY_TYPE_LABELS["3nights4days"],
 			description: "전체 일정 참석",
 		},
 		{
 			value: "2nights3days",
-			label: "2박 3일",
+			label: STAY_TYPE_LABELS["2nights3days"],
 			description: "부분 참석",
 		},
 		{
 			value: "1night2days",
-			label: "1박 2일",
+			label: STAY_TYPE_LABELS["1night2days"],
 			description: "부분 참석",
 		},
 		{
 			value: "dayTrip",
-			label: "무박 (당일치기)",
+			label: STAY_TYPE_LABELS.dayTrip,
 			description: "숙박 없이 당일만 참석",
 		},
 	];
 
-export function AttendanceInfoStep() {
-	const navigate = useNavigate();
-	const { formData, updateFormData, nextStep } = useOnboardingFormStore();
+export function AttendanceInfoStep({ onNext }: AttendanceInfoStepProps) {
+	const { formData, updateFormData } = useOnboardingFormStore();
 
 	const form = useForm<AttendanceFormData>({
 		resolver: zodResolver(attendanceSchema),
@@ -72,8 +70,7 @@ export function AttendanceInfoStep() {
 
 	const onSubmit = (data: AttendanceFormData) => {
 		updateFormData(data);
-		nextStep();
-		navigate({ to: "/onboarding" });
+		onNext();
 	};
 
 	return (
@@ -177,3 +174,5 @@ export function AttendanceInfoStep() {
 		</motion.div>
 	);
 }
+
+export default AttendanceInfoStep;
