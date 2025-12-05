@@ -78,6 +78,7 @@ export interface PersonalInfo {
 /** 참석 정보 (Step 2) */
 export interface AttendanceInfo {
 	stayType: StayType | null;
+	attendanceDate?: string;
 	pickupTimeDescription?: string;
 }
 
@@ -124,14 +125,6 @@ interface OnboardingFormActions {
 	// UI 상태
 	setIsLoading: (loading: boolean) => void;
 
-	// 전체 폼 데이터 (Draft 용)
-	setFormData: (data: {
-		personalInfo?: Partial<PersonalInfo>;
-		attendanceInfo?: Partial<AttendanceInfo>;
-		supportInfo?: Partial<SupportInfo>;
-		additionalInfo?: Partial<AdditionalInfo>;
-	}) => void;
-
 	// 폼 초기화
 	clearForm: () => void;
 
@@ -158,6 +151,7 @@ const initialPersonalInfo: PersonalInfo = {
 
 const initialAttendanceInfo: AttendanceInfo = {
 	stayType: null,
+	attendanceDate: undefined,
 	pickupTimeDescription: undefined,
 };
 
@@ -280,27 +274,6 @@ export const useOnboardingFormStore = create<OnboardingFormStore>()(
 
 			setIsLoading: (loading) => {
 				set({ isLoading: loading }, undefined, "loading/set");
-			},
-
-			setFormData: (data) => {
-				set(
-					(state) => ({
-						personalInfo: data.personalInfo
-							? { ...state.personalInfo, ...data.personalInfo }
-							: state.personalInfo,
-						attendanceInfo: data.attendanceInfo
-							? { ...state.attendanceInfo, ...data.attendanceInfo }
-							: state.attendanceInfo,
-						supportInfo: data.supportInfo
-							? { ...state.supportInfo, ...data.supportInfo }
-							: state.supportInfo,
-						additionalInfo: data.additionalInfo
-							? { ...state.additionalInfo, ...data.additionalInfo }
-							: state.additionalInfo,
-					}),
-					undefined,
-					"formData/set"
-				);
 			},
 
 			clearForm: () => {

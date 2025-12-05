@@ -11,6 +11,8 @@ import {
 import { Button, cn } from "@jwc/ui";
 import { useNavigate } from "@tanstack/react-router";
 import { useMutation } from "convex/react";
+import { format, parseISO } from "date-fns";
+import { ko } from "date-fns/locale";
 import type { Variants } from "framer-motion";
 import { motion } from "framer-motion";
 import {
@@ -162,6 +164,7 @@ export function ConfirmStep() {
 				department: personalInfo.department,
 				ageGroup: personalInfo.ageGroup,
 				stayType: attendanceInfo.stayType,
+				attendanceDate: attendanceInfo.attendanceDate,
 				pickupTimeDescription: attendanceInfo.pickupTimeDescription,
 				isPaid: false,
 				tfTeam: supportInfo?.tfTeam,
@@ -256,12 +259,25 @@ export function ConfirmStep() {
 							}
 						/>
 						{attendanceInfo?.stayType &&
-							attendanceInfo.stayType !== "3nights4days" &&
-							attendanceInfo.pickupTimeDescription && (
-								<InfoRow
-									label="참석/픽업 시간"
-									value={attendanceInfo.pickupTimeDescription}
-								/>
+							attendanceInfo.stayType !== "3nights4days" && (
+								<>
+									{attendanceInfo.attendanceDate && (
+										<InfoRow
+											label="참석 일시"
+											value={format(
+												parseISO(attendanceInfo.attendanceDate),
+												"yyyy년 M월 d일 (EEE) HH:mm",
+												{ locale: ko }
+											)}
+										/>
+									)}
+									{attendanceInfo.pickupTimeDescription && (
+										<InfoRow
+											label="추가 안내"
+											value={attendanceInfo.pickupTimeDescription}
+										/>
+									)}
+								</>
 							)}
 					</InfoCard>
 				</motion.div>

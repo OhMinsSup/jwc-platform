@@ -12,7 +12,7 @@ import {
 	PartyPopper,
 } from "lucide-react";
 import Confetti from "react-confetti";
-import { useWindowSize } from "react-use";
+import { useWindowSize } from "@/hooks/use-window-size";
 import { useOnboardingFormStore } from "@/store/onboarding-form-store";
 
 const formVariants = {

@@ -1,8 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { lazy, Suspense, useEffect, useRef, useTransition } from "react";
+import { lazy, Suspense } from "react";
 import { OnboardingErrorBoundary } from "@/components/onboarding";
 import StepProgress from "@/components/onboarding/StepProgress";
-import { useOnboardingDraft } from "@/hooks/use-onboarding-draft";
 import { isValidStep, type StepSlug } from "@/store/onboarding-form-store";
 
 // Lazy load step components
@@ -49,30 +48,8 @@ function StepLoader() {
 
 function OnboardingStepPage() {
 	const { step } = Route.useParams();
-	const search = Route.useSearch();
 
 	const currentStep = step as StepSlug;
-	const phoneHash = (search as { phoneHash?: string }).phoneHash ?? null;
-
-	// Draft 관련 훅 - phoneHash를 직접 전달
-	const { hasDraft, isDraftReady, hydrateFormFromDraft } =
-		useOnboardingDraft(phoneHash);
-
-	// Transition for async operations
-	const [, startTransition] = useTransition();
-
-	// Draft 로드 상태 추적
-	const hasHydratedRef = useRef(false);
-
-	// Draft 데이터가 있으면 폼에 적용 (최초 1회)
-	useEffect(() => {
-		if (isDraftReady && hasDraft && !hasHydratedRef.current) {
-			hasHydratedRef.current = true;
-			startTransition(() => {
-				hydrateFormFromDraft().catch(console.error);
-			});
-		}
-	}, [isDraftReady, hasDraft, hydrateFormFromDraft]);
 
 	// 진행 상황 표시 여부 (welcome, complete 제외)
 	const showProgress = !["welcome", "complete"].includes(currentStep);

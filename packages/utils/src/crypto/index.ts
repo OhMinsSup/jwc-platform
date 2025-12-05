@@ -5,9 +5,20 @@
  * 클라이언트와 서버 모두에서 사용 가능합니다.
  */
 
-// ============================================================
-// 타입 정의
-// ============================================================
+// Web Crypto API 가져오기 (브라우저와 Node.js 모두 지원)
+async function getCrypto(): Promise<Crypto> {
+	if (typeof globalThis.crypto !== "undefined" && globalThis.crypto.subtle) {
+		return globalThis.crypto;
+	}
+
+	if (typeof window !== "undefined" && window.crypto && window.crypto.subtle) {
+		return window.crypto;
+	}
+	// Node.js 환경에서는 webcrypto 사용
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	const modules = await import("node:crypto");
+	return modules.webcrypto as Crypto;
+}
 
 export interface EncryptedData {
 	/** 암호화된 데이터 (Base64) */
@@ -25,17 +36,9 @@ export interface EncryptedPersonalInfo {
 	phoneHash: string;
 }
 
-// ============================================================
-// 상수
-// ============================================================
-
 const ALGORITHM = "AES-GCM";
 const KEY_LENGTH = 256;
 const IV_LENGTH = 12; // GCM 권장 IV 길이
-
-// ============================================================
-// 유틸리티 함수
-// ============================================================
 
 /**
  * ArrayBuffer를 Base64 문자열로 변환
@@ -84,6 +87,8 @@ function arrayBufferToString(buffer: ArrayBuffer): string {
  * 암호화 키 생성 (환경 변수에서 비밀키를 가져와 키 파생)
  */
 export async function deriveKey(secret: string): Promise<CryptoKey> {
+	const crypto = await getCrypto();
+
 	const keyMaterial = await crypto.subtle.importKey(
 		"raw",
 		stringToArrayBuffer(secret),
@@ -114,6 +119,8 @@ export async function encrypt(
 	plaintext: string,
 	key: CryptoKey
 ): Promise<EncryptedData> {
+	const crypto = await getCrypto();
+
 	// 랜덤 IV 생성
 	const iv = crypto.getRandomValues(new Uint8Array(IV_LENGTH));
 
@@ -137,6 +144,8 @@ export async function decrypt(
 	encryptedData: EncryptedData,
 	key: CryptoKey
 ): Promise<string> {
+	const crypto = await getCrypto();
+
 	const iv = base64ToArrayBuffer(encryptedData.iv);
 	const ciphertext = base64ToArrayBuffer(encryptedData.ciphertext);
 
@@ -154,6 +163,8 @@ export async function decrypt(
  * - 검색/식별용으로 사용 (암호화와 별개)
  */
 export async function hash(data: string): Promise<string> {
+	const crypto = await getCrypto();
+
 	const hashBuffer = await crypto.subtle.digest(
 		"SHA-256",
 		stringToArrayBuffer(data)

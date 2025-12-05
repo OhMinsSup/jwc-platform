@@ -28,7 +28,10 @@ export const Route = createFileRoute("/onboarding")({
 	validateSearch: onboardingSearchSchema,
 	beforeLoad: ({ location }) => {
 		// /onboarding 접근 시 /onboarding/welcome으로 리다이렉트
-		if (location.pathname === "/onboarding") {
+		if (
+			location.pathname === "/onboarding" ||
+			location.pathname === "/onboarding/"
+		) {
 			throw redirect({ to: "/onboarding/$step", params: { step: "welcome" } });
 		}
 	},

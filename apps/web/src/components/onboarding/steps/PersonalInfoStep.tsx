@@ -21,7 +21,7 @@ import {
 import { useNavigate } from "@tanstack/react-router";
 import type { Variants } from "framer-motion";
 import { motion } from "framer-motion";
-import { AsYouType } from "libphonenumber-js";
+import { AsYouType } from "libphonenumber-js/min";
 import {
 	ArrowLeft,
 	ArrowRight,
