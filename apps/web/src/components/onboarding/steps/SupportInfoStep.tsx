@@ -16,7 +16,18 @@ import {
 import { useNavigate } from "@tanstack/react-router";
 import type { Variants } from "framer-motion";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Car, Check, Heart, Users } from "lucide-react";
+import {
+	ArrowLeft,
+	ArrowRight,
+	Camera,
+	Car,
+	Check,
+	Gamepad2,
+	Heart,
+	type LucideIcon,
+	Music,
+	Users,
+} from "lucide-react";
 import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod/v4";
@@ -51,31 +62,31 @@ const TF_TEAM_OPTIONS: {
 	value: TfTeam;
 	label: string;
 	description: string;
-	icon: string;
+	Icon: LucideIcon;
 }[] = [
 	{
 		value: "none",
 		label: TF_TEAM_LABELS.none,
 		description: "TF팀에 참여하지 않습니다",
-		icon: "🙏",
+		Icon: Heart,
 	},
 	{
 		value: "praise",
 		label: TF_TEAM_LABELS.praise,
 		description: "예배 찬양 인도 및 반주",
-		icon: "🎵",
+		Icon: Music,
 	},
 	{
 		value: "program",
 		label: TF_TEAM_LABELS.program,
 		description: "레크레이션 및 친교 프로그램 진행",
-		icon: "🎮",
+		Icon: Gamepad2,
 	},
 	{
 		value: "media",
 		label: TF_TEAM_LABELS.media,
 		description: "사진/영상 촬영 및 편집",
-		icon: "📸",
+		Icon: Camera,
 	},
 ];
 
@@ -195,8 +206,8 @@ export function SupportInfoStep() {
 													whileHover={{ scale: 1.01 }}
 													whileTap={{ scale: 0.99 }}
 												>
-													<div className="flex h-12 w-12 items-center justify-center rounded-lg bg-background text-2xl shadow-sm">
-														{option.icon}
+													<div className="flex h-12 w-12 items-center justify-center rounded-lg bg-background shadow-sm">
+														<option.Icon className="h-6 w-6 text-muted-foreground" />
 													</div>
 													<div className="flex-1">
 														<div className="font-medium text-foreground">

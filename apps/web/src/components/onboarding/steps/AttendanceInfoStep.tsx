@@ -22,7 +22,11 @@ import {
 	Calendar,
 	Check,
 	Clock,
+	type LucideIcon,
 	MessageSquare,
+	Moon,
+	Sun,
+	Tent,
 } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
@@ -57,31 +61,31 @@ const STAY_OPTIONS: {
 	value: StayType;
 	label: string;
 	description: string;
-	icon: string;
+	Icon: LucideIcon;
 }[] = [
 	{
 		value: "3nights4days",
 		label: STAY_TYPE_LABELS["3nights4days"],
 		description: "전체 일정 참석",
-		icon: "🏕️",
+		Icon: Calendar,
 	},
 	{
 		value: "2nights3days",
 		label: STAY_TYPE_LABELS["2nights3days"],
 		description: "부분 참석",
-		icon: "⛺",
+		Icon: Tent,
 	},
 	{
 		value: "1night2days",
 		label: STAY_TYPE_LABELS["1night2days"],
 		description: "부분 참석",
-		icon: "🌙",
+		Icon: Moon,
 	},
 	{
 		value: "dayTrip",
 		label: STAY_TYPE_LABELS.dayTrip,
 		description: "숙박 없이 당일만 참석",
-		icon: "☀️",
+		Icon: Sun,
 	},
 ];
 
@@ -195,8 +199,8 @@ export function AttendanceInfoStep() {
 													whileHover={{ scale: 1.01 }}
 													whileTap={{ scale: 0.99 }}
 												>
-													<div className="flex h-12 w-12 items-center justify-center rounded-lg bg-background text-2xl shadow-sm">
-														{option.icon}
+													<div className="flex h-12 w-12 items-center justify-center rounded-lg bg-background shadow-sm">
+														<option.Icon className="h-6 w-6 text-muted-foreground" />
 													</div>
 													<div className="flex-1">
 														<div className="font-medium text-foreground">
