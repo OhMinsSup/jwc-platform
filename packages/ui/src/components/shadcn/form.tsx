@@ -1,6 +1,5 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Label } from "@jwc/ui/components/shadcn/label";
 import { cn } from "@jwc/ui/lib/utils";
 
@@ -10,31 +9,15 @@ import type {
 	ControllerProps,
 	FieldPath,
 	FieldValues,
-	UseFormProps,
 } from "react-hook-form";
 import {
-	useForm as __useForm,
+	useForm,
 	Controller,
 	FormProvider,
 	useFormContext,
 } from "react-hook-form";
-import type { ZodType } from "zod/v4";
 
 const Form = FormProvider;
-
-const useForm = <TFieldValues extends FieldValues = FieldValues>(
-	props: Omit<UseFormProps<TFieldValues>, "resolver"> & {
-		schema: ZodType<TFieldValues>;
-	}
-) => {
-	const { schema, ...rest } = props;
-	const form = __useForm<TFieldValues>({
-		...rest,
-		resolver: zodResolver(schema),
-	});
-
-	return form;
-};
 
 interface FormFieldContextValue<
 	TFieldValues extends FieldValues = FieldValues,
