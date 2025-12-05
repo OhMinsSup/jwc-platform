@@ -8,7 +8,6 @@ import {
 	encryptDraftPersonalInfoServer,
 } from "../lib/crypto-server";
 import {
-	type OnboardingFormData,
 	type StepSlug,
 	useOnboardingFormStore,
 } from "../store/onboarding-form-store";
@@ -45,120 +44,17 @@ export interface UseOnboardingDraftReturn {
 	clearError: () => void;
 }
 
-/**
- * Draft 데이터를 OnboardingFormData 형식으로 변환 (복호화 필요)
- * - name, phone은 서버에서 복호화해야 함
- */
-function mapDraftToFormData(
-	draft: DraftDocument,
-	decryptedData?: { name?: string; phone?: string }
-): Partial<OnboardingFormData> {
-	const result: Partial<OnboardingFormData> = {};
-
-	// 복호화된 개인정보
-	if (decryptedData?.name) {
-		result.name = decryptedData.name;
-	}
-	if (decryptedData?.phone) {
-		result.phone = decryptedData.phone;
-	}
-
-	if (draft.gender) {
-		result.gender = draft.gender;
-	}
-	if (draft.department) {
-		result.department = draft.department;
-	}
-	if (draft.ageGroup) {
-		result.ageGroup = draft.ageGroup;
-	}
-	if (draft.stayType) {
-		result.stayType = draft.stayType;
-	}
-	if (draft.attendanceDate) {
-		result.attendanceDate = draft.attendanceDate;
-	}
-	if (draft.pickupTimeDescription) {
-		result.pickupTimeDescription = draft.pickupTimeDescription;
-	}
-	if (draft.tfTeam) {
-		result.tfTeam = draft.tfTeam;
-	}
-	if (draft.canProvideRide !== undefined) {
-		result.canProvideRide = draft.canProvideRide;
-	}
-	if (draft.rideDetails) {
-		result.rideDetails = draft.rideDetails;
-	}
-	if (draft.tshirtSize) {
-		result.tshirtSize = draft.tshirtSize;
-	}
-
-	return result;
-}
-
-/**
- * FormData를 Draft upsert args로 변환 (암호화된 데이터 포함)
- */
-function mapFormDataToDraftArgs(
-	phoneHash: string,
-	currentStep: StepSlug,
-	formData: OnboardingFormData,
-	encryptedData?: { encryptedName?: string; encryptedPhone?: string }
-) {
-	return {
-		phoneHash,
-		currentStep,
-		encryptedName: encryptedData?.encryptedName,
-		encryptedPhone: encryptedData?.encryptedPhone,
-		gender: formData.gender ?? undefined,
-		department: formData.department ?? undefined,
-		ageGroup: formData.ageGroup || undefined,
-		stayType: formData.stayType ?? undefined,
-		attendanceDate: formData.attendanceDate,
-		pickupTimeDescription: formData.pickupTimeDescription,
-		tfTeam: formData.tfTeam,
-		canProvideRide: formData.canProvideRide,
-		rideDetails: formData.rideDetails,
-		tshirtSize: formData.tshirtSize ?? undefined,
-	};
-}
-
 // ============================================================
 // Hook
 // ============================================================
 
 /**
  * 온보딩 Draft 관리 훅
- *
- * @description
- * - phoneHash로 서버에서 draft 실시간 구독
- * - 폼 데이터 저장/삭제 기능 제공
- * - Zustand store와 직접 연동
- *
- * @example
- * ```tsx
- * const { draft, hasDraft, isDraftReady, saveDraftImmediately, hydrateFormFromDraft } = useOnboardingDraft(phoneHash);
- *
- * // Draft 로드 후 폼에 적용
- * useEffect(() => {
- *   if (isDraftReady && hasDraft && !hasHydrated) {
- *     hydrateFormFromDraft();
- *     setHasHydrated(true);
- *   }
- * }, [isDraftReady, hasDraft]);
- *
- * // 스텝 이동 시 저장
- * const handleNext = async () => {
- *   await saveDraftImmediately(currentStep);
- *   navigate(nextStep);
- * };
- * ```
  */
 export function useOnboardingDraft(
 	phoneHash: string | null
 ): UseOnboardingDraftReturn {
-	const { formData, setFormData } = useOnboardingFormStore();
+	const store = useOnboardingFormStore();
 
 	// State
 	const [isSaving, setIsSaving] = useState(false);
@@ -206,18 +102,97 @@ export function useOnboardingDraft(
 				}
 			}
 
-			const draftData = mapDraftToFormData(draft, decryptedData);
-			const hasData = Object.keys(draftData).length > 0;
+			// 폼 데이터 설정
+			store.setFormData({
+				personalInfo: {
+					name: decryptedData?.name,
+					phone: decryptedData?.phone,
+					gender: draft.gender,
+					department: draft.department,
+					ageGroup: draft.ageGroup,
+				},
+				attendanceInfo: {
+					stayType: draft.stayType,
+					pickupTimeDescription: draft.pickupTimeDescription,
+				},
+				supportInfo: {
+					tfTeam: draft.tfTeam,
+					canProvideRide: draft.canProvideRide,
+					rideDetails: draft.rideDetails,
+				},
+				additionalInfo: {
+					tshirtSize: draft.tshirtSize,
+				},
+			});
 
-			if (hasData) {
-				setFormData(draftData);
-			}
-			return hasData;
+			return true;
 		} catch (err) {
 			console.error("[Draft] Failed to hydrate:", err);
 			return false;
 		}
-	}, [draft, setFormData]);
+	}, [draft, store]);
+
+	/**
+	 * 현재 폼 데이터를 Draft args로 변환
+	 */
+	const getFormDataForDraft = useCallback(
+		async (currentStep: StepSlug) => {
+			const { personalInfo, attendanceInfo, supportInfo, additionalInfo } =
+				store;
+
+			// phoneHash가 없으면 저장 불가
+			if (!phoneHash) {
+				throw new Error("phoneHash is required to save draft");
+			}
+
+			// 개인정보 암호화
+			let encryptedData:
+				| { encryptedName?: string; encryptedPhone?: string }
+				| undefined;
+
+			if (personalInfo.name || personalInfo.phone) {
+				const result = await encryptDraftPersonalInfoServer({
+					data: {
+						name: personalInfo.name || undefined,
+						phone: personalInfo.phone || undefined,
+					},
+				});
+				if (result.success) {
+					encryptedData = result.data;
+				}
+			}
+
+			return {
+				phoneHash,
+				currentStep,
+				encryptedName: encryptedData?.encryptedName,
+				encryptedPhone: encryptedData?.encryptedPhone,
+				gender: personalInfo.gender ?? undefined,
+				department: personalInfo.department ?? undefined,
+				ageGroup: personalInfo.ageGroup || undefined,
+				stayType: attendanceInfo.stayType ?? undefined,
+				pickupTimeDescription: attendanceInfo.pickupTimeDescription,
+				tfTeam: supportInfo.tfTeam,
+				canProvideRide: supportInfo.canProvideRide,
+				rideDetails: supportInfo.rideDetails,
+				tshirtSize: additionalInfo.tshirtSize ?? undefined,
+			};
+		},
+		[phoneHash, store]
+	);
+
+	/**
+	 * 현재 폼 데이터 해시 생성
+	 */
+	const getFormDataHash = useCallback(() => {
+		const { personalInfo, attendanceInfo, supportInfo, additionalInfo } = store;
+		return stableHash({
+			personalInfo,
+			attendanceInfo,
+			supportInfo,
+			additionalInfo,
+		});
+	}, [store]);
 
 	/**
 	 * 현재 폼 데이터를 서버에 저장 (디바운스)
@@ -235,38 +210,15 @@ export function useOnboardingDraft(
 
 			// 디바운스된 저장
 			saveTimeoutRef.current = setTimeout(async () => {
-				const dataHash = stableHash(formData);
+				const dataHash = getFormDataHash();
 				if (dataHash === lastSavedDataRef.current) {
 					return;
 				}
 
 				setIsSaving(true);
 				try {
-					// 개인정보 암호화
-					let encryptedData:
-						| { encryptedName?: string; encryptedPhone?: string }
-						| undefined;
-
-					if (formData.name || formData.phone) {
-						const result = await encryptDraftPersonalInfoServer({
-							data: {
-								name: formData.name || undefined,
-								phone: formData.phone || undefined,
-							},
-						});
-						if (result.success) {
-							encryptedData = result.data;
-						}
-					}
-
-					await upsertDraft(
-						mapFormDataToDraftArgs(
-							phoneHash,
-							currentStep,
-							formData,
-							encryptedData
-						)
-					);
+					const args = await getFormDataForDraft(currentStep);
+					await upsertDraft(args);
 					lastSavedDataRef.current = dataHash;
 				} catch (err) {
 					console.error("[Draft] Failed to save:", err);
@@ -275,7 +227,7 @@ export function useOnboardingDraft(
 				}
 			}, DEBOUNCE_DELAY);
 		},
-		[phoneHash, formData, upsertDraft]
+		[phoneHash, getFormDataHash, getFormDataForDraft, upsertDraft]
 	);
 
 	/**
@@ -292,38 +244,15 @@ export function useOnboardingDraft(
 				saveTimeoutRef.current = null;
 			}
 
-			const dataHash = stableHash(formData);
+			const dataHash = getFormDataHash();
 			if (dataHash === lastSavedDataRef.current) {
 				return;
 			}
 
 			setIsSaving(true);
 			try {
-				// 개인정보 암호화
-				let encryptedData:
-					| { encryptedName?: string; encryptedPhone?: string }
-					| undefined;
-
-				if (formData.name || formData.phone) {
-					const result = await encryptDraftPersonalInfoServer({
-						data: {
-							name: formData.name || undefined,
-							phone: formData.phone || undefined,
-						},
-					});
-					if (result.success) {
-						encryptedData = result.data;
-					}
-				}
-
-				await upsertDraft(
-					mapFormDataToDraftArgs(
-						phoneHash,
-						currentStep,
-						formData,
-						encryptedData
-					)
-				);
+				const args = await getFormDataForDraft(currentStep);
+				await upsertDraft(args);
 				lastSavedDataRef.current = dataHash;
 			} catch (err) {
 				const e = err instanceof Error ? err : new Error(String(err));
@@ -333,7 +262,7 @@ export function useOnboardingDraft(
 				setIsSaving(false);
 			}
 		},
-		[phoneHash, formData, upsertDraft]
+		[phoneHash, getFormDataHash, getFormDataForDraft, upsertDraft]
 	);
 
 	/**

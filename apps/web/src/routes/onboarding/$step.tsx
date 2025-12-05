@@ -1,14 +1,9 @@
-import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useRef, useTransition } from "react";
-import { OnboardingErrorBoundary } from "@/components/onboarding/OnboardingErrorBoundary";
-import {
-	getNextStep,
-	getPrevStep,
-	isValidStep,
-	type StepSlug,
-} from "@/store/onboarding-form-store";
+import { OnboardingErrorBoundary } from "@/components/onboarding";
+import StepProgress from "@/components/onboarding/StepProgress";
 import { useOnboardingDraft } from "@/hooks/use-onboarding-draft";
-import type { OnboardingSearchParams } from "./route";
+import { isValidStep, type StepSlug } from "@/store/onboarding-form-store";
 
 // Lazy load step components
 const WelcomeStep = lazy(
@@ -26,14 +21,11 @@ const SupportInfoStep = lazy(
 const AdditionalInfoStep = lazy(
 	() => import("@/components/onboarding/steps/AdditionalInfoStep")
 );
-const PaymentInfoStep = lazy(
-	() => import("@/components/onboarding/steps/PaymentInfoStep")
-);
 const ConfirmStep = lazy(
 	() => import("@/components/onboarding/steps/ConfirmStep")
 );
-const CompletedStep = lazy(
-	() => import("@/components/onboarding/steps/CompletedStep")
+const CompleteStep = lazy(
+	() => import("@/components/onboarding/steps/CompleteStep")
 );
 
 export const Route = createFileRoute("/onboarding/$step")({
@@ -58,13 +50,12 @@ function StepLoader() {
 function OnboardingStepPage() {
 	const { step } = Route.useParams();
 	const search = Route.useSearch();
-	const navigate = useNavigate();
 
 	const currentStep = step as StepSlug;
-	const phoneHash = search.phoneHash ?? null;
+	const phoneHash = (search as { phoneHash?: string }).phoneHash ?? null;
 
 	// Draft 관련 훅 - phoneHash를 직접 전달
-	const { hasDraft, isDraftReady, saveDraftImmediately, hydrateFormFromDraft } =
+	const { hasDraft, isDraftReady, hydrateFormFromDraft } =
 		useOnboardingDraft(phoneHash);
 
 	// Transition for async operations
@@ -83,61 +74,40 @@ function OnboardingStepPage() {
 		}
 	}, [isDraftReady, hasDraft, hydrateFormFromDraft]);
 
-	// 다음 스텝으로 이동 (search params 유지, draft 저장)
-	const goToNextStep = async (newSearch?: Partial<OnboardingSearchParams>) => {
-		const nextStep = getNextStep(currentStep);
-		if (nextStep) {
-			// phoneHash가 있으면 draft 저장
-			const hash = phoneHash || newSearch?.phoneHash;
-			if (hash) {
-				await saveDraftImmediately(currentStep);
-			}
-			startTransition(() => {
-				navigate({
-					to: "/onboarding/$step",
-					params: { step: nextStep },
-					search: { ...search, ...newSearch },
-				});
-			});
-		}
-	};
-
-	// 이전 스텝으로 이동 (search params 유지)
-	const goToPrevStep = () => {
-		startTransition(() => {
-			const prevStep = getPrevStep(currentStep);
-			if (prevStep) {
-				navigate({
-					to: "/onboarding/$step",
-					params: { step: prevStep },
-					search,
-				});
-			}
-		});
-	};
+	// 진행 상황 표시 여부 (welcome, complete 제외)
+	const showProgress = !["welcome", "complete"].includes(currentStep);
 
 	const renderStep = () => {
 		switch (currentStep) {
 			case "welcome":
-				return <WelcomeStep onNext={goToNextStep} />;
-			case "personal-info":
-				return <PersonalInfoStep onNext={goToNextStep} />;
-			case "attendance-info":
-				return <AttendanceInfoStep onNext={goToNextStep} />;
-			case "support-info":
-				return <SupportInfoStep onNext={goToNextStep} />;
-			case "additional-info":
-				return <AdditionalInfoStep onNext={goToNextStep} />;
-			case "payment-info":
-				return <PaymentInfoStep onNext={goToNextStep} />;
+				return <WelcomeStep />;
+			case "personal":
+				return <PersonalInfoStep />;
+			case "attendance":
+				return <AttendanceInfoStep />;
+			case "support":
+				return <SupportInfoStep />;
+			case "additional":
+				return <AdditionalInfoStep />;
 			case "confirm":
-				return <ConfirmStep onNext={goToNextStep} onPrev={goToPrevStep} />;
-			case "completed":
-				return <CompletedStep />;
+				return <ConfirmStep />;
+			case "complete":
+				return <CompleteStep />;
 			default:
-				return <WelcomeStep onNext={goToNextStep} />;
+				return <WelcomeStep />;
 		}
 	};
 
-	return <Suspense fallback={<StepLoader />}>{renderStep()}</Suspense>;
+	return (
+		<div className="min-h-screen bg-background">
+			{showProgress && (
+				<div className="sticky top-0 z-10 border-border/50 border-b bg-background/80 backdrop-blur-sm">
+					<div className="mx-auto max-w-xl px-4 py-4">
+						<StepProgress currentStep={currentStep} />
+					</div>
+				</div>
+			)}
+			<Suspense fallback={<StepLoader />}>{renderStep()}</Suspense>
+		</div>
+	);
 }

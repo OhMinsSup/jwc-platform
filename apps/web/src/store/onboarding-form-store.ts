@@ -11,41 +11,30 @@ import { devtools } from "zustand/middleware";
 // Re-export types from schema
 export type { Department, Gender, StayType, TfTeam, TshirtSize };
 
+// ============================================================
+// Steps 설정
+// ============================================================
+
 export const STEPS = [
 	"welcome",
-	"personal-info",
-	"attendance-info",
-	"support-info",
-	"additional-info",
-	"payment-info",
+	"personal",
+	"attendance",
+	"support",
+	"additional",
 	"confirm",
-	"completed",
+	"complete",
 ] as const;
 
 export type StepSlug = (typeof STEPS)[number];
 
-export const STEP_CONFIG: Record<Uppercase<StepSlug> | "TOTAL_STEPS", number> =
-	{
-		WELCOME: 0,
-		"PERSONAL-INFO": 1,
-		"ATTENDANCE-INFO": 2,
-		"SUPPORT-INFO": 3,
-		"ADDITIONAL-INFO": 4,
-		"PAYMENT-INFO": 5,
-		CONFIRM: 6,
-		COMPLETED: 7,
-		TOTAL_STEPS: 7,
-	} as const;
-
 export const STEP_LABELS: Record<StepSlug, string> = {
 	welcome: "시작",
-	"personal-info": "기본 정보",
-	"attendance-info": "참석 정보",
-	"support-info": "봉사 지원",
-	"additional-info": "추가 정보",
-	"payment-info": "회비 안내",
+	personal: "기본 정보",
+	attendance: "참석 정보",
+	support: "봉사 지원",
+	additional: "추가 정보",
 	confirm: "확인",
-	completed: "완료",
+	complete: "완료",
 } as const;
 
 /** 스텝 슬러그를 인덱스로 변환 */
@@ -73,8 +62,12 @@ export const getPrevStep = (currentSlug: StepSlug): StepSlug | null => {
 	return currentIndex > 0 ? (STEPS[currentIndex - 1] ?? null) : null;
 };
 
+// ============================================================
+// 각 스텝별 데이터 타입
+// ============================================================
+
 /** 개인 정보 (Step 1) */
-interface PersonalInfo {
+export interface PersonalInfo {
 	name: string;
 	phone: string;
 	gender: Gender | null;
@@ -83,61 +76,77 @@ interface PersonalInfo {
 }
 
 /** 참석 정보 (Step 2) */
-interface AttendanceInfo {
+export interface AttendanceInfo {
 	stayType: StayType | null;
-	attendanceDate?: string;
 	pickupTimeDescription?: string;
 }
 
 /** 봉사 및 지원 정보 (Step 3) */
-interface SupportInfo {
+export interface SupportInfo {
 	tfTeam?: TfTeam;
 	canProvideRide?: boolean;
 	rideDetails?: string;
 }
 
 /** 추가 정보 (Step 4) */
-interface AdditionalInfo {
+export interface AdditionalInfo {
 	tshirtSize: TshirtSize | null;
 }
 
-/** 회비 정보 (Step 5) */
-interface PaymentInfo {
-	isPaid: boolean;
+// ============================================================
+// Store 타입 정의
+// ============================================================
+
+interface OnboardingFormState {
+	// 현재 스텝
+	currentStep: StepSlug;
+
+	// 각 스텝별 데이터
+	personalInfo: PersonalInfo;
+	attendanceInfo: AttendanceInfo;
+	supportInfo: SupportInfo;
+	additionalInfo: AdditionalInfo;
+
+	// UI 상태
+	isLoading: boolean;
 }
 
-/** 전체 폼 데이터 */
-export interface OnboardingFormData
-	extends PersonalInfo,
-		AttendanceInfo,
-		SupportInfo,
-		AdditionalInfo,
-		PaymentInfo {}
+interface OnboardingFormActions {
+	// 스텝 이동
+	setCurrentStep: (step: StepSlug) => void;
 
-interface FormDataSlice {
-	formData: OnboardingFormData;
-}
+	// 각 스텝 데이터 설정
+	setPersonalInfo: (data: Partial<PersonalInfo>) => void;
+	setAttendanceInfo: (data: Partial<AttendanceInfo>) => void;
+	setSupportInfo: (data: Partial<SupportInfo>) => void;
+	setAdditionalInfo: (data: Partial<AdditionalInfo>) => void;
 
-interface FormActionsSlice {
-	/** 폼 데이터 부분 업데이트 */
-	updateFormData: (data: Partial<OnboardingFormData>) => void;
-	/** 폼 데이터 전체 교체 (Draft 로드 시) */
-	setFormData: (data: Partial<OnboardingFormData>) => void;
-	/** 폼 초기화 */
-	resetForm: () => void;
-}
+	// UI 상태
+	setIsLoading: (loading: boolean) => void;
 
-interface ValidationSlice {
-	/** 스텝별 유효성 검사 */
+	// 전체 폼 데이터 (Draft 용)
+	setFormData: (data: {
+		personalInfo?: Partial<PersonalInfo>;
+		attendanceInfo?: Partial<AttendanceInfo>;
+		supportInfo?: Partial<SupportInfo>;
+		additionalInfo?: Partial<AdditionalInfo>;
+	}) => void;
+
+	// 폼 초기화
+	clearForm: () => void;
+
+	// 유효성 검사
 	isStepValid: (step: StepSlug) => boolean;
-	/** 전체 폼 유효성 검사 */
 	isFormComplete: () => boolean;
 }
 
 export interface OnboardingFormStore
-	extends FormDataSlice,
-		FormActionsSlice,
-		ValidationSlice {}
+	extends OnboardingFormState,
+		OnboardingFormActions {}
+
+// ============================================================
+// 초기값
+// ============================================================
 
 const initialPersonalInfo: PersonalInfo = {
 	name: "",
@@ -149,7 +158,6 @@ const initialPersonalInfo: PersonalInfo = {
 
 const initialAttendanceInfo: AttendanceInfo = {
 	stayType: null,
-	attendanceDate: undefined,
 	pickupTimeDescription: undefined,
 };
 
@@ -163,20 +171,11 @@ const initialAdditionalInfo: AdditionalInfo = {
 	tshirtSize: null,
 };
 
-const initialPaymentInfo: PaymentInfo = {
-	isPaid: false,
-};
+// ============================================================
+// 유효성 검사 함수
+// ============================================================
 
-const initialFormData: OnboardingFormData = {
-	...initialPersonalInfo,
-	...initialAttendanceInfo,
-	...initialSupportInfo,
-	...initialAdditionalInfo,
-	...initialPaymentInfo,
-};
-
-/** 개인정보 스텝 유효성 검사 */
-function validatePersonalInfo(data: OnboardingFormData): boolean {
+function validatePersonalInfo(data: PersonalInfo): boolean {
 	return !!(
 		data.name &&
 		data.phone &&
@@ -186,29 +185,24 @@ function validatePersonalInfo(data: OnboardingFormData): boolean {
 	);
 }
 
-/** 참석정보 스텝 유효성 검사 */
-function validateAttendanceInfo(data: OnboardingFormData): boolean {
+function validateAttendanceInfo(data: AttendanceInfo): boolean {
 	return !!data.stayType;
 }
 
-/** 추가정보 스텝 유효성 검사 */
-function validateAdditionalInfo(data: OnboardingFormData): boolean {
+function validateAdditionalInfo(data: AdditionalInfo): boolean {
 	return !!data.tshirtSize;
 }
 
-/** 스텝별 유효성 검사 */
-function validateStep(step: StepSlug, data: OnboardingFormData): boolean {
+function validateStep(step: StepSlug, state: OnboardingFormState): boolean {
 	switch (step) {
-		case "personal-info":
-			return validatePersonalInfo(data);
-		case "attendance-info":
-			return validateAttendanceInfo(data);
-		case "support-info":
+		case "personal":
+			return validatePersonalInfo(state.personalInfo);
+		case "attendance":
+			return validateAttendanceInfo(state.attendanceInfo);
+		case "support":
 			return true; // 선택 필드만 있음
-		case "additional-info":
-			return validateAdditionalInfo(data);
-		case "payment-info":
-			return true; // 정보 표시만
+		case "additional":
+			return validateAdditionalInfo(state.additionalInfo);
 		case "confirm":
 			return true;
 		default:
@@ -216,47 +210,117 @@ function validateStep(step: StepSlug, data: OnboardingFormData): boolean {
 	}
 }
 
-/** 전체 폼 유효성 검사 */
-function validateFormComplete(data: OnboardingFormData): boolean {
+function validateFormComplete(state: OnboardingFormState): boolean {
 	return (
-		validatePersonalInfo(data) &&
-		validateAttendanceInfo(data) &&
-		validateAdditionalInfo(data)
+		validatePersonalInfo(state.personalInfo) &&
+		validateAttendanceInfo(state.attendanceInfo) &&
+		validateAdditionalInfo(state.additionalInfo)
 	);
 }
+
+// ============================================================
+// Store 생성
+// ============================================================
 
 export const useOnboardingFormStore = create<OnboardingFormStore>()(
 	devtools(
 		(set, get) => ({
 			// State
-			formData: initialFormData,
+			currentStep: "welcome",
+			personalInfo: initialPersonalInfo,
+			attendanceInfo: initialAttendanceInfo,
+			supportInfo: initialSupportInfo,
+			additionalInfo: initialAdditionalInfo,
+			isLoading: false,
 
 			// Actions
-			updateFormData: (data) => {
+			setCurrentStep: (step) => {
+				set({ currentStep: step }, undefined, "step/set");
+			},
+
+			setPersonalInfo: (data) => {
 				set(
 					(state) => ({
-						formData: { ...state.formData, ...data },
+						personalInfo: { ...state.personalInfo, ...data },
 					}),
 					undefined,
-					"formData/update"
+					"personalInfo/update"
 				);
+			},
+
+			setAttendanceInfo: (data) => {
+				set(
+					(state) => ({
+						attendanceInfo: { ...state.attendanceInfo, ...data },
+					}),
+					undefined,
+					"attendanceInfo/update"
+				);
+			},
+
+			setSupportInfo: (data) => {
+				set(
+					(state) => ({
+						supportInfo: { ...state.supportInfo, ...data },
+					}),
+					undefined,
+					"supportInfo/update"
+				);
+			},
+
+			setAdditionalInfo: (data) => {
+				set(
+					(state) => ({
+						additionalInfo: { ...state.additionalInfo, ...data },
+					}),
+					undefined,
+					"additionalInfo/update"
+				);
+			},
+
+			setIsLoading: (loading) => {
+				set({ isLoading: loading }, undefined, "loading/set");
 			},
 
 			setFormData: (data) => {
 				set(
-					{ formData: { ...initialFormData, ...data } },
+					(state) => ({
+						personalInfo: data.personalInfo
+							? { ...state.personalInfo, ...data.personalInfo }
+							: state.personalInfo,
+						attendanceInfo: data.attendanceInfo
+							? { ...state.attendanceInfo, ...data.attendanceInfo }
+							: state.attendanceInfo,
+						supportInfo: data.supportInfo
+							? { ...state.supportInfo, ...data.supportInfo }
+							: state.supportInfo,
+						additionalInfo: data.additionalInfo
+							? { ...state.additionalInfo, ...data.additionalInfo }
+							: state.additionalInfo,
+					}),
 					undefined,
 					"formData/set"
 				);
 			},
 
-			resetForm: () => {
-				set({ formData: initialFormData }, undefined, "formData/reset");
+			clearForm: () => {
+				set(
+					{
+						currentStep: "welcome",
+						personalInfo: initialPersonalInfo,
+						attendanceInfo: initialAttendanceInfo,
+						supportInfo: initialSupportInfo,
+						additionalInfo: initialAdditionalInfo,
+						isLoading: false,
+					},
+					undefined,
+					"form/clear"
+				);
 			},
 
 			// Validation
-			isStepValid: (step) => validateStep(step, get().formData),
-			isFormComplete: () => validateFormComplete(get().formData),
+			isStepValid: (step) => validateStep(step, get()),
+			isFormComplete: () => validateFormComplete(get()),
 		}),
 		{
 			name: "OnboardingFormStore",
@@ -265,42 +329,30 @@ export const useOnboardingFormStore = create<OnboardingFormStore>()(
 	)
 );
 
+// ============================================================
+// Selector hooks (성능 최적화)
+// ============================================================
+
 /** 개인정보만 선택 */
 export const usePersonalInfo = () =>
-	useOnboardingFormStore((state) => ({
-		name: state.formData.name,
-		phone: state.formData.phone,
-		gender: state.formData.gender,
-		department: state.formData.department,
-		ageGroup: state.formData.ageGroup,
-	}));
+	useOnboardingFormStore((state) => state.personalInfo);
 
 /** 참석정보만 선택 */
 export const useAttendanceInfo = () =>
-	useOnboardingFormStore((state) => ({
-		stayType: state.formData.stayType,
-		attendanceDate: state.formData.attendanceDate,
-		pickupTimeDescription: state.formData.pickupTimeDescription,
-	}));
+	useOnboardingFormStore((state) => state.attendanceInfo);
 
 /** 봉사정보만 선택 */
 export const useSupportInfo = () =>
-	useOnboardingFormStore((state) => ({
-		tfTeam: state.formData.tfTeam,
-		canProvideRide: state.formData.canProvideRide,
-		rideDetails: state.formData.rideDetails,
-	}));
+	useOnboardingFormStore((state) => state.supportInfo);
 
 /** 추가정보만 선택 */
 export const useAdditionalInfo = () =>
-	useOnboardingFormStore((state) => ({
-		tshirtSize: state.formData.tshirtSize,
-	}));
+	useOnboardingFormStore((state) => state.additionalInfo);
 
-/** 액션만 선택 (리렌더링 최소화) */
-export const useFormActions = () =>
-	useOnboardingFormStore((state) => ({
-		updateFormData: state.updateFormData,
-		setFormData: state.setFormData,
-		resetForm: state.resetForm,
-	}));
+/** 현재 스텝만 선택 */
+export const useCurrentStep = () =>
+	useOnboardingFormStore((state) => state.currentStep);
+
+/** 로딩 상태만 선택 */
+export const useIsLoading = () =>
+	useOnboardingFormStore((state) => state.isLoading);

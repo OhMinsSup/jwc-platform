@@ -1,13 +1,10 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-	AGE_GROUP_REGEX,
-	DEPARTMENT_LABELS,
-	DepartmentEnum,
-	GENDER_LABELS,
-	GenderEnum,
-} from "@jwc/schema";
+"use client";
+
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { AGE_GROUP_REGEX, DepartmentEnum, GenderEnum } from "@jwc/schema";
 import {
 	Button,
+	cn,
 	Form,
 	FormControl,
 	FormField,
@@ -15,228 +12,356 @@ import {
 	FormLabel,
 	FormMessage,
 	Input,
-	RadioGroup,
-	RadioGroupItem,
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
 } from "@jwc/ui";
+import { useNavigate } from "@tanstack/react-router";
+import type { Variants } from "framer-motion";
 import { motion } from "framer-motion";
-import { ArrowRight, Loader2 } from "lucide-react";
-import { useState } from "react";
+import {
+	ArrowLeft,
+	ArrowRight,
+	Building2,
+	Calendar,
+	Phone,
+	User,
+	Users,
+} from "lucide-react";
+import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod/v4";
-import { getPhoneHashServer } from "@/lib/crypto-server";
+import { AGE_GROUPS, DEPARTMENTS } from "@/lib/constants";
 import { useOnboardingFormStore } from "@/store/onboarding-form-store";
-import type { OnboardingSearchParams } from "@/routes/onboarding/route";
 
-interface PersonalInfoStepProps {
-	onNext: (search?: Partial<OnboardingSearchParams>) => void;
-}
-
+// 개인정보 스키마
 const personalInfoSchema = z.object({
-	name: z.string().min(2, "이름은 2글자 이상이어야 합니다"),
+	name: z.string().min(2, "이름은 2자 이상이어야 합니다"),
 	phone: z
 		.string()
-		.regex(/^01[016789]-?\d{3,4}-?\d{4}$/, "올바른 전화번호를 입력해주세요"),
+		.regex(
+			/^01[0-9]-?[0-9]{3,4}-?[0-9]{4}$/,
+			"올바른 전화번호 형식이 아닙니다"
+		),
 	gender: GenderEnum,
 	department: DepartmentEnum,
-	ageGroup: z
-		.string()
-		.min(1, "또래를 입력해주세요")
-		.refine((value) => AGE_GROUP_REGEX.test(value), {
-			message: "또래를 숫자 2자리로 입력해주세요. (예시: 00또래)",
-		}),
+	ageGroup: z.string().regex(AGE_GROUP_REGEX, "올바른 연령대 형식이 아닙니다"),
 });
 
-type PersonalInfoFormData = z.infer<typeof personalInfoSchema>;
+type PersonalInfoInput = z.infer<typeof personalInfoSchema>;
 
-export function PersonalInfoStep({ onNext }: PersonalInfoStepProps) {
-	const { formData, updateFormData } = useOnboardingFormStore();
-	const [isSubmitting, setIsSubmitting] = useState(false);
+const formVariants: Variants = {
+	hidden: { opacity: 0 },
+	visible: {
+		opacity: 1,
+		transition: { staggerChildren: 0.08, delayChildren: 0.1 },
+	},
+};
 
-	const form = useForm<PersonalInfoFormData>({
-		resolver: zodResolver(personalInfoSchema),
+const itemVariants: Variants = {
+	hidden: { opacity: 0, y: 16 },
+	visible: {
+		opacity: 1,
+		y: 0,
+		transition: { duration: 0.4, ease: "easeOut" },
+	},
+};
+
+// 선택 버튼 컴포넌트
+function SelectionButton({
+	selected,
+	onClick,
+	children,
+	className,
+}: {
+	selected: boolean;
+	onClick: () => void;
+	children: React.ReactNode;
+	className?: string;
+}) {
+	return (
+		<button
+			className={cn(
+				"rounded-full px-5 py-2.5 font-medium text-sm transition-all duration-200",
+				"border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background",
+				selected
+					? "border-primary bg-primary text-primary-foreground shadow-md"
+					: "border-border bg-muted/50 text-muted-foreground hover:border-muted-foreground/30 hover:bg-muted",
+				className
+			)}
+			onClick={onClick}
+			type="button"
+		>
+			{children}
+		</button>
+	);
+}
+
+export function PersonalInfoStep() {
+	const navigate = useNavigate();
+	const {
+		personalInfo,
+		setPersonalInfo,
+		setCurrentStep,
+		isLoading,
+		setIsLoading,
+	} = useOnboardingFormStore();
+	const formRef = useRef<HTMLFormElement>(null);
+
+	const form = useForm<PersonalInfoInput>({
+		resolver: standardSchemaResolver(personalInfoSchema),
 		defaultValues: {
-			name: formData.name,
-			phone: formData.phone,
-			gender: formData.gender || undefined,
-			department: formData.department || undefined,
-			ageGroup: formData.ageGroup,
+			name: personalInfo.name,
+			phone: personalInfo.phone,
+			gender: personalInfo.gender ?? undefined,
+			department: personalInfo.department ?? undefined,
+			ageGroup: personalInfo.ageGroup,
 		},
+		mode: "onChange",
 	});
 
-	const onSubmit = async (data: PersonalInfoFormData) => {
-		setIsSubmitting(true);
+	// Store 값이 변경되면 폼 값도 업데이트
+	useEffect(() => {
+		if (personalInfo) {
+			form.reset({
+				name: personalInfo.name,
+				phone: personalInfo.phone,
+				gender: personalInfo.gender ?? undefined,
+				department: personalInfo.department ?? undefined,
+				ageGroup: personalInfo.ageGroup,
+			});
+		}
+	}, [personalInfo, form]);
+
+	const onSubmit = async (data: PersonalInfoInput) => {
+		setIsLoading(true);
 		try {
-			// 폼 데이터 업데이트
-			updateFormData(data);
-
-			// 전화번호로 해시 생성
-			const result = await getPhoneHashServer({ data: { phone: data.phone } });
-
-			if (result.success) {
-				// phoneHash를 URL에 추가하여 다음 스텝으로 이동
-				onNext({ phoneHash: result.data });
-			} else {
-				// 해시 생성 실패해도 다음 스텝으로 이동 (저장 기능만 비활성화)
-				console.warn("[PersonalInfo] Failed to generate phone hash");
-				onNext();
-			}
-		} catch (error) {
-			console.error("[PersonalInfo] Error:", error);
-			// 에러가 나도 다음으로 진행 (UX 우선)
-			onNext();
+			setPersonalInfo(data);
+			setCurrentStep("attendance");
+			await navigate({
+				to: "/onboarding/$step",
+				params: { step: "attendance" },
+			});
 		} finally {
-			setIsSubmitting(false);
+			setIsLoading(false);
 		}
 	};
 
+	const handleBack = async () => {
+		setCurrentStep("welcome");
+		await navigate({ to: "/onboarding/$step", params: { step: "welcome" } });
+	};
+
+	const genderOptions = [
+		{ value: "male" as const, label: "남성" },
+		{ value: "female" as const, label: "여성" },
+	];
+
 	return (
-		<motion.div
-			animate={{ opacity: 1, x: 0 }}
-			exit={{ opacity: 0, x: -20 }}
-			initial={{ opacity: 0, x: 20 }}
-			transition={{ duration: 0.3 }}
-		>
-			<div className="mb-8">
-				<h2 className="mb-2 font-bold text-2xl">기본 정보</h2>
+		<div className="mx-auto w-full max-w-xl px-4 py-8">
+			{/* 헤더 */}
+			<motion.div
+				animate={{ opacity: 1, y: 0 }}
+				className="mb-10"
+				initial={{ opacity: 0, y: -10 }}
+				transition={{ duration: 0.5 }}
+			>
+				<div className="mb-3 flex items-center gap-3">
+					<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+						<User className="h-5 w-5 text-primary" />
+					</div>
+					<span className="font-medium text-primary text-sm">Step 1 of 5</span>
+				</div>
+				<h1 className="mb-2 font-bold text-2xl text-foreground md:text-3xl">
+					기본 정보를 입력해주세요
+				</h1>
 				<p className="text-muted-foreground">
-					참가자의 기본 정보를 입력해주세요.
+					정확한 정보 입력은 더 나은 서비스 제공에 도움이 됩니다
 				</p>
-			</div>
+			</motion.div>
 
 			<Form {...form}>
-				<form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
-					{/* 이름 */}
-					<FormField
-						control={form.control}
-						name="name"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>이름 *</FormLabel>
-								<FormControl>
-									<Input placeholder="홍길동" {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					{/* 전화번호 */}
-					<FormField
-						control={form.control}
-						name="phone"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>전화번호 *</FormLabel>
-								<FormControl>
-									<Input placeholder="010-1234-5678" type="tel" {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					{/* 성별 */}
-					<FormField
-						control={form.control}
-						name="gender"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>성별 *</FormLabel>
-								<FormControl>
-									<RadioGroup
-										className="flex gap-4"
-										defaultValue={field.value}
-										onValueChange={field.onChange}
-									>
-										{(Object.entries(GENDER_LABELS) as [string, string][]).map(
-											([value, label]) => (
-												<div
-													className="flex items-center space-x-2"
-													key={value}
-												>
-													<RadioGroupItem id={value} value={value} />
-													<label className="cursor-pointer" htmlFor={value}>
-														{label}
-													</label>
-												</div>
-											)
-										)}
-									</RadioGroup>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					{/* 소속 부서 */}
-					<FormField
-						control={form.control}
-						name="department"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>소속 부서 *</FormLabel>
-								<Select
-									defaultValue={field.value}
-									onValueChange={field.onChange}
-								>
+				<motion.form
+					animate="visible"
+					className="space-y-8"
+					initial="hidden"
+					onSubmit={form.handleSubmit(onSubmit)}
+					ref={formRef}
+					variants={formVariants}
+				>
+					{/* 이름 입력 */}
+					<motion.div variants={itemVariants}>
+						<FormField
+							control={form.control}
+							name="name"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel className="flex items-center gap-2 font-medium text-foreground text-sm">
+										<User className="h-4 w-4 text-muted-foreground" />
+										이름
+									</FormLabel>
 									<FormControl>
-										<SelectTrigger>
-											<SelectValue placeholder="부서를 선택해주세요" />
-										</SelectTrigger>
+										<Input
+											{...field}
+											className="h-12 border-border/50 bg-muted/30 transition-all duration-200 focus:border-primary focus:bg-background"
+											placeholder="이름을 입력하세요"
+										/>
 									</FormControl>
-									<SelectContent>
-										{(
-											Object.entries(DEPARTMENT_LABELS) as [string, string][]
-										).map(([value, label]) => (
-											<SelectItem key={value} value={value}>
-												{label}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</motion.div>
 
-					{/* 또래 */}
-					<FormField
-						control={form.control}
-						name="ageGroup"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>또래 *</FormLabel>
-								<FormControl>
-									<Input placeholder="00또래" {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
+					{/* 전화번호 입력 */}
+					<motion.div variants={itemVariants}>
+						<FormField
+							control={form.control}
+							name="phone"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel className="flex items-center gap-2 font-medium text-foreground text-sm">
+										<Phone className="h-4 w-4 text-muted-foreground" />
+										전화번호
+									</FormLabel>
+									<FormControl>
+										<Input
+											{...field}
+											className="h-12 border-border/50 bg-muted/30 transition-all duration-200 focus:border-primary focus:bg-background"
+											placeholder="010-0000-0000"
+											type="tel"
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</motion.div>
 
-					<div className="flex justify-end pt-4">
-						<Button className="gap-2" disabled={isSubmitting} type="submit">
-							{isSubmitting ? (
-								<>
-									<Loader2 className="h-4 w-4 animate-spin" />
-									처리 중...
-								</>
+					{/* 성별 선택 */}
+					<motion.div variants={itemVariants}>
+						<FormField
+							control={form.control}
+							name="gender"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel className="mb-3 flex items-center gap-2 font-medium text-foreground text-sm">
+										<Users className="h-4 w-4 text-muted-foreground" />
+										성별
+									</FormLabel>
+									<FormControl>
+										<div className="flex flex-wrap gap-2">
+											{genderOptions.map((option) => (
+												<SelectionButton
+													key={option.value}
+													onClick={() => field.onChange(option.value)}
+													selected={field.value === option.value}
+												>
+													{option.label}
+												</SelectionButton>
+											))}
+										</div>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</motion.div>
+
+					{/* 소속 선택 */}
+					<motion.div variants={itemVariants}>
+						<FormField
+							control={form.control}
+							name="department"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel className="mb-3 flex items-center gap-2 font-medium text-foreground text-sm">
+										<Building2 className="h-4 w-4 text-muted-foreground" />
+										소속
+									</FormLabel>
+									<FormControl>
+										<div className="flex flex-wrap gap-2">
+											{DEPARTMENTS.map((dept) => (
+												<SelectionButton
+													key={dept.value}
+													onClick={() => field.onChange(dept.value)}
+													selected={field.value === dept.value}
+												>
+													{dept.label}
+												</SelectionButton>
+											))}
+										</div>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</motion.div>
+
+					{/* 연령대 선택 */}
+					<motion.div variants={itemVariants}>
+						<FormField
+							control={form.control}
+							name="ageGroup"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel className="mb-3 flex items-center gap-2 font-medium text-foreground text-sm">
+										<Calendar className="h-4 w-4 text-muted-foreground" />
+										연령대
+									</FormLabel>
+									<FormControl>
+										<div className="flex flex-wrap gap-2">
+											{AGE_GROUPS.map((age) => (
+												<SelectionButton
+													key={age.value}
+													onClick={() => field.onChange(age.value)}
+													selected={field.value === age.value}
+												>
+													{age.label}
+												</SelectionButton>
+											))}
+										</div>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</motion.div>
+
+					{/* 버튼 영역 */}
+					<motion.div className="flex gap-3 pt-4" variants={itemVariants}>
+						<Button
+							className="h-12 rounded-xl border-border/50 px-6 hover:bg-muted/50"
+							onClick={handleBack}
+							type="button"
+							variant="outline"
+						>
+							<ArrowLeft className="mr-2 h-4 w-4" />
+							이전
+						</Button>
+						<Button
+							className="h-12 flex-1 rounded-xl bg-primary font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-all duration-200 hover:bg-primary/90"
+							disabled={isLoading || !form.formState.isValid}
+							type="submit"
+						>
+							{isLoading ? (
+								<motion.div
+									animate={{ rotate: 360 }}
+									className="h-5 w-5 rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground"
+									transition={{
+										duration: 1,
+										repeat: Number.POSITIVE_INFINITY,
+										ease: "linear",
+									}}
+								/>
 							) : (
 								<>
-									다음
-									<ArrowRight className="h-4 w-4" />
+									다음 단계
+									<ArrowRight className="ml-2 h-4 w-4" />
 								</>
 							)}
 						</Button>
-					</div>
-				</form>
+					</motion.div>
+				</motion.form>
 			</Form>
-		</motion.div>
+		</div>
 	);
 }
 
