@@ -12,10 +12,16 @@ import {
 	FormLabel,
 	FormMessage,
 	Input,
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
 } from "@jwc/ui";
 import { useNavigate } from "@tanstack/react-router";
 import type { Variants } from "framer-motion";
 import { motion } from "framer-motion";
+import { AsYouType } from "libphonenumber-js";
 import {
 	ArrowLeft,
 	ArrowRight,
@@ -25,7 +31,7 @@ import {
 	User,
 	Users,
 } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod/v4";
 import { AGE_GROUPS, DEPARTMENTS } from "@/lib/constants";
@@ -36,10 +42,13 @@ const personalInfoSchema = z.object({
 	name: z.string().min(2, "이름은 2자 이상이어야 합니다"),
 	phone: z
 		.string()
-		.regex(
-			/^01[0-9]-?[0-9]{3,4}-?[0-9]{4}$/,
-			"올바른 전화번호 형식이 아닙니다"
-		),
+		.min(1, "전화번호를 입력해주세요.")
+		.refine((value) => {
+			const asYouType = new AsYouType("KR");
+			asYouType.input(value);
+			const number = asYouType.getNumber();
+			return number?.isValid() ?? false;
+		}, "유효한 전화번호를 입력해주세요."),
 	gender: GenderEnum,
 	department: DepartmentEnum,
 	ageGroup: z.string().regex(AGE_GROUP_REGEX, "올바른 연령대 형식이 아닙니다"),
@@ -149,6 +158,24 @@ export function PersonalInfoStep() {
 		await navigate({ to: "/onboarding/$step", params: { step: "welcome" } });
 	};
 
+	// 전화번호 포맷팅 함수
+	const formatPhoneNumber = useCallback((value: string) => {
+		const asYouType = new AsYouType("KR");
+		return asYouType.input(value);
+	}, []);
+
+	const handlePhoneChange = useCallback(
+		(
+			e: React.ChangeEvent<HTMLInputElement>,
+			onChange: (value: string) => void
+		) => {
+			const rawValue = e.target.value.replace(/[^\d]/g, "");
+			const formattedValue = formatPhoneNumber(rawValue);
+			onChange(formattedValue);
+		},
+		[formatPhoneNumber]
+	);
+
 	const genderOptions = [
 		{ value: "male" as const, label: "남성" },
 		{ value: "female" as const, label: "여성" },
@@ -225,6 +252,7 @@ export function PersonalInfoStep() {
 										<Input
 											{...field}
 											className="h-12 border-border/50 bg-muted/30 transition-all duration-200 focus:border-primary focus:bg-background"
+											onChange={(e) => handlePhoneChange(e, field.onChange)}
 											placeholder="010-0000-0000"
 											type="tel"
 										/>
@@ -306,19 +334,20 @@ export function PersonalInfoStep() {
 										<Calendar className="h-4 w-4 text-muted-foreground" />
 										연령대
 									</FormLabel>
-									<FormControl>
-										<div className="flex flex-wrap gap-2">
+									<Select onValueChange={field.onChange} value={field.value}>
+										<FormControl>
+											<SelectTrigger className="h-12 border-border/50 bg-muted/30 transition-all duration-200 focus:border-primary focus:bg-background">
+												<SelectValue placeholder="연령대를 선택하세요" />
+											</SelectTrigger>
+										</FormControl>
+										<SelectContent>
 											{AGE_GROUPS.map((age) => (
-												<SelectionButton
-													key={age.value}
-													onClick={() => field.onChange(age.value)}
-													selected={field.value === age.value}
-												>
+												<SelectItem key={age.value} value={age.value}>
 													{age.label}
-												</SelectionButton>
+												</SelectItem>
 											))}
-										</div>
-									</FormControl>
+										</SelectContent>
+									</Select>
 									<FormMessage />
 								</FormItem>
 							)}

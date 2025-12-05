@@ -147,6 +147,9 @@ importers:
       framer-motion:
         specifier: ^12.23.25
         version: 12.23.25(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      libphonenumber-js:
+        specifier: ^1.12.29
+        version: 1.12.29
       lucide-react:
         specifier: ^0.555.0
         version: 0.555.0(react@19.2.0)

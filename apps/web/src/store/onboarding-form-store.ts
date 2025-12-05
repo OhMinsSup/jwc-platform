@@ -31,7 +31,7 @@ export const STEP_LABELS: Record<StepSlug, string> = {
 	welcome: "시작",
 	personal: "기본 정보",
 	attendance: "참석 정보",
-	support: "봉사 지원",
+	support: "지원",
 	additional: "추가 정보",
 	confirm: "확인",
 	complete: "완료",

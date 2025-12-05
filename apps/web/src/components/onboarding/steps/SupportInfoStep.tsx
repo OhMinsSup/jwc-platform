@@ -159,7 +159,7 @@ export function SupportInfoStep() {
 					<span className="font-medium text-primary text-sm">Step 3 of 5</span>
 				</div>
 				<h1 className="mb-2 font-bold text-2xl text-foreground md:text-3xl">
-					봉사 및 지원
+					지원
 				</h1>
 				<p className="text-muted-foreground">
 					수련회 준비에 함께해 주실 부분이 있으시면 알려주세요

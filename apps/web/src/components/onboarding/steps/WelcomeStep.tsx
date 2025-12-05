@@ -70,7 +70,7 @@ export function WelcomeStep() {
 					>
 						<Sparkles className="h-4 w-4 text-primary" />
 						<span className="font-medium text-primary text-sm">
-							2025 청년부 수련회
+							2025 청년부 겨울 수련회
 						</span>
 					</motion.div>
 				</motion.div>

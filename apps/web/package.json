@@ -28,6 +28,7 @@
     "better-auth": "catalog:",
     "convex": "catalog:",
     "framer-motion": "^12.23.25",
+    "libphonenumber-js": "^1.12.29",
     "lucide-react": "^0.555.0",
     "react": "catalog:react19",
     "react-confetti": "^6.4.0",
