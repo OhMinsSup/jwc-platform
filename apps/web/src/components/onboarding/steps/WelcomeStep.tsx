@@ -1,7 +1,7 @@
 import { Button } from "@jwc/ui";
 import { motion } from "framer-motion";
 import { ArrowRight, Church } from "lucide-react";
-import { useOnboardingFormStore } from "@/lib/onboarding-form-store";
+import { useOnboardingFormStore } from "@/store/onboarding-form-store";
 
 interface WelcomeStepProps {
 	onNext: () => void;

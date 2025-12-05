@@ -18,7 +18,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, Car, Users } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod/v4";
-import { useOnboardingFormStore } from "@/lib/onboarding-form-store";
+import { useOnboardingFormStore } from "@/store/onboarding-form-store";
 
 const supportSchema = z.object({
 	tfTeam: TfTeamEnum.optional(),

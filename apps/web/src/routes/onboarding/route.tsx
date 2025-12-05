@@ -15,7 +15,7 @@ import {
 	isValidStep,
 	STEP_LABELS,
 	type StepSlug,
-} from "@/lib/onboarding-form-store";
+} from "@/store/onboarding-form-store";
 
 const onboardingSearchSchema = z.object({
 	/** 전화번호 해시 - draft 조회 및 저장에 사용 */

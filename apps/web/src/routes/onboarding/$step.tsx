@@ -6,8 +6,8 @@ import {
 	getPrevStep,
 	isValidStep,
 	type StepSlug,
-} from "@/lib/onboarding-form-store";
-import { useOnboardingDraft } from "@/lib/use-onboarding-draft";
+} from "@/store/onboarding-form-store";
+import { useOnboardingDraft } from "@/hooks/use-onboarding-draft";
 import type { OnboardingSearchParams } from "./route";
 
 // Lazy load step components

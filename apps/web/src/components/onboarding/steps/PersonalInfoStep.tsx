@@ -29,7 +29,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod/v4";
 import { getPhoneHashServer } from "@/lib/crypto-server";
-import { useOnboardingFormStore } from "@/lib/onboarding-form-store";
+import { useOnboardingFormStore } from "@/store/onboarding-form-store";
 import type { OnboardingSearchParams } from "@/routes/onboarding/route";
 
 interface PersonalInfoStepProps {

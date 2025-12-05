@@ -20,7 +20,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, Shirt } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod/v4";
-import { useOnboardingFormStore } from "@/lib/onboarding-form-store";
+import { useOnboardingFormStore } from "@/store/onboarding-form-store";
 
 const additionalSchema = z.object({
 	tshirtSize: TshirtSizeEnum,

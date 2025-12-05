@@ -15,7 +15,7 @@ import {
 	Info,
 } from "lucide-react";
 import { useState } from "react";
-import { useOnboardingFormStore } from "@/lib/onboarding-form-store";
+import { useOnboardingFormStore } from "@/store/onboarding-form-store";
 
 const PAYMENT_INFO = {
 	bank: "카카오뱅크",

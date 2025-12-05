@@ -6,12 +6,12 @@ import { stableHash } from "stable-hash";
 import {
 	decryptDraftPersonalInfoServer,
 	encryptDraftPersonalInfoServer,
-} from "./crypto-server";
+} from "../lib/crypto-server";
 import {
 	type OnboardingFormData,
 	type StepSlug,
 	useOnboardingFormStore,
-} from "./onboarding-form-store";
+} from "../store/onboarding-form-store";
 
 /** 디바운스 시간 (ms) */
 const DEBOUNCE_DELAY = 1000;

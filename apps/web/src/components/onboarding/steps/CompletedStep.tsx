@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { CheckCircle2, Home, PartyPopper } from "lucide-react";
 import Confetti from "react-confetti";
 import { useWindowSize } from "react-use";
-import { useOnboardingFormStore } from "@/lib/onboarding-form-store";
+import { useOnboardingFormStore } from "@/store/onboarding-form-store";
 
 // CompletedStep은 마지막 단계이므로 props가 필요 없음
 

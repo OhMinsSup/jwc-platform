@@ -28,7 +28,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { encryptPersonalInfoServer } from "@/lib/crypto-server";
-import { useOnboardingFormStore } from "@/lib/onboarding-form-store";
+import { useOnboardingFormStore } from "@/store/onboarding-form-store";
 
 interface ConfirmStepProps {
 	onNext: () => void;
