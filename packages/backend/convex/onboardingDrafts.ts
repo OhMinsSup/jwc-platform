@@ -37,10 +37,6 @@ const tshirtSizeValidator = v.union(
 	v.literal("3xl")
 );
 
-// ============================================================
-// Query 함수
-// ============================================================
-
 /**
  * 전화번호 해시로 임시저장 데이터 조회
  */
@@ -87,10 +83,6 @@ export const getStale = query({
 	},
 });
 
-// ============================================================
-// Mutation 함수
-// ============================================================
-
 /**
  * 임시저장 데이터 저장/업데이트 (Upsert)
  * - phoneHash 기준으로 기존 데이터가 있으면 업데이트, 없으면 생성
@@ -101,8 +93,8 @@ export const upsert = mutation({
 		currentStep: v.string(),
 
 		// 폼 데이터 (모두 optional)
-		name: v.optional(v.string()),
-		phone: v.optional(v.string()),
+		encryptedName: v.optional(v.string()),
+		encryptedPhone: v.optional(v.string()),
 		gender: v.optional(genderValidator),
 		department: v.optional(departmentValidator),
 		ageGroup: v.optional(v.string()),

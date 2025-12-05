@@ -1,5 +1,5 @@
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
-import { lazy, Suspense, useEffect, useRef } from "react";
+import { lazy, Suspense, useEffect, useRef, useTransition } from "react";
 import { OnboardingErrorBoundary } from "@/components/onboarding/OnboardingErrorBoundary";
 import {
 	getNextStep,
@@ -67,14 +67,19 @@ function OnboardingStepPage() {
 	const { hasDraft, isDraftReady, saveDraftImmediately, hydrateFormFromDraft } =
 		useOnboardingDraft(phoneHash);
 
+	// Transition for async operations
+	const [, startTransition] = useTransition();
+
 	// Draft 로드 상태 추적
 	const hasHydratedRef = useRef(false);
 
 	// Draft 데이터가 있으면 폼에 적용 (최초 1회)
 	useEffect(() => {
 		if (isDraftReady && hasDraft && !hasHydratedRef.current) {
-			hydrateFormFromDraft();
 			hasHydratedRef.current = true;
+			startTransition(() => {
+				hydrateFormFromDraft().catch(console.error);
+			});
 		}
 	}, [isDraftReady, hasDraft, hydrateFormFromDraft]);
 
@@ -87,24 +92,28 @@ function OnboardingStepPage() {
 			if (hash) {
 				await saveDraftImmediately(currentStep);
 			}
-			navigate({
-				to: "/onboarding/$step",
-				params: { step: nextStep },
-				search: { ...search, ...newSearch },
+			startTransition(() => {
+				navigate({
+					to: "/onboarding/$step",
+					params: { step: nextStep },
+					search: { ...search, ...newSearch },
+				});
 			});
 		}
 	};
 
 	// 이전 스텝으로 이동 (search params 유지)
 	const goToPrevStep = () => {
-		const prevStep = getPrevStep(currentStep);
-		if (prevStep) {
-			navigate({
-				to: "/onboarding/$step",
-				params: { step: prevStep },
-				search,
-			});
-		}
+		startTransition(() => {
+			const prevStep = getPrevStep(currentStep);
+			if (prevStep) {
+				navigate({
+					to: "/onboarding/$step",
+					params: { step: prevStep },
+					search,
+				});
+			}
+		});
 	};
 
 	const renderStep = () => {

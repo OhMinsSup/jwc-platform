@@ -7,7 +7,7 @@ import {
 	useNavigate,
 } from "@tanstack/react-router";
 import { ArrowLeft, Github, Home } from "lucide-react";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { OnboardingErrorBoundary } from "@/components/onboarding/OnboardingErrorBoundary";
 import {
 	getPrevStep,

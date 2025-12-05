@@ -4,6 +4,10 @@ import { useMutation, useQuery } from "convex/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { stableHash } from "stable-hash";
 import {
+	decryptDraftPersonalInfoServer,
+	encryptDraftPersonalInfoServer,
+} from "./crypto-server";
+import {
 	type OnboardingFormData,
 	type StepSlug,
 	useOnboardingFormStore,
@@ -29,8 +33,8 @@ export interface UseOnboardingDraftReturn {
 	isSaving: boolean;
 	/** 에러 */
 	error: Error | null;
-	/** Draft 데이터를 폼에 적용 */
-	hydrateFormFromDraft: () => boolean;
+	/** Draft 데이터를 폼에 적용 (복호화 포함) */
+	hydrateFormFromDraft: () => Promise<boolean>;
 	/** 현재 폼 데이터를 서버에 저장 (디바운스) */
 	saveDraft: (currentStep: StepSlug) => void;
 	/** 즉시 저장 (스텝 이동 전) */
@@ -41,22 +45,24 @@ export interface UseOnboardingDraftReturn {
 	clearError: () => void;
 }
 
-// ============================================================
-// Helpers
-// ============================================================
-
 /**
- * Draft 데이터를 OnboardingFormData 형식으로 변환
+ * Draft 데이터를 OnboardingFormData 형식으로 변환 (복호화 필요)
+ * - name, phone은 서버에서 복호화해야 함
  */
-function mapDraftToFormData(draft: DraftDocument): Partial<OnboardingFormData> {
+function mapDraftToFormData(
+	draft: DraftDocument,
+	decryptedData?: { name?: string; phone?: string }
+): Partial<OnboardingFormData> {
 	const result: Partial<OnboardingFormData> = {};
 
-	if (draft.name) {
-		result.name = draft.name;
+	// 복호화된 개인정보
+	if (decryptedData?.name) {
+		result.name = decryptedData.name;
 	}
-	if (draft.phone) {
-		result.phone = draft.phone;
+	if (decryptedData?.phone) {
+		result.phone = decryptedData.phone;
 	}
+
 	if (draft.gender) {
 		result.gender = draft.gender;
 	}
@@ -92,18 +98,19 @@ function mapDraftToFormData(draft: DraftDocument): Partial<OnboardingFormData> {
 }
 
 /**
- * FormData를 Draft upsert args로 변환
+ * FormData를 Draft upsert args로 변환 (암호화된 데이터 포함)
  */
 function mapFormDataToDraftArgs(
-phoneHash: string,
-currentStep: StepSlug,
-formData: OnboardingFormData
+	phoneHash: string,
+	currentStep: StepSlug,
+	formData: OnboardingFormData,
+	encryptedData?: { encryptedName?: string; encryptedPhone?: string }
 ) {
 	return {
 		phoneHash,
 		currentStep,
-		name: formData.name || undefined,
-		phone: formData.phone || undefined,
+		encryptedName: encryptedData?.encryptedName,
+		encryptedPhone: encryptedData?.encryptedPhone,
 		gender: formData.gender ?? undefined,
 		department: formData.department ?? undefined,
 		ageGroup: formData.ageGroup || undefined,
@@ -149,7 +156,7 @@ formData: OnboardingFormData
  * ```
  */
 export function useOnboardingDraft(
-phoneHash: string | null
+	phoneHash: string | null
 ): UseOnboardingDraftReturn {
 	const { formData, setFormData } = useOnboardingFormStore();
 
@@ -163,9 +170,9 @@ phoneHash: string | null
 
 	// Convex 실시간 구독
 	const draft = useQuery(
-api.onboardingDrafts.getByPhoneHash,
-phoneHash ? { phoneHash } : "skip"
-);
+		api.onboardingDrafts.getByPhoneHash,
+		phoneHash ? { phoneHash } : "skip"
+	);
 
 	// Mutations
 	const upsertDraft = useMutation(api.onboardingDrafts.upsert);
@@ -176,27 +183,47 @@ phoneHash ? { phoneHash } : "skip"
 	const isDraftReady = phoneHash !== null && draft !== undefined;
 
 	/**
-	 * Draft 데이터를 폼에 적용
+	 * Draft 데이터를 폼에 적용 (복호화 포함)
 	 */
-	const hydrateFormFromDraft = useCallback(() => {
+	const hydrateFormFromDraft = useCallback(async () => {
 		if (!draft) {
 			return false;
 		}
 
-		const draftData = mapDraftToFormData(draft);
-		const hasData = Object.keys(draftData).length > 0;
+		try {
+			// 암호화된 개인정보가 있으면 복호화
+			let decryptedData: { name?: string; phone?: string } | undefined;
 
-		if (hasData) {
-			setFormData(draftData);
+			if (draft.encryptedName || draft.encryptedPhone) {
+				const result = await decryptDraftPersonalInfoServer({
+					data: {
+						encryptedName: draft.encryptedName,
+						encryptedPhone: draft.encryptedPhone,
+					},
+				});
+				if (result.success) {
+					decryptedData = result.data;
+				}
+			}
+
+			const draftData = mapDraftToFormData(draft, decryptedData);
+			const hasData = Object.keys(draftData).length > 0;
+
+			if (hasData) {
+				setFormData(draftData);
+			}
+			return hasData;
+		} catch (err) {
+			console.error("[Draft] Failed to hydrate:", err);
+			return false;
 		}
-		return hasData;
 	}, [draft, setFormData]);
 
 	/**
 	 * 현재 폼 데이터를 서버에 저장 (디바운스)
 	 */
 	const saveDraft = useCallback(
-(currentStep: StepSlug) => {
+		(currentStep: StepSlug) => {
 			if (!phoneHash) {
 				return;
 			}
@@ -215,9 +242,31 @@ phoneHash ? { phoneHash } : "skip"
 
 				setIsSaving(true);
 				try {
+					// 개인정보 암호화
+					let encryptedData:
+						| { encryptedName?: string; encryptedPhone?: string }
+						| undefined;
+
+					if (formData.name || formData.phone) {
+						const result = await encryptDraftPersonalInfoServer({
+							data: {
+								name: formData.name || undefined,
+								phone: formData.phone || undefined,
+							},
+						});
+						if (result.success) {
+							encryptedData = result.data;
+						}
+					}
+
 					await upsertDraft(
-mapFormDataToDraftArgs(phoneHash, currentStep, formData)
-);
+						mapFormDataToDraftArgs(
+							phoneHash,
+							currentStep,
+							formData,
+							encryptedData
+						)
+					);
 					lastSavedDataRef.current = dataHash;
 				} catch (err) {
 					console.error("[Draft] Failed to save:", err);
@@ -233,7 +282,7 @@ mapFormDataToDraftArgs(phoneHash, currentStep, formData)
 	 * 즉시 저장 (스텝 이동 전)
 	 */
 	const saveDraftImmediately = useCallback(
-async (currentStep: StepSlug) => {
+		async (currentStep: StepSlug) => {
 			if (!phoneHash) {
 				return;
 			}
@@ -250,9 +299,31 @@ async (currentStep: StepSlug) => {
 
 			setIsSaving(true);
 			try {
+				// 개인정보 암호화
+				let encryptedData:
+					| { encryptedName?: string; encryptedPhone?: string }
+					| undefined;
+
+				if (formData.name || formData.phone) {
+					const result = await encryptDraftPersonalInfoServer({
+						data: {
+							name: formData.name || undefined,
+							phone: formData.phone || undefined,
+						},
+					});
+					if (result.success) {
+						encryptedData = result.data;
+					}
+				}
+
 				await upsertDraft(
-mapFormDataToDraftArgs(phoneHash, currentStep, formData)
-);
+					mapFormDataToDraftArgs(
+						phoneHash,
+						currentStep,
+						formData,
+						encryptedData
+					)
+				);
 				lastSavedDataRef.current = dataHash;
 			} catch (err) {
 				const e = err instanceof Error ? err : new Error(String(err));
@@ -292,7 +363,7 @@ mapFormDataToDraftArgs(phoneHash, currentStep, formData)
 
 	// 클린업
 	useEffect(
-() => () => {
+		() => () => {
 			if (saveTimeoutRef.current) {
 				clearTimeout(saveTimeoutRef.current);
 			}

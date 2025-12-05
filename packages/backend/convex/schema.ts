@@ -130,11 +130,11 @@ export default defineSchema({
 		/** 마지막 수정 시간 */
 		lastUpdatedAt: v.number(),
 
-		/** 이름 (평문 - 최종 제출 시에만 암호화) */
-		name: v.optional(v.string()),
+		/** 암호화된 이름 (JSON: {ciphertext, iv}) */
+		encryptedName: v.optional(v.string()),
 
-		/** 전화번호 (평문 - 최종 제출 시에만 암호화) */
-		phone: v.optional(v.string()),
+		/** 암호화된 전화번호 (JSON: {ciphertext, iv}) */
+		encryptedPhone: v.optional(v.string()),
 
 		/** 성별 */
 		gender: v.optional(genderType),

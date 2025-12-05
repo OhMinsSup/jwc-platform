@@ -27,7 +27,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { getPhoneHashServer } from "@/lib/crypto-server";
 import { useOnboardingFormStore } from "@/lib/onboarding-form-store";
 import type { OnboardingSearchParams } from "@/routes/onboarding/route";

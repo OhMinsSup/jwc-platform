@@ -18,7 +18,7 @@ import {
 	FormProvider,
 	useFormContext,
 } from "react-hook-form";
-import type { ZodType } from "zod";
+import type { ZodType } from "zod/v4";
 
 const Form = FormProvider;
 
