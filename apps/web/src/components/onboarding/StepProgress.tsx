@@ -18,20 +18,23 @@ const FORM_STEPS: StepSlug[] = [
 ];
 
 function getIndicatorColor(isCompleted: boolean, isCurrent: boolean): string {
-	if (isCompleted || isCurrent) {
-		return "hsl(var(--primary))";
+	if (isCompleted) {
+		return "hsl(var(--primary))"; // 완료: 진한 primary
 	}
-	return "hsl(var(--muted))";
+	if (isCurrent) {
+		return "hsl(var(--primary) / 0.7)"; // 현재: 중간 톤
+	}
+	return "hsl(var(--muted))"; // 미진행: 연한 muted
 }
 
 function getLabelClassName(isCurrent: boolean, isCompleted: boolean): string {
-	if (isCurrent) {
-		return "text-primary";
-	}
 	if (isCompleted) {
-		return "text-foreground";
+		return "text-foreground font-semibold opacity-100"; // 완료: 진하게
 	}
-	return "text-muted-foreground";
+	if (isCurrent) {
+		return "text-primary font-medium opacity-90"; // 현재: 강조색 + 중간
+	}
+	return "text-muted-foreground font-normal opacity-50"; // 미진행: 연하게
 }
 
 interface StepIndicatorProps {
@@ -59,9 +62,12 @@ function StepIndicator({
 					}}
 					className={cn(
 						"relative flex h-8 w-8 items-center justify-center rounded-full font-medium text-xs",
-						isCompleted || isCurrent
-							? "text-primary-foreground"
-							: "text-muted-foreground"
+						isCompleted
+							? "text-primary-foreground" // 완료: 진한 배경 + 밝은 글자
+							: // biome-ignore lint/style/noNestedTernary: <explanation> It's more readable this way.</explanation>
+								isCurrent
+								? "text-primary-foreground" // 현재: 중간 배경 + 밝은 글자
+								: "text-muted-foreground/60" // 미진행: 연한 배경 + 연한 글자
 					)}
 					initial={false}
 					transition={{ duration: 0.2 }}
@@ -72,10 +78,17 @@ function StepIndicator({
 							initial={{ scale: 0 }}
 							transition={{ type: "spring", stiffness: 300, damping: 20 }}
 						>
-							<Check className="h-4 w-4" />
+							<Check
+								className={cn(
+									"h-4 w-4",
+									getLabelClassName(isCurrent, isCompleted)
+								)}
+							/>
 						</motion.div>
 					) : (
-						<span>{index + 1}</span>
+						<span className={cn(getLabelClassName(isCurrent, isCompleted))}>
+							{index + 1}
+						</span>
 					)}
 				</motion.div>
 				<span

@@ -10,7 +10,7 @@ import {
 } from "@jwc/schema";
 import { Button, cn } from "@jwc/ui";
 import { useNavigate } from "@tanstack/react-router";
-import { useMutation } from "convex/react";
+import { useAction } from "convex/react";
 import { format, parseISO } from "date-fns";
 import { ko } from "date-fns/locale";
 import type { Variants } from "framer-motion";
@@ -26,7 +26,6 @@ import {
 	Users,
 } from "lucide-react";
 import { useState } from "react";
-import { encryptPersonalInfoServer } from "@/lib/crypto-server";
 import {
 	type StepSlug,
 	useOnboardingFormStore,
@@ -111,7 +110,7 @@ export function ConfirmStep() {
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
-	const upsertApplication = useMutation(api.onboarding.upsert);
+	const upsert = useAction(api.onboardingActions.upsert);
 
 	const handleBack = async () => {
 		setCurrentStep("additional");
@@ -142,24 +141,10 @@ export function ConfirmStep() {
 		setError(null);
 
 		try {
-			// 서버에서 개인정보 암호화
-			const encryptResult = await encryptPersonalInfoServer({
-				data: {
-					name: personalInfo.name,
-					phone: personalInfo.phone,
-				},
-			});
-
-			if (!encryptResult.success) {
-				throw new Error("개인정보 암호화에 실패했습니다.");
-			}
-
-			const encryptedInfo = encryptResult.data;
-
-			await upsertApplication({
-				encryptedName: encryptedInfo.encryptedName,
-				encryptedPhone: encryptedInfo.encryptedPhone,
-				phoneHash: encryptedInfo.phoneHash,
+			// 평문 데이터를 직접 전달 (암호화는 Convex action 내부에서 처리)
+			await upsert({
+				name: personalInfo.name,
+				phone: personalInfo.phone,
 				gender: personalInfo.gender,
 				department: personalInfo.department,
 				ageGroup: personalInfo.ageGroup,

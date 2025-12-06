@@ -6,6 +6,9 @@ settings:
 
 catalogs:
   default:
+    '@better-auth/expo':
+      specifier: 1.3.34
+      version: 1.3.34
     '@convex-dev/better-auth':
       specifier: ^0.9.9
       version: 0.9.9
@@ -15,9 +18,15 @@ catalogs:
     convex:
       specifier: ^1.30.0
       version: 1.30.0
+    postcss:
+      specifier: ^8.5.1
+      version: 8.5.4
     tailwindcss:
       specifier: ^4.1.3
       version: 3.4.17
+    tsdown:
+      specifier: ^0.16.7
+      version: 0.16.7
     typescript:
       specifier: ^5.9.3
       version: 5.9.3
@@ -83,7 +92,7 @@ importers:
     dependencies:
       '@convex-dev/better-auth':
         specifier: 'catalog:'
-        version: 0.9.9(@standard-schema/spec@1.0.0)(better-auth@1.3.34(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(solid-js@1.9.10))(convex@1.30.0(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.3)
+        version: 0.9.9(@standard-schema/spec@1.0.0)(better-auth@1.3.34(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(convex@1.30.0(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.3)
       '@convex-dev/react-query':
         specifier: ^0.1.0
         version: 0.1.0(@tanstack/react-query@5.90.11(react@19.2.0))(convex@1.30.0(react@19.2.0))
@@ -214,12 +223,24 @@ importers:
       '@convex-dev/better-auth':
         specifier: 'catalog:'
         version: 0.9.9(@standard-schema/spec@1.0.0)(better-auth@1.3.34(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(convex@1.30.0(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.3)
+      '@convex-dev/workpool':
+        specifier: ^0.3.0
+        version: 0.3.0(convex-helpers@0.1.106(@standard-schema/spec@1.0.0)(convex@1.30.0(react@19.2.0))(react@19.2.0)(typescript@5.9.3)(zod@3.25.76))(convex@1.30.0(react@19.2.0))
+      '@jwc/spreadsheet':
+        specifier: workspace:*
+        version: link:../spreadsheet
+      '@jwc/utils':
+        specifier: workspace:*
+        version: link:../utils
       better-auth:
         specifier: 'catalog:'
         version: 1.3.34(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(solid-js@1.9.10)
       convex:
         specifier: 'catalog:'
         version: 1.30.0(react@19.2.0)
+      solapi:
+        specifier: ^5.5.3
+        version: 5.5.3
       tsdown:
         specifier: 'catalog:'
         version: 0.16.7(typescript@5.9.3)
@@ -1131,6 +1152,12 @@ packages:
     peerDependencies:
       '@tanstack/react-query': ^5.0.0
       convex: ^1.29.3
+
+  '@convex-dev/workpool@0.3.0':
+    resolution: {integrity: sha512-nY8Ub0pmfuxZ2rcnNwVeESYPyJqLU4h+afodEdg8Ifnr+vcFUuee/p69vMFmeqC2y4yo9IDPHrdiVZVyjbBE7A==}
+    peerDependencies:
+      convex: ^1.24.8
+      convex-helpers: ^0.1.94
 
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -6759,6 +6786,10 @@ packages:
     resolution: {integrity: sha512-D3YaD0aRxR3mEcqnidIs7ReYJFVzWdd6fXJYUM8ixcQcJRGTka/b3saV0KflYhyVJXKhb947GndU35SxYNResQ==}
     engines: {node: '>= 10.0.0', npm: '>= 3.0.0'}
 
+  solapi@5.5.3:
+    resolution: {integrity: sha512-LQWEGZvaYSclJ1QznVK0GPrjamXr56rxEugDtPU3NZuPsTS+Ob6j/+N2xPHy8rrAtexb0fVGlwl6KR4vmDxN3A==}
+    engines: {node: '>=18'}
+
   solid-js@1.9.10:
     resolution: {integrity: sha512-Coz956cos/EPDlhs6+jsdTxKuJDPT7B5SVIWgABwROyxjY7Xbr8wkzD68Et+NxnV7DLJ3nJdAC2r9InuV/4Jew==}
 
@@ -8369,24 +8400,6 @@ snapshots:
       picocolors: 1.1.1
       sisteransi: 1.0.5
 
-  '@convex-dev/better-auth@0.9.9(@standard-schema/spec@1.0.0)(better-auth@1.3.34(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(solid-js@1.9.10))(convex@1.30.0(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.3)':
-    dependencies:
-      better-auth: 1.3.34(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(solid-js@1.9.10)
-      common-tags: 1.8.2
-      convex: 1.30.0(react@19.2.0)
-      convex-helpers: 0.1.106(@standard-schema/spec@1.0.0)(convex@1.30.0(react@19.2.0))(react@19.2.0)(typescript@5.9.3)(zod@3.25.76)
-      jose: 6.1.2
-      react: 19.2.0
-      react-dom: 19.2.0(react@19.2.0)
-      remeda: 2.32.0
-      semver: 7.7.3
-      type-fest: 4.41.0
-      zod: 3.25.76
-    transitivePeerDependencies:
-      - '@standard-schema/spec'
-      - hono
-      - typescript
-
   '@convex-dev/better-auth@0.9.9(@standard-schema/spec@1.0.0)(better-auth@1.3.34(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(convex@1.30.0(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.3)':
     dependencies:
       better-auth: 1.3.34(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(solid-js@1.9.10)
@@ -8409,6 +8422,11 @@ snapshots:
     dependencies:
       '@tanstack/react-query': 5.90.11(react@19.2.0)
       convex: 1.30.0(react@19.2.0)
+
+  '@convex-dev/workpool@0.3.0(convex-helpers@0.1.106(@standard-schema/spec@1.0.0)(convex@1.30.0(react@19.2.0))(react@19.2.0)(typescript@5.9.3)(zod@3.25.76))(convex@1.30.0(react@19.2.0))':
+    dependencies:
+      convex: 1.30.0(react@19.2.0)
+      convex-helpers: 0.1.106(@standard-schema/spec@1.0.0)(convex@1.30.0(react@19.2.0))(react@19.2.0)(typescript@5.9.3)(zod@3.25.76)
 
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
@@ -11997,7 +12015,6 @@ snapshots:
     dependencies:
       '@standard-schema/spec': 1.0.0
       fast-check: 3.23.2
-    optional: true
 
   electron-to-chromium@1.5.263: {}
 
@@ -14786,6 +14803,11 @@ snapshots:
     dependencies:
       ip-address: 9.0.5
       smart-buffer: 4.2.0
+
+  solapi@5.5.3:
+    dependencies:
+      date-fns: 4.1.0
+      effect: 3.19.8
 
   solid-js@1.9.10:
     dependencies:
