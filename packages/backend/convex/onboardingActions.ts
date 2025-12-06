@@ -129,3 +129,75 @@ export const getByPhone = action({
 		});
 	},
 });
+
+/** 복호화된 신청서 정보 */
+export interface DecryptedOnboarding {
+	_id: Id<"onboarding">;
+	_creationTime: number;
+	name: string;
+	phone: string;
+	gender: "male" | "female";
+	department: "youth1" | "youth2" | "other";
+	ageGroup: string;
+	stayType: "3nights4days" | "2nights3days" | "1night2days" | "dayTrip";
+	attendanceDate?: string;
+	pickupTimeDescription?: string;
+	isPaid: boolean;
+	tfTeam?: "none" | "praise" | "program" | "media";
+	canProvideRide?: boolean;
+	rideDetails?: string;
+	tshirtSize?: "s" | "m" | "l" | "xl" | "2xl" | "3xl";
+}
+
+/**
+ * ID로 신청서 조회 (복호화 포함)
+ * - 암호화된 이름/전화번호를 복호화하여 반환
+ */
+export const getByIdDecrypted = action({
+	args: {
+		id: v.id("onboarding"),
+	},
+	handler: async (ctx, args): Promise<DecryptedOnboarding | null> => {
+		const AES_KEY = process.env.AES_KEY;
+		if (!AES_KEY) {
+			throw new Error("AES_KEY is not configured in environment variables");
+		}
+
+		const onboarding = await ctx.runQuery(internal.onboarding.getByIdInternal, {
+			id: args.id,
+		});
+
+		if (!onboarding) {
+			return null;
+		}
+
+		// 동적 import로 crypto 함수 가져오기
+		const { deriveKey, decryptPersonalInfo, stringToEncryptedData } =
+			await import("@jwc/utils/crypto");
+
+		const key = await deriveKey(AES_KEY);
+		const { name, phone } = await decryptPersonalInfo(
+			stringToEncryptedData(onboarding.name),
+			stringToEncryptedData(onboarding.phone),
+			key
+		);
+
+		return {
+			_id: onboarding._id,
+			_creationTime: onboarding._creationTime,
+			name,
+			phone,
+			gender: onboarding.gender,
+			department: onboarding.department,
+			ageGroup: onboarding.ageGroup,
+			stayType: onboarding.stayType,
+			attendanceDate: onboarding.attendanceDate,
+			pickupTimeDescription: onboarding.pickupTimeDescription,
+			isPaid: onboarding.isPaid,
+			tfTeam: onboarding.tfTeam,
+			canProvideRide: onboarding.canProvideRide,
+			rideDetails: onboarding.rideDetails,
+			tshirtSize: onboarding.tshirtSize,
+		};
+	},
+});
