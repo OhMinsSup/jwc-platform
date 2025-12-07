@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { internalMutation, internalQuery, query } from "./_generated/server";
-import { smsPool } from "./lib/workpool";
+import { smsPool, spreadsheetPool } from "./lib/workpool";
 
 /** 성별 */
 const genderValidator = v.union(v.literal("male"), v.literal("female"));
@@ -49,6 +49,14 @@ const encryptedDataValidator = v.object({
  * 모든 수련회 신청서 조회
  */
 export const getAll = query({
+	handler: async (ctx) => await ctx.db.query("onboarding").collect(),
+});
+
+/**
+ * 모든 수련회 신청서 조회 (Internal)
+ * - Node.js 액션에서 호출 가능
+ */
+export const getAllInternal = internalQuery({
 	handler: async (ctx) => await ctx.db.query("onboarding").collect(),
 });
 
@@ -141,6 +149,20 @@ export const upsertInternal = internalMutation({
 				rideDetails: args.rideDetails,
 				tshirtSize: args.tshirtSize,
 			});
+
+			await spreadsheetPool.enqueueAction(
+				ctx,
+				internal.spreadsheet.syncAllToGoogleSheets,
+				{},
+				{
+					onComplete: internal.spreadsheetHandlers.onSpreadsheetSyncComplete,
+					context: {
+						type: "onboarding-sync",
+						onboardingId: existing._id,
+					},
+				}
+			);
+
 			return { isNew: false, id: existing._id };
 		}
 
@@ -171,6 +193,19 @@ export const upsertInternal = internalMutation({
 				onComplete: internal.smsHandlers.onSmsComplete,
 				context: {
 					type: "onboarding-welcome",
+					onboardingId: newId,
+				},
+			}
+		);
+
+		await spreadsheetPool.enqueueAction(
+			ctx,
+			internal.spreadsheet.syncAllToGoogleSheets,
+			{},
+			{
+				onComplete: internal.spreadsheetHandlers.onSpreadsheetSyncComplete,
+				context: {
+					type: "onboarding-sync",
 					onboardingId: newId,
 				},
 			}

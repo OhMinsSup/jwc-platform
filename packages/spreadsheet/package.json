@@ -15,7 +15,6 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@jwc/env": "workspace:*",
     "@jwc/utils": "workspace:*",
     "exceljs": "^4.4.0",
     "google-auth-library": "^10.5.0",

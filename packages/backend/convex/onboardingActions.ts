@@ -7,7 +7,13 @@
  * - 개인정보 암호화 처리
  */
 
-import { deriveKey, encryptPersonalInfo, hashPhone } from "@jwc/utils/crypto";
+import {
+	decryptPersonalInfo,
+	deriveKey,
+	encryptPersonalInfo,
+	hashPhone,
+	stringToEncryptedData,
+} from "@jwc/utils/crypto";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
@@ -170,10 +176,6 @@ export const getByIdDecrypted = action({
 		if (!onboarding) {
 			return null;
 		}
-
-		// 동적 import로 crypto 함수 가져오기
-		const { deriveKey, decryptPersonalInfo, stringToEncryptedData } =
-			await import("@jwc/utils/crypto");
 
 		const key = await deriveKey(AES_KEY);
 		const { name, phone } = await decryptPersonalInfo(

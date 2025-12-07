@@ -11,11 +11,6 @@ import type {
 	IGoogleSheetsClient,
 	IGoogleSheetsConfig,
 } from "../core/interfaces";
-import { env } from "../env";
-
-// ============================================================================
-// 타입 정의
-// ============================================================================
 
 /**
  * Google Sheets 테이블 정보
@@ -41,10 +36,6 @@ export interface SheetMetadata {
 	table?: GoogleSheetsTable | null;
 }
 
-// ============================================================================
-// Google Sheets 클라이언트 구현
-// ============================================================================
-
 /**
  * Google Sheets API 클라이언트
  * IGoogleSheetsClient 인터페이스를 구현합니다.
@@ -56,11 +47,11 @@ export class GoogleSheetsClient implements IGoogleSheetsClient {
 
 	constructor(config?: Partial<IGoogleSheetsConfig>) {
 		this.config = {
-			spreadsheetId: config?.spreadsheetId || env.GOOGLE_SHEET_ID,
-			sheetName: config?.sheetName || env.GOOGLE_SHEET_TITLE,
+			spreadsheetId: config?.spreadsheetId || process.env.GOOGLE_SHEET_ID,
+			sheetName: config?.sheetName || process.env.GOOGLE_SHEET_TITLE,
 			credentials: config?.credentials || {
-				clientEmail: env.GOOGLE_CLIENT_EMAIL,
-				privateKey: env.GOOGLE_PRIVATE_KEY,
+				clientEmail: process.env.GOOGLE_CLIENT_EMAIL,
+				privateKey: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
 			},
 		};
 

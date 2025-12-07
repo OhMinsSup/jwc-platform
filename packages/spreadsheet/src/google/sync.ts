@@ -13,20 +13,12 @@ import type {
 import { SchemaBasedTransformer } from "../core/transformer";
 import { GoogleSheetsClient, type GoogleSheetsTable } from "./client";
 
-// ============================================================================
-// Google Sheets 동기화 결과 타입
-// ============================================================================
-
 export interface GoogleSheetsSyncResult {
 	success: boolean;
 	rowCount: number;
 	sheetId?: number;
 	error?: string;
 }
-
-// ============================================================================
-// 스키마 기반 Google Sheets 동기화 관리자
-// ============================================================================
 
 /**
  * 스키마 기반 Google Sheets 동기화 관리자
@@ -44,6 +36,14 @@ export class GoogleSheetsSyncer<T = Record<string, unknown>>
 	constructor(config?: Partial<IGoogleSheetsConfig>) {
 		this.client = new GoogleSheetsClient(config);
 		const clientConfig = this.client.getConfig();
+		if (!clientConfig.spreadsheetId) {
+			throw new Error("Google Sheets 스프레드시트 ID가 설정되지 않았습니다.");
+		}
+
+		if (!clientConfig.sheetName) {
+			throw new Error("Google Sheets 시트 이름이 설정되지 않았습니다.");
+		}
+
 		this.spreadsheetId = clientConfig.spreadsheetId;
 		this.sheetName = clientConfig.sheetName;
 	}
@@ -167,6 +167,7 @@ export class GoogleSheetsSyncer<T = Record<string, unknown>>
 		const columnProperties = this.schema.columns.map((col, idx) => {
 			const columnDef: sheets_v4.Schema$TableColumnProperties = {
 				columnName: col.header,
+				columnType: col.type,
 				columnIndex: idx,
 			};
 

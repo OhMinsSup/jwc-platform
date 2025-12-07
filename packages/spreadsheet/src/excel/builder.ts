@@ -9,10 +9,6 @@ import ExcelJS from "exceljs";
 import type { IColumnDefinition, ISpreadsheetSchema } from "../core/interfaces";
 import { SchemaBasedTransformer } from "../core/transformer";
 
-// ============================================================================
-// 스타일 설정 상수
-// ============================================================================
-
 const STYLES = {
 	header: {
 		font: { bold: true, color: { argb: "FFFFFFFF" }, size: 11 },
@@ -47,10 +43,6 @@ const STYLES = {
 		},
 	},
 } as const;
-
-// ============================================================================
-// Excel 스타일러 구현
-// ============================================================================
 
 /**
  * Excel 셀 스타일 관리자
@@ -120,10 +112,6 @@ export class ExcelStyler {
 		this.worksheet.views = [{ state: "frozen", ySplit: rowCount }];
 	}
 }
-
-// ============================================================================
-// Excel 빌더 구현
-// ============================================================================
 
 /**
  * 스키마 기반 Excel 빌더

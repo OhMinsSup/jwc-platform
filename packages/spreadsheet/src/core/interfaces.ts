@@ -7,10 +7,6 @@
 
 import type * as Excel from "exceljs";
 
-// ============================================================================
-// 기본 타입 정의
-// ============================================================================
-
 /**
  * 스프레드시트 컬럼 타입
  * Excel과 Google Sheets에서 공통으로 사용되는 타입
@@ -62,10 +58,6 @@ export interface ISpreadsheetSchema<T = Record<string, unknown>> {
 	/** 기본 시트명 */
 	defaultSheetName?: string;
 }
-
-// ============================================================================
-// 데이터 변환 인터페이스
-// ============================================================================
 
 /**
  * 데이터 변환기 인터페이스
@@ -209,12 +201,12 @@ export interface IExcelBuilder<T = Record<string, unknown>> {
  * Google Sheets 설정
  */
 export interface IGoogleSheetsConfig {
-	spreadsheetId: string;
-	sheetName: string;
-	credentials?: {
+	spreadsheetId?: string;
+	sheetName?: string;
+	credentials?: Partial<{
 		clientEmail: string;
 		privateKey: string;
-	};
+	}>;
 }
 
 /**
@@ -291,10 +283,6 @@ export interface IGoogleSheetsSyncer<T = Record<string, unknown>> {
 	 */
 	sync(): Promise<{ success: boolean; rowCount: number }>;
 }
-
-// ============================================================================
-// 통합 스프레드시트 인터페이스
-// ============================================================================
 
 /**
  * 스프레드시트 실행 결과
@@ -384,10 +372,6 @@ export interface ISpreadsheetBuilder<T = Record<string, unknown>> {
 	 */
 	dispose(): void;
 }
-
-// ============================================================================
-// 스키마 팩토리 인터페이스
-// ============================================================================
 
 /**
  * 스키마 레지스트리 인터페이스
