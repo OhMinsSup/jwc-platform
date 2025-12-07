@@ -90,10 +90,6 @@ export interface TemplateMessageOptions extends BaseMessageOptions {
 	variables?: TemplateVariables;
 }
 
-// ============================================================
-// Message Templates
-// ============================================================
-
 /** 메시지 템플릿 정의 */
 export interface MessageTemplate {
 	/** 템플릿 이름 (관리용) */
@@ -136,10 +132,6 @@ export const MESSAGE_TEMPLATES: Record<string, MessageTemplate> = {
 		text: "[청년부 수련회]\n{{name}}님, 수련회 회비 납입 안내드립니다.\n\n금액: {{amount}}원\n계좌: {{account}}\n\n감사합니다!",
 	},
 };
-
-// ============================================================
-// Utility Functions
-// ============================================================
 
 /**
  * 전화번호 정규화 (하이픈 제거)
@@ -304,10 +296,6 @@ export function createSolapiClient(config: SolapiClientConfig): SolapiClient {
 		},
 	};
 }
-
-// ============================================================
-// Factory with Environment Variables
-// ============================================================
 
 let _cachedClient: SolapiClient | null = null;
 

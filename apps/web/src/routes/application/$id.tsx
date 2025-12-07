@@ -407,7 +407,7 @@ function ApplicationDetailPage() {
 	}
 
 	return (
-		<div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+		<div className="bg-gradient-to-b from-background to-muted/20">
 			{/* 헤더 */}
 			<header className="sticky top-0 z-50 border-border/40 border-b bg-background/80 backdrop-blur-lg">
 				<div className="container mx-auto flex h-14 max-w-2xl items-center px-4">

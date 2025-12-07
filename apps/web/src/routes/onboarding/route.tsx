@@ -102,7 +102,7 @@ function NavigationHeader() {
 						<ArrowLeft className="h-5 w-5" />
 					</Button>
 				) : (
-					<Link to="/">
+					<Link to="/onboarding">
 						<Button size="icon" variant="ghost">
 							<Home className="h-5 w-5" />
 						</Button>
