@@ -12,7 +12,6 @@ import {
 	deriveKey,
 	stringToEncryptedData,
 } from "@jwc/utils/crypto";
-import { dayjs } from "@jwc/utils/date";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { internalAction } from "./_generated/server";
@@ -72,27 +71,12 @@ export const sendOnboardingWelcome = internalAction({
 					onboarding.stayType as keyof typeof STAY_TYPE_LABELS
 				] ?? onboarding.stayType;
 
-			// 참석 날짜/시간 정보 (부분참일 경우에만 표시)
-			let attendanceInfo = "";
-			if (onboarding.stayType !== "3nights4days" && onboarding.attendanceDate) {
-				const _attendanceDate = onboarding.attendanceDate;
-				const attendanceDate = _attendanceDate
-					? dayjs(_attendanceDate).format("YYYY년 MM월 DD일 (ddd) HH:mm")
-					: "";
-
-				attendanceInfo = `⏰ 참석일: ${attendanceDate}\n`;
-				if (onboarding.pickupTimeDescription) {
-					attendanceInfo += `🚗 픽업시간: ${onboarding.pickupTimeDescription}\n`;
-				}
-			}
-
 			// 사이트 URL (환경변수 또는 기본값)
 			const siteUrl = `${process.env.SITE_URL}/application/${args.onboardingId}`;
 
 			const text = interpolateTemplate(template.text, {
 				name,
 				stayType: stayTypeLabel,
-				attendanceInfo,
 				siteUrl,
 			});
 
