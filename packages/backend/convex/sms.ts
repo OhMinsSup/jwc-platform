@@ -10,7 +10,7 @@
 import {
 	decryptPersonalInfo,
 	deriveKey,
-	stringToEncryptedData,
+	type EncryptedData,
 } from "@jwc/utils/crypto";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
@@ -55,8 +55,8 @@ export const sendOnboardingWelcome = internalAction({
 
 			// 암호화된 데이터 복호화
 			const { name, phone } = await decryptPersonalInfo(
-				stringToEncryptedData(onboarding.name),
-				stringToEncryptedData(onboarding.phone),
+				onboarding.name as unknown as EncryptedData,
+				onboarding.phone as unknown as EncryptedData,
 				key
 			);
 

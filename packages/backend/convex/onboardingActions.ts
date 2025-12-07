@@ -12,9 +12,9 @@ import {
 	deriveKey,
 	encryptPersonalInfo,
 	hashPhone,
-	stringToEncryptedData,
 } from "@jwc/utils/crypto";
 import { v } from "convex/values";
+import type { EncryptedData } from "../../utils/src/crypto";
 import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
 import { action } from "./_generated/server";
@@ -179,8 +179,8 @@ export const getByIdDecrypted = action({
 
 		const key = await deriveKey(AES_KEY);
 		const { name, phone } = await decryptPersonalInfo(
-			stringToEncryptedData(onboarding.name),
-			stringToEncryptedData(onboarding.phone),
+			onboarding.name as unknown as EncryptedData,
+			onboarding.phone as unknown as EncryptedData,
 			key
 		);
 

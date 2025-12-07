@@ -9,12 +9,9 @@
  */
 
 import { defineSchema, syncToGoogleSheets } from "@jwc/spreadsheet";
-import {
-	decryptPersonalInfo,
-	deriveKey,
-	stringToEncryptedData,
-} from "@jwc/utils/crypto";
+import { decryptPersonalInfo, deriveKey } from "@jwc/utils/crypto";
 import { dayjs } from "@jwc/utils/date";
+import type { EncryptedData } from "../../utils/src/crypto";
 import { internal } from "./_generated/api";
 import type { Doc } from "./_generated/dataModel";
 import { internalAction } from "./_generated/server";
@@ -101,8 +98,8 @@ async function decryptAndTransformOnboarding(
 ): Promise<SpreadsheetRow | null> {
 	try {
 		const decryptedInfo = await decryptPersonalInfo(
-			stringToEncryptedData(onboarding.name),
-			stringToEncryptedData(onboarding.phone),
+			onboarding.name as unknown as EncryptedData,
+			onboarding.phone as unknown as EncryptedData,
 			key
 		);
 		return transformToSpreadsheetRow(onboarding, decryptedInfo);

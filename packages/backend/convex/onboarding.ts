@@ -136,8 +136,8 @@ export const upsertInternal = internalMutation({
 		if (existing) {
 			// 기존 신청서가 있으면 수정 (회비 납입 상태는 유지)
 			await ctx.db.patch(existing._id, {
-				name: JSON.stringify(args.encryptedName),
-				phone: JSON.stringify(args.encryptedPhone),
+				name: args.encryptedName,
+				phone: args.encryptedPhone,
 				gender: args.gender,
 				department: args.department,
 				ageGroup: args.ageGroup,
@@ -168,8 +168,8 @@ export const upsertInternal = internalMutation({
 
 		// 신규 생성
 		const newId = await ctx.db.insert("onboarding", {
-			name: JSON.stringify(args.encryptedName),
-			phone: JSON.stringify(args.encryptedPhone),
+			name: args.encryptedName,
+			phone: args.encryptedPhone,
 			phoneHash: args.phoneHash,
 			gender: args.gender,
 			department: args.department,

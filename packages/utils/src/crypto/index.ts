@@ -17,6 +17,7 @@ export interface EncryptedData {
 	ciphertext: string;
 	/** 초기화 벡터 (Base64) */
 	iv: string;
+	[key: string]: string;
 }
 
 export interface EncryptedPersonalInfo {
@@ -65,44 +66,44 @@ function arrayBufferToString(buffer: ArrayBuffer): string {
  */
 export async function deriveKey(secret: string): Promise<NodeCryptoKey> {
 	const keyMaterial = await crypto.subtle.importKey(
-"raw",
-stringToUint8Array(secret),
-"PBKDF2",
-false,
-["deriveKey"]
-);
+		"raw",
+		stringToUint8Array(secret),
+		"PBKDF2",
+		false,
+		["deriveKey"]
+	);
 
 	return crypto.subtle.deriveKey(
-{
-name: "PBKDF2",
-// 고정된 salt 사용 (동일한 비밀키로 동일한 암호화 키 생성)
-salt: stringToUint8Array("jwc-form-salt-v1"),
-iterations: 100_000,
-hash: "SHA-256",
-},
-keyMaterial,
-{ name: ALGORITHM, length: KEY_LENGTH },
-false,
-["encrypt", "decrypt"]
-);
+		{
+			name: "PBKDF2",
+			// 고정된 salt 사용 (동일한 비밀키로 동일한 암호화 키 생성)
+			salt: stringToUint8Array("jwc-form-salt-v1"),
+			iterations: 100_000,
+			hash: "SHA-256",
+		},
+		keyMaterial,
+		{ name: ALGORITHM, length: KEY_LENGTH },
+		false,
+		["encrypt", "decrypt"]
+	);
 }
 
 /**
  * 데이터 암호화
  */
 export async function encrypt(
-plaintext: string,
-key: NodeCryptoKey
+	plaintext: string,
+	key: NodeCryptoKey
 ): Promise<EncryptedData> {
 	// 랜덤 IV 생성
 	const iv = crypto.getRandomValues(new Uint8Array(IV_LENGTH));
 
 	// 암호화
 	const ciphertext = await crypto.subtle.encrypt(
-{ name: ALGORITHM, iv },
-key,
-stringToUint8Array(plaintext)
-);
+		{ name: ALGORITHM, iv },
+		key,
+		stringToUint8Array(plaintext)
+	);
 
 	return {
 		ciphertext: uint8ArrayToBase64(new Uint8Array(ciphertext)),
@@ -114,17 +115,17 @@ stringToUint8Array(plaintext)
  * 데이터 복호화
  */
 export async function decrypt(
-encryptedData: EncryptedData,
-key: NodeCryptoKey
+	encryptedData: EncryptedData,
+	key: NodeCryptoKey
 ): Promise<string> {
 	const iv = base64ToUint8Array(encryptedData.iv);
 	const ciphertext = base64ToUint8Array(encryptedData.ciphertext);
 
 	const plaintext = await crypto.subtle.decrypt(
-{ name: ALGORITHM, iv },
-key,
-ciphertext
-);
+		{ name: ALGORITHM, iv },
+		key,
+		ciphertext
+	);
 
 	return arrayBufferToString(plaintext);
 }
@@ -135,9 +136,9 @@ ciphertext
  */
 export async function hash(data: string): Promise<string> {
 	const hashBuffer = await crypto.subtle.digest(
-"SHA-256",
-stringToUint8Array(data)
-);
+		"SHA-256",
+		stringToUint8Array(data)
+	);
 	return uint8ArrayToBase64(new Uint8Array(hashBuffer));
 }
 
@@ -154,15 +155,15 @@ export function hashPhone(phone: string): Promise<string> {
  * 개인정보 암호화 (이름, 전화번호)
  */
 export async function encryptPersonalInfo(
-name: string,
-phone: string,
-key: NodeCryptoKey
+	name: string,
+	phone: string,
+	key: NodeCryptoKey
 ): Promise<EncryptedPersonalInfo> {
 	const [encryptedName, encryptedPhone, phoneHash] = await Promise.all([
-encrypt(name, key),
-encrypt(phone, key),
-hashPhone(phone),
-]);
+		encrypt(name, key),
+		encrypt(phone, key),
+		hashPhone(phone),
+	]);
 
 	return {
 		encryptedName,
@@ -175,14 +176,14 @@ hashPhone(phone),
  * 개인정보 복호화 (이름, 전화번호)
  */
 export async function decryptPersonalInfo(
-encryptedName: EncryptedData,
-encryptedPhone: EncryptedData,
-key: NodeCryptoKey
+	encryptedName: EncryptedData,
+	encryptedPhone: EncryptedData,
+	key: NodeCryptoKey
 ): Promise<{ name: string; phone: string }> {
 	const [name, phone] = await Promise.all([
-decrypt(encryptedName, key),
-decrypt(encryptedPhone, key),
-]);
+		decrypt(encryptedName, key),
+		decrypt(encryptedPhone, key),
+	]);
 
 	return { name, phone };
 }

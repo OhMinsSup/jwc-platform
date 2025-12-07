@@ -52,10 +52,10 @@ export default defineSchema({
 		// ──────────────────────────────────────────────────────
 
 		/** 이름 (암호화됨 - JSON 문자열: {ciphertext, iv}) */
-		name: v.string(),
+		name: v.record(v.string(), v.string()),
 
 		/** 전화번호 (암호화됨 - JSON 문자열: {ciphertext, iv}) */
-		phone: v.string(),
+		phone: v.record(v.string(), v.string()),
 
 		/** 전화번호 해시 (검색/식별용 - SHA-256) */
 		phoneHash: v.string(),
