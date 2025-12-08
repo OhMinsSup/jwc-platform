@@ -5,6 +5,7 @@
  *
  * Node.js 런타임에서 실행됨
  * - SMS 발송 (Workpool 사용)
+ * - 단축 URL 생성
  */
 
 import {
@@ -26,6 +27,7 @@ import {
  * 온보딩 완료 환영 메시지 발송 액션
  * - onboardingId로 DB에서 데이터 조회
  * - 암호화된 이름/전화번호 복호화
+ * - 단축 URL 생성
  * - SMS 발송
  */
 export const sendOnboardingWelcome = internalAction({
@@ -71,8 +73,25 @@ export const sendOnboardingWelcome = internalAction({
 					onboarding.stayType as keyof typeof STAY_TYPE_LABELS
 				] ?? onboarding.stayType;
 
-			// 사이트 URL (환경변수 또는 기본값)
-			const siteUrl = `${process.env.SITE_URL}/application/${args.onboardingId}`;
+			// 사이트 URL 생성
+			const baseUrl =
+				process.env.SITE_URL ?? "https://jwc-platforms.vercel.app";
+			const targetUrl = `${baseUrl}/application/${args.onboardingId}`;
+
+			// 단축 URL 생성
+			const shortUrlResult = await ctx.runMutation(
+				internal.shortUrl.createInternal,
+				{
+					targetUrl,
+					metadata: {
+						type: "onboarding-welcome",
+						onboardingId: args.onboardingId,
+					},
+				}
+			);
+
+			// 단축 URL (예: https://jwc.vercel.app/s/abc123)
+			const siteUrl = `${baseUrl}/s/${shortUrlResult.code}`;
 
 			const text = interpolateTemplate(template.text, {
 				name,

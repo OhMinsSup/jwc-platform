@@ -16,6 +16,7 @@ import type * as lib_solapi from "../lib/solapi.js";
 import type * as lib_workpool from "../lib/workpool.js";
 import type * as onboarding from "../onboarding.js";
 import type * as onboardingActions from "../onboardingActions.js";
+import type * as shortUrl from "../shortUrl.js";
 import type * as sms from "../sms.js";
 import type * as smsHandlers from "../smsHandlers.js";
 import type * as spreadsheet from "../spreadsheet.js";
@@ -37,6 +38,7 @@ declare const fullApi: ApiFromModules<{
   "lib/workpool": typeof lib_workpool;
   onboarding: typeof onboarding;
   onboardingActions: typeof onboardingActions;
+  shortUrl: typeof shortUrl;
   sms: typeof sms;
   smsHandlers: typeof smsHandlers;
   spreadsheet: typeof spreadsheet;

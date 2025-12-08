@@ -113,4 +113,32 @@ export default defineSchema({
 		.index("by_department", ["department"])
 		.index("by_stayType", ["stayType"])
 		.index("by_isPaid", ["isPaid"]),
+
+	/**
+	 * 단축 URL 테이블
+	 * - SMS 등에서 사용할 짧은 URL 관리
+	 */
+	shortUrls: defineTable({
+		/** 단축 코드 (예: "abc123") */
+		code: v.string(),
+
+		/** 원본 URL (리다이렉트 대상) */
+		targetUrl: v.string(),
+
+		/** 생성 시간 */
+		createdAt: v.number(),
+
+		/** 만료 시간 (optional) */
+		expiresAt: v.optional(v.number()),
+
+		/** 메타데이터 (용도, 관련 ID 등) */
+		metadata: v.optional(
+			v.object({
+				type: v.optional(v.string()),
+				onboardingId: v.optional(v.id("onboarding")),
+			})
+		),
+	})
+		.index("by_code", ["code"])
+		.index("by_targetUrl", ["targetUrl"]),
 });

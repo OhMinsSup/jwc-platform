@@ -116,20 +116,7 @@ export const MESSAGE_TEMPLATES: Record<string, MessageTemplate> = {
 신청한 내용은 하단 링크에서 확인하실 수 있습니다.
 
 {{siteUrl}}
-
-감사합니다!`,
-	},
-	"onboarding-confirmation": {
-		name: "온보딩 확인 메시지",
-		text: `[청년부 수련회]
-{{name}}님의 신청 내역입니다.
-
-📅 참석: {{stayType}}
-{{attendanceInfo}}🔗 신청확인: {{siteUrl}}`,
-	},
-	"payment-reminder": {
-		name: "회비 납입 안내",
-		text: "[청년부 수련회]\n{{name}}님, 수련회 회비 납입 안내드립니다.\n\n금액: {{amount}}원\n계좌: {{account}}\n\n감사합니다!",
+`,
 	},
 };
 
