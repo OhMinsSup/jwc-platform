@@ -11,17 +11,19 @@ import { createFileRoute, notFound, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/s/$code")({
 	loader: async ({ params, context }) => {
-		const shortUrl = await context.convexQueryClient.fetchQuery(
-			convexQuery(api.shortUrl.getByCode, { code: params.code })
-		);
+		if (!params.code) {
+			throw notFound();
+		}
+		const query = convexQuery(api.shortUrl.getByCode, { code: params.code });
+		const data = await context.queryClient.ensureQueryData(query);
 
-		if (!shortUrl) {
+		if (!data) {
 			throw notFound();
 		}
 
 		// 서버사이드 리다이렉트
 		throw redirect({
-			href: shortUrl.targetUrl,
+			href: data.targetUrl,
 			statusCode: 302,
 		});
 	},

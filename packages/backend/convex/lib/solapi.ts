@@ -113,8 +113,6 @@ export const MESSAGE_TEMPLATES: Record<string, MessageTemplate> = {
 		name: "온보딩 환영 메시지",
 		text: `[청년부 수련회]
 {{name}}님, 신청이 완료되었습니다!
-신청한 내용은 하단 링크에서 확인하실 수 있습니다.
-
 {{siteUrl}}
 `,
 	},
