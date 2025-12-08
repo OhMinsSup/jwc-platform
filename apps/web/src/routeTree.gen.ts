@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as OnboardingRouteRouteImport } from './routes/onboarding/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApplicationIndexRouteImport } from './routes/application/index'
 import { Route as SCodeRouteImport } from './routes/s/$code'
 import { Route as OnboardingStepRouteImport } from './routes/onboarding/$step'
 import { Route as ApplicationIdRouteImport } from './routes/application/$id'
@@ -24,6 +25,11 @@ const OnboardingRouteRoute = OnboardingRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApplicationIndexRoute = ApplicationIndexRouteImport.update({
+  id: '/application/',
+  path: '/application/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SCodeRoute = SCodeRouteImport.update({
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/application/$id': typeof ApplicationIdRoute
   '/onboarding/$step': typeof OnboardingStepRoute
   '/s/$code': typeof SCodeRoute
+  '/application': typeof ApplicationIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +68,7 @@ export interface FileRoutesByTo {
   '/application/$id': typeof ApplicationIdRoute
   '/onboarding/$step': typeof OnboardingStepRoute
   '/s/$code': typeof SCodeRoute
+  '/application': typeof ApplicationIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
@@ -70,6 +78,7 @@ export interface FileRoutesById {
   '/application/$id': typeof ApplicationIdRoute
   '/onboarding/$step': typeof OnboardingStepRoute
   '/s/$code': typeof SCodeRoute
+  '/application/': typeof ApplicationIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
@@ -80,6 +89,7 @@ export interface FileRouteTypes {
     | '/application/$id'
     | '/onboarding/$step'
     | '/s/$code'
+    | '/application'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -88,6 +98,7 @@ export interface FileRouteTypes {
     | '/application/$id'
     | '/onboarding/$step'
     | '/s/$code'
+    | '/application'
     | '/api/auth/$'
   id:
     | '__root__'
@@ -96,6 +107,7 @@ export interface FileRouteTypes {
     | '/application/$id'
     | '/onboarding/$step'
     | '/s/$code'
+    | '/application/'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
@@ -104,6 +116,7 @@ export interface RootRouteChildren {
   OnboardingRouteRoute: typeof OnboardingRouteRouteWithChildren
   ApplicationIdRoute: typeof ApplicationIdRoute
   SCodeRoute: typeof SCodeRoute
+  ApplicationIndexRoute: typeof ApplicationIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -121,6 +134,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/application/': {
+      id: '/application/'
+      path: '/application'
+      fullPath: '/application'
+      preLoaderRoute: typeof ApplicationIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/s/$code': {
@@ -171,6 +191,7 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingRouteRoute: OnboardingRouteRouteWithChildren,
   ApplicationIdRoute: ApplicationIdRoute,
   SCodeRoute: SCodeRoute,
+  ApplicationIndexRoute: ApplicationIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport

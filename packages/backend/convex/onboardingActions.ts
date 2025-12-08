@@ -136,12 +136,13 @@ export const getByPhone = action({
 	},
 });
 
-/** 복호화된 신청서 정보 */
+/** 복호화된 신청서 정보 (전화번호 마스킹됨) */
 export interface DecryptedOnboarding {
 	_id: Id<"onboarding">;
 	_creationTime: number;
 	name: string;
-	phone: string;
+	/** 마스킹된 전화번호 (010-****-5678) */
+	maskedPhone: string;
 	gender: "male" | "female";
 	department: "youth1" | "youth2" | "other";
 	ageGroup: string;
@@ -156,8 +157,24 @@ export interface DecryptedOnboarding {
 }
 
 /**
- * ID로 신청서 조회 (복호화 포함)
+ * 전화번호 마스킹 (예: 010-1234-5678 → 010-****-5678)
+ */
+function maskPhone(phone: string): string {
+	// 숫자만 추출
+	const digits = phone.replace(/\D/g, "");
+	if (digits.length === 11) {
+		return `${digits.slice(0, 3)}-****-${digits.slice(7)}`;
+	}
+	if (digits.length === 10) {
+		return `${digits.slice(0, 3)}-***-${digits.slice(6)}`;
+	}
+	return "***-****-****";
+}
+
+/**
+ * ID로 신청서 조회 (복호화 포함, 전화번호 마스킹)
  * - 암호화된 이름/전화번호를 복호화하여 반환
+ * - 전화번호는 마스킹 처리됨
  */
 export const getByIdDecrypted = action({
 	args: {
@@ -188,7 +205,7 @@ export const getByIdDecrypted = action({
 			_id: onboarding._id,
 			_creationTime: onboarding._creationTime,
 			name,
-			phone,
+			maskedPhone: maskPhone(phone),
 			gender: onboarding.gender,
 			department: onboarding.department,
 			ageGroup: onboarding.ageGroup,
@@ -201,5 +218,94 @@ export const getByIdDecrypted = action({
 			rideDetails: onboarding.rideDetails,
 			tshirtSize: onboarding.tshirtSize,
 		};
+	},
+});
+
+/** 리스트 아이템 (전화번호 마스킹된 버전) */
+export interface OnboardingListItem {
+	_id: Id<"onboarding">;
+	_creationTime: number;
+	name: string;
+	maskedPhone: string;
+	gender: "male" | "female";
+	department: "youth1" | "youth2" | "other";
+	ageGroup: string;
+	stayType: "3nights4days" | "2nights3days" | "1night2days" | "dayTrip";
+	isPaid: boolean;
+	tfTeam?: "none" | "praise" | "program" | "media";
+	tshirtSize?: "s" | "m" | "l" | "xl" | "2xl" | "3xl";
+}
+
+/**
+ * 신청서 목록 조회 (검색 기능 포함)
+ * - 이름, 전화번호, 부서로 검색 가능
+ * - 전화번호는 마스킹 처리되어 반환
+ */
+export const searchOnboardings = action({
+	args: {
+		searchQuery: v.optional(v.string()),
+		department: v.optional(departmentValidator),
+	},
+	handler: async (ctx, args): Promise<OnboardingListItem[]> => {
+		const AES_KEY = process.env.AES_KEY;
+		if (!AES_KEY) {
+			throw new Error("AES_KEY is not configured in environment variables");
+		}
+
+		// 전체 데이터 조회
+		let onboardings = await ctx.runQuery(internal.onboarding.getAllInternal);
+
+		// 부서 필터링 (DB 레벨)
+		if (args.department) {
+			onboardings = onboardings.filter(
+				(item) => item.department === args.department
+			);
+		}
+
+		const key = await deriveKey(AES_KEY);
+
+		// 복호화 및 검색 필터링
+		const results: OnboardingListItem[] = [];
+
+		for (const item of onboardings) {
+			const { name, phone } = await decryptPersonalInfo(
+				item.name as unknown as EncryptedData,
+				item.phone as unknown as EncryptedData,
+				key
+			);
+
+			// 검색어가 있으면 이름 또는 전화번호로 필터링
+			if (args.searchQuery) {
+				const query = args.searchQuery.toLowerCase().trim();
+				const nameMatch = name.toLowerCase().includes(query);
+				const phoneMatch = phone
+					.replace(/\D/g, "")
+					.includes(query.replace(/\D/g, ""));
+				const hasMatch = nameMatch || phoneMatch;
+
+				if (!hasMatch) {
+					continue;
+				}
+			}
+
+			results.push({
+				_id: item._id,
+				_creationTime: item._creationTime,
+				name,
+				maskedPhone: maskPhone(phone),
+				gender: item.gender,
+				department: item.department,
+				ageGroup: item.ageGroup,
+				stayType: item.stayType,
+				isPaid: item.isPaid,
+				tfTeam: item.tfTeam,
+				tshirtSize: item.tshirtSize,
+			});
+		}
+
+		// 최신순 정렬
+		results.sort((a, b) => b._creationTime - a._creationTime);
+
+		return results;
 	},
 });

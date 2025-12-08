@@ -3,7 +3,6 @@ import { api } from "@jwc/backend/convex/_generated/api";
 import type { Id } from "@jwc/backend/convex/_generated/dataModel";
 import {
 	DEPARTMENT_LABELS,
-	GENDER_LABELS,
 	STAY_TYPE_LABELS,
 	TF_TEAM_LABELS,
 	TSHIRT_SIZE_LABELS,
@@ -110,7 +109,7 @@ interface DecryptedOnboarding {
 	_id: Id<"onboarding">;
 	_creationTime: number;
 	name: string;
-	phone: string;
+	maskedPhone: string;
 	gender: "male" | "female";
 	department: "youth1" | "youth2" | "other";
 	ageGroup: string;
@@ -169,7 +168,7 @@ interface StatusHeaderProps {
 function StatusHeader({ data, ssrData, isDecrypting }: StatusHeaderProps) {
 	const createdAt = new Date(ssrData._creationTime);
 	const displayName = data?.name ?? "로딩 중...";
-	const displayPhone = data?.phone ?? "***-****-****";
+	const displayPhone = data?.maskedPhone ?? "***-****-****";
 
 	return (
 		<motion.div
@@ -232,8 +231,8 @@ function StatusHeader({ data, ssrData, isDecrypting }: StatusHeaderProps) {
 interface OnboardingData {
 	_id: Id<"onboarding">;
 	_creationTime: number;
-	name: string;
-	phone: string;
+	name: Record<string, string>;
+	phone: Record<string, string>;
 	phoneHash: string;
 	gender: "male" | "female";
 	department: "youth1" | "youth2" | "other";
@@ -260,7 +259,7 @@ function ApplicationContent({
 	isDecrypting,
 }: ApplicationContentProps) {
 	const displayName = decryptedData?.name ?? "●●●";
-	const displayPhone = decryptedData?.phone ?? "***-****-****";
+	const displayPhone = decryptedData?.maskedPhone ?? "***-****-****";
 
 	return (
 		<motion.div
@@ -301,7 +300,7 @@ function ApplicationContent({
 						{displayPhone}
 					</span>
 				</div>
-				<InfoRow label="성별" value={GENDER_LABELS[ssrData.gender]} />
+				{/* <InfoRow label="성별" value={GENDER_LABELS[ssrData.gender]} /> */}
 				<InfoRow label="소속" value={DEPARTMENT_LABELS[ssrData.department]} />
 				<InfoRow label="연령대" value={ssrData.ageGroup} />
 			</InfoCard>
