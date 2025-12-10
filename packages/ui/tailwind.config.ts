@@ -1,55 +1,14 @@
-import baseConfig from "@jwc/tailwind-config/web";
-/*
- * This file is not used for any compilation purpose, it is only used
- * for Tailwind Intellisense & Autocompletion in the source files
- */
 import type { Config } from "tailwindcss";
 
+/*
+ * Tailwind CSS v4 Configuration
+ * - 대부분의 설정은 globals.css의 @theme inline에서 처리
+ * - 이 파일은 content 경로와 Intellisense를 위해 사용
+ */
 export default {
-	darkMode: ["class"],
-	safelist: ["dark", "light"],
+	darkMode: "class",
 	content: [
-		...baseConfig.content,
-		"./src/components/**/*.*.{tsx,ts,js}",
-		"./src/layouts/**/*.*.{tsx,ts,js}",
+		"./src/**/*.{ts,tsx,js,jsx}",
+		"../../packages/ui/src/**/*.{ts,tsx,js,jsx}",
 	],
-	presets: [baseConfig],
-	theme: {
-		extend: {
-			keyframes: {
-				"accordion-down": {
-					from: {
-						height: "0",
-					},
-					to: {
-						height: "var(--radix-accordion-content-height)",
-					},
-				},
-				"accordion-up": {
-					from: {
-						height: "var(--radix-accordion-content-height)",
-					},
-					to: {
-						height: "0",
-					},
-				},
-			},
-			animation: {
-				"accordion-down": "accordion-down 0.2s ease-out",
-				"accordion-up": "accordion-up 0.2s ease-out",
-			},
-			colors: {
-				sidebar: {
-					DEFAULT: "hsl(var(--sidebar-background))",
-					foreground: "hsl(var(--sidebar-foreground))",
-					primary: "hsl(var(--sidebar-primary))",
-					"primary-foreground": "hsl(var(--sidebar-primary-foreground))",
-					accent: "hsl(var(--sidebar-accent))",
-					"accent-foreground": "hsl(var(--sidebar-accent-foreground))",
-					border: "hsl(var(--sidebar-border))",
-					ring: "hsl(var(--sidebar-ring))",
-				},
-			},
-		},
-	},
-} as Config;
+} satisfies Config;

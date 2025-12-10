@@ -5,6 +5,5 @@ import { dayjs } from "./config";
 setDayjsLocale();
 setDayjsPlugin();
 
-export const getDateFormat = (date?: ConfigType) => {
-	return dayjs(date).tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss");
-};
+export const getDateFormat = (date?: ConfigType) =>
+	dayjs(date).tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss");

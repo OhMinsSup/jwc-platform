@@ -1,0 +1,5 @@
+{
+  "extends": "@jwc/tsconfig/internal-package.json",
+  "include": ["convex", "*.ts", "src"],
+  "exclude": ["node_modules"]
+}

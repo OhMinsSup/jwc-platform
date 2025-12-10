@@ -1,5 +1,6 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "extends": ["ultracite/core", "ultracite/react", "ultracite/next"],
   "vcs": {
     "enabled": false,
     "clientKind": "git",
@@ -7,38 +8,44 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "ignore": [".next", ".turbo", ".zed", ".vscode", "dist", "node_modules", ".cache", "migrations", "payload.types.ts"]
+    "includes": [
+      "**",
+      "!**/temp",
+      "!**/packages/db/prisma",
+      "!**/.next",
+      "!**/dist",
+      "!**/.turbo",
+      "!**/dev-dist",
+      "!**/.zed",
+      "!**/.vscode",
+      "!**/routeTree.gen.ts",
+      "!**/src-tauri",
+      "!**/.nuxt",
+      "!bts.jsonc",
+      "!**/.expo",
+      "!**/.wrangler",
+      "!**/.alchemy",
+      "!**/.svelte-kit",
+      "!**/wrangler.jsonc",
+      "!**/.source",
+      "!**/output",
+      "!**/transformed",
+      "!**/logs",
+      "!**/_generated"
+    ]
   },
   "formatter": {
     "enabled": true,
     "indentStyle": "tab"
   },
-  "organizeImports": {
-    "enabled": true
-  },
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "linter": {
     "enabled": true,
     "rules": {
       "recommended": true,
-      "a11y": {
-        "recommended": true,
-        "useButtonType": "error",
-        "useKeyWithClickEvents": "error",
-        "useValidAnchor": "error"
-      },
-      "security": {
-        "recommended": true,
-        "noDangerouslySetInnerHtml": "error"
-      },
       "suspicious": {
-        "noArrayIndexKey": "error",
-        "noExplicitAny": "error"
-      },
-      "style": {
-        "noDefaultExport": "off",
-        "useImportType": "error",
-        "noNonNullAssertion": "error",
-        "useShorthandArrayType": "error"
+        "noConsole": "off",
+        "noDocumentCookie": "off"
       },
       "correctness": {
         "useExhaustiveDependencies": "info"
@@ -50,17 +57,39 @@
           "options": {
             "functions": ["clsx", "cva", "cn"]
           }
-        }
+        },
+        "noShadow": "off"
+      },
+      "style": {
+        "useConsistentTypeDefinitions": "off",
+        "noParameterAssign": "error",
+        "useAsConstAssertion": "error",
+        "useDefaultParameterLast": "error",
+        "useEnumInitializers": "error",
+        "useSelfClosingElements": "error",
+        "useSingleVarDeclarator": "error",
+        "noUnusedTemplateLiteral": "error",
+        "useNumberNamespace": "error",
+        "noInferrableTypes": "error",
+        "noUselessElse": "error",
+        "noMagicNumbers": "off",
+        "useFilenamingConvention": "off",
+        "noExportedImports": "off"
+      },
+      "performance": {
+        "noBarrelFile": "off",
+        "noNamespaceImport": "off"
       }
     }
   },
   "javascript": {
     "formatter": {
-      "quoteStyle": "double",
-      "jsxQuoteStyle": "double",
-      "trailingCommas": "es5",
-      "semicolons": "always",
-      "arrowParentheses": "always"
+      "quoteStyle": "double"
+    }
+  },
+  "json": {
+    "formatter": {
+      "trailingCommas": "none"
     }
   }
 }

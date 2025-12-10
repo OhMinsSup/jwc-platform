@@ -8,8 +8,10 @@ interface ClientOnlyProps {
 	fallback?: React.ReactNode;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-const emptySubscribe = () => () => {};
+// No-op unsubscribe function for useSyncExternalStore
+const emptySubscribe = () => (): void => {
+	// Intentionally empty - server-side rendering doesn't need subscription
+};
 
 function ClientOnly({ children, fallback }: ClientOnlyProps) {
 	const value = useSyncExternalStore(
@@ -19,7 +21,7 @@ function ClientOnly({ children, fallback }: ClientOnlyProps) {
 	);
 
 	if (value === "server") {
-		return fallback ? <>{fallback}</> : null;
+		return fallback ?? null;
 	}
 
 	return <>{children}</>;

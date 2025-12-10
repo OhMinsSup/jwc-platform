@@ -54,7 +54,6 @@ import {
 	X,
 	Youtube,
 } from "lucide-react";
-import React from "react";
 
 export const Icons = {
 	CalendarIcon: (props: LucideProps) => <CalendarIcon {...props} />,

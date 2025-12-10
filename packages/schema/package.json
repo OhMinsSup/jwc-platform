@@ -1,25 +1,26 @@
 {
-	"name": "@jwc/schema",
-	"version": "0.1.0",
-	"private": true,
-	"license": "MIT",
-	"type": "module",
-	"exports": {
-		"./package.json": "./package.json",
-		".": "./src/index.ts"
-	},
-	"scripts": {
-		"clean": "git clean -xdf .cache .turbo dist node_modules",
-		"format": "biome format --write ./src",
-		"lint": "biome lint --error-on-warnings ./src",
-		"typecheck": "tsc --noEmit"
-	},
-	"dependencies": {
-		"libphonenumber-js": "^1.12.6",
-		"zod": "catalog:"
-	},
-	"devDependencies": {
-		"@jwc/tsconfig": "workspace:*",
-		"typescript": "catalog:"
-	}
+  "name": "@jwc/schema",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "format": "biome format --write ./src",
+    "lint": "biome lint --error-on-warnings ./src",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "libphonenumber-js": "^1.12.29",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@jwc/tsconfig": "workspace:*",
+    "tsdown": "catalog:",
+    "typescript": "catalog:"
+  }
 }

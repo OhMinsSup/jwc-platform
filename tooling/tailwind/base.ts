@@ -1,45 +1,11 @@
 import type { Config } from "tailwindcss";
 
+/**
+ * Tailwind CSS v4 Base Configuration
+ * - v4에서는 대부분의 설정이 CSS로 이동
+ * - 이 파일은 content 경로와 공통 설정만 포함
+ */
 export default {
-	darkMode: ["class"],
-	content: ["src/**/*.{ts,tsx}"],
-	theme: {
-		extend: {
-			colors: {
-				border: "hsl(var(--border))",
-				input: "hsl(var(--input))",
-				ring: "hsl(var(--ring))",
-				background: "hsl(var(--background))",
-				foreground: "hsl(var(--foreground))",
-				primary: {
-					DEFAULT: "hsl(var(--primary))",
-					foreground: "hsl(var(--primary-foreground))",
-				},
-				secondary: {
-					DEFAULT: "hsl(var(--secondary))",
-					foreground: "hsl(var(--secondary-foreground))",
-				},
-				destructive: {
-					DEFAULT: "hsl(var(--destructive))",
-					foreground: "hsl(var(--destructive-foreground))",
-				},
-				muted: {
-					DEFAULT: "hsl(var(--muted))",
-					foreground: "hsl(var(--muted-foreground))",
-				},
-				accent: {
-					DEFAULT: "hsl(var(--accent))",
-					foreground: "hsl(var(--accent-foreground))",
-				},
-				popover: {
-					DEFAULT: "hsl(var(--popover))",
-					foreground: "hsl(var(--popover-foreground))",
-				},
-				card: {
-					DEFAULT: "hsl(var(--card))",
-					foreground: "hsl(var(--card-foreground))",
-				},
-			},
-		},
-	},
+	darkMode: "class",
+	content: ["src/**/*.{ts,tsx,js,jsx}"],
 } satisfies Config;
