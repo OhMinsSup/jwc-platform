@@ -9,9 +9,9 @@
  */
 
 import { defineSchema, syncToGoogleSheets } from "@jwc/spreadsheet";
+import type { EncryptedData } from "@jwc/utils/crypto";
 import { decryptPersonalInfo, deriveKey } from "@jwc/utils/crypto";
 import { dayjs } from "@jwc/utils/date";
-import type { EncryptedData } from "../../utils/src/crypto";
 import { internal } from "./_generated/api";
 import type { Doc } from "./_generated/dataModel";
 import { internalAction } from "./_generated/server";

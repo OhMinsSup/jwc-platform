@@ -41,11 +41,11 @@ export function FormInputField<T extends FieldValues>({
 					<FormControl>
 						<Input
 							{...field}
-							type={type}
-							placeholder={placeholder}
-							disabled={disabled}
-							required={required}
 							autoComplete={autoComplete}
+							disabled={disabled}
+							placeholder={placeholder}
+							required={required}
+							type={type}
 						/>
 					</FormControl>
 					<FormMessage />

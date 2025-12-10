@@ -39,10 +39,10 @@ export function FormTextAreaField<T extends FieldValues>({
 					<FormControl>
 						<Textarea
 							{...field}
-							placeholder={placeholder}
-							rows={rows}
 							disabled={disabled}
+							placeholder={placeholder}
 							required={required}
+							rows={rows}
 						/>
 					</FormControl>
 					<FormMessage />
