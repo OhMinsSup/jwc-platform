@@ -1,7 +1,7 @@
 import { defineConfig } from "tsdown";
 
 export default defineConfig({
-	entry: ["src/app.ts", "src/node.ts", "src/payload.ts"],
+	entry: ["src/**/*.ts"],
 	dts: true,
 	clean: true,
 	treeshake: true,

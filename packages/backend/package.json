@@ -12,7 +12,6 @@
     "default": "./convex/*.ts"
   },
   "scripts": {
-    "build": "tsdown",
     "clean": "git clean -xdf .cache .turbo dist node_modules convex/_generated",
     "format": "biome format --write ./src",
     "lint": "biome lint --error-on-warnings ./src",

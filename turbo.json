@@ -12,7 +12,14 @@
     },
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "next-env.d.ts"]
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "next-env.d.ts",
+        "dist/**",
+        ".tanstack/**",
+        "convex/_generated/**"
+      ]
     },
     "format": {
       "outputLogs": "new-only"
@@ -58,22 +65,28 @@
     }
   },
   "globalEnv": [
-    "SENTRY_AUTH_TOKEN",
-    "SENTRY_ORG",
-    "SENTRY_PROJECT",
-    "AES_KEY",
-    "SKIP_ENV_VALIDATION",
+    "VITE_PAID_ACCOUNT_NUMBER",
+    "VITE_SENTRY_DSN",
     "GOOGLE_CLIENT_EMAIL",
     "GOOGLE_PRIVATE_KEY",
     "GOOGLE_SHEET_TITLE",
     "GOOGLE_SHEET_ID",
-    "PAYLOAD_PRIVATE_SECRET",
-    "PAYLOAD_PRIVATE_REVALIDATION_KEY",
-    "NEXT_PUBLIC_SENTRY_DSN",
-    "NEXT_PUBLIC_PAID_ACCOUNT_NUMBER",
-    "NEXT_PUBLIC_APP_URL",
-    "DATABASE_ENGINE",
-    "DATABASE_URL"
+    "AES_KEY",
+    "BETTER_AUTH_SECRET",
+    "WEBHOOK_SECRET",
+    "SENTRY_AUTH_TOKEN",
+    "SENTRY_PROJECT",
+    "SENTRY_ORG",
+    "VITE_CONVEX_SITE_URL",
+    "VITE_CONVEX_URL",
+    "VITE_SITE_URL",
+    "SITE_URL",
+    "CONVEX_DEPLOY_KEY",
+    "CONVEX_SITE_URL",
+    "CONVEX_URL",
+    "SOLAPI_API_KEY",
+    "SOLAPI_API_SECRET",
+    "SOLAPI_SENDER_PHONE"
   ],
   "globalPassThroughEnv": [
     "NODE_ENV",
