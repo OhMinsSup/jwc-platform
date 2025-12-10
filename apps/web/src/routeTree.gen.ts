@@ -15,6 +15,7 @@ import { Route as ApplicationIndexRouteImport } from './routes/application/index
 import { Route as SCodeRouteImport } from './routes/s/$code'
 import { Route as OnboardingStepRouteImport } from './routes/onboarding/$step'
 import { Route as ApplicationIdRouteImport } from './routes/application/$id'
+import { Route as ApiWebhookSpreadsheetRouteImport } from './routes/api/webhook/spreadsheet'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const OnboardingRouteRoute = OnboardingRouteRouteImport.update({
@@ -47,6 +48,11 @@ const ApplicationIdRoute = ApplicationIdRouteImport.update({
   path: '/application/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiWebhookSpreadsheetRoute = ApiWebhookSpreadsheetRouteImport.update({
+  id: '/api/webhook/spreadsheet',
+  path: '/api/webhook/spreadsheet',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -61,6 +67,7 @@ export interface FileRoutesByFullPath {
   '/s/$code': typeof SCodeRoute
   '/application': typeof ApplicationIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/webhook/spreadsheet': typeof ApiWebhookSpreadsheetRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -70,6 +77,7 @@ export interface FileRoutesByTo {
   '/s/$code': typeof SCodeRoute
   '/application': typeof ApplicationIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/webhook/spreadsheet': typeof ApiWebhookSpreadsheetRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -80,6 +88,7 @@ export interface FileRoutesById {
   '/s/$code': typeof SCodeRoute
   '/application/': typeof ApplicationIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/webhook/spreadsheet': typeof ApiWebhookSpreadsheetRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +100,7 @@ export interface FileRouteTypes {
     | '/s/$code'
     | '/application'
     | '/api/auth/$'
+    | '/api/webhook/spreadsheet'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +110,7 @@ export interface FileRouteTypes {
     | '/s/$code'
     | '/application'
     | '/api/auth/$'
+    | '/api/webhook/spreadsheet'
   id:
     | '__root__'
     | '/'
@@ -109,6 +120,7 @@ export interface FileRouteTypes {
     | '/s/$code'
     | '/application/'
     | '/api/auth/$'
+    | '/api/webhook/spreadsheet'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -118,6 +130,7 @@ export interface RootRouteChildren {
   SCodeRoute: typeof SCodeRoute
   ApplicationIndexRoute: typeof ApplicationIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiWebhookSpreadsheetRoute: typeof ApiWebhookSpreadsheetRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -164,6 +177,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApplicationIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/webhook/spreadsheet': {
+      id: '/api/webhook/spreadsheet'
+      path: '/api/webhook/spreadsheet'
+      fullPath: '/api/webhook/spreadsheet'
+      preLoaderRoute: typeof ApiWebhookSpreadsheetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -193,6 +213,7 @@ const rootRouteChildren: RootRouteChildren = {
   SCodeRoute: SCodeRoute,
   ApplicationIndexRoute: ApplicationIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiWebhookSpreadsheetRoute: ApiWebhookSpreadsheetRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

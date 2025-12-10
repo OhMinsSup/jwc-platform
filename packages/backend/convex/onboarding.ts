@@ -1,6 +1,11 @@
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
-import { internalMutation, internalQuery, query } from "./_generated/server";
+import {
+	internalMutation,
+	internalQuery,
+	mutation,
+	query,
+} from "./_generated/server";
 import { smsPool, spreadsheetPool } from "./lib/workpool";
 
 /** 성별 */
@@ -227,4 +232,94 @@ export const getByPhoneHashInternal = internalQuery({
 			.query("onboarding")
 			.withIndex("by_phoneHash", (q) => q.eq("phoneHash", args.phoneHash))
 			.first(),
+});
+
+/**
+ * 스프레드시트에서 특정 필드 업데이트
+ * - Google Sheets 웹훅에서 호출 (TanStack API 라우터 경유)
+ */
+export const updateFieldFromSpreadsheet = mutation({
+	args: {
+		id: v.id("onboarding"),
+		field: v.string(),
+		value: v.string(),
+	},
+	handler: async (ctx, args) => {
+		const { id, field, value } = args;
+
+		// 업데이트 가능한 필드 목록 및 변환 로직
+		const fieldUpdaters: Record<
+			string,
+			(val: string) => Record<string, unknown> | null
+		> = {
+			납입여부: (val) => ({ isPaid: val === "납입" }),
+			성별: (val) => {
+				const genderMap: Record<string, string> = {
+					남성: "male",
+					여성: "female",
+				};
+				return genderMap[val] ? { gender: genderMap[val] } : null;
+			},
+			소속: (val) => {
+				const deptMap: Record<string, string> = {
+					청년1부: "youth1",
+					청년2부: "youth2",
+					기타: "other",
+				};
+				return deptMap[val] ? { department: deptMap[val] } : null;
+			},
+			연령대: (val) => ({ ageGroup: val }),
+			숙박형태: (val) => {
+				const stayMap: Record<string, string> = {
+					"3박4일 (전체 참석)": "3nights4days",
+					"2박3일": "2nights3days",
+					"1박2일": "1night2days",
+					"무박 (당일치기)": "dayTrip",
+				};
+				return stayMap[val] ? { stayType: stayMap[val] } : null;
+			},
+			픽업시간: (val) => ({ pickupTimeDescription: val || undefined }),
+			TF팀: (val) => {
+				const tfMap: Record<string, string> = {
+					없음: "none",
+					찬양팀: "praise",
+					프로그램팀: "program",
+					미디어팀: "media",
+				};
+				return tfMap[val] ? { tfTeam: tfMap[val] } : null;
+			},
+			차량지원: (val) => ({ canProvideRide: val === "가능" }),
+			차량정보: (val) => ({ rideDetails: val || undefined }),
+			티셔츠: (val) => {
+				const sizeMap: Record<string, string> = {
+					S: "s",
+					M: "m",
+					L: "l",
+					XL: "xl",
+					"2XL": "2xl",
+					"3XL": "3xl",
+				};
+				return sizeMap[val] ? { tshirtSize: sizeMap[val] } : null;
+			},
+		};
+
+		const updater = fieldUpdaters[field];
+		if (!updater) {
+			console.log(`[Spreadsheet Webhook] Unknown field: ${field}`);
+			return { success: false, error: `Unknown field: ${field}` };
+		}
+
+		const updateData = updater(value);
+		if (!updateData) {
+			console.log(
+				`[Spreadsheet Webhook] Invalid value for field ${field}: ${value}`
+			);
+			return { success: false, error: `Invalid value for field ${field}` };
+		}
+
+		await ctx.db.patch(id, updateData);
+		console.log(`[Spreadsheet Webhook] Updated ${field} to ${value} for ${id}`);
+
+		return { success: true, field, value };
+	},
 });

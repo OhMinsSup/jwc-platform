@@ -25,6 +25,7 @@ import {
 
 /** 스프레드시트 행 데이터 타입 */
 interface SpreadsheetRow {
+	id: string;
 	createdAt: string;
 	name: string;
 	phone: string;
@@ -72,6 +73,7 @@ function transformToSpreadsheetRow(
 		: "";
 
 	return {
+		id: onboarding._id,
 		createdAt,
 		name: decryptedInfo.name,
 		phone: decryptedInfo.phone,
@@ -173,6 +175,12 @@ export const syncAllToGoogleSheets = internalAction({
 				name: "onboarding",
 				defaultSheetName: "신청자목록",
 				columns: [
+					{
+						key: "id",
+						header: "ID",
+						type: "text",
+						width: 28,
+					},
 					{
 						key: "createdAt",
 						header: "신청일시",
