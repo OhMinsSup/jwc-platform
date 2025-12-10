@@ -18,6 +18,7 @@
     "clean:workspaces": "turbo run clean",
     "dev": "turbo watch dev --continue",
     "auth:generate": "pnpm -F @jwc/backend auth:generate",
+    "boundaries": "turbo boundaries",
     "convex:dev": "turbo -F @jwc/backend convex:dev",
     "convex:setup": "turbo -F @jwc/backend convex:setup",
     "format": "turbo run format",

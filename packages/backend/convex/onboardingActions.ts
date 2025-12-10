@@ -7,6 +7,7 @@
  * - 개인정보 암호화 처리
  */
 
+import type { EncryptedData } from "@jwc/utils/crypto";
 import {
 	decryptPersonalInfo,
 	deriveKey,
@@ -14,7 +15,6 @@ import {
 	hashPhone,
 } from "@jwc/utils/crypto";
 import { v } from "convex/values";
-import type { EncryptedData } from "../../utils/src/crypto";
 import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
 import { action } from "./_generated/server";
