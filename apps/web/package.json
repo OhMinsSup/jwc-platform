@@ -6,7 +6,7 @@
     "build": "vite build",
     "serve": "pnpm with-env vite preview",
     "dev": "pnpm with-env vite dev --port=3000",
-    "start": "pnpx srvx --prod -s ../client dist/server/server.js",
+    "start": "node .output/server/index.mjs",
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
@@ -50,6 +50,7 @@
     "@types/react-dom": "catalog:react19",
     "@vitejs/plugin-react": "^5.0.4",
     "jsdom": "^26.0.0",
+    "nitro": "3.0.1-alpha.1",
     "typescript": "catalog:",
     "vite": "^7.0.2",
     "web-vitals": "^5.0.3"
