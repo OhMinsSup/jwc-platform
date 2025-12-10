@@ -11,12 +11,12 @@ export const Route = createFileRoute("/")({
 
 /** 수련회 정보 */
 const RETREAT_INFO = {
-	title: "2025 동계 청년부 수련회",
-	theme: "더 나은 내일을 향해",
-	date: "2025년 1월 24일(금) ~ 27일(월)",
+	title: "2026 동계 청년부 수련회",
+	theme: "멸종위기사랑",
+	date: "2026년 1월 8일(목) ~ 1월 11일(일)",
 	duration: "3박 4일",
-	location: "양평 수양관",
-	deadline: "2025년 1월 12일",
+	location: "광림 수도원",
+	deadline: "2026년 1월 8일",
 };
 
 /** 특징/혜택 */

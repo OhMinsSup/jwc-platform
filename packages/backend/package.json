@@ -35,6 +35,7 @@
   "dependencies": {
     "@better-auth/expo": "catalog:",
     "@convex-dev/better-auth": "catalog:",
+    "@convex-dev/crons": "^0.2.0",
     "@convex-dev/workpool": "^0.3.0",
     "@jwc/spreadsheet": "workspace:*",
     "@jwc/utils": "workspace:*",

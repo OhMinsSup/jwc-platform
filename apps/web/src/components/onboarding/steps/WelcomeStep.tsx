@@ -39,7 +39,7 @@ const floatAnimation = {
 };
 
 const highlights = [
-	{ icon: Calendar, text: "2025년 여름", color: "text-blue-500" },
+	{ icon: Calendar, text: "2026년 겨울", color: "text-blue-500" },
 	{ icon: Users, text: "청년부 수련회", color: "text-purple-500" },
 	{ icon: MapPin, text: "함께하는 시간", color: "text-green-500" },
 ];
@@ -70,19 +70,16 @@ export function WelcomeStep() {
 					>
 						<Sparkles className="h-4 w-4 text-primary" />
 						<span className="font-medium text-primary text-sm">
-							2025 청년부 겨울 수련회
+							2026 청년부 겨울 수련회
 						</span>
 					</motion.div>
 				</motion.div>
 
 				{/* 메인 타이틀 */}
 				<motion.div className="mb-6" variants={itemVariants}>
-					<h1 className="font-bold text-4xl text-foreground tracking-tight md:text-5xl">
-						함께하는
-					</h1>
 					<h1 className="mt-1 font-bold text-4xl tracking-tight md:text-5xl">
 						<span className="bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">
-							은혜로운 시간
+							멸종위기사랑
 						</span>
 					</h1>
 				</motion.div>

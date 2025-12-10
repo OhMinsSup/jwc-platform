@@ -79,7 +79,7 @@ const TF_TEAM_OPTIONS: {
 	{
 		value: "program",
 		label: TF_TEAM_LABELS.program,
-		description: "레크레이션 및 친교 프로그램 진행",
+		description: "레크레이션 및 워크숍 진행",
 		Icon: Gamepad2,
 	},
 	{
