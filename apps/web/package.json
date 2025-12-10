@@ -6,6 +6,7 @@
     "build": "vite build",
     "serve": "pnpm with-env vite preview",
     "dev": "pnpm with-env vite dev --port=3000",
+    "start": "pnpx srvx --prod -s ../client dist/server/server.js",
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
