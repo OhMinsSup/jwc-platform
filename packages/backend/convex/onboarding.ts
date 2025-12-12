@@ -1,3 +1,4 @@
+import { omit } from "@jwc/utils/common";
 import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
@@ -68,6 +69,26 @@ export const getByIdInternal = internalQuery({
 		id: v.id("onboarding"),
 	},
 	handler: async (ctx, args) => await ctx.db.get(args.id),
+});
+
+/**
+ * ID로 수련회 신청서 조회 (Public)
+ * - 클라이언트에서 직접 호출 가능
+ * - 민감한 정보(전화번호 등)는 제외하고 반환
+ */
+export const getById = query({
+	args: {
+		id: v.id("onboarding"),
+	},
+	handler: async (ctx, args) => {
+		const doc = await ctx.db.get(args.id);
+		if (!doc) {
+			return null;
+		}
+
+		// 민감한 정보 제외
+		return omit(doc, ["phone", "phoneHash"]);
+	},
 });
 
 /**

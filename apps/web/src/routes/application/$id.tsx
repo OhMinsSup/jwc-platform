@@ -1,4 +1,4 @@
-import { convexAction } from "@convex-dev/react-query";
+import { convexQuery } from "@convex-dev/react-query";
 import { api } from "@jwc/backend/convex/_generated/api";
 import type { Id } from "@jwc/backend/convex/_generated/dataModel";
 import {
@@ -28,7 +28,8 @@ export const Route = createFileRoute("/application/$id")({
 			throw notFound();
 		}
 
-		const query = convexAction(api.onboardingActions.getByIdDecrypted, { id });
+		// SSR 적용: convexQuery 사용
+		const query = convexQuery(api.onboarding.getById, { id });
 		const data = await queryClient.ensureQueryData(query);
 		if (!data) {
 			throw notFound();
@@ -98,7 +99,7 @@ function Header() {
 		<div className="flex items-start justify-between">
 			<div>
 				<h1 className="font-bold text-3xl tracking-tight">{data.name}</h1>
-				<p className="mt-1 text-muted-foreground">{data.maskedPhone}</p>
+				{/* 전화번호 노출 제거 */}
 			</div>
 			<div className="flex flex-col items-end gap-2">
 				<Badge

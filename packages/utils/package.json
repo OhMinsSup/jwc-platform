@@ -7,7 +7,8 @@
     "./date": "./src/date/index.ts",
     "./format": "./src/format/index.ts",
     "./options": "./src/options/index.ts",
-    "./crypto": "./src/crypto/index.ts"
+    "./crypto": "./src/crypto/index.ts",
+    "./common": "./src/common/index.ts"
   },
   "license": "MIT",
   "scripts": {
