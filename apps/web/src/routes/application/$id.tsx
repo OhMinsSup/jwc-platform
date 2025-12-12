@@ -17,6 +17,7 @@ import {
 } from "@jwc/ui";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { format } from "date-fns";
+import { ko } from "date-fns/locale";
 import { ArrowLeft, Calendar, Car, CheckCircle2, User } from "lucide-react";
 
 export const Route = createFileRoute("/application/$id")({
@@ -168,7 +169,11 @@ function ScheduleInfoCard() {
 				{data.attendanceDate && (
 					<div className="grid grid-cols-2 gap-1">
 						<span className="text-muted-foreground">참석 날짜</span>
-						<span className="font-medium">{data.attendanceDate}</span>
+						<span className="font-medium">
+							{format(new Date(data.attendanceDate), "yyyy년 M월 d일 a h시", {
+								locale: ko,
+							})}
+						</span>
 					</div>
 				)}
 				{data.pickupTimeDescription && (

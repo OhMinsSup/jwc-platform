@@ -8,11 +8,7 @@
  * - 단축 URL 생성
  */
 
-import {
-	decryptPersonalInfo,
-	deriveKey,
-	type EncryptedData,
-} from "@jwc/utils/crypto";
+import { decrypt, deriveKey, type EncryptedData } from "@jwc/utils/crypto";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { internalAction } from "./_generated/server";
@@ -56,11 +52,11 @@ export const sendOnboardingWelcome = internalAction({
 			const key = await deriveKey(AES_KEY);
 
 			// 암호화된 데이터 복호화
-			const { name, phone } = await decryptPersonalInfo(
-				onboarding.name as unknown as EncryptedData,
+			const phone = await decrypt(
 				onboarding.phone as unknown as EncryptedData,
 				key
 			);
+			const name = onboarding.name;
 
 			// 템플릿 메시지 생성
 			const template = MESSAGE_TEMPLATES["onboarding-welcome"];
