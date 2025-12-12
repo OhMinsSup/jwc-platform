@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
 
 @custom-variant dark (&:is(.dark *));
 
@@ -61,7 +62,7 @@
 	--chart-4: hsl(43 74% 66%);
 	--chart-5: hsl(27 87% 67%);
 
-	--radius: 0.5rem;
+	--radius: 0.5rem; /* 8px */
 
 	/* Sidebar */
 	--sidebar: hsl(0 0% 98%);
@@ -127,6 +128,10 @@
    Tailwind v4 Theme (inline - no hsl wrapper)
    ============================================ */
 @theme inline {
+	/* Fonts */
+	--font-sans:
+		"Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+
 	/* Base Colors */
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);
@@ -183,9 +188,9 @@
 
 	/* Border Radius */
 	--radius-sm: calc(var(--radius) - 4px);
-	--radius-md: calc(var(--radius) - 2px);
-	--radius-lg: var(--radius);
-	--radius-xl: calc(var(--radius) + 4px);
+	--radius-md: var(--radius);
+	--radius-lg: calc(var(--radius) + 4px);
+	--radius-xl: calc(var(--radius) + 8px);
 
 	/* Accordion Animations */
 	--animate-accordion-down: accordion-down 0.2s ease-out;

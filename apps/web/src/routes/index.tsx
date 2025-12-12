@@ -57,143 +57,163 @@ function HomeComponent() {
 	const pingColor = isConnected ? "bg-green-400" : "bg-orange-400";
 
 	return (
-		<div className="flex min-h-svh flex-col">
-			{/* Hero Section */}
-			<section className="relative flex flex-1 flex-col items-center justify-center px-4 py-20">
-				{/* Background gradient */}
-				<div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
-
-				<div className="relative z-10 mx-auto max-w-4xl text-center">
-					{/* Badge */}
-					<div className="mb-6 inline-flex items-center gap-2 rounded-full border bg-background/80 px-4 py-1.5 text-sm backdrop-blur-sm">
-						<span className="relative flex h-2 w-2">
-							<span
-								className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-75 ${pingColor}`}
-							/>
-							<span
-								className={`relative inline-flex h-2 w-2 rounded-full ${statusColor}`}
-							/>
-						</span>
-						<span className="text-muted-foreground">
+		<div className="flex min-h-svh flex-col bg-background text-foreground">
+			{/* Navbar */}
+			<header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+				<div className="container mx-auto flex h-16 items-center justify-between px-4">
+					<div className="flex items-center gap-2 font-bold text-xl tracking-tight">
+						<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+							<svg
+								aria-labelledby="logo-title"
+								className="h-5 w-5"
+								fill="none"
+								role="img"
+								stroke="currentColor"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth="2"
+								viewBox="0 0 24 24"
+								xmlns="http://www.w3.org/2000/svg"
+							>
+								<title id="logo-title">JWC Retreat Logo</title>
+								<path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
+							</svg>
+						</div>
+						<span>JWC Retreat</span>
+					</div>
+					<nav className="hidden items-center gap-6 font-medium text-muted-foreground text-sm md:flex">
+						<Link className="transition-colors hover:text-foreground" to="/">
+							홈
+						</Link>
+						<Link className="transition-colors hover:text-foreground" to="/">
+							수련회 안내
+						</Link>
+						<Link className="transition-colors hover:text-foreground" to="/">
+							문의하기
+						</Link>
+					</nav>
+					<div className="flex items-center gap-4">
+						<div className="hidden items-center gap-2 text-muted-foreground text-xs sm:flex">
+							<span className="relative flex h-2 w-2">
+								<span
+									className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-75 ${pingColor}`}
+								/>
+								<span
+									className={`relative inline-flex h-2 w-2 rounded-full ${statusColor}`}
+								/>
+							</span>
 							{getStatusText(healthCheck.isLoading, isConnected)}
-						</span>
-					</div>
-
-					{/* Title */}
-					<h1 className="mb-4 font-bold text-4xl tracking-tight sm:text-5xl md:text-6xl">
-						{RETREAT_INFO.title}
-					</h1>
-
-					{/* Theme */}
-					<p className="mb-8 text-muted-foreground text-xl sm:text-2xl">
-						"{RETREAT_INFO.theme}"
-					</p>
-
-					{/* Key Info */}
-					<div className="mb-10 flex flex-wrap items-center justify-center gap-4 text-muted-foreground text-sm sm:gap-6 sm:text-base">
-						<div className="flex items-center gap-2">
-							<Calendar className="h-4 w-4" />
-							<span>{RETREAT_INFO.date}</span>
 						</div>
-						<div className="flex items-center gap-2">
-							<Clock className="h-4 w-4" />
-							<span>{RETREAT_INFO.duration}</span>
-						</div>
-						<div className="flex items-center gap-2">
-							<MapPin className="h-4 w-4" />
-							<span>{RETREAT_INFO.location}</span>
-						</div>
-					</div>
-
-					{/* CTA Buttons */}
-					<div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-						<Button asChild className="w-full sm:w-auto" size="lg">
-							<Link params={{ step: "welcome" }} to="/onboarding/$step">
-								수련회 신청하기
-								<ArrowRight className="ml-2 h-4 w-4" />
-							</Link>
-						</Button>
 						<Button
 							asChild
-							className="w-full sm:w-auto"
-							size="lg"
-							variant="outline"
+							className="rounded-full px-6 font-semibold"
+							size="sm"
 						>
-							<Link search={{ phoneHash: undefined }} to="/application">
-								신청 내역 조회
+							<Link params={{ step: "welcome" }} to="/onboarding/$step">
+								신청하기
 							</Link>
 						</Button>
 					</div>
-
-					{/* Deadline Notice */}
-					<p className="mt-6 text-muted-foreground text-sm">
-						<Clock className="mr-1 inline-block h-3 w-3" />
-						신청 마감: {RETREAT_INFO.deadline}
-					</p>
 				</div>
-			</section>
+			</header>
 
-			{/* Features Section */}
-			<section className="border-t bg-muted/30 px-4 py-16">
-				<div className="mx-auto max-w-4xl">
-					<h2 className="mb-10 text-center font-semibold text-2xl">
-						수련회에서 경험하세요
-					</h2>
-					<div className="grid gap-6 sm:grid-cols-3">
-						{FEATURES.map((feature) => (
-							<div
-								className="rounded-xl border bg-background p-6 text-center transition-shadow hover:shadow-md"
-								key={feature.title}
-							>
-								<div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-									<feature.icon className="h-6 w-6 text-primary" />
+			<main className="flex-1">
+				{/* Hero Section */}
+				<section className="container mx-auto px-4 py-24 md:py-32">
+					<div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-8">
+						<div className="flex flex-col justify-center space-y-8">
+							<div className="space-y-4">
+								<div className="inline-flex items-center rounded-full border px-3 py-1 font-medium text-muted-foreground text-sm">
+									<span className="mr-2 inline-block h-2 w-2 rounded-full bg-primary" />
+									{RETREAT_INFO.date}
 								</div>
-								<h3 className="mb-2 font-medium">{feature.title}</h3>
-								<p className="text-muted-foreground text-sm">
-									{feature.description}
+								<h1 className="font-bold text-4xl tracking-tighter sm:text-5xl xl:text-6xl/none">
+									{RETREAT_INFO.title}
+									<br />
+									<span className="text-primary">"{RETREAT_INFO.theme}"</span>
+								</h1>
+								<p className="max-w-[600px] text-muted-foreground md:text-xl">
+									함께 모여 예배하고 교제하며, 하나님의 사랑을 깊이 경험하는
+									시간에 여러분을 초대합니다.
 								</p>
 							</div>
-						))}
-					</div>
-				</div>
-			</section>
-
-			{/* Steps Section */}
-			<section className="px-4 py-16">
-				<div className="mx-auto max-w-4xl">
-					<h2 className="mb-10 text-center font-semibold text-2xl">
-						신청 절차
-					</h2>
-					<div className="grid gap-4 sm:grid-cols-4">
-						{[
-							{ step: "1", title: "정보 입력", desc: "기본 정보 작성" },
-							{ step: "2", title: "일정 선택", desc: "참석 일정 선택" },
-							{ step: "3", title: "추가 정보", desc: "TF팀, 차량 등" },
-							{ step: "4", title: "신청 완료", desc: "최종 확인" },
-						].map((item, idx) => (
-							<div
-								className="relative flex flex-col items-center"
-								key={item.step}
-							>
-								{idx < 3 && (
-									<div className="absolute top-5 left-1/2 hidden h-0.5 w-full bg-border sm:block" />
-								)}
-								<div className="relative z-10 flex h-10 w-10 items-center justify-center rounded-full bg-primary font-medium text-primary-foreground text-sm">
-									{item.step}
-								</div>
-								<h3 className="mt-3 font-medium">{item.title}</h3>
-								<p className="text-muted-foreground text-sm">{item.desc}</p>
+							<div className="flex flex-col gap-3 min-[400px]:flex-row">
+								<Button
+									asChild
+									className="rounded-full px-8 text-base"
+									size="lg"
+								>
+									<Link params={{ step: "welcome" }} to="/onboarding/$step">
+										지금 신청하기
+										<ArrowRight className="ml-2 h-4 w-4" />
+									</Link>
+								</Button>
+								<Button
+									asChild
+									className="rounded-full px-8 text-base"
+									size="lg"
+									variant="outline"
+								>
+									<Link to="/application">신청 내역 조회</Link>
+								</Button>
 							</div>
-						))}
+							<div className="flex items-center gap-4 text-muted-foreground text-sm">
+								<div className="flex items-center gap-1">
+									<MapPin className="h-4 w-4" />
+									{RETREAT_INFO.location}
+								</div>
+								<div className="h-4 w-px bg-border" />
+								<div className="flex items-center gap-1">
+									<Clock className="h-4 w-4" />
+									마감: {RETREAT_INFO.deadline}
+								</div>
+							</div>
+						</div>
+						<div className="relative mx-auto aspect-video w-full max-w-[600px] overflow-hidden rounded-xl border bg-muted/50 shadow-xl lg:aspect-square">
+							<div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
+								{/* Placeholder for Hero Image */}
+								<div className="text-center">
+									<Calendar className="mx-auto mb-4 h-16 w-16 opacity-20" />
+									<p>수련회 포스터 / 이미지 영역</p>
+								</div>
+							</div>
+						</div>
 					</div>
-				</div>
-			</section>
+				</section>
+
+				{/* Features Section */}
+				<section className="border-t bg-muted/40 py-24">
+					<div className="container mx-auto px-4">
+						<div className="mb-12 text-center">
+							<h2 className="font-bold text-3xl tracking-tighter sm:text-4xl">
+								함께하는 즐거움
+							</h2>
+							<p className="mt-4 text-muted-foreground md:text-lg">
+								이번 수련회에서 경험할 수 있는 특별한 시간들을 소개합니다.
+							</p>
+						</div>
+						<div className="grid gap-8 md:grid-cols-3">
+							{FEATURES.map((feature, index) => (
+								<div
+									className="group relative overflow-hidden rounded-2xl border bg-background p-8 transition-all hover:shadow-lg"
+									key={`feature:${index.toString()}`}
+								>
+									<div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+										<feature.icon className="h-6 w-6" />
+									</div>
+									<h3 className="mb-2 font-bold text-xl">{feature.title}</h3>
+									<p className="text-muted-foreground">{feature.description}</p>
+								</div>
+							))}
+						</div>
+					</div>
+				</section>
+			</main>
 
 			{/* Footer */}
-			<footer className="border-t px-4 py-8">
-				<div className="mx-auto max-w-4xl text-center text-muted-foreground text-sm">
-					<p>© 2025 JWC Platforms. All rights reserved.</p>
-					<p className="mt-1">청년부 수련회 신청 시스템</p>
+			<footer className="border-t py-12 text-center text-muted-foreground text-sm">
+				<div className="container mx-auto px-4">
+					<p>© 2026 JWC Youth. All rights reserved.</p>
 				</div>
 			</footer>
 		</div>

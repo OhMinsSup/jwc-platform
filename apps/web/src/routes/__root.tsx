@@ -75,7 +75,7 @@ function RootDocument() {
 			authClient={authClient}
 			client={context.convexClient}
 		>
-			<html className="dark" lang="en">
+			<html lang="en">
 				{/** biome-ignore lint/style/noHeadElement: <explanation> Head */}
 				<head>
 					<HeadContent />

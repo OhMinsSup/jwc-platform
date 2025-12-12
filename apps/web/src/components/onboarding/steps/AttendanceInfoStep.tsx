@@ -226,7 +226,7 @@ export function AttendanceInfoStep() {
 	};
 
 	return (
-		<div className="mx-auto w-full max-w-xl px-4 py-8">
+		<div className="mx-auto w-full max-w-xl">
 			<Form {...form}>
 				<motion.form
 					animate="visible"

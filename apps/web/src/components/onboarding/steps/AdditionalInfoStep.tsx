@@ -106,7 +106,7 @@ export function AdditionalInfoStep() {
 	};
 
 	return (
-		<div className="mx-auto w-full max-w-xl px-4 py-8">
+		<div className="mx-auto w-full max-w-xl">
 			{/* 헤더 */}
 			<motion.div
 				animate={{ opacity: 1, y: 0 }}

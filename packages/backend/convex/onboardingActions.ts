@@ -8,15 +8,10 @@
  */
 
 import type { EncryptedData } from "@jwc/utils/crypto";
-import {
-	decryptPersonalInfo,
-	deriveKey,
-	encryptPersonalInfo,
-	hashPhone,
-} from "@jwc/utils/crypto";
+import { decrypt, deriveKey, encrypt, hashPhone } from "@jwc/utils/crypto";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
-import type { Doc, Id } from "./_generated/dataModel";
+import type { Id } from "./_generated/dataModel";
 import { action } from "./_generated/server";
 
 /** 성별 */
@@ -95,16 +90,18 @@ export const upsert = action({
 			throw new Error("AES_KEY is not configured in environment variables");
 		}
 
-		// 개인정보 암호화
+		// 전화번호만 암호화 (이름은 평문 저장)
 		const key = await deriveKey(AES_KEY);
-		const { encryptedName, encryptedPhone, phoneHash } =
-			await encryptPersonalInfo(args.name, args.phone, key);
+		const [encryptedPhone, phoneHashValue] = await Promise.all([
+			encrypt(args.phone, key),
+			hashPhone(args.phone),
+		]);
 
 		// Internal mutation 호출
 		return ctx.runMutation(internal.onboarding.upsertInternal, {
-			encryptedName,
+			name: args.name,
 			encryptedPhone,
-			phoneHash,
+			phoneHash: phoneHashValue,
 			gender: args.gender,
 			department: args.department,
 			ageGroup: args.ageGroup,
@@ -116,22 +113,6 @@ export const upsert = action({
 			canProvideRide: args.canProvideRide,
 			rideDetails: args.rideDetails,
 			tshirtSize: args.tshirtSize,
-		});
-	},
-});
-
-/**
- * 전화번호로 신청서 조회 (Action)
- * - 평문 전화번호를 받아서 내부에서 해시 처리
- */
-export const getByPhone = action({
-	args: {
-		phone: v.string(),
-	},
-	handler: async (ctx, args): Promise<Doc<"onboarding"> | null> => {
-		const phoneHashValue = await hashPhone(args.phone);
-		return ctx.runQuery(internal.onboarding.getByPhoneHashInternal, {
-			phoneHash: phoneHashValue,
 		});
 	},
 });
@@ -173,7 +154,8 @@ function maskPhone(phone: string): string {
 
 /**
  * ID로 신청서 조회 (복호화 포함, 전화번호 마스킹)
- * - 암호화된 이름/전화번호를 복호화하여 반환
+ * - 암호화된 전화번호를 복호화하여 반환
+ * - 이름은 평문으로 저장되어 있음
  * - 전화번호는 마스킹 처리됨
  */
 export const getByIdDecrypted = action({
@@ -181,11 +163,6 @@ export const getByIdDecrypted = action({
 		id: v.id("onboarding"),
 	},
 	handler: async (ctx, args): Promise<DecryptedOnboarding | null> => {
-		const AES_KEY = process.env.AES_KEY;
-		if (!AES_KEY) {
-			throw new Error("AES_KEY is not configured in environment variables");
-		}
-
 		const onboarding = await ctx.runQuery(internal.onboarding.getByIdInternal, {
 			id: args.id,
 		});
@@ -194,18 +171,23 @@ export const getByIdDecrypted = action({
 			return null;
 		}
 
+		// 전화번호 복호화 후 마스킹
+		const AES_KEY = process.env.AES_KEY;
+		if (!AES_KEY) {
+			throw new Error("AES_KEY is not configured in environment variables");
+		}
 		const key = await deriveKey(AES_KEY);
-		const { name, phone } = await decryptPersonalInfo(
-			onboarding.name as unknown as EncryptedData,
+		const phone = await decrypt(
 			onboarding.phone as unknown as EncryptedData,
 			key
 		);
+		const maskedPhoneValue = maskPhone(phone);
 
 		return {
 			_id: onboarding._id,
 			_creationTime: onboarding._creationTime,
-			name,
-			maskedPhone: maskPhone(phone),
+			name: onboarding.name as string,
+			maskedPhone: maskedPhoneValue,
 			gender: onboarding.gender,
 			department: onboarding.department,
 			ageGroup: onboarding.ageGroup,
@@ -218,94 +200,5 @@ export const getByIdDecrypted = action({
 			rideDetails: onboarding.rideDetails,
 			tshirtSize: onboarding.tshirtSize,
 		};
-	},
-});
-
-/** 리스트 아이템 (전화번호 마스킹된 버전) */
-export interface OnboardingListItem {
-	_id: Id<"onboarding">;
-	_creationTime: number;
-	name: string;
-	maskedPhone: string;
-	gender: "male" | "female";
-	department: "youth1" | "youth2" | "other";
-	ageGroup: string;
-	stayType: "3nights4days" | "2nights3days" | "1night2days" | "dayTrip";
-	isPaid: boolean;
-	tfTeam?: "none" | "praise" | "program" | "media";
-	tshirtSize?: "s" | "m" | "l" | "xl" | "2xl" | "3xl";
-}
-
-/**
- * 신청서 목록 조회 (검색 기능 포함)
- * - 이름, 전화번호, 부서로 검색 가능
- * - 전화번호는 마스킹 처리되어 반환
- */
-export const searchOnboardings = action({
-	args: {
-		searchQuery: v.optional(v.string()),
-		department: v.optional(departmentValidator),
-	},
-	handler: async (ctx, args): Promise<OnboardingListItem[]> => {
-		const AES_KEY = process.env.AES_KEY;
-		if (!AES_KEY) {
-			throw new Error("AES_KEY is not configured in environment variables");
-		}
-
-		// 전체 데이터 조회
-		let onboardings = await ctx.runQuery(internal.onboarding.getAllInternal);
-
-		// 부서 필터링 (DB 레벨)
-		if (args.department) {
-			onboardings = onboardings.filter(
-				(item) => item.department === args.department
-			);
-		}
-
-		const key = await deriveKey(AES_KEY);
-
-		// 복호화 및 검색 필터링
-		const results: OnboardingListItem[] = [];
-
-		for (const item of onboardings) {
-			const { name, phone } = await decryptPersonalInfo(
-				item.name as unknown as EncryptedData,
-				item.phone as unknown as EncryptedData,
-				key
-			);
-
-			// 검색어가 있으면 이름 또는 전화번호로 필터링
-			if (args.searchQuery) {
-				const query = args.searchQuery.toLowerCase().trim();
-				const nameMatch = name.toLowerCase().includes(query);
-				const phoneMatch = phone
-					.replace(/\D/g, "")
-					.includes(query.replace(/\D/g, ""));
-				const hasMatch = nameMatch || phoneMatch;
-
-				if (!hasMatch) {
-					continue;
-				}
-			}
-
-			results.push({
-				_id: item._id,
-				_creationTime: item._creationTime,
-				name,
-				maskedPhone: maskPhone(phone),
-				gender: item.gender,
-				department: item.department,
-				ageGroup: item.ageGroup,
-				stayType: item.stayType,
-				isPaid: item.isPaid,
-				tfTeam: item.tfTeam,
-				tshirtSize: item.tshirtSize,
-			});
-		}
-
-		// 최신순 정렬
-		results.sort((a, b) => b._creationTime - a._creationTime);
-
-		return results;
 	},
 });

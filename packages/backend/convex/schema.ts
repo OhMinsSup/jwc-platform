@@ -51,8 +51,8 @@ export default defineSchema({
 		// 기본 개인 정보
 		// ──────────────────────────────────────────────────────
 
-		/** 이름 (암호화됨 - JSON 문자열: {ciphertext, iv}) */
-		name: v.record(v.string(), v.string()),
+		/** 이름 (평문) */
+		name: v.string(),
 
 		/** 전화번호 (암호화됨 - JSON 문자열: {ciphertext, iv}) */
 		phone: v.record(v.string(), v.string()),
@@ -112,7 +112,13 @@ export default defineSchema({
 		.index("by_phoneHash", ["phoneHash"])
 		.index("by_department", ["department"])
 		.index("by_stayType", ["stayType"])
-		.index("by_isPaid", ["isPaid"]),
+		.index("by_isPaid", ["isPaid"])
+		.index("by_name", ["name"])
+		// Full-text search 인덱스 (이름 검색)
+		.searchIndex("search_name", {
+			searchField: "name",
+			filterFields: ["department"],
+		}),
 
 	/**
 	 * 단축 URL 테이블

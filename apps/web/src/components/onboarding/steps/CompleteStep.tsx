@@ -71,7 +71,7 @@ export function CompleteStep() {
 				width={width}
 			/>
 
-			<div className="mx-auto w-full max-w-xl px-4 py-12">
+			<div className="mx-auto w-full max-w-xl">
 				<motion.div
 					animate="visible"
 					className="flex flex-col items-center text-center"

@@ -55,7 +55,7 @@ export function WelcomeStep() {
 	};
 
 	return (
-		<div className="flex min-h-screen items-center justify-center px-4 py-12">
+		<div className="flex flex-col items-center justify-center">
 			<motion.div
 				animate="visible"
 				className="w-full max-w-lg text-center"

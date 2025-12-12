@@ -1,4 +1,6 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { Button } from "@jwc/ui";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { Home } from "lucide-react";
 import { lazy, Suspense } from "react";
 import { OnboardingErrorBoundary } from "@/components/onboarding";
 import StepProgress from "@/components/onboarding/StepProgress";
@@ -76,15 +78,55 @@ function OnboardingStepPage() {
 	};
 
 	return (
-		<div className="min-h-screen bg-background">
+		<div className="flex min-h-svh flex-col bg-muted/5">
+			{/* Navbar */}
+			<header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+				<div className="container mx-auto flex h-16 items-center justify-between px-4">
+					<Link
+						className="flex items-center gap-2 font-bold text-xl tracking-tight"
+						to="/"
+					>
+						<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+							<svg
+								className="h-5 w-5"
+								fill="none"
+								stroke="currentColor"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth="2"
+								viewBox="0 0 24 24"
+								xmlns="http://www.w3.org/2000/svg"
+							>
+								<title>JWC Retreat Logo</title>
+								<path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
+							</svg>
+						</div>
+						<span>JWC Retreat</span>
+					</Link>
+					<div className="flex items-center gap-4">
+						<Button asChild size="sm" variant="ghost">
+							<Link to="/">
+								<Home className="mr-2 h-4 w-4" />
+								홈으로
+							</Link>
+						</Button>
+					</div>
+				</div>
+			</header>
+
 			{showProgress && (
-				<div className="sticky top-0 z-10 border-border/50 border-b bg-background/80 backdrop-blur-sm">
-					<div className="mx-auto max-w-xl px-4 py-4">
+				<div className="sticky top-16 z-40 border-b bg-background/80 backdrop-blur-sm">
+					<div className="container mx-auto max-w-2xl px-4 py-4">
 						<StepProgress currentStep={currentStep} />
 					</div>
 				</div>
 			)}
-			<Suspense fallback={<StepLoader />}>{renderStep()}</Suspense>
+
+			<main className="flex-1 py-8 md:py-12">
+				<div className="container mx-auto max-w-2xl px-4">
+					<Suspense fallback={<StepLoader />}>{renderStep()}</Suspense>
+				</div>
+			</main>
 		</div>
 	);
 }

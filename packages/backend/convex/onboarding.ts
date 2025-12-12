@@ -1,3 +1,4 @@
+import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import {
@@ -51,28 +52,11 @@ const encryptedDataValidator = v.object({
 });
 
 /**
- * 모든 수련회 신청서 조회
- */
-export const getAll = query({
-	handler: async (ctx) => await ctx.db.query("onboarding").collect(),
-});
-
-/**
  * 모든 수련회 신청서 조회 (Internal)
  * - Node.js 액션에서 호출 가능
  */
 export const getAllInternal = internalQuery({
 	handler: async (ctx) => await ctx.db.query("onboarding").collect(),
-});
-
-/**
- * ID로 수련회 신청서 조회
- */
-export const getById = query({
-	args: {
-		id: v.id("onboarding"),
-	},
-	handler: async (ctx, args) => await ctx.db.get(args.id),
 });
 
 /**
@@ -87,28 +71,13 @@ export const getByIdInternal = internalQuery({
 });
 
 /**
- * 전화번호 해시로 수련회 신청서 조회
- * - 클라이언트에서 해시를 계산해서 전달
- */
-export const getByPhoneHash = query({
-	args: {
-		phoneHash: v.string(),
-	},
-	handler: async (ctx, args) =>
-		await ctx.db
-			.query("onboarding")
-			.withIndex("by_phoneHash", (q) => q.eq("phoneHash", args.phoneHash))
-			.first(),
-});
-
-/**
  * 수련회 신청서 Upsert Internal Mutation
  * - action에서 호출하는 내부 mutation
  */
 export const upsertInternal = internalMutation({
 	args: {
-		// 암호화된 개인 정보
-		encryptedName: encryptedDataValidator,
+		// 개인 정보
+		name: v.string(),
 		encryptedPhone: encryptedDataValidator,
 		phoneHash: v.string(),
 
@@ -141,7 +110,7 @@ export const upsertInternal = internalMutation({
 		if (existing) {
 			// 기존 신청서가 있으면 수정 (회비 납입 상태는 유지)
 			await ctx.db.patch(existing._id, {
-				name: args.encryptedName,
+				name: args.name,
 				phone: args.encryptedPhone,
 				gender: args.gender,
 				department: args.department,
@@ -173,7 +142,7 @@ export const upsertInternal = internalMutation({
 
 		// 신규 생성
 		const newId = await ctx.db.insert("onboarding", {
-			name: args.encryptedName,
+			name: args.name,
 			phone: args.encryptedPhone,
 			phoneHash: args.phoneHash,
 			gender: args.gender,
@@ -321,5 +290,89 @@ export const updateFieldFromSpreadsheet = mutation({
 		console.log(`[Spreadsheet Webhook] Updated ${field} to ${value} for ${id}`);
 
 		return { success: true, field, value };
+	},
+});
+
+/**
+ * 신청서 목록 조회 (Full-text Search + 페이지네이션)
+ * - Convex searchIndex를 사용한 이름 검색
+ * - 부서 필터 지원
+ */
+export const searchOnboardings = query({
+	args: {
+		searchQuery: v.optional(v.string()),
+		department: v.optional(departmentValidator),
+		paginationOpts: paginationOptsValidator,
+	},
+	handler: async (ctx, args) => {
+		const dept = args.department;
+		const searchTerm = args.searchQuery?.trim();
+
+		// 검색어가 있으면 searchIndex 사용
+		if (searchTerm) {
+			// searchIndex는 paginate를 직접 지원하지 않으므로 take 사용
+			const searchResults = dept
+				? await ctx.db
+						.query("onboarding")
+						.withSearchIndex("search_name", (q) =>
+							q.search("name", searchTerm).eq("department", dept)
+						)
+						.take(100)
+				: await ctx.db
+						.query("onboarding")
+						.withSearchIndex("search_name", (q) => q.search("name", searchTerm))
+						.take(100);
+
+			// 목록용 데이터로 변환
+			const results = searchResults.map((item) => ({
+				_id: item._id,
+				_creationTime: item._creationTime,
+				name: item.name as string,
+				gender: item.gender,
+				department: item.department,
+				ageGroup: item.ageGroup,
+				stayType: item.stayType,
+				isPaid: item.isPaid,
+				tfTeam: item.tfTeam,
+				tshirtSize: item.tshirtSize,
+			}));
+
+			return {
+				page: results,
+				isDone: true,
+				continueCursor: "",
+			};
+		}
+
+		// 검색어가 없으면 일반 쿼리 + 페이지네이션
+		const baseQuery = dept
+			? ctx.db
+					.query("onboarding")
+					.withIndex("by_department", (q) => q.eq("department", dept))
+			: ctx.db.query("onboarding");
+
+		const paginatedResult = await baseQuery
+			.order("desc")
+			.paginate(args.paginationOpts);
+
+		// 목록용 데이터로 변환
+		const results = paginatedResult.page.map((item) => ({
+			_id: item._id,
+			_creationTime: item._creationTime,
+			name: item.name as string,
+			gender: item.gender,
+			department: item.department,
+			ageGroup: item.ageGroup,
+			stayType: item.stayType,
+			isPaid: item.isPaid,
+			tfTeam: item.tfTeam,
+			tshirtSize: item.tshirtSize,
+		}));
+
+		return {
+			page: results,
+			isDone: paginatedResult.isDone,
+			continueCursor: paginatedResult.continueCursor,
+		};
 	},
 });
