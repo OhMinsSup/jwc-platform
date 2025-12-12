@@ -47,6 +47,10 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 				content: "width=device-width, initial-scale=1",
 			},
 			{
+				name: "robots",
+				content: "noindex, nofollow",
+			},
+			{
 				title: "2026 동계 청년부 수련회 - 멸종위기사랑",
 			},
 			{

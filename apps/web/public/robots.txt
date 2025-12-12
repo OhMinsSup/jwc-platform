@@ -1,5 +1,4 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Disallow: /
 
-Sitemap:  https://jwc.vercel.app/sitemap.xml
