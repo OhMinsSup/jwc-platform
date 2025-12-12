@@ -57,8 +57,6 @@
     "./components/shadcn/tooltip": "./src/components/shadcn/tooltip.tsx",
     "./components/hooks/use-toast": "./src/components/hooks/use-toast.ts",
     "./components/hooks/use-mobile": "./src/components/hooks/use-mobile.tsx",
-    "./components/custom/client-only": "./src/components/custom/client-only.tsx",
-    "./components/custom/divider": "./src/components/custom/divider.tsx",
     ".": "./src/index.ts",
     "./lib/utils": "./src/lib/utils/index.ts"
   },

@@ -69,8 +69,3 @@ export * from "./components/hooks/use-toast";
 // Icons
 
 export * from "./components/shadcn/icons";
-
-// Custom
-
-export * from "./components/custom/client-only";
-export * from "./components/custom/divider";
