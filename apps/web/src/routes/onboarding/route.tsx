@@ -20,6 +20,17 @@ export const Route = createFileRoute("/onboarding")({
 			throw redirect({ to: "/onboarding/$step", params: { step: "welcome" } });
 		}
 	},
+	head: () => ({
+		meta: [
+			{
+				title: "수련회 신청하기 - 2026 동계 청년부 수련회",
+			},
+			{
+				property: "og:title",
+				content: "수련회 신청하기 - 2026 동계 청년부 수련회",
+			},
+		],
+	}),
 	component: OnboardingLayout,
 	errorComponent: OnboardingErrorBoundary,
 });

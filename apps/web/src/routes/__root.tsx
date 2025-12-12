@@ -47,7 +47,43 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 				content: "width=device-width, initial-scale=1",
 			},
 			{
-				title: "My App",
+				title: "2026 동계 청년부 수련회 - 멸종위기사랑",
+			},
+			{
+				name: "description",
+				content:
+					"2026년 1월 8일(목) ~ 1월 11일(일) 광림 수도원에서 진행되는 청년부 수련회에 초대합니다.",
+			},
+			{
+				name: "keywords",
+				content:
+					"청년부, 수련회, 2026, 동계수련회, 멸종위기사랑, 광림수도원, 교회수련회",
+			},
+			{
+				property: "og:type",
+				content: "website",
+			},
+			{
+				property: "og:title",
+				content: "2026 동계 청년부 수련회 - 멸종위기사랑",
+			},
+			{
+				property: "og:description",
+				content:
+					"2026년 1월 8일(목) ~ 1월 11일(일) 광림 수도원에서 진행되는 청년부 수련회에 초대합니다.",
+			},
+			{
+				name: "twitter:card",
+				content: "summary_large_image",
+			},
+			{
+				name: "twitter:title",
+				content: "2026 동계 청년부 수련회 - 멸종위기사랑",
+			},
+			{
+				name: "twitter:description",
+				content:
+					"2026년 1월 8일(목) ~ 1월 11일(일) 광림 수도원에서 진행되는 청년부 수련회에 초대합니다.",
 			},
 		],
 		links: [
@@ -55,12 +91,16 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 				rel: "stylesheet",
 				href: appCss,
 			},
+			{
+				rel: "icon",
+				href: "/favicon.ico",
+			},
 		],
 	}),
 
 	component: RootDocument,
 	beforeLoad: async (ctx) => {
-		const { userId, token } = await fetchAuth();
+		const { token, userId } = await fetchAuth();
 		if (token) {
 			ctx.context.convexQueryClient.serverHttpClient?.setAuth(token);
 		}
@@ -75,7 +115,7 @@ function RootDocument() {
 			authClient={authClient}
 			client={context.convexClient}
 		>
-			<html lang="en">
+			<html lang="ko">
 				{/** biome-ignore lint/style/noHeadElement: <explanation> Head */}
 				<head>
 					<HeadContent />

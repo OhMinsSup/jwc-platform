@@ -37,6 +37,30 @@ export const Route = createFileRoute("/application/$id")({
 		}
 		return data;
 	},
+	head: ({ loaderData }) => {
+		if (!loaderData) {
+			return { meta: [] };
+		}
+		return {
+			meta: [
+				{
+					title: `${loaderData.name}님의 수련회 신청서 - 2026 동계 청년부 수련회`,
+				},
+				{
+					property: "og:title",
+					content: `${loaderData.name}님의 수련회 신청서 - 2026 동계 청년부 수련회`,
+				},
+				{
+					name: "description",
+					content: `${loaderData.name}님의 2026 동계 청년부 수련회 신청 내역입니다.`,
+				},
+				{
+					property: "og:description",
+					content: `${loaderData.name}님의 2026 동계 청년부 수련회 신청 내역입니다.`,
+				},
+			],
+		};
+	},
 	errorComponent: ({ error }) => (
 		<div className="flex min-h-svh flex-col items-center justify-center gap-4 bg-background">
 			<p className="text-destructive">

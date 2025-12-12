@@ -7,6 +7,17 @@ import { ArrowRight, Calendar, Clock, MapPin, Users } from "lucide-react";
 
 export const Route = createFileRoute("/")({
 	component: HomeComponent,
+	head: () => ({
+		meta: [
+			{
+				title: "2026 동계 청년부 수련회 - 멸종위기사랑",
+			},
+			{
+				property: "og:title",
+				content: "2026 동계 청년부 수련회 - 멸종위기사랑",
+			},
+		],
+	}),
 });
 
 /** 수련회 정보 */
