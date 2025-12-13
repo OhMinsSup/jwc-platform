@@ -31,7 +31,7 @@ interface LogoProps extends Omit<ComponentProps<typeof Link>, "to"> {
 
 export function Logo({
 	to = "/",
-	showText = true,
+	showText = false,
 	className = "",
 	children,
 	...props
@@ -45,7 +45,7 @@ export function Logo({
 			<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
 				<LogoIcon />
 			</div>
-			{showText && <span>JWC Retreat</span>}
+			{showText && <span>JWC</span>}
 			{children}
 		</Link>
 	);

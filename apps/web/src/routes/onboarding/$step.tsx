@@ -1,6 +1,4 @@
-import { Button } from "@jwc/ui";
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
-import { Home } from "lucide-react";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { lazy, Suspense } from "react";
 import { LoadingSpinner, Navbar, PageLayout } from "@/components/common";
 import { OnboardingErrorBoundary } from "@/components/onboarding";
@@ -79,20 +77,7 @@ function OnboardingStepPage() {
 	};
 
 	return (
-		<PageLayout
-			header={
-				<Navbar
-					rightSlot={
-						<Button asChild size="sm" variant="ghost">
-							<Link to="/">
-								<Home className="mr-2 h-4 w-4" />
-								홈으로
-							</Link>
-						</Button>
-					}
-				/>
-			}
-		>
+		<PageLayout header={<Navbar />}>
 			{showProgress && (
 				<div className="sticky top-16 z-40 border-b bg-background/80 backdrop-blur-sm">
 					<div className="container mx-auto max-w-2xl px-4 py-4">

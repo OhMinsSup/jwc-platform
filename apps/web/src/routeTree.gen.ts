@@ -9,6 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as OnboardingRouteRouteImport } from './routes/onboarding/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApplicationIndexRouteImport } from './routes/application/index'
@@ -18,6 +20,16 @@ import { Route as ApplicationIdRouteImport } from './routes/application/$id'
 import { Route as ApiWebhookSpreadsheetRouteImport } from './routes/api/webhook/spreadsheet'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OnboardingRouteRoute = OnboardingRouteRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
@@ -62,6 +74,8 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/onboarding': typeof OnboardingRouteRouteWithChildren
+  '/about': typeof AboutRoute
+  '/contact': typeof ContactRoute
   '/application/$id': typeof ApplicationIdRoute
   '/onboarding/$step': typeof OnboardingStepRoute
   '/s/$code': typeof SCodeRoute
@@ -72,6 +86,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/onboarding': typeof OnboardingRouteRouteWithChildren
+  '/about': typeof AboutRoute
+  '/contact': typeof ContactRoute
   '/application/$id': typeof ApplicationIdRoute
   '/onboarding/$step': typeof OnboardingStepRoute
   '/s/$code': typeof SCodeRoute
@@ -83,6 +99,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/onboarding': typeof OnboardingRouteRouteWithChildren
+  '/about': typeof AboutRoute
+  '/contact': typeof ContactRoute
   '/application/$id': typeof ApplicationIdRoute
   '/onboarding/$step': typeof OnboardingStepRoute
   '/s/$code': typeof SCodeRoute
@@ -95,6 +113,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/onboarding'
+    | '/about'
+    | '/contact'
     | '/application/$id'
     | '/onboarding/$step'
     | '/s/$code'
@@ -105,6 +125,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/onboarding'
+    | '/about'
+    | '/contact'
     | '/application/$id'
     | '/onboarding/$step'
     | '/s/$code'
@@ -115,6 +137,8 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/onboarding'
+    | '/about'
+    | '/contact'
     | '/application/$id'
     | '/onboarding/$step'
     | '/s/$code'
@@ -126,6 +150,8 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   OnboardingRouteRoute: typeof OnboardingRouteRouteWithChildren
+  AboutRoute: typeof AboutRoute
+  ContactRoute: typeof ContactRoute
   ApplicationIdRoute: typeof ApplicationIdRoute
   SCodeRoute: typeof SCodeRoute
   ApplicationIndexRoute: typeof ApplicationIndexRoute
@@ -135,6 +161,20 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/onboarding': {
       id: '/onboarding'
       path: '/onboarding'
@@ -209,6 +249,8 @@ const OnboardingRouteRouteWithChildren = OnboardingRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   OnboardingRouteRoute: OnboardingRouteRouteWithChildren,
+  AboutRoute: AboutRoute,
+  ContactRoute: ContactRoute,
   ApplicationIdRoute: ApplicationIdRoute,
   SCodeRoute: SCodeRoute,
   ApplicationIndexRoute: ApplicationIndexRoute,

@@ -67,13 +67,22 @@ function HomeComponent() {
 				<Navbar
 					navSlot={
 						<>
-							<Link className="transition-colors hover:text-foreground" to="/">
+							<Link
+								className="font-semibold text-foreground transition-colors"
+								to="/"
+							>
 								홈
 							</Link>
-							<Link className="transition-colors hover:text-foreground" to="/">
+							<Link
+								className="transition-colors hover:text-foreground"
+								to="/about"
+							>
 								수련회 안내
 							</Link>
-							<Link className="transition-colors hover:text-foreground" to="/">
+							<Link
+								className="transition-colors hover:text-foreground"
+								to="/contact"
+							>
 								문의하기
 							</Link>
 						</>
