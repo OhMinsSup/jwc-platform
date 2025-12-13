@@ -19,6 +19,12 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { ArrowLeft, Calendar, Car, CheckCircle2, User } from "lucide-react";
+import {
+	FullPageLoading,
+	InfoBlock,
+	InfoGrid,
+	InfoRow,
+} from "@/components/common";
 
 export const Route = createFileRoute("/application/$id")({
 	component: ApplicationDetailPage,
@@ -71,14 +77,7 @@ export const Route = createFileRoute("/application/$id")({
 			</Button>
 		</div>
 	),
-	pendingComponent: () => (
-		<div className="flex min-h-svh items-center justify-center bg-background">
-			<div className="flex flex-col items-center gap-4">
-				<div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-				<p className="text-muted-foreground">불러오는 중...</p>
-			</div>
-		</div>
-	),
+	pendingComponent: () => <FullPageLoading message="불러오는 중..." />,
 });
 
 function ApplicationDetailPage() {
@@ -152,23 +151,15 @@ function UserInfoCard() {
 					기본 정보
 				</CardTitle>
 			</CardHeader>
-			<CardContent className="grid gap-4 text-sm">
-				<div className="grid grid-cols-2 gap-1">
-					<span className="text-muted-foreground">성별</span>
-					<span className="font-medium">
-						{data.gender === "male" ? "남성" : "여성"}
-					</span>
-				</div>
-				<div className="grid grid-cols-2 gap-1">
-					<span className="text-muted-foreground">부서</span>
-					<span className="font-medium">
-						{DEPARTMENT_LABELS[data.department]}
-					</span>
-				</div>
-				<div className="grid grid-cols-2 gap-1">
-					<span className="text-muted-foreground">또래</span>
-					<span className="font-medium">{data.ageGroup}</span>
-				</div>
+			<CardContent>
+				<InfoGrid>
+					<InfoRow
+						label="성별"
+						value={data.gender === "male" ? "남성" : "여성"}
+					/>
+					<InfoRow label="부서" value={DEPARTMENT_LABELS[data.department]} />
+					<InfoRow label="또래" value={data.ageGroup} />
+				</InfoGrid>
 			</CardContent>
 		</Card>
 	);
@@ -185,29 +176,26 @@ function ScheduleInfoCard() {
 					참석 일정
 				</CardTitle>
 			</CardHeader>
-			<CardContent className="grid gap-4 text-sm">
-				<div className="grid grid-cols-2 gap-1">
-					<span className="text-muted-foreground">숙박 형태</span>
-					<span className="font-medium">{STAY_TYPE_LABELS[data.stayType]}</span>
-				</div>
-				{data.attendanceDate && (
-					<div className="grid grid-cols-2 gap-1">
-						<span className="text-muted-foreground">참석 날짜</span>
-						<span className="font-medium">
-							{format(new Date(data.attendanceDate), "yyyy년 M월 d일 a h시", {
-								locale: ko,
-							})}
-						</span>
-					</div>
-				)}
-				{data.pickupTimeDescription && (
-					<div className="col-span-2 mt-2">
-						<span className="block text-muted-foreground">
-							픽업/부분참석 메모
-						</span>
-						<p className="mt-1 font-medium">{data.pickupTimeDescription}</p>
-					</div>
-				)}
+			<CardContent>
+				<InfoGrid>
+					<InfoRow label="숙박 형태" value={STAY_TYPE_LABELS[data.stayType]} />
+					{data.attendanceDate && (
+						<InfoRow
+							label="참석 날짜"
+							value={format(
+								new Date(data.attendanceDate),
+								"yyyy년 M월 d일 a h시",
+								{ locale: ko }
+							)}
+						/>
+					)}
+					{data.pickupTimeDescription && (
+						<InfoBlock
+							label="픽업/부분참석 메모"
+							value={data.pickupTimeDescription}
+						/>
+					)}
+				</InfoGrid>
 			</CardContent>
 		</Card>
 	);
@@ -223,21 +211,21 @@ function AdditionalInfoCard() {
 					추가 정보
 				</CardTitle>
 			</CardHeader>
-			<CardContent className="grid gap-4 text-sm">
-				<div className="grid grid-cols-2 gap-1">
-					<span className="text-muted-foreground">TF팀 지원</span>
-					<span className="font-medium">
-						{data.tfTeam && data.tfTeam !== "none"
-							? TF_TEAM_LABELS[data.tfTeam]
-							: "지원 안함"}
-					</span>
-				</div>
-				<div className="grid grid-cols-2 gap-1">
-					<span className="text-muted-foreground">티셔츠 사이즈</span>
-					<span className="font-medium">
-						{data.tshirtSize ? TSHIRT_SIZE_LABELS[data.tshirtSize] : "-"}
-					</span>
-				</div>
+			<CardContent>
+				<InfoGrid>
+					<InfoRow
+						label="TF팀 지원"
+						value={
+							data.tfTeam && data.tfTeam !== "none"
+								? TF_TEAM_LABELS[data.tfTeam]
+								: "지원 안함"
+						}
+					/>
+					<InfoRow
+						label="티셔츠 사이즈"
+						value={data.tshirtSize ? TSHIRT_SIZE_LABELS[data.tshirtSize] : "-"}
+					/>
+				</InfoGrid>
 			</CardContent>
 		</Card>
 	);
@@ -253,17 +241,16 @@ function RideInfoCard() {
 					차량 지원
 				</CardTitle>
 			</CardHeader>
-			<CardContent className="grid gap-4 text-sm">
-				<div className="grid grid-cols-2 gap-1">
-					<span className="text-muted-foreground">지원 여부</span>
-					<span className="font-medium text-green-600">가능</span>
-				</div>
-				{data.rideDetails && (
-					<div className="col-span-2 mt-2">
-						<span className="block text-muted-foreground">상세 내용</span>
-						<p className="mt-1 font-medium">{data.rideDetails}</p>
-					</div>
-				)}
+			<CardContent>
+				<InfoGrid>
+					<InfoRow
+						label="지원 여부"
+						value={<span className="text-green-600">가능</span>}
+					/>
+					{data.rideDetails && (
+						<InfoBlock label="상세 내용" value={data.rideDetails} />
+					)}
+				</InfoGrid>
 			</CardContent>
 		</Card>
 	);

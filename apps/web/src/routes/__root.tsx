@@ -92,6 +92,15 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 		],
 		links: [
 			{
+				rel: "preconnect",
+				href: "https://cdn.jsdelivr.net",
+				crossOrigin: "anonymous",
+			},
+			{
+				rel: "stylesheet",
+				href: "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css",
+			},
+			{
 				rel: "stylesheet",
 				href: appCss,
 			},

@@ -4,6 +4,12 @@ import { Button } from "@jwc/ui";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Calendar, Clock, MapPin, Users } from "lucide-react";
+import {
+	ConnectionStatus,
+	Footer,
+	Navbar,
+	PageLayout,
+} from "@/components/common";
 
 export const Route = createFileRoute("/")({
 	component: HomeComponent,
@@ -49,184 +55,138 @@ const FEATURES = [
 	},
 ];
 
-/** 상태 텍스트 반환 */
-function getStatusText(isLoading: boolean, isConnected: boolean): string {
-	if (isLoading) {
-		return "연결 중...";
-	}
-	if (isConnected) {
-		return "신청 접수 중";
-	}
-	return "서버 점검 중";
-}
-
 function HomeComponent() {
 	const healthCheck = useQuery(convexQuery(api.healthCheck.get, {}));
 
 	const isConnected = healthCheck.data === "OK";
-	const statusColor = isConnected ? "bg-green-500" : "bg-orange-500";
-	const pingColor = isConnected ? "bg-green-400" : "bg-orange-400";
 
 	return (
-		<div className="flex min-h-svh flex-col bg-background text-foreground">
-			{/* Navbar */}
-			<header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-				<div className="container mx-auto flex h-16 items-center justify-between px-4">
-					<div className="flex items-center gap-2 font-bold text-xl tracking-tight">
-						<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-							<svg
-								aria-labelledby="logo-title"
-								className="h-5 w-5"
-								fill="none"
-								role="img"
-								stroke="currentColor"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth="2"
-								viewBox="0 0 24 24"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<title id="logo-title">JWC Retreat Logo</title>
-								<path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
-							</svg>
-						</div>
-						<span>JWC Retreat</span>
-					</div>
-					<nav className="hidden items-center gap-6 font-medium text-muted-foreground text-sm md:flex">
-						<Link className="transition-colors hover:text-foreground" to="/">
-							홈
-						</Link>
-						<Link className="transition-colors hover:text-foreground" to="/">
-							수련회 안내
-						</Link>
-						<Link className="transition-colors hover:text-foreground" to="/">
-							문의하기
-						</Link>
-					</nav>
-					<div className="flex items-center gap-4">
-						<div className="hidden items-center gap-2 text-muted-foreground text-xs sm:flex">
-							<span className="relative flex h-2 w-2">
-								<span
-									className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-75 ${pingColor}`}
-								/>
-								<span
-									className={`relative inline-flex h-2 w-2 rounded-full ${statusColor}`}
-								/>
-							</span>
-							{getStatusText(healthCheck.isLoading, isConnected)}
-						</div>
-						<Button
-							asChild
-							className="rounded-full px-6 font-semibold"
-							size="sm"
-						>
-							<Link params={{ step: "welcome" }} to="/onboarding/$step">
-								신청하기
+		<PageLayout
+			footer={<Footer />}
+			header={
+				<Navbar
+					navSlot={
+						<>
+							<Link className="transition-colors hover:text-foreground" to="/">
+								홈
 							</Link>
-						</Button>
-					</div>
-				</div>
-			</header>
-
-			<main className="flex-1">
-				{/* Hero Section */}
-				<section className="container mx-auto px-4 py-24 md:py-32">
-					<div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-8">
-						<div className="flex flex-col justify-center space-y-8">
-							<div className="space-y-4">
-								<div className="inline-flex items-center rounded-full border px-3 py-1 font-medium text-muted-foreground text-sm">
-									<span className="mr-2 inline-block h-2 w-2 rounded-full bg-primary" />
-									{RETREAT_INFO.date}
-								</div>
-								<h1 className="font-bold text-4xl tracking-tighter sm:text-5xl xl:text-6xl/none">
-									{RETREAT_INFO.title}
-									<br />
-									<span className="text-primary">"{RETREAT_INFO.theme}"</span>
-								</h1>
-								<p className="max-w-[600px] text-muted-foreground md:text-xl">
-									함께 모여 예배하고 교제하며, 하나님의 사랑을 깊이 경험하는
-									시간에 여러분을 초대합니다.
-								</p>
+							<Link className="transition-colors hover:text-foreground" to="/">
+								수련회 안내
+							</Link>
+							<Link className="transition-colors hover:text-foreground" to="/">
+								문의하기
+							</Link>
+						</>
+					}
+					rightSlot={
+						<>
+							<ConnectionStatus
+								connectedText="신청 접수 중"
+								disconnectedText="서버 점검 중"
+								isConnected={isConnected}
+								isLoading={healthCheck.isLoading}
+								loadingText="연결 중..."
+							/>
+							<Button
+								asChild
+								className="rounded-full px-6 font-semibold"
+								size="sm"
+							>
+								<Link params={{ step: "welcome" }} to="/onboarding/$step">
+									신청하기
+								</Link>
+							</Button>
+						</>
+					}
+				/>
+			}
+		>
+			{/* Hero Section */}
+			<section className="container mx-auto px-4 py-24 md:py-32">
+				<div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-8">
+					<div className="flex flex-col justify-center space-y-8">
+						<div className="space-y-4">
+							<div className="inline-flex items-center rounded-full border px-3 py-1 font-medium text-muted-foreground text-sm">
+								<span className="mr-2 inline-block h-2 w-2 rounded-full bg-primary" />
+								{RETREAT_INFO.date}
 							</div>
-							<div className="flex flex-col gap-3 min-[400px]:flex-row">
-								<Button
-									asChild
-									className="rounded-full px-8 text-base"
-									size="lg"
-								>
-									<Link params={{ step: "welcome" }} to="/onboarding/$step">
-										지금 신청하기
-										<ArrowRight className="ml-2 h-4 w-4" />
-									</Link>
-								</Button>
-								<Button
-									asChild
-									className="rounded-full px-8 text-base"
-									size="lg"
-									variant="outline"
-								>
-									<Link to="/application">신청 내역 조회</Link>
-								</Button>
-							</div>
-							<div className="flex items-center gap-4 text-muted-foreground text-sm">
-								<div className="flex items-center gap-1">
-									<MapPin className="h-4 w-4" />
-									{RETREAT_INFO.location}
-								</div>
-								<div className="h-4 w-px bg-border" />
-								<div className="flex items-center gap-1">
-									<Clock className="h-4 w-4" />
-									마감: {RETREAT_INFO.deadline}
-								</div>
-							</div>
-						</div>
-						<div className="relative mx-auto aspect-video w-full max-w-[600px] overflow-hidden rounded-xl border bg-muted/50 shadow-xl lg:aspect-square">
-							<div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
-								{/* Placeholder for Hero Image */}
-								<div className="text-center">
-									<Calendar className="mx-auto mb-4 h-16 w-16 opacity-20" />
-									<p>수련회 포스터 / 이미지 영역</p>
-								</div>
-							</div>
-						</div>
-					</div>
-				</section>
-
-				{/* Features Section */}
-				<section className="border-t bg-muted/40 py-24">
-					<div className="container mx-auto px-4">
-						<div className="mb-12 text-center">
-							<h2 className="font-bold text-3xl tracking-tighter sm:text-4xl">
-								함께하는 즐거움
-							</h2>
-							<p className="mt-4 text-muted-foreground md:text-lg">
-								이번 수련회에서 경험할 수 있는 특별한 시간들을 소개합니다.
+							<h1 className="font-bold text-4xl tracking-tighter sm:text-5xl xl:text-6xl/none">
+								{RETREAT_INFO.title}
+								<br />
+								<span className="text-primary">"{RETREAT_INFO.theme}"</span>
+							</h1>
+							<p className="max-w-[600px] text-muted-foreground md:text-xl">
+								함께 모여 예배하고 교제하며, 하나님의 사랑을 깊이 경험하는
+								시간에 여러분을 초대합니다.
 							</p>
 						</div>
-						<div className="grid gap-8 md:grid-cols-3">
-							{FEATURES.map((feature, index) => (
-								<div
-									className="group relative overflow-hidden rounded-2xl border bg-background p-8 transition-all hover:shadow-lg"
-									key={`feature:${index.toString()}`}
-								>
-									<div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-										<feature.icon className="h-6 w-6" />
-									</div>
-									<h3 className="mb-2 font-bold text-xl">{feature.title}</h3>
-									<p className="text-muted-foreground">{feature.description}</p>
-								</div>
-							))}
+						<div className="flex flex-col gap-3 min-[400px]:flex-row">
+							<Button asChild className="rounded-full px-8 text-base" size="lg">
+								<Link params={{ step: "welcome" }} to="/onboarding/$step">
+									지금 신청하기
+									<ArrowRight className="ml-2 h-4 w-4" />
+								</Link>
+							</Button>
+							<Button
+								asChild
+								className="rounded-full px-8 text-base"
+								size="lg"
+								variant="outline"
+							>
+								<Link to="/application">신청 내역 조회</Link>
+							</Button>
+						</div>
+						<div className="flex items-center gap-4 text-muted-foreground text-sm">
+							<div className="flex items-center gap-1">
+								<MapPin className="h-4 w-4" />
+								{RETREAT_INFO.location}
+							</div>
+							<div className="h-4 w-px bg-border" />
+							<div className="flex items-center gap-1">
+								<Clock className="h-4 w-4" />
+								마감: {RETREAT_INFO.deadline}
+							</div>
 						</div>
 					</div>
-				</section>
-			</main>
-
-			{/* Footer */}
-			<footer className="border-t py-12 text-center text-muted-foreground text-sm">
-				<div className="container mx-auto px-4">
-					<p>© 2026 JWC Youth. All rights reserved.</p>
+					<div className="relative mx-auto aspect-video w-full max-w-[600px] overflow-hidden rounded-xl border bg-muted/50 shadow-xl lg:aspect-square">
+						<div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
+							{/* Placeholder for Hero Image */}
+							<div className="text-center">
+								<Calendar className="mx-auto mb-4 h-16 w-16 opacity-20" />
+								<p>수련회 포스터 / 이미지 영역</p>
+							</div>
+						</div>
+					</div>
 				</div>
-			</footer>
-		</div>
+			</section>
+
+			{/* Features Section */}
+			<section className="border-t bg-muted/40 py-24">
+				<div className="container mx-auto px-4">
+					<div className="mb-12 text-center">
+						<h2 className="font-bold text-3xl tracking-tighter sm:text-4xl">
+							함께하는 즐거움
+						</h2>
+						<p className="mt-4 text-muted-foreground md:text-lg">
+							이번 수련회에서 경험할 수 있는 특별한 시간들을 소개합니다.
+						</p>
+					</div>
+					<div className="grid gap-8 md:grid-cols-3">
+						{FEATURES.map((feature, index) => (
+							<div
+								className="group relative overflow-hidden rounded-2xl border bg-background p-8 transition-all hover:shadow-lg"
+								key={`feature:${index.toString()}`}
+							>
+								<div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+									<feature.icon className="h-6 w-6" />
+								</div>
+								<h3 className="mb-2 font-bold text-xl">{feature.title}</h3>
+								<p className="text-muted-foreground">{feature.description}</p>
+							</div>
+						))}
+					</div>
+				</div>
+			</section>
+		</PageLayout>
 	);
 }

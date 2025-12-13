@@ -39,9 +39,9 @@ const floatAnimation = {
 };
 
 const highlights = [
-	{ icon: Calendar, text: "2026년 겨울", color: "text-blue-500" },
+	{ icon: Calendar, text: "2026년 1월 8일", color: "text-blue-500" },
 	{ icon: Users, text: "청년부 수련회", color: "text-purple-500" },
-	{ icon: MapPin, text: "함께하는 시간", color: "text-green-500" },
+	{ icon: MapPin, text: "광림 수도원", color: "text-green-500" },
 ];
 
 export function WelcomeStep() {
