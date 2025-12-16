@@ -9,7 +9,6 @@
   "files": {
     "ignoreUnknown": false,
     "includes": [
-      "**",
       "!**/temp",
       "!**/packages/db/prisma",
       "!**/.next",

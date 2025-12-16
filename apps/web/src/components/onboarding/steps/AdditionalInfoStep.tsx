@@ -181,7 +181,7 @@ export function AdditionalInfoStep() {
 													{field.value === option.value && (
 														<motion.div
 															animate={{ scale: 1 }}
-															className="-top-2 -right-2 absolute flex h-5 w-5 items-center justify-center rounded-full bg-primary"
+															className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary"
 															initial={{ scale: 0 }}
 														>
 															<Check className="h-3 w-3 text-primary-foreground" />
