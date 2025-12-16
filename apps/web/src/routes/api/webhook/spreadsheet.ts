@@ -79,7 +79,7 @@ export const Route = createFileRoute("/api/webhook/spreadsheet")({
 					}
 
 					// 수정 불가 필드 체크 (ID, 신청일시, 이름, 연락처 등)
-					const readOnlyFields = ["ID", "신청일시", "이름", "연락처", "참석일"];
+					const readOnlyFields = ["ID", "신청일시", "연락처"];
 					if (readOnlyFields.includes(payload.header)) {
 						console.log(`[Webhook] Read-only field: ${payload.header}`);
 						return json({

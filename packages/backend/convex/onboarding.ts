@@ -1,4 +1,5 @@
 import { omit } from "@jwc/utils/common";
+import { dayjs } from "@jwc/utils/date";
 import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
@@ -234,8 +235,54 @@ export const updateFieldFromSpreadsheet = mutation({
 		field: v.string(),
 		value: v.string(),
 	},
+	// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation> 웹훅 필드 매핑 처리</explanation>
 	handler: async (ctx, args) => {
 		const { id, field, value } = args;
+
+		// 참석일자/참석시간 처리
+		if (field === "참석일자" || field === "참석시간") {
+			const doc = await ctx.db.get(id);
+			if (!doc) {
+				return { success: false, error: "Document not found" };
+			}
+
+			let datePart = "";
+			let timePart = "";
+
+			if (doc.attendanceDate) {
+				const d = dayjs(doc.attendanceDate).tz("Asia/Seoul");
+				datePart = d.format("YYYY-MM-DD");
+				timePart = d.format("HH:mm");
+			}
+
+			if (field === "참석일자") {
+				datePart = value;
+			} else if (field === "참석시간") {
+				timePart = value;
+			}
+
+			if (datePart && timePart) {
+				// 한국 시간 기준으로 날짜/시간 조합
+				const dateTimeStr = `${datePart} ${timePart}`;
+				const newDateTime = dayjs.tz(dateTimeStr, "Asia/Seoul");
+
+				if (!newDateTime.isValid()) {
+					return {
+						success: false,
+						error: `Invalid date/time combination: ${dateTimeStr}`,
+					};
+				}
+
+				const isoString = newDateTime.toISOString();
+				await ctx.db.patch(id, { attendanceDate: isoString });
+				console.log(
+					`[Spreadsheet Webhook] Updated attendanceDate to ${isoString} for ${id}`
+				);
+				return { success: true, field, value };
+			}
+
+			return { success: false, error: "Invalid date/time value" };
+		}
 
 		// 업데이트 가능한 필드 목록 및 변환 로직
 		const fieldUpdaters: Record<

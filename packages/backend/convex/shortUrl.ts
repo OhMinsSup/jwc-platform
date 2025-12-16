@@ -36,7 +36,6 @@ function generateShortCode(length: number = CODE_LENGTH): string {
 export const createInternal = internalMutation({
 	args: {
 		targetUrl: v.string(),
-		expiresAt: v.optional(v.number()),
 		metadata: v.optional(
 			v.object({
 				type: v.optional(v.string()),
@@ -44,7 +43,7 @@ export const createInternal = internalMutation({
 			})
 		),
 	},
-	handler: async (ctx, { targetUrl, expiresAt, metadata }) => {
+	handler: async (ctx, { targetUrl, metadata }) => {
 		// 고유한 코드 생성 (충돌 방지)
 		let code: string;
 		let attempts = 0;
@@ -71,7 +70,6 @@ export const createInternal = internalMutation({
 			code,
 			targetUrl,
 			createdAt: Date.now(),
-			expiresAt,
 			metadata,
 		});
 
@@ -85,7 +83,6 @@ export const createInternal = internalMutation({
 export const create = mutation({
 	args: {
 		targetUrl: v.string(),
-		expiresAt: v.optional(v.number()),
 		metadata: v.optional(
 			v.object({
 				type: v.optional(v.string()),
@@ -93,7 +90,7 @@ export const create = mutation({
 			})
 		),
 	},
-	handler: async (ctx, { targetUrl, expiresAt, metadata }) => {
+	handler: async (ctx, { targetUrl, metadata }) => {
 		// 고유한 코드 생성 (충돌 방지)
 		let code: string;
 		let attempts = 0;
@@ -120,7 +117,6 @@ export const create = mutation({
 			code,
 			targetUrl,
 			createdAt: Date.now(),
-			expiresAt,
 			metadata,
 		});
 
@@ -143,11 +139,6 @@ export const getByCode = query({
 			return null;
 		}
 
-		// 만료 확인
-		if (shortUrl.expiresAt && shortUrl.expiresAt < Date.now()) {
-			return null;
-		}
-
 		return shortUrl;
 	},
 });
@@ -164,11 +155,6 @@ export const getByCodeInternal = internalQuery({
 			.first();
 
 		if (!shortUrl) {
-			return null;
-		}
-
-		// 만료 확인
-		if (shortUrl.expiresAt && shortUrl.expiresAt < Date.now()) {
 			return null;
 		}
 
@@ -201,19 +187,9 @@ export const remove = mutation({
  */
 export const cleanupExpired = internalMutation({
 	args: {},
-	handler: async (ctx) => {
-		const now = Date.now();
-		const expiredUrls = await ctx.db
-			.query("shortUrls")
-			.filter((q) => q.lt(q.field("expiresAt"), now))
-			.collect();
+	handler: () => {
+		console.log("cleanupExpired called - not implemented yet");
 
-		let deletedCount = 0;
-		for (const url of expiredUrls) {
-			await ctx.db.delete(url._id);
-			deletedCount += 1;
-		}
-
-		return { deletedCount };
+		return { deletedCount: 0 };
 	},
 });

@@ -33,7 +33,8 @@ interface SpreadsheetRow {
 	department: string;
 	ageGroup: string;
 	stayType: string;
-	attendanceDate: string;
+	attendanceDateOnly: string;
+	attendanceTime: string;
 	pickupTimeDescription: string;
 	isPaid: string;
 	tfTeam: string;
@@ -68,8 +69,11 @@ function transformToSpreadsheetRow(
 		: "";
 
 	const _attendanceDate = onboarding.attendanceDate;
-	const attendanceDate = _attendanceDate
-		? dayjs(_attendanceDate).format("YYYY년 MM월 DD일 (ddd) HH:mm")
+	const attendanceDateOnly = _attendanceDate
+		? dayjs(_attendanceDate).format("YYYY-MM-DD")
+		: "";
+	const attendanceTime = _attendanceDate
+		? dayjs(_attendanceDate).format("HH:mm")
 		: "";
 
 	return {
@@ -81,7 +85,8 @@ function transformToSpreadsheetRow(
 		department,
 		ageGroup: onboarding.ageGroup,
 		stayType,
-		attendanceDate,
+		attendanceDateOnly,
+		attendanceTime,
 		pickupTimeDescription: onboarding.pickupTimeDescription ?? "",
 		isPaid: onboarding.isPaid ? "납입" : "미납",
 		tfTeam,
@@ -236,10 +241,68 @@ export const syncAllToGoogleSheets = internalAction({
 						width: 16,
 					},
 					{
-						key: "attendanceDate",
-						header: "참석일",
-						type: "text",
+						key: "attendanceDateOnly",
+						header: "참석일자",
+						type: "dropdown",
+						options: ["2026-01-08", "2026-01-09", "2026-01-10", "2026-01-11"],
 						width: 12,
+					},
+					{
+						key: "attendanceTime",
+						header: "참석시간",
+						type: "dropdown",
+						options: [
+							"00:00",
+							"00:30",
+							"01:00",
+							"01:30",
+							"02:00",
+							"02:30",
+							"03:00",
+							"03:30",
+							"04:00",
+							"04:30",
+							"05:00",
+							"05:30",
+							"06:00",
+							"06:30",
+							"07:00",
+							"07:30",
+							"08:00",
+							"08:30",
+							"09:00",
+							"09:30",
+							"10:00",
+							"10:30",
+							"11:00",
+							"11:30",
+							"12:00",
+							"12:30",
+							"13:00",
+							"13:30",
+							"14:00",
+							"14:30",
+							"15:00",
+							"15:30",
+							"16:00",
+							"16:30",
+							"17:00",
+							"17:30",
+							"18:00",
+							"18:30",
+							"19:00",
+							"19:30",
+							"20:00",
+							"20:30",
+							"21:00",
+							"21:30",
+							"22:00",
+							"22:30",
+							"23:00",
+							"23:30",
+							"24:00",
+						],
+						width: 10,
 					},
 					{
 						key: "pickupTimeDescription",

@@ -134,9 +134,6 @@ export default defineSchema({
 		/** 생성 시간 */
 		createdAt: v.number(),
 
-		/** 만료 시간 (optional) */
-		expiresAt: v.optional(v.number()),
-
 		/** 메타데이터 (용도, 관련 ID 등) */
 		metadata: v.optional(
 			v.object({
