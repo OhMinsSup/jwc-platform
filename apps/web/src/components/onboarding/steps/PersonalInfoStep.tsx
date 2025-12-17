@@ -20,6 +20,7 @@ import {
 	SelectValue,
 	Sheet,
 	SheetContent,
+	SheetDescription,
 	SheetHeader,
 	SheetTitle,
 	SheetTrigger,
@@ -152,7 +153,6 @@ export function PersonalInfoStep() {
 			setPersonalInfo(data);
 			setCurrentStep("attendance");
 			await navigate({
-				to: "/onboarding/$step",
 				params: { step: "attendance" },
 			});
 		});
@@ -161,7 +161,7 @@ export function PersonalInfoStep() {
 	const handleBack = () => {
 		startTransition(async () => {
 			setCurrentStep("welcome");
-			await navigate({ to: "/onboarding/$step", params: { step: "welcome" } });
+			await navigate({ params: { step: "welcome" } });
 		});
 	};
 
@@ -372,6 +372,9 @@ export function PersonalInfoStep() {
 											>
 												<SheetHeader>
 													<SheetTitle>연령대 선택</SheetTitle>
+													<SheetDescription className="sr-only">
+														본인의 연령대를 선택해주세요.
+													</SheetDescription>
 												</SheetHeader>
 												<ScrollArea className="h-full pb-10">
 													<div className="grid gap-2 py-4">

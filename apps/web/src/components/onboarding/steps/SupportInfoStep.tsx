@@ -125,7 +125,6 @@ export function SupportInfoStep() {
 			setSupportInfo(data);
 			setCurrentStep("additional");
 			await navigate({
-				to: "/onboarding/$step",
 				params: { step: "additional" },
 			});
 		});
@@ -135,7 +134,6 @@ export function SupportInfoStep() {
 		startTransition(async () => {
 			setCurrentStep("attendance");
 			await navigate({
-				to: "/onboarding/$step",
 				params: { step: "attendance" },
 			});
 		});
@@ -190,7 +188,7 @@ export function SupportInfoStep() {
 									<FormControl>
 										<div className="grid gap-3">
 											{TF_TEAM_OPTIONS.map((option) => (
-												<motion.button
+												<button
 													className={cn(
 														"relative flex items-center gap-4 rounded-xl border p-4 text-left transition-all duration-200",
 														"focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background",
@@ -201,8 +199,6 @@ export function SupportInfoStep() {
 													key={option.value}
 													onClick={() => field.onChange(option.value)}
 													type="button"
-													whileHover={{ scale: 1.01 }}
-													whileTap={{ scale: 0.99 }}
 												>
 													<div className="flex h-12 w-12 items-center justify-center rounded-lg bg-background shadow-sm">
 														<option.Icon className="h-6 w-6 text-muted-foreground" />
@@ -224,7 +220,7 @@ export function SupportInfoStep() {
 															<Check className="h-4 w-4 text-primary-foreground" />
 														</motion.div>
 													)}
-												</motion.button>
+												</button>
 											))}
 										</div>
 									</FormControl>

@@ -90,7 +90,6 @@ export function AdditionalInfoStep() {
 			setAdditionalInfo(data);
 			setCurrentStep("confirm");
 			await navigate({
-				to: "/onboarding/$step",
 				params: { step: "confirm" },
 			});
 		});
@@ -99,7 +98,7 @@ export function AdditionalInfoStep() {
 	const handleBack = () => {
 		startTransition(async () => {
 			setCurrentStep("support");
-			await navigate({ to: "/onboarding/$step", params: { step: "support" } });
+			await navigate({ params: { step: "support" } });
 		});
 	};
 
@@ -149,7 +148,7 @@ export function AdditionalInfoStep() {
 									<FormControl>
 										<div className="grid grid-cols-3 gap-3">
 											{TSHIRT_SIZE_OPTIONS.map((option) => (
-												<motion.button
+												<button
 													className={cn(
 														"relative flex flex-col items-center justify-center rounded-xl border px-3 py-5 transition-all duration-200",
 														"focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background",
@@ -160,8 +159,6 @@ export function AdditionalInfoStep() {
 													key={option.value}
 													onClick={() => field.onChange(option.value)}
 													type="button"
-													whileHover={{ scale: 1.02 }}
-													whileTap={{ scale: 0.98 }}
 												>
 													<span
 														className={cn(
@@ -185,7 +182,7 @@ export function AdditionalInfoStep() {
 															<Check className="h-3 w-3 text-primary-foreground" />
 														</motion.div>
 													)}
-												</motion.button>
+												</button>
 											))}
 										</div>
 									</FormControl>

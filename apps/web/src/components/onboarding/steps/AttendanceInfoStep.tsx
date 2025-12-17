@@ -23,6 +23,7 @@ import {
 	SelectValue,
 	Sheet,
 	SheetContent,
+	SheetDescription,
 	SheetHeader,
 	SheetTitle,
 	SheetTrigger,
@@ -286,7 +287,6 @@ export function AttendanceInfoStep() {
 			});
 			setCurrentStep("support");
 			await navigate({
-				to: "/onboarding/$step",
 				params: { step: "support" },
 			});
 		});
@@ -295,7 +295,7 @@ export function AttendanceInfoStep() {
 	const handleBack = () => {
 		startTransition(async () => {
 			setCurrentStep("personal");
-			await navigate({ to: "/onboarding/$step", params: { step: "personal" } });
+			await navigate({ params: { step: "personal" } });
 		});
 	};
 
@@ -429,6 +429,9 @@ export function AttendanceInfoStep() {
 															>
 																<SheetHeader>
 																	<SheetTitle>참석 일시 선택</SheetTitle>
+																	<SheetDescription className="sr-only">
+																		수련회 참석 일시를 선택해주세요.
+																	</SheetDescription>
 																</SheetHeader>
 																<ScrollArea className="h-full pb-10">
 																	<div className="flex justify-center">
