@@ -70,6 +70,21 @@ function onEdit(e) {
     return;
   }
 
+  // 기본값은 e.value 사용
+  let newValue = e.value;
+  let oldValue = e.oldValue;
+
+  // 참석일자, 참석시간 컬럼은 화면에 보이는 값(Display Value) 사용
+  // (Google Sheets가 날짜/시간을 숫자로 변환하여 전달하는 문제 해결)
+  if (headerValue === '참석일자' || headerValue === '참석시간') {
+    newValue = range.getDisplayValue();
+    // 주의: oldValue는 getDisplayValue()로 가져올 수 없음 (이미 변경되었으므로)
+    // 따라서 oldValue는 숫자형태로 올 수밖에 없지만, 
+    // 웹훅 수신측에서 로깅용으로만 사용한다면 그대로 두거나,
+    // 필요하다면 Apps Script에서 포맷팅을 시도할 수 있음.
+    // 여기서는 e.oldValue를 그대로 사용하되, 숫자형태일 수 있음을 인지해야 함.
+  }
+
   const payload = {
     eventType: 'EDIT',
     spreadsheetId: spreadsheetId,
@@ -79,8 +94,8 @@ function onEdit(e) {
     column: range.getColumn(),
     header: headerValue,
     id: String(idValue),
-    oldValue: e.oldValue,
-    newValue: e.value,
+    oldValue: oldValue,
+    newValue: newValue,
     timestamp: new Date().toISOString(),
   };
 

@@ -2,7 +2,9 @@
 const KOREAN_DATE_REGEX = /(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일/;
 const DATE_SEPARATOR_REGEX = /(\d{4})[.|/|-](\d{1,2})[.|/|-](\d{1,2})/;
 
-const KOREAN_AMPM_TIME_REGEX = /(오전|오후)\s*(\d{1,2})시(?:\s*(\d{1,2})분)?/;
+// "오전 10시", "오후 2시 30분", "오후 8:30" 등 지원
+const KOREAN_AMPM_TIME_REGEX =
+	/(오전|오후)\s*(\d{1,2})(?:시|:)(?:\s*(\d{1,2})(?:분)?)?/;
 const KOREAN_24H_TIME_REGEX = /(\d{1,2})시\s*(\d{1,2})분/;
 const TIME_HHMM_REGEX = /(\d{1,2}):(\d{1,2})/;
 
