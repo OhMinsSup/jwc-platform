@@ -13,6 +13,8 @@ import type * as crons from "../crons.js";
 import type * as healthCheck from "../healthCheck.js";
 import type * as http from "../http.js";
 import type * as lib_constants from "../lib/constants.js";
+import type * as lib_dateUtils from "../lib/dateUtils.js";
+import type * as lib_onboardingHelpers from "../lib/onboardingHelpers.js";
 import type * as lib_solapi from "../lib/solapi.js";
 import type * as lib_workpool from "../lib/workpool.js";
 import type * as onboarding from "../onboarding.js";
@@ -36,6 +38,8 @@ declare const fullApi: ApiFromModules<{
   healthCheck: typeof healthCheck;
   http: typeof http;
   "lib/constants": typeof lib_constants;
+  "lib/dateUtils": typeof lib_dateUtils;
+  "lib/onboardingHelpers": typeof lib_onboardingHelpers;
   "lib/solapi": typeof lib_solapi;
   "lib/workpool": typeof lib_workpool;
   onboarding: typeof onboarding;

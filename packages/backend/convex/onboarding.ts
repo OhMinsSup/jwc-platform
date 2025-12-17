@@ -9,7 +9,49 @@ import {
 	mutation,
 	query,
 } from "./_generated/server";
+import { parseKoreanDate, parseKoreanTime } from "./lib/dateUtils";
+import { fieldUpdaters } from "./lib/onboardingHelpers";
 import { smsPool, spreadsheetPool } from "./lib/workpool";
+
+/**
+ * 참석일자/시간 필드 업데이트를 위한 헬퍼 함수
+ */
+function buildAttendanceDateTime(
+	existingDate: string | undefined,
+	field: "참석일자" | "참석시간",
+	value: string
+): { success: true; isoString: string } | { success: false; error: string } {
+	let datePart = "";
+	let timePart = "";
+
+	if (existingDate) {
+		const d = dayjs(existingDate).tz("Asia/Seoul");
+		datePart = d.format("YYYY-MM-DD");
+		timePart = d.format("HH:mm");
+	}
+
+	if (field === "참석일자") {
+		datePart = parseKoreanDate(value);
+	} else {
+		timePart = parseKoreanTime(value);
+	}
+
+	if (!(datePart && timePart)) {
+		return { success: false, error: "Invalid date/time value" };
+	}
+
+	const dateTimeStr = `${datePart} ${timePart}`;
+	const newDateTime = dayjs.tz(dateTimeStr, "Asia/Seoul");
+
+	if (!newDateTime.isValid()) {
+		return {
+			success: false,
+			error: `Invalid date/time combination: ${dateTimeStr}`,
+		};
+	}
+
+	return { success: true, isoString: newDateTime.toISOString() };
+}
 
 /** 성별 */
 const genderValidator = v.union(v.literal("male"), v.literal("female"));
@@ -235,7 +277,6 @@ export const updateFieldFromSpreadsheet = mutation({
 		field: v.string(),
 		value: v.string(),
 	},
-	// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation> 웹훅 필드 매핑 처리</explanation>
 	handler: async (ctx, args) => {
 		const { id, field, value } = args;
 
@@ -246,100 +287,19 @@ export const updateFieldFromSpreadsheet = mutation({
 				return { success: false, error: "Document not found" };
 			}
 
-			let datePart = "";
-			let timePart = "";
-
-			if (doc.attendanceDate) {
-				const d = dayjs(doc.attendanceDate);
-				datePart = d.format("YYYY-MM-DD");
-				timePart = d.format("HH:mm");
+			const result = buildAttendanceDateTime(doc.attendanceDate, field, value);
+			if (!result.success) {
+				return result;
 			}
 
-			if (field === "참석일자") {
-				datePart = value;
-			} else if (field === "참석시간") {
-				timePart = value;
-			}
-
-			if (datePart && timePart) {
-				// 한국 시간 기준으로 날짜/시간 조합
-				const dateTimeStr = `${datePart} ${timePart}`;
-				const newDateTime = dayjs(dateTimeStr);
-
-				if (!newDateTime.isValid()) {
-					return {
-						success: false,
-						error: `Invalid date/time combination: ${dateTimeStr}`,
-					};
-				}
-
-				const isoString = newDateTime.toISOString();
-				await ctx.db.patch(id, { attendanceDate: isoString });
-				console.log(
-					`[Spreadsheet Webhook] Updated attendanceDate to ${isoString} for ${id}`
-				);
-				return { success: true, field, value };
-			}
-
-			return { success: false, error: "Invalid date/time value" };
+			await ctx.db.patch(id, { attendanceDate: result.isoString });
+			console.log(
+				`[Spreadsheet Webhook] Updated attendanceDate to ${result.isoString} for ${id}`
+			);
+			return { success: true, field, value };
 		}
 
 		// 업데이트 가능한 필드 목록 및 변환 로직
-		const fieldUpdaters: Record<
-			string,
-			(val: string) => Record<string, unknown> | null
-		> = {
-			납입여부: (val) => ({ isPaid: val === "납입" }),
-			성별: (val) => {
-				const genderMap: Record<string, string> = {
-					남성: "male",
-					여성: "female",
-				};
-				return genderMap[val] ? { gender: genderMap[val] } : null;
-			},
-			소속: (val) => {
-				const deptMap: Record<string, string> = {
-					청년1부: "youth1",
-					청년2부: "youth2",
-					기타: "other",
-				};
-				return deptMap[val] ? { department: deptMap[val] } : null;
-			},
-			연령대: (val) => ({ ageGroup: val }),
-			숙박형태: (val) => {
-				const stayMap: Record<string, string> = {
-					"3박4일 (전체 참석)": "3nights4days",
-					"2박3일": "2nights3days",
-					"1박2일": "1night2days",
-					"무박 (당일치기)": "dayTrip",
-				};
-				return stayMap[val] ? { stayType: stayMap[val] } : null;
-			},
-			픽업시간: (val) => ({ pickupTimeDescription: val || undefined }),
-			TF팀: (val) => {
-				const tfMap: Record<string, string> = {
-					없음: "none",
-					찬양팀: "praise",
-					프로그램팀: "program",
-					미디어팀: "media",
-				};
-				return tfMap[val] ? { tfTeam: tfMap[val] } : null;
-			},
-			차량지원: (val) => ({ canProvideRide: val === "가능" }),
-			차량정보: (val) => ({ rideDetails: val || undefined }),
-			티셔츠: (val) => {
-				const sizeMap: Record<string, string> = {
-					S: "s",
-					M: "m",
-					L: "l",
-					XL: "xl",
-					"2XL": "2xl",
-					"3XL": "3xl",
-				};
-				return sizeMap[val] ? { tshirtSize: sizeMap[val] } : null;
-			},
-		};
-
 		const updater = fieldUpdaters[field];
 		if (!updater) {
 			console.log(`[Spreadsheet Webhook] Unknown field: ${field}`);

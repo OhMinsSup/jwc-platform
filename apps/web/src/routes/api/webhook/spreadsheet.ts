@@ -91,12 +91,14 @@ export const Route = createFileRoute("/api/webhook/spreadsheet")({
 					// 서버 사이드에서는 ConvexHttpClient 사용
 					const client = new ConvexHttpClient(CONVEX_URL);
 
+					const nextValue = payload.newValue ?? "";
+
 					const result = await client.mutation(
 						api.onboarding.updateFieldFromSpreadsheet,
 						{
 							id: payload.id as Id<"onboarding">,
 							field: payload.header,
-							value: payload.newValue ?? "",
+							value: nextValue,
 						}
 					);
 
