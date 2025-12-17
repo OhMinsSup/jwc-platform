@@ -12,7 +12,7 @@ import { decrypt, deriveKey, type EncryptedData } from "@jwc/utils/crypto";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { internalAction } from "./_generated/server";
-import { STAY_TYPE_LABELS } from "./lib/constants";
+import { FEES, STAY_TYPE_LABELS } from "./lib/constants";
 import {
 	getSolapiClient,
 	interpolateTemplate,
@@ -267,9 +267,14 @@ export const sendPaymentReminder = internalAction({
 						STAY_TYPE_LABELS[user.stayType as keyof typeof STAY_TYPE_LABELS] ??
 						user.stayType;
 
+					const amount = FEES[user.stayType] ?? 0;
+					const accountInfo = process.env.VITE_PAID_ACCOUNT_NUMBER ?? "";
+
 					const text = interpolateTemplate(template.text, {
 						name: user.name,
 						stayType: stayTypeLabel,
+						amount: amount.toLocaleString(),
+						accountInfo,
 						siteUrl,
 					});
 
