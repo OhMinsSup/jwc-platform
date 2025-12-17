@@ -73,7 +73,7 @@ function transformToSpreadsheetRow(
 		? dayjs(_attendanceDate).format("YYYY년 MM월 DD일")
 		: "";
 	const attendanceTime = _attendanceDate
-		? dayjs(_attendanceDate).format("A h시 mm분").replace(" 00분", "")
+		? dayjs(_attendanceDate).format("A hh:mm")
 		: "";
 
 	return {

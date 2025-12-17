@@ -26,9 +26,9 @@ function buildAttendanceDateTime(
 	let timePart = "";
 
 	if (existingDate) {
-		const d = dayjs(existingDate).tz("Asia/Seoul");
+		const d = dayjs(existingDate);
 		datePart = d.format("YYYY-MM-DD");
-		timePart = d.format("HH:mm");
+		timePart = d.tz("Asia/Seoul").format("HH:mm");
 	}
 
 	console.log({ datePart, timePart });
@@ -47,7 +47,7 @@ function buildAttendanceDateTime(
 
 	const dateTimeStr = `${datePart} ${timePart}`;
 	const newDateTime = dayjs.tz(dateTimeStr, "Asia/Seoul");
-	console.log("combined dateTime:", newDateTime);
+	console.log("combined dateTime:", newDateTime.format("YYYY-MM-DD HH:mm"));
 
 	if (!newDateTime.isValid()) {
 		return {
