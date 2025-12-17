@@ -18,7 +18,8 @@
         "next-env.d.ts",
         "dist/**",
         ".tanstack/**",
-        "convex/_generated/**"
+        "convex/_generated/**",
+        ".output/**"
       ]
     },
     "format": {

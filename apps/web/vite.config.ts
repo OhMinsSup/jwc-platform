@@ -13,4 +13,7 @@ export default defineConfig({
 		nitro({ preset: "vercel" }),
 		viteReact(),
 	],
+	build: {
+		chunkSizeWarningLimit: 1000,
+	},
 });

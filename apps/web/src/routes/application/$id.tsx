@@ -184,7 +184,7 @@ function ScheduleInfoCard() {
 							label="참석 날짜"
 							value={format(
 								new Date(data.attendanceDate),
-								"yyyy년 M월 d일 a h시",
+								"yyyy년 M월 d일 a h시 mm분",
 								{ locale: ko }
 							)}
 						/>
