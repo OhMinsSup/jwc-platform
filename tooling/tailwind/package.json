@@ -13,7 +13,6 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@tailwindcss/typography": "^0.5.16",
     "postcss": "catalog:",
     "tailwindcss": "catalog:"
   },

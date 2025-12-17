@@ -287,6 +287,7 @@ export function AttendanceInfoStep() {
 			});
 			setCurrentStep("support");
 			await navigate({
+				to: "/onboarding/$step",
 				params: { step: "support" },
 			});
 		});
@@ -295,7 +296,7 @@ export function AttendanceInfoStep() {
 	const handleBack = () => {
 		startTransition(async () => {
 			setCurrentStep("personal");
-			await navigate({ params: { step: "personal" } });
+			await navigate({ to: "/onboarding/$step", params: { step: "personal" } });
 		});
 	};
 
@@ -409,7 +410,6 @@ export function AttendanceInfoStep() {
 																		"w-full justify-start text-left font-normal",
 																		!field.value && "text-muted-foreground"
 																	)}
-																	ref={field.ref}
 																	variant="outline"
 																>
 																	<CalendarIcon className="mr-2 h-4 w-4" />
@@ -455,7 +455,6 @@ export function AttendanceInfoStep() {
 																		"w-full justify-start text-left font-normal",
 																		!field.value && "text-muted-foreground"
 																	)}
-																	ref={field.ref}
 																	variant="outline"
 																>
 																	<CalendarIcon className="mr-2 h-4 w-4" />

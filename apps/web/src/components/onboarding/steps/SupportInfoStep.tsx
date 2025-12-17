@@ -125,6 +125,7 @@ export function SupportInfoStep() {
 			setSupportInfo(data);
 			setCurrentStep("additional");
 			await navigate({
+				to: "/onboarding/$step",
 				params: { step: "additional" },
 			});
 		});
@@ -134,6 +135,7 @@ export function SupportInfoStep() {
 		startTransition(async () => {
 			setCurrentStep("attendance");
 			await navigate({
+				to: "/onboarding/$step",
 				params: { step: "attendance" },
 			});
 		});

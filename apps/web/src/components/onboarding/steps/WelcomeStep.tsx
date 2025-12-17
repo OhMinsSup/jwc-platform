@@ -48,7 +48,7 @@ const highlights = [
 export function WelcomeStep() {
 	const navigate = useNavigate();
 	const { clearForm, setCurrentStep } = useOnboardingFormStore();
-	const [, startTransition] = useTransition();
+	const [_isPending, startTransition] = useTransition();
 
 	const handleStart = () => {
 		startTransition(async () => {

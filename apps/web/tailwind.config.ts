@@ -1,4 +1,5 @@
-import config from "@jwc/tailwind-config/web";
+import config from "@jwc/ui/tailwind.config";
+import typography from "@tailwindcss/typography";
 import type { Config } from "tailwindcss";
 
 /*
@@ -9,5 +10,10 @@ import type { Config } from "tailwindcss";
 export default {
 	darkMode: "class",
 	presets: [config],
-	content: ["./src/components/**/*.*.{tsx,ts,js}"],
+	content: [
+		"./src/**/*.{ts,tsx,js,jsx}",
+		"../../packages/ui/src/components/shadcn/*.{ts,tsx}",
+		"../../packages/ui/src/components/custom/*.{ts,tsx}",
+	],
+	plugins: [typography],
 } satisfies Config;

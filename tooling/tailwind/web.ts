@@ -1,4 +1,3 @@
-import typography from "@tailwindcss/typography";
 import type { Config } from "tailwindcss";
 
 import base from "./base";
@@ -11,10 +10,4 @@ import base from "./base";
 export default {
 	content: base.content,
 	presets: [base],
-	theme: {
-		container: {
-			center: true,
-		},
-	},
-	plugins: [typography],
 } satisfies Config;

@@ -60,12 +60,6 @@ function HomeComponent() {
 							>
 								수련회 안내
 							</Link>
-							<Link
-								className="transition-colors hover:text-foreground"
-								to="/contact"
-							>
-								문의하기
-							</Link>
 						</>
 					}
 					rightSlot={

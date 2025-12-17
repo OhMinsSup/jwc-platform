@@ -1,6 +1,11 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Activity, lazy, Suspense } from "react";
-import { LoadingSpinner, Navbar, PageLayout } from "@/components/common";
+import {
+	FullPageLoading,
+	LoadingSpinner,
+	Navbar,
+	PageLayout,
+} from "@/components/common";
 import { OnboardingErrorBoundary } from "@/components/onboarding";
 import StepProgress from "@/components/onboarding/StepProgress";
 import { isValidStep, type StepSlug } from "@/store/onboarding-form-store";
@@ -29,7 +34,6 @@ const CompleteStep = lazy(
 );
 
 export const Route = createFileRoute("/onboarding/$step")({
-	viewTransition: true,
 	beforeLoad: ({ params }) => {
 		// 유효하지 않은 스텝이면 welcome으로 리다이렉트
 		if (!isValidStep(params.step)) {
@@ -38,6 +42,7 @@ export const Route = createFileRoute("/onboarding/$step")({
 	},
 	component: OnboardingStepPage,
 	errorComponent: OnboardingErrorBoundary,
+	pendingComponent: () => <FullPageLoading message="불러오는 중..." />,
 });
 
 function StepLoader() {

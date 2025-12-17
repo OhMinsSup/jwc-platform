@@ -166,12 +166,6 @@ function AboutPage() {
 							>
 								수련회 안내
 							</Link>
-							<Link
-								className="transition-colors hover:text-foreground"
-								to="/contact"
-							>
-								문의하기
-							</Link>
 						</>
 					}
 					rightSlot={
@@ -388,14 +382,6 @@ function AboutPage() {
 									신청하기
 									<ArrowRight className="ml-2 h-4 w-4" />
 								</Link>
-							</Button>
-							<Button
-								asChild
-								className="rounded-full px-8"
-								size="lg"
-								variant="outline"
-							>
-								<Link to="/contact">문의하기</Link>
 							</Button>
 						</div>
 					</div>

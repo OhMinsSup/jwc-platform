@@ -90,6 +90,7 @@ export function AdditionalInfoStep() {
 			setAdditionalInfo(data);
 			setCurrentStep("confirm");
 			await navigate({
+				to: "/onboarding/$step",
 				params: { step: "confirm" },
 			});
 		});
@@ -98,7 +99,7 @@ export function AdditionalInfoStep() {
 	const handleBack = () => {
 		startTransition(async () => {
 			setCurrentStep("support");
-			await navigate({ params: { step: "support" } });
+			await navigate({ to: "/onboarding/$step", params: { step: "support" } });
 		});
 	};
 

@@ -26,7 +26,12 @@ import {
 	TableHeader,
 	TableRow,
 } from "@jwc/ui";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import {
+	createFileRoute,
+	Link,
+	redirect,
+	useNavigate,
+} from "@tanstack/react-router";
 import { usePaginatedQuery } from "convex/react";
 import { format } from "date-fns";
 import type { Variants } from "framer-motion";
@@ -61,6 +66,11 @@ interface ApplicationSearchParams {
 
 export const Route = createFileRoute("/application/")({
 	component: ApplicationListPage,
+	loader: () => {
+		throw redirect({
+			to: "/",
+		});
+	},
 	validateSearch: (
 		search: Record<string, unknown>
 	): ApplicationSearchParams => ({
@@ -252,7 +262,7 @@ function ApplicationListPage() {
 				{/* Filters */}
 				<div className="mb-6 flex flex-col gap-4 rounded-xl border bg-card p-4 shadow-sm md:flex-row md:items-center">
 					<div className="relative flex-1">
-						<Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+						<Search className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-muted-foreground" />
 						<Input
 							className="pl-9"
 							onChange={(e) => setInputValue(e.target.value)}

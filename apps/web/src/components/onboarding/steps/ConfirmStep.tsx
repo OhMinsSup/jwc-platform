@@ -130,14 +130,18 @@ export function ConfirmStep() {
 	};
 
 	const handleSubmit = () => {
+		if (!(personalInfo && attendanceInfo)) {
+			setError(
+				"필수 정보가 누락되었습니다. 이전 단계로 돌아가 정보를 입력해주세요."
+			);
+			return;
+		}
+
+		const { gender, department, name, phone, ageGroup } = personalInfo;
+		const { stayType, attendanceDate, pickupTimeDescription } = attendanceInfo;
+
 		// 필수 필드 검증
-		if (
-			!(
-				personalInfo?.gender &&
-				personalInfo?.department &&
-				attendanceInfo?.stayType
-			)
-		) {
+		if (!(gender && department && stayType)) {
 			setError(
 				"필수 정보가 누락되었습니다. 이전 단계로 돌아가 정보를 입력해주세요."
 			);
@@ -150,14 +154,14 @@ export function ConfirmStep() {
 			try {
 				// 평문 데이터를 직접 전달 (암호화는 Convex action 내부에서 처리)
 				await upsert({
-					name: personalInfo.name,
-					phone: personalInfo.phone,
-					gender: personalInfo.gender,
-					department: personalInfo.department,
-					ageGroup: personalInfo.ageGroup,
-					stayType: attendanceInfo.stayType,
-					attendanceDate: attendanceInfo.attendanceDate,
-					pickupTimeDescription: attendanceInfo.pickupTimeDescription,
+					name,
+					phone,
+					gender,
+					department,
+					ageGroup,
+					stayType,
+					attendanceDate,
+					pickupTimeDescription,
 					isPaid: false,
 					tfTeam: supportInfo?.tfTeam,
 					canProvideRide: supportInfo?.canProvideRide,

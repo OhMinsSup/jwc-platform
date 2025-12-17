@@ -153,6 +153,7 @@ export function PersonalInfoStep() {
 			setPersonalInfo(data);
 			setCurrentStep("attendance");
 			await navigate({
+				to: "/onboarding/$step",
 				params: { step: "attendance" },
 			});
 		});
@@ -161,7 +162,7 @@ export function PersonalInfoStep() {
 	const handleBack = () => {
 		startTransition(async () => {
 			setCurrentStep("welcome");
-			await navigate({ params: { step: "welcome" } });
+			await navigate({ to: "/onboarding/$step", params: { step: "welcome" } });
 		});
 	};
 
@@ -353,7 +354,6 @@ export function PersonalInfoStep() {
 															"h-12 w-full justify-between border-border/50 bg-muted/30 font-normal transition-all duration-200 hover:bg-muted/50",
 															!field.value && "text-muted-foreground"
 														)}
-														ref={field.ref}
 														role="combobox"
 														variant="outline"
 													>
