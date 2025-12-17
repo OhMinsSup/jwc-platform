@@ -250,7 +250,7 @@ export const updateFieldFromSpreadsheet = mutation({
 			let timePart = "";
 
 			if (doc.attendanceDate) {
-				const d = dayjs(doc.attendanceDate).tz("Asia/Seoul");
+				const d = dayjs(doc.attendanceDate);
 				datePart = d.format("YYYY-MM-DD");
 				timePart = d.format("HH:mm");
 			}
@@ -264,7 +264,7 @@ export const updateFieldFromSpreadsheet = mutation({
 			if (datePart && timePart) {
 				// 한국 시간 기준으로 날짜/시간 조합
 				const dateTimeStr = `${datePart} ${timePart}`;
-				const newDateTime = dayjs.tz(dateTimeStr, "Asia/Seoul");
+				const newDateTime = dayjs(dateTimeStr);
 
 				if (!newDateTime.isValid()) {
 					return {
