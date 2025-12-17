@@ -107,6 +107,15 @@ export default defineSchema({
 
 		/** 단체티 사이즈 */
 		tshirtSize: v.optional(tshirtSizeType),
+
+		/** 미입금 알림 발송 상태 */
+		// 3일에 한번씩 미입금자에게 알림 SMS를 보내기 위해 상태를 기록 (최대 3회)
+		unpaidNotificationStatus: v.optional(
+			v.object({
+				lastSentAt: v.number(), // 마지막 발송 시간 (타임스탬프)
+				sentCount: v.number(), // 발송 횟수
+			})
+		),
 	})
 		// 인덱스 정의
 		.index("by_phoneHash", ["phoneHash"])
@@ -114,6 +123,11 @@ export default defineSchema({
 		.index("by_stayType", ["stayType"])
 		.index("by_isPaid", ["isPaid"])
 		.index("by_name", ["name"])
+		// 미입금자이면서 아직 3회 이하로 알림을 받지 않은 신청서 조회용
+		.index("unpaid_needing_notification", [
+			"isPaid",
+			"unpaidNotificationStatus.sentCount",
+		])
 		// Full-text search 인덱스 (이름 검색)
 		.searchIndex("search_name", {
 			searchField: "name",

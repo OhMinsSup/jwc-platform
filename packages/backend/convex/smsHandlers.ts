@@ -34,10 +34,5 @@ export const onSmsComplete = internalMutation({
 		} else {
 			console.log(`[SMS Complete] ${context.type} for ${target} was canceled`);
 		}
-
-		// 온보딩 관련 SMS인 경우 추가 처리 가능
-		// if (context.onboardingId && result.kind === "failed") {
-		// 	await _ctx.db.insert("smsLogs", { ... });
-		// }
 	},
 });

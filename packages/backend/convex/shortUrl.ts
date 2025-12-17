@@ -181,15 +181,3 @@ export const remove = mutation({
 		return true;
 	},
 });
-
-/**
- * 만료된 단축 URL 정리 (Internal - 스케줄러에서 호출)
- */
-export const cleanupExpired = internalMutation({
-	args: {},
-	handler: () => {
-		console.log("cleanupExpired called - not implemented yet");
-
-		return { deletedCount: 0 };
-	},
-});

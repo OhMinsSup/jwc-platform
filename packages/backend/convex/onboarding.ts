@@ -188,6 +188,20 @@ export const upsertInternal = internalMutation({
 				tshirtSize: args.tshirtSize,
 			});
 
+			// 최초 생성 시 SMS 환영 메시지 발송 (Workpool 사용)
+			await smsPool.enqueueAction(
+				ctx,
+				internal.sms.sendOnboardingUpdate,
+				{ onboardingId: existing._id },
+				{
+					onComplete: internal.smsHandlers.onSmsComplete,
+					context: {
+						type: "onboarding-update",
+						onboardingId: existing._id,
+					},
+				}
+			);
+
 			await spreadsheetPool.enqueueAction(
 				ctx,
 				internal.spreadsheet.syncAllToGoogleSheets,
@@ -402,5 +416,61 @@ export const searchOnboardings = query({
 			isDone: paginatedResult.isDone,
 			continueCursor: paginatedResult.continueCursor,
 		};
+	},
+});
+
+/**
+ * 미입금 알림 대상자 조회 (Internal)
+ * - 미입금 상태
+ * - 알림 발송 조건 충족 (최초 3일 후, 이후 3일 간격, 최대 3회)
+ */
+export const getUnpaidForReminder = internalQuery({
+	args: {},
+	handler: async (ctx) => {
+		const now = Date.now();
+		const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
+
+		const unpaidUsers = await ctx.db
+			.query("onboarding")
+			.withIndex("by_isPaid", (q) => q.eq("isPaid", false))
+			.collect();
+
+		return unpaidUsers.filter((user) => {
+			const status = user.unpaidNotificationStatus;
+
+			// 1. 아직 알림을 한 번도 안 받은 경우
+			if (!status) {
+				// 신청 후 3일 지났는지 확인
+				return now - user._creationTime >= THREE_DAYS_MS;
+			}
+
+			// 2. 이미 알림을 받은 경우
+			// 최대 3회 미만이고, 마지막 발송 후 3일 지났는지 확인
+			return status.sentCount < 3 && now - status.lastSentAt >= THREE_DAYS_MS;
+		});
+	},
+});
+
+/**
+ * 미입금 알림 발송 상태 업데이트 (Internal)
+ */
+export const updatePaymentReminderStatus = internalMutation({
+	args: {
+		onboardingId: v.id("onboarding"),
+	},
+	handler: async (ctx, args) => {
+		const user = await ctx.db.get(args.onboardingId);
+		if (!user) {
+			return;
+		}
+
+		const currentCount = user.unpaidNotificationStatus?.sentCount ?? 0;
+
+		await ctx.db.patch(args.onboardingId, {
+			unpaidNotificationStatus: {
+				lastSentAt: Date.now(),
+				sentCount: currentCount + 1,
+			},
+		});
 	},
 });
