@@ -183,7 +183,7 @@ function AboutPage() {
 			}
 		>
 			{/* Hero Section */}
-			<section className="border-b bg-gradient-to-b from-primary/5 to-background py-16 md:py-24">
+			<section className="border-b bg-linear-to-b from-primary/5 to-background py-16 md:py-24">
 				<div className="container mx-auto px-4">
 					<div className="mx-auto max-w-3xl text-center">
 						<div className="mb-4 inline-flex items-center rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 font-medium text-primary text-sm">

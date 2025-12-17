@@ -21,6 +21,7 @@ function buildAttendanceDateTime(
 	field: "참석일자" | "참석시간",
 	value: string
 ): { success: true; isoString: string } | { success: false; error: string } {
+	console.log(existingDate);
 	let datePart = "";
 	let timePart = "";
 
@@ -30,10 +31,14 @@ function buildAttendanceDateTime(
 		timePart = d.format("HH:mm");
 	}
 
+	console.log({ datePart, timePart });
+
 	if (field === "참석일자") {
 		datePart = parseKoreanDate(value);
+		console.log("parsed datePart:", datePart);
 	} else {
 		timePart = parseKoreanTime(value);
+		console.log("parsed timePart:", timePart);
 	}
 
 	if (!(datePart && timePart)) {
@@ -42,6 +47,7 @@ function buildAttendanceDateTime(
 
 	const dateTimeStr = `${datePart} ${timePart}`;
 	const newDateTime = dayjs.tz(dateTimeStr, "Asia/Seoul");
+	console.log("combined dateTime:", newDateTime);
 
 	if (!newDateTime.isValid()) {
 		return {
