@@ -18,7 +18,7 @@ import {
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
-import { ArrowLeft, Calendar, Car, CheckCircle2, User } from "lucide-react";
+import { Calendar, Car, CheckCircle2, User } from "lucide-react";
 import {
 	FullPageLoading,
 	InfoBlock,
@@ -86,7 +86,6 @@ function ApplicationDetailPage() {
 	return (
 		<div className="min-h-svh bg-background py-12">
 			<div className="container mx-auto max-w-3xl px-4">
-				<BackButton />
 				<div className="grid gap-6">
 					<Header />
 					<div className="grid gap-6 md:grid-cols-2">
@@ -98,21 +97,6 @@ function ApplicationDetailPage() {
 				</div>
 			</div>
 		</div>
-	);
-}
-
-function BackButton() {
-	return (
-		<Button
-			asChild
-			className="mb-8 pl-0 hover:bg-transparent hover:text-primary"
-			variant="ghost"
-		>
-			<Link className="flex items-center gap-2" to="/application">
-				<ArrowLeft className="h-4 w-4" />
-				<span>목록으로 돌아가기</span>
-			</Link>
-		</Button>
 	);
 }
 
