@@ -15,11 +15,17 @@ import {
 	Popover,
 	PopoverContent,
 	PopoverTrigger,
+	ScrollArea,
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
+	Sheet,
+	SheetContent,
+	SheetHeader,
+	SheetTitle,
+	SheetTrigger,
 	Textarea,
 } from "@jwc/ui";
 import { useNavigate } from "@tanstack/react-router";
@@ -39,9 +45,10 @@ import {
 	Sun,
 	Tent,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod/v4";
+import { useWindowSize } from "@/hooks/use-window-size";
 import { useOnboardingFormStore } from "@/store/onboarding-form-store";
 
 const formVariants: Variants = {
@@ -138,17 +145,113 @@ const STAY_OPTIONS: {
 	},
 ];
 
+// ISO 8601 문자열을 Date 객체로 변환
+const parseDateTime = (dateString: string | undefined): Date | undefined => {
+	if (!dateString) {
+		return;
+	}
+	try {
+		return parseISO(dateString);
+	} catch {
+		return;
+	}
+};
+
+// Date 객체와 시간을 ISO 8601 형식 문자열로 변환
+const formatDateTime = (date: Date, time: string): string => {
+	const dateStr = format(date, "yyyy-MM-dd");
+	return `${dateStr}T${time}:00`;
+};
+
+// ISO 8601 문자열에서 시간(HH:mm) 추출
+const getTimeFromDate = (dateString: string | undefined): string => {
+	if (!dateString) {
+		return "09:00";
+	}
+	try {
+		const date = parseISO(dateString);
+		return format(date, "HH:mm");
+	} catch {
+		return "09:00";
+	}
+};
+
+interface AttendanceDatePickerProps {
+	value: string | undefined;
+	onChange: (value: string) => void;
+	onClose: () => void;
+}
+
+const AttendanceDatePicker = ({
+	value,
+	onChange,
+	onClose,
+}: AttendanceDatePickerProps) => {
+	return (
+		<div className="space-y-4 p-4">
+			<Calendar
+				autoFocus
+				disabled={(date) => {
+					// 수련회 기간 내 날짜만 선택 가능 (2026년 1월 8-11일)
+					const minDate = new Date(2026, 0, 8);
+					const maxDate = new Date(2026, 0, 11);
+					return date < minDate || date > maxDate;
+				}}
+				locale={ko}
+				mode="single"
+				month={new Date(2026, 0)}
+				onSelect={(date) => {
+					if (date) {
+						const time = getTimeFromDate(value);
+						onChange(formatDateTime(date, time));
+					}
+				}}
+				selected={parseDateTime(value)}
+			/>
+			<div className="border-t pt-4">
+				<span className="mb-2 block font-medium text-sm">시간 선택</span>
+				<Select
+					onValueChange={(time) => {
+						const currentDate = parseDateTime(value);
+						if (currentDate) {
+							onChange(formatDateTime(currentDate, time));
+						} else {
+							// 날짜가 없으면 수련회 첫날로 기본 설정
+							const defaultDate = new Date(2026, 0, 8);
+							onChange(formatDateTime(defaultDate, time));
+						}
+					}}
+					value={getTimeFromDate(value)}
+				>
+					<SelectTrigger className="w-full">
+						<Clock className="mr-2 h-4 w-4 text-muted-foreground" />
+						<SelectValue placeholder="시간을 선택하세요" />
+					</SelectTrigger>
+					<SelectContent>
+						{TIME_OPTIONS.map((option) => (
+							<SelectItem key={option.value} value={option.value}>
+								{option.label}
+							</SelectItem>
+						))}
+					</SelectContent>
+				</Select>
+			</div>
+			<Button className="w-full" onClick={onClose} type="button">
+				확인
+			</Button>
+		</div>
+	);
+};
+
 export function AttendanceInfoStep() {
 	const navigate = useNavigate();
-	const {
-		attendanceInfo,
-		setAttendanceInfo,
-		setCurrentStep,
-		isLoading,
-		setIsLoading,
-	} = useOnboardingFormStore();
+	const { attendanceInfo, setAttendanceInfo, setCurrentStep } =
+		useOnboardingFormStore();
 	const formRef = useRef<HTMLFormElement>(null);
 	const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+	const [isPending, startTransition] = useTransition();
+	const { width } = useWindowSize();
+	const isMobile = width < 768;
 
 	const form = useForm<AttendanceFormData>({
 		resolver: standardSchemaResolver(attendanceSchema),
@@ -174,55 +277,26 @@ export function AttendanceInfoStep() {
 		}
 	}, [attendanceInfo, form]);
 
-	// ISO 8601 문자열을 Date 객체로 변환
-	const parseDateTime = (dateString: string | undefined): Date | undefined => {
-		if (!dateString) {
-			return;
-		}
-		try {
-			return parseISO(dateString);
-		} catch {
-			return;
-		}
-	};
-
-	// Date 객체와 시간을 ISO 8601 형식 문자열로 변환
-	const formatDateTime = (date: Date, time: string): string => {
-		const dateStr = format(date, "yyyy-MM-dd");
-		return `${dateStr}T${time}:00`;
-	};
-
-	// ISO 8601 문자열에서 시간(HH:mm) 추출
-	const getTimeFromDate = (dateString: string | undefined): string => {
-		if (!dateString) {
-			return "09:00";
-		}
-		try {
-			const date = parseISO(dateString);
-			return format(date, "HH:mm");
-		} catch {
-			return "09:00";
-		}
-	};
-
-	const onSubmit = async (data: AttendanceFormData) => {
-		setIsLoading(true);
-		try {
+	const onSubmit = (data: AttendanceFormData) => {
+		startTransition(async () => {
 			setAttendanceInfo({
 				stayType: data.stayType,
 				attendanceDate: data.attendanceDate,
 				pickupTimeDescription: data.pickupTimeDescription,
 			});
 			setCurrentStep("support");
-			await navigate({ to: "/onboarding/$step", params: { step: "support" } });
-		} finally {
-			setIsLoading(false);
-		}
+			await navigate({
+				to: "/onboarding/$step",
+				params: { step: "support" },
+			});
+		});
 	};
 
-	const handleBack = async () => {
-		setCurrentStep("personal");
-		await navigate({ to: "/onboarding/$step", params: { step: "personal" } });
+	const handleBack = () => {
+		startTransition(async () => {
+			setCurrentStep("personal");
+			await navigate({ to: "/onboarding/$step", params: { step: "personal" } });
+		});
 	};
 
 	return (
@@ -324,107 +398,86 @@ export function AttendanceInfoStep() {
 										render={({ field }) => (
 											<FormItem>
 												<FormControl>
-													<Popover
-														onOpenChange={setIsCalendarOpen}
-														open={isCalendarOpen}
-													>
-														<PopoverTrigger asChild>
-															<Button
-																className={cn(
-																	"w-full justify-start text-left font-normal",
-																	!field.value && "text-muted-foreground"
-																)}
-																variant="outline"
-															>
-																<CalendarIcon className="mr-2 h-4 w-4" />
-																{field.value
-																	? format(
-																			parseDateTime(field.value) ?? new Date(),
-																			"yyyy년 M월 d일 (EEE) HH:mm",
-																			{ locale: ko }
-																		)
-																	: "날짜와 시간을 선택하세요"}
-															</Button>
-														</PopoverTrigger>
-														<PopoverContent
-															align="start"
-															className="w-auto p-0"
+													{isMobile ? (
+														<Sheet
+															onOpenChange={setIsCalendarOpen}
+															open={isCalendarOpen}
 														>
-															<div className="space-y-4 p-4">
-																<Calendar
-																	autoFocus
-																	disabled={(date) => {
-																		// 수련회 기간 내 날짜만 선택 가능 (2026년 1월 8-11일)
-																		const minDate = new Date(2026, 0, 8);
-																		const maxDate = new Date(2026, 0, 11);
-																		return date < minDate || date > maxDate;
-																	}}
-																	locale={ko}
-																	mode="single"
-																	month={new Date(2026, 0)}
-																	onSelect={(date) => {
-																		if (date) {
-																			const time = getTimeFromDate(field.value);
-																			field.onChange(
-																				formatDateTime(date, time)
-																			);
-																		}
-																	}}
-																	selected={parseDateTime(field.value)}
-																/>
-																<div className="border-t pt-4">
-																	<span className="mb-2 block font-medium text-sm">
-																		시간 선택
-																	</span>
-																	<Select
-																		onValueChange={(time) => {
-																			const currentDate = parseDateTime(
-																				field.value
-																			);
-																			if (currentDate) {
-																				field.onChange(
-																					formatDateTime(currentDate, time)
-																				);
-																			} else {
-																				// 날짜가 없으면 수련회 첫날로 기본 설정
-																				const defaultDate = new Date(
-																					2026,
-																					0,
-																					8
-																				);
-																				field.onChange(
-																					formatDateTime(defaultDate, time)
-																				);
-																			}
-																		}}
-																		value={getTimeFromDate(field.value)}
-																	>
-																		<SelectTrigger className="w-full">
-																			<Clock className="mr-2 h-4 w-4 text-muted-foreground" />
-																			<SelectValue placeholder="시간을 선택하세요" />
-																		</SelectTrigger>
-																		<SelectContent>
-																			{TIME_OPTIONS.map((option) => (
-																				<SelectItem
-																					key={option.value}
-																					value={option.value}
-																				>
-																					{option.label}
-																				</SelectItem>
-																			))}
-																		</SelectContent>
-																	</Select>
-																</div>
+															<SheetTrigger asChild>
 																<Button
-																	className="w-full"
-																	onClick={() => setIsCalendarOpen(false)}
-																	type="button"
+																	className={cn(
+																		"w-full justify-start text-left font-normal",
+																		!field.value && "text-muted-foreground"
+																	)}
+																	ref={field.ref}
+																	variant="outline"
 																>
-																	확인
+																	<CalendarIcon className="mr-2 h-4 w-4" />
+																	{field.value
+																		? format(
+																				parseDateTime(field.value) ??
+																					new Date(),
+																				"yyyy년 M월 d일 (EEE) HH:mm",
+																				{ locale: ko }
+																			)
+																		: "날짜와 시간을 선택하세요"}
 																</Button>
-															</div>
-														</PopoverContent>
-													</Popover>
+															</SheetTrigger>
+															<SheetContent
+																className="h-[80%] rounded-t-[20px]"
+																side="bottom"
+															>
+																<SheetHeader>
+																	<SheetTitle>참석 일시 선택</SheetTitle>
+																</SheetHeader>
+																<ScrollArea className="h-full pb-10">
+																	<div className="flex justify-center">
+																		<AttendanceDatePicker
+																			onChange={field.onChange}
+																			onClose={() => setIsCalendarOpen(false)}
+																			value={field.value}
+																		/>
+																	</div>
+																</ScrollArea>
+															</SheetContent>
+														</Sheet>
+													) : (
+														<Popover
+															onOpenChange={setIsCalendarOpen}
+															open={isCalendarOpen}
+														>
+															<PopoverTrigger asChild>
+																<Button
+																	className={cn(
+																		"w-full justify-start text-left font-normal",
+																		!field.value && "text-muted-foreground"
+																	)}
+																	ref={field.ref}
+																	variant="outline"
+																>
+																	<CalendarIcon className="mr-2 h-4 w-4" />
+																	{field.value
+																		? format(
+																				parseDateTime(field.value) ??
+																					new Date(),
+																				"yyyy년 M월 d일 (EEE) HH:mm",
+																				{ locale: ko }
+																			)
+																		: "날짜와 시간을 선택하세요"}
+																</Button>
+															</PopoverTrigger>
+															<PopoverContent
+																align="start"
+																className="w-auto p-0"
+															>
+																<AttendanceDatePicker
+																	onChange={field.onChange}
+																	onClose={() => setIsCalendarOpen(false)}
+																	value={field.value}
+																/>
+															</PopoverContent>
+														</Popover>
+													)}
 												</FormControl>
 												<FormMessage />
 											</FormItem>
@@ -481,10 +534,10 @@ export function AttendanceInfoStep() {
 						</Button>
 						<Button
 							className="h-12 flex-1 rounded-xl bg-primary font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-all duration-200 hover:bg-primary/90"
-							disabled={isLoading || !form.formState.isValid}
+							disabled={isPending || !form.formState.isValid}
 							type="submit"
 						>
-							{isLoading ? (
+							{isPending ? (
 								<motion.div
 									animate={{ rotate: 360 }}
 									className="h-5 w-5 rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground"

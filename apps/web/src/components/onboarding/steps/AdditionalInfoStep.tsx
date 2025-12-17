@@ -20,7 +20,7 @@ import { useNavigate } from "@tanstack/react-router";
 import type { Variants } from "framer-motion";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Check, Ruler, Shirt } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod/v4";
 import { useOnboardingFormStore } from "@/store/onboarding-form-store";
@@ -63,14 +63,10 @@ const TSHIRT_SIZE_OPTIONS: {
 
 export function AdditionalInfoStep() {
 	const navigate = useNavigate();
-	const {
-		additionalInfo,
-		setAdditionalInfo,
-		setCurrentStep,
-		isLoading,
-		setIsLoading,
-	} = useOnboardingFormStore();
+	const { additionalInfo, setAdditionalInfo, setCurrentStep } =
+		useOnboardingFormStore();
 	const formRef = useRef<HTMLFormElement>(null);
+	const [isPending, startTransition] = useTransition();
 
 	const form = useForm<AdditionalFormData>({
 		resolver: standardSchemaResolver(additionalSchema),
@@ -89,20 +85,22 @@ export function AdditionalInfoStep() {
 		}
 	}, [additionalInfo, form]);
 
-	const onSubmit = async (data: AdditionalFormData) => {
-		setIsLoading(true);
-		try {
+	const onSubmit = (data: AdditionalFormData) => {
+		startTransition(async () => {
 			setAdditionalInfo(data);
 			setCurrentStep("confirm");
-			await navigate({ to: "/onboarding/$step", params: { step: "confirm" } });
-		} finally {
-			setIsLoading(false);
-		}
+			await navigate({
+				to: "/onboarding/$step",
+				params: { step: "confirm" },
+			});
+		});
 	};
 
-	const handleBack = async () => {
-		setCurrentStep("support");
-		await navigate({ to: "/onboarding/$step", params: { step: "support" } });
+	const handleBack = () => {
+		startTransition(async () => {
+			setCurrentStep("support");
+			await navigate({ to: "/onboarding/$step", params: { step: "support" } });
+		});
 	};
 
 	return (
@@ -181,7 +179,7 @@ export function AdditionalInfoStep() {
 													{field.value === option.value && (
 														<motion.div
 															animate={{ scale: 1 }}
-															className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary"
+															className="-top-2 -right-2 absolute flex h-5 w-5 items-center justify-center rounded-full bg-primary"
 															initial={{ scale: 0 }}
 														>
 															<Check className="h-3 w-3 text-primary-foreground" />
@@ -227,10 +225,10 @@ export function AdditionalInfoStep() {
 						</Button>
 						<Button
 							className="h-12 flex-1 rounded-xl bg-primary font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-all duration-200 hover:bg-primary/90"
-							disabled={isLoading || !form.formState.isValid}
+							disabled={isPending || !form.formState.isValid}
 							type="submit"
 						>
-							{isLoading ? (
+							{isPending ? (
 								<motion.div
 									animate={{ rotate: 360 }}
 									className="h-5 w-5 rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground"

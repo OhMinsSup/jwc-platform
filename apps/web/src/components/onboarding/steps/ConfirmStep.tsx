@@ -25,7 +25,7 @@ import {
 	User,
 	Users,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import {
 	type StepSlug,
 	useOnboardingFormStore,
@@ -107,22 +107,29 @@ export function ConfirmStep() {
 		setCurrentStep,
 		clearForm,
 	} = useOnboardingFormStore();
-	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const [isPending, startTransition] = useTransition();
 
 	const upsert = useAction(api.onboardingActions.upsert);
 
-	const handleBack = async () => {
-		setCurrentStep("additional");
-		await navigate({ to: "/onboarding/$step", params: { step: "additional" } });
+	const handleBack = () => {
+		startTransition(async () => {
+			setCurrentStep("additional");
+			await navigate({
+				to: "/onboarding/$step",
+				params: { step: "additional" },
+			});
+		});
 	};
 
-	const goToStep = async (step: StepSlug) => {
-		setCurrentStep(step);
-		await navigate({ to: "/onboarding/$step", params: { step } });
+	const goToStep = (step: StepSlug) => {
+		startTransition(async () => {
+			setCurrentStep(step);
+			await navigate({ to: "/onboarding/$step", params: { step } });
+		});
 	};
 
-	const handleSubmit = async () => {
+	const handleSubmit = () => {
 		// 필수 필드 검증
 		if (
 			!(
@@ -137,36 +144,38 @@ export function ConfirmStep() {
 			return;
 		}
 
-		setIsSubmitting(true);
-		setError(null);
+		startTransition(async () => {
+			setError(null);
 
-		try {
-			// 평문 데이터를 직접 전달 (암호화는 Convex action 내부에서 처리)
-			await upsert({
-				name: personalInfo.name,
-				phone: personalInfo.phone,
-				gender: personalInfo.gender,
-				department: personalInfo.department,
-				ageGroup: personalInfo.ageGroup,
-				stayType: attendanceInfo.stayType,
-				attendanceDate: attendanceInfo.attendanceDate,
-				pickupTimeDescription: attendanceInfo.pickupTimeDescription,
-				isPaid: false,
-				tfTeam: supportInfo?.tfTeam,
-				canProvideRide: supportInfo?.canProvideRide,
-				rideDetails: supportInfo?.rideDetails,
-				tshirtSize: additionalInfo?.tshirtSize ?? undefined,
-			});
+			try {
+				// 평문 데이터를 직접 전달 (암호화는 Convex action 내부에서 처리)
+				await upsert({
+					name: personalInfo.name,
+					phone: personalInfo.phone,
+					gender: personalInfo.gender,
+					department: personalInfo.department,
+					ageGroup: personalInfo.ageGroup,
+					stayType: attendanceInfo.stayType,
+					attendanceDate: attendanceInfo.attendanceDate,
+					pickupTimeDescription: attendanceInfo.pickupTimeDescription,
+					isPaid: false,
+					tfTeam: supportInfo?.tfTeam,
+					canProvideRide: supportInfo?.canProvideRide,
+					rideDetails: supportInfo?.rideDetails,
+					tshirtSize: additionalInfo?.tshirtSize ?? undefined,
+				});
 
-			clearForm();
-			setCurrentStep("complete");
-			await navigate({ to: "/onboarding/$step", params: { step: "complete" } });
-		} catch (err) {
-			console.error("Failed to submit application:", err);
-			setError("신청 중 오류가 발생했습니다. 다시 시도해주세요.");
-		} finally {
-			setIsSubmitting(false);
-		}
+				clearForm();
+				setCurrentStep("complete");
+				await navigate({
+					to: "/onboarding/$step",
+					params: { step: "complete" },
+				});
+			} catch (err) {
+				console.error("Failed to submit application:", err);
+				setError("신청 중 오류가 발생했습니다. 다시 시도해주세요.");
+			}
+		});
 	};
 
 	return (
@@ -325,7 +334,7 @@ export function ConfirmStep() {
 				<motion.div className="flex gap-3 pt-6" variants={itemVariants}>
 					<Button
 						className="h-12 rounded-xl border-border/50 px-6 hover:bg-muted/50"
-						disabled={isSubmitting}
+						disabled={isPending}
 						onClick={handleBack}
 						type="button"
 						variant="outline"
@@ -339,11 +348,11 @@ export function ConfirmStep() {
 							"bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70",
 							"text-primary-foreground shadow-primary/20"
 						)}
-						disabled={isSubmitting}
+						disabled={isPending}
 						onClick={handleSubmit}
 						type="button"
 					>
-						{isSubmitting ? (
+						{isPending ? (
 							<motion.div
 								animate={{ rotate: 360 }}
 								className="h-5 w-5 rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground"

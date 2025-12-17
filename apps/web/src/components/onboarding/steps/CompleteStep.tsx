@@ -11,6 +11,7 @@ import {
 	Home,
 	PartyPopper,
 } from "lucide-react";
+import { useTransition } from "react";
 import Confetti from "react-confetti";
 import { useWindowSize } from "@/hooks/use-window-size";
 import { useOnboardingFormStore } from "@/store/onboarding-form-store";
@@ -54,10 +55,13 @@ export function CompleteStep() {
 	const navigate = useNavigate();
 	const { personalInfo, clearForm } = useOnboardingFormStore();
 	const { width, height } = useWindowSize();
+	const [, startTransition] = useTransition();
 
 	const handleGoHome = () => {
-		clearForm();
-		navigate({ to: "/" });
+		startTransition(() => {
+			clearForm();
+			navigate({ to: "/" });
+		});
 	};
 
 	return (
@@ -96,7 +100,7 @@ export function CompleteStep() {
 							</div>
 							<motion.div
 								animate={{ scale: 1, rotate: 0 }}
-								className="absolute -top-3 -right-3"
+								className="-top-3 -right-3 absolute"
 								initial={{ scale: 0, rotate: -30 }}
 								transition={{ delay: 0.5, type: "spring", stiffness: 300 }}
 							>

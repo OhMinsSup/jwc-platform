@@ -12,11 +12,17 @@ import {
 	FormLabel,
 	FormMessage,
 	Input,
+	ScrollArea,
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
+	Sheet,
+	SheetContent,
+	SheetHeader,
+	SheetTitle,
+	SheetTrigger,
 } from "@jwc/ui";
 import { useNavigate } from "@tanstack/react-router";
 import type { Variants } from "framer-motion";
@@ -27,13 +33,16 @@ import {
 	ArrowRight,
 	Building2,
 	Calendar,
+	Check,
+	ChevronDown,
 	Phone,
 	User,
 	Users,
 } from "lucide-react";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod/v4";
+import { useWindowSize } from "@/hooks/use-window-size";
 import { AGE_GROUPS, DEPARTMENTS } from "@/lib/constants";
 import { useOnboardingFormStore } from "@/store/onboarding-form-store";
 
@@ -105,14 +114,13 @@ function SelectionButton({
 
 export function PersonalInfoStep() {
 	const navigate = useNavigate();
-	const {
-		personalInfo,
-		setPersonalInfo,
-		setCurrentStep,
-		isLoading,
-		setIsLoading,
-	} = useOnboardingFormStore();
+	const { personalInfo, setPersonalInfo, setCurrentStep } =
+		useOnboardingFormStore();
 	const formRef = useRef<HTMLFormElement>(null);
+	const [isPending, startTransition] = useTransition();
+	const { width } = useWindowSize();
+	const isMobile = width < 768;
+	const [isAgeSheetOpen, setIsAgeSheetOpen] = useState(false);
 
 	const form = useForm<PersonalInfoInput>({
 		resolver: standardSchemaResolver(personalInfoSchema),
@@ -139,23 +147,22 @@ export function PersonalInfoStep() {
 		}
 	}, [personalInfo, form]);
 
-	const onSubmit = async (data: PersonalInfoInput) => {
-		setIsLoading(true);
-		try {
+	const onSubmit = (data: PersonalInfoInput) => {
+		startTransition(async () => {
 			setPersonalInfo(data);
 			setCurrentStep("attendance");
 			await navigate({
 				to: "/onboarding/$step",
 				params: { step: "attendance" },
 			});
-		} finally {
-			setIsLoading(false);
-		}
+		});
 	};
 
-	const handleBack = async () => {
-		setCurrentStep("welcome");
-		await navigate({ to: "/onboarding/$step", params: { step: "welcome" } });
+	const handleBack = () => {
+		startTransition(async () => {
+			setCurrentStep("welcome");
+			await navigate({ to: "/onboarding/$step", params: { step: "welcome" } });
+		});
 	};
 
 	// 전화번호 포맷팅 함수
@@ -334,20 +341,87 @@ export function PersonalInfoStep() {
 										<Calendar className="h-4 w-4 text-muted-foreground" />
 										연령대
 									</FormLabel>
-									<Select onValueChange={field.onChange} value={field.value}>
-										<FormControl>
-											<SelectTrigger className="h-12 border-border/50 bg-muted/30 transition-all duration-200 focus:border-primary focus:bg-background">
-												<SelectValue placeholder="연령대를 선택하세요" />
-											</SelectTrigger>
-										</FormControl>
-										<SelectContent>
-											{AGE_GROUPS.map((age) => (
-												<SelectItem key={age.value} value={age.value}>
-													{age.label}
-												</SelectItem>
-											))}
-										</SelectContent>
-									</Select>
+									{isMobile ? (
+										<Sheet
+											onOpenChange={setIsAgeSheetOpen}
+											open={isAgeSheetOpen}
+										>
+											<SheetTrigger asChild>
+												<FormControl>
+													<Button
+														className={cn(
+															"h-12 w-full justify-between border-border/50 bg-muted/30 font-normal transition-all duration-200 hover:bg-muted/50",
+															!field.value && "text-muted-foreground"
+														)}
+														ref={field.ref}
+														role="combobox"
+														variant="outline"
+													>
+														{field.value
+															? AGE_GROUPS.find(
+																	(age) => age.value === field.value
+																)?.label
+															: "연령대를 선택하세요"}
+														<ChevronDown className="h-4 w-4 opacity-50" />
+													</Button>
+												</FormControl>
+											</SheetTrigger>
+											<SheetContent
+												className="h-[80%] rounded-t-[20px]"
+												side="bottom"
+											>
+												<SheetHeader>
+													<SheetTitle>연령대 선택</SheetTitle>
+												</SheetHeader>
+												<ScrollArea className="h-full pb-10">
+													<div className="grid gap-2 py-4">
+														{AGE_GROUPS.map((age) => (
+															<Button
+																className={cn(
+																	"h-12 justify-start text-left",
+																	field.value === age.value &&
+																		"bg-primary text-primary-foreground"
+																)}
+																key={age.value}
+																onClick={() => {
+																	field.onChange(age.value);
+																	setIsAgeSheetOpen(false);
+																}}
+																variant={
+																	field.value === age.value
+																		? "default"
+																		: "outline"
+																}
+															>
+																{age.label}
+																{field.value === age.value && (
+																	<Check className="ml-auto h-4 w-4" />
+																)}
+															</Button>
+														))}
+													</div>
+												</ScrollArea>
+											</SheetContent>
+										</Sheet>
+									) : (
+										<Select onValueChange={field.onChange} value={field.value}>
+											<FormControl>
+												<SelectTrigger
+													className="h-12 border-border/50 bg-muted/30 transition-all duration-200 focus:border-primary focus:bg-background"
+													ref={field.ref}
+												>
+													<SelectValue placeholder="연령대를 선택하세요" />
+												</SelectTrigger>
+											</FormControl>
+											<SelectContent>
+												{AGE_GROUPS.map((age) => (
+													<SelectItem key={age.value} value={age.value}>
+														{age.label}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+									)}
 									<FormMessage />
 								</FormItem>
 							)}
@@ -367,10 +441,10 @@ export function PersonalInfoStep() {
 						</Button>
 						<Button
 							className="h-12 flex-1 rounded-xl bg-primary font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-all duration-200 hover:bg-primary/90"
-							disabled={isLoading || !form.formState.isValid}
+							disabled={isPending || !form.formState.isValid}
 							type="submit"
 						>
-							{isLoading ? (
+							{isPending ? (
 								<motion.div
 									animate={{ rotate: 360 }}
 									className="h-5 w-5 rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground"

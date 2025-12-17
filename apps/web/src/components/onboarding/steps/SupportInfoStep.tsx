@@ -28,7 +28,7 @@ import {
 	Music,
 	Users,
 } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod/v4";
 import { useOnboardingFormStore } from "@/store/onboarding-form-store";
@@ -92,14 +92,10 @@ const TF_TEAM_OPTIONS: {
 
 export function SupportInfoStep() {
 	const navigate = useNavigate();
-	const {
-		supportInfo,
-		setSupportInfo,
-		setCurrentStep,
-		isLoading,
-		setIsLoading,
-	} = useOnboardingFormStore();
+	const { supportInfo, setSupportInfo, setCurrentStep } =
+		useOnboardingFormStore();
 	const formRef = useRef<HTMLFormElement>(null);
+	const [isPending, startTransition] = useTransition();
 
 	const form = useForm<SupportFormData>({
 		resolver: standardSchemaResolver(supportSchema),
@@ -124,23 +120,25 @@ export function SupportInfoStep() {
 		}
 	}, [supportInfo, form]);
 
-	const onSubmit = async (data: SupportFormData) => {
-		setIsLoading(true);
-		try {
+	const onSubmit = (data: SupportFormData) => {
+		startTransition(async () => {
 			setSupportInfo(data);
 			setCurrentStep("additional");
 			await navigate({
 				to: "/onboarding/$step",
 				params: { step: "additional" },
 			});
-		} finally {
-			setIsLoading(false);
-		}
+		});
 	};
 
-	const handleBack = async () => {
-		setCurrentStep("attendance");
-		await navigate({ to: "/onboarding/$step", params: { step: "attendance" } });
+	const handleBack = () => {
+		startTransition(async () => {
+			setCurrentStep("attendance");
+			await navigate({
+				to: "/onboarding/$step",
+				params: { step: "attendance" },
+			});
+		});
 	};
 
 	return (
@@ -336,10 +334,10 @@ export function SupportInfoStep() {
 						</Button>
 						<Button
 							className="h-12 flex-1 rounded-xl bg-primary font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-all duration-200 hover:bg-primary/90"
-							disabled={isLoading}
+							disabled={isPending}
 							type="submit"
 						>
-							{isLoading ? (
+							{isPending ? (
 								<motion.div
 									animate={{ rotate: 360 }}
 									className="h-5 w-5 rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground"

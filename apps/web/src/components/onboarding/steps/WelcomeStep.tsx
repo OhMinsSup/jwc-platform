@@ -4,6 +4,7 @@ import { Button, cn } from "@jwc/ui";
 import { useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { ArrowRight, Calendar, MapPin, Sparkles, Users } from "lucide-react";
+import { useTransition } from "react";
 import { useOnboardingFormStore } from "@/store/onboarding-form-store";
 
 const containerVariants = {
@@ -47,11 +48,14 @@ const highlights = [
 export function WelcomeStep() {
 	const navigate = useNavigate();
 	const { clearForm, setCurrentStep } = useOnboardingFormStore();
+	const [, startTransition] = useTransition();
 
-	const handleStart = async () => {
-		clearForm();
-		setCurrentStep("personal");
-		await navigate({ to: "/onboarding/$step", params: { step: "personal" } });
+	const handleStart = () => {
+		startTransition(async () => {
+			clearForm();
+			setCurrentStep("personal");
+			await navigate({ to: "/onboarding/$step", params: { step: "personal" } });
+		});
 	};
 
 	return (
