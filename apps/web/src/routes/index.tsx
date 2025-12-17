@@ -3,7 +3,7 @@ import { api } from "@jwc/backend/convex/_generated/api";
 import { Button } from "@jwc/ui";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Calendar, Clock, MapPin, Users } from "lucide-react";
+import { ArrowRight, Calendar, Clock, MapPin } from "lucide-react";
 import {
 	ConnectionStatus,
 	Footer,
@@ -35,25 +35,6 @@ const RETREAT_INFO = {
 	location: "광림 수도원",
 	deadline: "2026년 1월 8일",
 };
-
-/** 특징/혜택 */
-const FEATURES = [
-	{
-		icon: Users,
-		title: "함께하는 시간",
-		description: "청년부 형제자매들과 깊은 교제의 시간",
-	},
-	{
-		icon: Calendar,
-		title: "영적 충전",
-		description: "말씀과 찬양으로 채워지는 은혜의 시간",
-	},
-	{
-		icon: MapPin,
-		title: "자연 속 휴식",
-		description: "일상에서 벗어나 자연 속에서의 힐링",
-	},
-];
 
 function HomeComponent() {
 	const healthCheck = useQuery(convexQuery(api.healthCheck.get, {}));
@@ -165,34 +146,6 @@ function HomeComponent() {
 								<p>수련회 포스터 / 이미지 영역</p>
 							</div>
 						</div>
-					</div>
-				</div>
-			</section>
-
-			{/* Features Section */}
-			<section className="border-t bg-muted/40 py-24">
-				<div className="container mx-auto px-4">
-					<div className="mb-12 text-center">
-						<h2 className="font-bold text-3xl tracking-tighter sm:text-4xl">
-							함께하는 즐거움
-						</h2>
-						<p className="mt-4 text-muted-foreground md:text-lg">
-							이번 수련회에서 경험할 수 있는 특별한 시간들을 소개합니다.
-						</p>
-					</div>
-					<div className="grid gap-8 md:grid-cols-3">
-						{FEATURES.map((feature, index) => (
-							<div
-								className="group relative overflow-hidden rounded-2xl border bg-background p-8 transition-all hover:shadow-lg"
-								key={`feature:${index.toString()}`}
-							>
-								<div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-									<feature.icon className="h-6 w-6" />
-								</div>
-								<h3 className="mb-2 font-bold text-xl">{feature.title}</h3>
-								<p className="text-muted-foreground">{feature.description}</p>
-							</div>
-						))}
 					</div>
 				</div>
 			</section>
