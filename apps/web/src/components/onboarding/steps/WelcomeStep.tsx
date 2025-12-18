@@ -82,7 +82,7 @@ export function WelcomeStep() {
 				{/* 메인 타이틀 */}
 				<motion.div className="mb-6" variants={itemVariants}>
 					<h1 className="mt-1 font-bold text-4xl tracking-tight md:text-5xl">
-						<span className="bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">
+						<span className="bg-linear-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">
 							멸종위기사랑
 						</span>
 					</h1>
@@ -130,7 +130,7 @@ export function WelcomeStep() {
 					<Button
 						className={cn(
 							"group h-14 rounded-full px-10 font-medium text-base",
-							"bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70",
+							"bg-linear-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70",
 							"shadow-primary/25 shadow-xl hover:shadow-2xl hover:shadow-primary/30",
 							"transition-all duration-300"
 						)}

@@ -46,22 +46,6 @@ function HomeComponent() {
 			footer={<Footer />}
 			header={
 				<Navbar
-					navSlot={
-						<>
-							<Link
-								className="font-semibold text-foreground transition-colors"
-								to="/"
-							>
-								홈
-							</Link>
-							<Link
-								className="transition-colors hover:text-foreground"
-								to="/about"
-							>
-								수련회 안내
-							</Link>
-						</>
-					}
 					rightSlot={
 						<>
 							<ConnectionStatus

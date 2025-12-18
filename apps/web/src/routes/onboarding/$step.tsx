@@ -1,5 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { Activity, lazy, Suspense } from "react";
+import { lazy, Suspense } from "react";
 import {
 	FullPageLoading,
 	LoadingSpinner,
@@ -61,6 +61,25 @@ function OnboardingStepPage() {
 	// 진행 상황 표시 여부 (welcome, complete 제외)
 	const showProgress = !["welcome", "complete"].includes(currentStep);
 
+	const renderStep = () => {
+		switch (currentStep) {
+			case "personal":
+				return <PersonalInfoStep />;
+			case "attendance":
+				return <AttendanceInfoStep />;
+			case "support":
+				return <SupportInfoStep />;
+			case "additional":
+				return <AdditionalInfoStep />;
+			case "confirm":
+				return <ConfirmStep />;
+			case "complete":
+				return <CompleteStep />;
+			default:
+				return <WelcomeStep />;
+		}
+	};
+
 	return (
 		<PageLayout header={<Navbar />}>
 			{showProgress && (
@@ -73,33 +92,7 @@ function OnboardingStepPage() {
 
 			<div className="py-8 md:py-12">
 				<div className="container mx-auto max-w-2xl px-4">
-					<Suspense fallback={<StepLoader />}>
-						<Activity mode={currentStep === "welcome" ? "visible" : "hidden"}>
-							<WelcomeStep />
-						</Activity>
-						<Activity mode={currentStep === "personal" ? "visible" : "hidden"}>
-							<PersonalInfoStep />
-						</Activity>
-						<Activity
-							mode={currentStep === "attendance" ? "visible" : "hidden"}
-						>
-							<AttendanceInfoStep />
-						</Activity>
-						<Activity mode={currentStep === "support" ? "visible" : "hidden"}>
-							<SupportInfoStep />
-						</Activity>
-						<Activity
-							mode={currentStep === "additional" ? "visible" : "hidden"}
-						>
-							<AdditionalInfoStep />
-						</Activity>
-						<Activity mode={currentStep === "confirm" ? "visible" : "hidden"}>
-							<ConfirmStep />
-						</Activity>
-						<Activity mode={currentStep === "complete" ? "visible" : "hidden"}>
-							<CompleteStep />
-						</Activity>
-					</Suspense>
+					<Suspense fallback={<StepLoader />}>{renderStep()}</Suspense>
 				</div>
 			</div>
 		</PageLayout>
