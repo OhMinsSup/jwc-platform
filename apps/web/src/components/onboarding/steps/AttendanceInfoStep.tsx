@@ -46,9 +46,10 @@ import {
 	Sun,
 	Tent,
 } from "lucide-react";
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod/v4";
+import { useResponsiveModalState } from "@/hooks/use-responsive-modal-state";
 import { useWindowSize } from "@/hooks/use-window-size";
 import { useOnboardingFormStore } from "@/store/onboarding-form-store";
 
@@ -249,10 +250,16 @@ export function AttendanceInfoStep() {
 	const { attendanceInfo, setAttendanceInfo, setCurrentStep } =
 		useOnboardingFormStore();
 	const formRef = useRef<HTMLFormElement>(null);
-	const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 	const [isPending, startTransition] = useTransition();
 	const { width } = useWindowSize();
 	const isMobile = width < 768;
+
+	// 반응형 모달 상태 관리 (모바일: history.state, 데스크탑: 로컬 상태)
+	const { isOpen: isCalendarOpen, setIsOpen: setIsCalendarOpen } =
+		useResponsiveModalState({
+			id: "attendance-info-calendar",
+			isMobile,
+		});
 
 	const form = useForm<AttendanceFormData>({
 		resolver: standardSchemaResolver(attendanceSchema),

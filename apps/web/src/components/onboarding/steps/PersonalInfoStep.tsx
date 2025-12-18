@@ -40,9 +40,10 @@ import {
 	User,
 	Users,
 } from "lucide-react";
-import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useRef, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod/v4";
+import { useResponsiveModalState } from "@/hooks/use-responsive-modal-state";
 import { useWindowSize } from "@/hooks/use-window-size";
 import { AGE_GROUPS, DEPARTMENTS } from "@/lib/constants";
 import { useOnboardingFormStore } from "@/store/onboarding-form-store";
@@ -121,7 +122,13 @@ export function PersonalInfoStep() {
 	const [isPending, startTransition] = useTransition();
 	const { width } = useWindowSize();
 	const isMobile = width < 768;
-	const [isAgeSheetOpen, setIsAgeSheetOpen] = useState(false);
+
+	// 반응형 모달 상태 관리 (모바일: history.state, 데스크탑: 로컬 상태)
+	const { isOpen: isAgeSheetOpen, setIsOpen: setIsAgeSheetOpen } =
+		useResponsiveModalState({
+			id: "personal-info-age-selector",
+			isMobile,
+		});
 
 	const form = useForm<PersonalInfoInput>({
 		resolver: standardSchemaResolver(personalInfoSchema),

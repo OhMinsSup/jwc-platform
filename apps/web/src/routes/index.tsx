@@ -111,14 +111,6 @@ function HomeComponent() {
 									<ArrowRight className="ml-2 h-4 w-4" />
 								</Link>
 							</Button>
-							<Button
-								asChild
-								className="rounded-full px-8 text-base"
-								size="lg"
-								variant="outline"
-							>
-								<Link to="/application">신청 내역 조회</Link>
-							</Button>
 						</div>
 						<div className="flex items-center gap-4 text-muted-foreground text-sm">
 							<div className="flex items-center gap-1">

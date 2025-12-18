@@ -66,7 +66,7 @@ interface ApplicationSearchParams {
 
 export const Route = createFileRoute("/application/")({
 	component: ApplicationListPage,
-	loader: () => {
+	beforeLoad: () => {
 		throw redirect({
 			to: "/",
 		});
