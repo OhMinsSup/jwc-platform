@@ -45,8 +45,8 @@ export const TSHIRT_SIZE_LABELS: Record<string, string> = {
 
 /** 회비 정보 (원) */
 export const FEES: Record<string, number> = {
-	"3nights4days": 70_000,
+	"3nights4days": 60_000,
 	"2nights3days": 50_000,
-	"1night2days": 30_000,
-	dayTrip: 20_000,
+	"1night2days": 45_000,
+	dayTrip: 45_000,
 };

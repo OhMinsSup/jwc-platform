@@ -123,10 +123,10 @@ export function SupportInfoStep() {
 	const onSubmit = (data: SupportFormData) => {
 		startTransition(async () => {
 			setSupportInfo(data);
-			setCurrentStep("additional");
+			setCurrentStep("confirm");
 			await navigate({
 				to: "/onboarding/$step",
-				params: { step: "additional" },
+				params: { step: "confirm" },
 			});
 		});
 	};
@@ -161,6 +161,8 @@ export function SupportInfoStep() {
 				</h1>
 				<p className="text-muted-foreground">
 					수련회 준비에 함께해 주실 부분이 있으시면 알려주세요
+					<br />
+					목원도 참여 가능해요. 같이 준비하면서 함께 풍성한 은혜를 누려요
 				</p>
 			</motion.div>
 

@@ -112,7 +112,9 @@ export const MESSAGE_TEMPLATES: Record<string, MessageTemplate> = {
 	"onboarding-welcome": {
 		name: "온보딩 환영 메시지",
 		text: `[청년부 수련회]
-{{name}}님, 신청완료.
+{{name}}님, 수련회 신청완료
+금액: {{amount}}원 ({{stayType}})
+계좌: {{accountInfo}}
 {{siteUrl}}
 `,
 	},
@@ -120,6 +122,8 @@ export const MESSAGE_TEMPLATES: Record<string, MessageTemplate> = {
 		name: "신청 정보 수정 알림",
 		text: `[청년부 수련회]
 {{name}}님, 수정완료.
+금액: {{amount}}원 ({{stayType}})
+계좌: {{accountInfo}}
 {{siteUrl}}
 `,
 	},

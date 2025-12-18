@@ -1,20 +1,30 @@
 "use client";
 
+import { STAY_TYPE_LABELS } from "@jwc/schema";
 import { Button, cn } from "@jwc/ui";
 import { useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import {
 	Bell,
 	Calendar,
+	Check,
 	CheckCircle2,
+	Copy,
 	CreditCard,
 	Home,
 	PartyPopper,
 } from "lucide-react";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import Confetti from "react-confetti";
 import { useWindowSize } from "@/hooks/use-window-size";
 import { useOnboardingFormStore } from "@/store/onboarding-form-store";
+
+const FEES: Record<string, number> = {
+	"3nights4days": 60_000,
+	"2nights3days": 50_000,
+	"1night2days": 45_000,
+	dayTrip: 45_000,
+};
 
 const formVariants = {
 	hidden: { opacity: 0 },
@@ -53,15 +63,29 @@ const nextSteps = [
 
 export function CompleteStep() {
 	const navigate = useNavigate();
-	const { personalInfo, clearForm } = useOnboardingFormStore();
+	const { personalInfo, attendanceInfo, clearForm } = useOnboardingFormStore();
 	const { width, height } = useWindowSize();
 	const [, startTransition] = useTransition();
+	const [isCopied, setIsCopied] = useState(false);
+
+	const fee = attendanceInfo.stayType ? FEES[attendanceInfo.stayType] : 0;
+	const accountInfo =
+		import.meta.env.VITE_PAID_ACCOUNT_NUMBER || "계좌 정보 없음";
 
 	const handleGoHome = () => {
 		startTransition(() => {
 			clearForm();
 			navigate({ to: "/" });
 		});
+	};
+
+	const handleCopyAccount = () => {
+		if (!accountInfo) {
+			return;
+		}
+		navigator.clipboard.writeText(accountInfo);
+		setIsCopied(true);
+		setTimeout(() => setIsCopied(false), 2000);
 	};
 
 	return (
@@ -95,7 +119,7 @@ export function CompleteStep() {
 								damping: 15,
 							}}
 						>
-							<div className="flex h-28 w-28 items-center justify-center rounded-full bg-gradient-to-br from-green-400 to-green-600 shadow-green-500/30 shadow-lg">
+							<div className="flex h-28 w-28 items-center justify-center rounded-full bg-linear-to-br from-green-400 to-green-600 shadow-green-500/30 shadow-lg">
 								<CheckCircle2 className="h-14 w-14 text-white" />
 							</div>
 							<motion.div
@@ -104,7 +128,7 @@ export function CompleteStep() {
 								initial={{ scale: 0, rotate: -30 }}
 								transition={{ delay: 0.5, type: "spring", stiffness: 300 }}
 							>
-								<div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 shadow-amber-500/30 shadow-lg">
+								<div className="flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br from-amber-400 to-orange-500 shadow-amber-500/30 shadow-lg">
 									<PartyPopper className="h-6 w-6 text-white" />
 								</div>
 							</motion.div>
@@ -122,6 +146,52 @@ export function CompleteStep() {
 							</span>
 							님의 수련회 신청이 접수되었습니다
 						</p>
+					</motion.div>
+
+					{/* 참가비 안내 카드 */}
+					<motion.div
+						className="mb-8 w-full overflow-hidden rounded-2xl border border-border/50 bg-muted/20"
+						variants={itemVariants}
+					>
+						<div className="border-border/30 border-b bg-muted/30 px-6 py-4">
+							<h3 className="font-semibold text-foreground">참가비 안내</h3>
+						</div>
+						<div className="space-y-4 p-6">
+							<div className="flex items-center justify-between">
+								<span className="text-muted-foreground">참가 일정</span>
+								<span className="font-medium">
+									{attendanceInfo.stayType
+										? STAY_TYPE_LABELS[attendanceInfo.stayType]
+										: "-"}
+								</span>
+							</div>
+							<div className="flex items-center justify-between">
+								<span className="text-muted-foreground">참가비</span>
+								<span className="font-bold text-lg text-primary">
+									{fee?.toLocaleString()}원
+								</span>
+							</div>
+							<div className="border-border/30 border-t pt-4">
+								<div className="mb-2 text-muted-foreground text-sm">
+									입금 계좌
+								</div>
+								<div className="flex items-center justify-between rounded-lg border border-border/50 bg-background p-3">
+									<span className="font-medium font-mono">{accountInfo}</span>
+									<Button
+										className="h-8 w-8 text-muted-foreground hover:text-foreground"
+										onClick={handleCopyAccount}
+										size="icon"
+										variant="ghost"
+									>
+										{isCopied ? (
+											<Check className="h-4 w-4 text-green-500" />
+										) : (
+											<Copy className="h-4 w-4" />
+										)}
+									</Button>
+								</div>
+							</div>
+						</div>
 					</motion.div>
 
 					{/* 다음 단계 카드 */}
@@ -173,7 +243,7 @@ export function CompleteStep() {
 						variants={itemVariants}
 					>
 						<p className="text-muted-foreground text-sm">
-							입금 확인 및 세부 안내는 등록하신 연락처로 문자 또는 카카오톡으로
+							입금 확인 및 세부 안내는 등록하신 연락처로 문자로
 							안내드리겠습니다.
 						</p>
 					</motion.div>
@@ -183,7 +253,7 @@ export function CompleteStep() {
 						<Button
 							className={cn(
 								"h-12 rounded-xl px-8 font-medium shadow-lg transition-all duration-200",
-								"bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70",
+								"bg-linear-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70",
 								"text-primary-foreground shadow-primary/20"
 							)}
 							onClick={handleGoHome}

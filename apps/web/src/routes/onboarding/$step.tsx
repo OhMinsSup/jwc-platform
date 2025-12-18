@@ -23,9 +23,9 @@ const AttendanceInfoStep = lazy(
 const SupportInfoStep = lazy(
 	() => import("@/components/onboarding/steps/SupportInfoStep")
 );
-const AdditionalInfoStep = lazy(
-	() => import("@/components/onboarding/steps/AdditionalInfoStep")
-);
+// const AdditionalInfoStep = lazy(
+// 	() => import("@/components/onboarding/steps/AdditionalInfoStep")
+// );
 const ConfirmStep = lazy(
 	() => import("@/components/onboarding/steps/ConfirmStep")
 );
@@ -69,8 +69,8 @@ function OnboardingStepPage() {
 				return <AttendanceInfoStep />;
 			case "support":
 				return <SupportInfoStep />;
-			case "additional":
-				return <AdditionalInfoStep />;
+			// case "additional":
+			// 	return <AdditionalInfoStep />;
 			case "confirm":
 				return <ConfirmStep />;
 			case "complete":

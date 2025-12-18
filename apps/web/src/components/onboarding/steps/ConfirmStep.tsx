@@ -6,7 +6,6 @@ import {
 	GENDER_LABELS,
 	STAY_TYPE_LABELS,
 	TF_TEAM_LABELS,
-	TSHIRT_SIZE_LABELS,
 } from "@jwc/schema";
 import { Button, cn } from "@jwc/ui";
 import { useNavigate } from "@tanstack/react-router";
@@ -21,7 +20,6 @@ import {
 	CheckCircle2,
 	ClipboardCheck,
 	Edit3,
-	Shirt,
 	User,
 	Users,
 } from "lucide-react";
@@ -114,10 +112,10 @@ export function ConfirmStep() {
 
 	const handleBack = () => {
 		startTransition(async () => {
-			setCurrentStep("additional");
+			setCurrentStep("support");
 			await navigate({
 				to: "/onboarding/$step",
-				params: { step: "additional" },
+				params: { step: "support" },
 			});
 		});
 	};
@@ -306,7 +304,7 @@ export function ConfirmStep() {
 				</motion.div>
 
 				{/* 추가 정보 */}
-				<motion.div variants={itemVariants}>
+				{/* <motion.div variants={itemVariants}>
 					<InfoCard
 						icon={<Shirt className="h-4 w-4 text-muted-foreground" />}
 						onEdit={() => goToStep("additional")}
@@ -321,7 +319,7 @@ export function ConfirmStep() {
 							}
 						/>
 					</InfoCard>
-				</motion.div>
+				</motion.div> */}
 
 				{/* 에러 메시지 */}
 				{error && (
@@ -349,7 +347,7 @@ export function ConfirmStep() {
 					<Button
 						className={cn(
 							"h-12 flex-1 rounded-xl font-medium shadow-lg transition-all duration-200",
-							"bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70",
+							"bg-linear-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70",
 							"text-primary-foreground shadow-primary/20"
 						)}
 						disabled={isPending}

@@ -20,7 +20,7 @@ export const STEPS = [
 	"personal",
 	"attendance",
 	"support",
-	"additional",
+	// "additional",
 	"confirm",
 	"complete",
 ] as const;
@@ -32,7 +32,7 @@ export const STEP_LABELS: Record<StepSlug, string> = {
 	personal: "기본 정보",
 	attendance: "참석 정보",
 	support: "지원",
-	additional: "추가 정보",
+	// additional: "추가 정보",
 	confirm: "확인",
 	complete: "완료",
 } as const;
@@ -195,8 +195,8 @@ function validateStep(step: StepSlug, state: OnboardingFormState): boolean {
 			return validateAttendanceInfo(state.attendanceInfo);
 		case "support":
 			return true; // 선택 필드만 있음
-		case "additional":
-			return validateAdditionalInfo(state.additionalInfo);
+		// case "additional":
+		// return validateAdditionalInfo(state.additionalInfo);
 		case "confirm":
 			return true;
 		default:
