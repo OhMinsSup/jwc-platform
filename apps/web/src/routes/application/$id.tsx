@@ -1,6 +1,7 @@
 import { convexQuery } from "@convex-dev/react-query";
 import { api } from "@jwc/backend/convex/_generated/api";
 import type { Id } from "@jwc/backend/convex/_generated/dataModel";
+import { FEES } from "@jwc/backend/convex/lib/constants";
 import {
 	DEPARTMENT_LABELS,
 	STAY_TYPE_LABELS,
@@ -18,7 +19,16 @@ import {
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
-import { Calendar, Car, CheckCircle2, User } from "lucide-react";
+import {
+	Calendar,
+	Car,
+	Check,
+	CheckCircle2,
+	Copy,
+	CreditCard,
+	User,
+} from "lucide-react";
+import { useState } from "react";
 import {
 	FullPageLoading,
 	InfoBlock,
@@ -91,6 +101,7 @@ function ApplicationDetailPage() {
 					<div className="grid gap-6 md:grid-cols-2">
 						<UserInfoCard />
 						<ScheduleInfoCard />
+						<PaymentInfoCard />
 						<AdditionalInfoCard />
 						{data.canProvideRide && <RideInfoCard />}
 					</div>
@@ -179,6 +190,62 @@ function ScheduleInfoCard() {
 							value={data.pickupTimeDescription}
 						/>
 					)}
+				</InfoGrid>
+			</CardContent>
+		</Card>
+	);
+}
+
+function PaymentInfoCard() {
+	const data = Route.useLoaderData();
+	const [isCopied, setIsCopied] = useState(false);
+
+	const fee = data.stayType ? FEES[data.stayType] : 0;
+	const accountInfo =
+		import.meta.env.VITE_PAID_ACCOUNT_NUMBER || "계좌 정보 없음";
+
+	const handleCopyAccount = () => {
+		if (!accountInfo) {
+			return;
+		}
+		navigator.clipboard.writeText(accountInfo);
+		setIsCopied(true);
+		setTimeout(() => setIsCopied(false), 2000);
+	};
+
+	return (
+		<Card>
+			<CardHeader className="pb-2">
+				<CardTitle className="flex items-center gap-2 text-base">
+					<CreditCard aria-label="Payment Info" className="h-4 w-4" />
+					참가비 안내
+				</CardTitle>
+			</CardHeader>
+			<CardContent>
+				<InfoGrid>
+					<InfoRow label="참가비" value={`${fee?.toLocaleString()}원`} />
+					<div className="flex flex-col gap-1.5">
+						<span className="font-medium text-muted-foreground text-sm">
+							입금 계좌
+						</span>
+						<div className="flex items-center justify-between rounded-md border bg-muted/50 px-3 py-2">
+							<span className="font-medium font-mono text-sm">
+								{accountInfo}
+							</span>
+							<Button
+								className="h-6 w-6 text-muted-foreground hover:text-foreground"
+								onClick={handleCopyAccount}
+								size="icon"
+								variant="ghost"
+							>
+								{isCopied ? (
+									<Check className="h-3 w-3 text-green-500" />
+								) : (
+									<Copy className="h-3 w-3" />
+								)}
+							</Button>
+						</div>
+					</div>
 				</InfoGrid>
 			</CardContent>
 		</Card>
