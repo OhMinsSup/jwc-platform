@@ -103,7 +103,6 @@ export function ConfirmStep() {
 		supportInfo,
 		additionalInfo,
 		setCurrentStep,
-		clearForm,
 	} = useOnboardingFormStore();
 	const [error, setError] = useState<string | null>(null);
 	const [isPending, startTransition] = useTransition();
@@ -167,7 +166,6 @@ export function ConfirmStep() {
 					tshirtSize: additionalInfo?.tshirtSize ?? undefined,
 				});
 
-				clearForm();
 				setCurrentStep("complete");
 				await navigate({
 					to: "/onboarding/$step",

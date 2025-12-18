@@ -1,5 +1,6 @@
 "use client";
 
+import { FEES } from "@jwc/backend/convex/lib/constants";
 import { STAY_TYPE_LABELS } from "@jwc/schema";
 import { Button, cn } from "@jwc/ui";
 import { useNavigate } from "@tanstack/react-router";
@@ -18,13 +19,6 @@ import { useState, useTransition } from "react";
 import Confetti from "react-confetti";
 import { useWindowSize } from "@/hooks/use-window-size";
 import { useOnboardingFormStore } from "@/store/onboarding-form-store";
-
-const FEES: Record<string, number> = {
-	"3nights4days": 60_000,
-	"2nights3days": 50_000,
-	"1night2days": 45_000,
-	dayTrip: 45_000,
-};
 
 const formVariants = {
 	hidden: { opacity: 0 },
@@ -68,6 +62,7 @@ export function CompleteStep() {
 	const [, startTransition] = useTransition();
 	const [isCopied, setIsCopied] = useState(false);
 
+	console.log("FEES:", attendanceInfo); // Debug log to verify FEES import
 	const fee = attendanceInfo.stayType ? FEES[attendanceInfo.stayType] : 0;
 	const accountInfo =
 		import.meta.env.VITE_PAID_ACCOUNT_NUMBER || "계좌 정보 없음";
