@@ -194,6 +194,20 @@ export const upsertInternal = internalMutation({
 				tshirtSize: args.tshirtSize,
 			});
 
+			// 최초 생성 시 SMS 환영 메시지 발송 (Workpool 사용)
+			await smsPool.enqueueAction(
+				ctx,
+				internal.sms.sendOnboardingUpdate,
+				{ onboardingId: existing._id },
+				{
+					onComplete: internal.smsHandlers.onSmsComplete,
+					context: {
+						type: "onboarding-update",
+						onboardingId: existing._id,
+					},
+				}
+			);
+
 			await spreadsheetPool.enqueueAction(
 				ctx,
 				internal.spreadsheet.syncAllToGoogleSheets,
