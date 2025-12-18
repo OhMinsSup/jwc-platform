@@ -70,8 +70,7 @@ export const sendOnboardingWelcome = internalAction({
 				] ?? onboarding.stayType;
 
 			// 사이트 URL 생성
-			const baseUrl =
-				process.env.SITE_URL ?? "https://jwc-platforms.vercel.app";
+			const baseUrl = process.env.SITE_URL ?? "https://jjuliy.vercel.app";
 			const targetUrl = `${baseUrl}/application/${args.onboardingId}`;
 
 			// 단축 URL 생성
@@ -161,8 +160,7 @@ export const sendOnboardingUpdate = internalAction({
 				] ?? onboarding.stayType;
 
 			// 사이트 URL 생성
-			const baseUrl =
-				process.env.SITE_URL ?? "https://jwc-platforms.vercel.app";
+			const baseUrl = process.env.SITE_URL ?? "https://jjuliy.vercel.app";
 			const targetUrl = `${baseUrl}/application/${args.onboardingId}`;
 
 			// 단축 URL 생성
@@ -230,8 +228,7 @@ export const sendPaymentReminder = internalAction({
 
 			const key = await deriveKey(AES_KEY);
 			const client = getSolapiClient();
-			const baseUrl =
-				process.env.SITE_URL ?? "https://jwc-platforms.vercel.app";
+			const baseUrl = process.env.SITE_URL ?? "https://jjuliy.vercel.app";
 			const template = MESSAGE_TEMPLATES["payment-reminder"];
 
 			if (!template) {
