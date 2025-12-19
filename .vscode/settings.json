@@ -1,11 +1,9 @@
 {
-  // "[typescript,typescriptreact]": {
-  //   "editor.defaultFormatter": "esbenp.prettier-vscode"
-  // },
+  "prettier.enable": false,
+  "css.lint.unknownAtRules": "ignore",
   "editor.codeActionsOnSave": {
-    "source.organizeImports.biome": "explicit",
-    "source.fixAll.biome": "explicit",
-    "quickfix.biome": "explicit"
+  "source.organizeImports.biome": "explicit",
+    "source.fixAll.biome": "explicit"
   },
   "editor.defaultFormatter": "biomejs.biome",
   "deno.enablePaths": ["supabase/functions"],
@@ -25,30 +23,7 @@
     "http",
     "net"
   ],
-  // "editor.codeActionsOnSave": {
-  // "source.fixAll.eslint": "explicit"
-  // },
-  // "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
-  // "eslint.rules.customizations": [
-  //   {
-  //     "rule": "*",
-  //     "severity": "warn"
-  //   }
-  // ],
-  // "eslint.runtime": "node",
-  // "eslint.workingDirectories": [
-  //   {
-  //     "pattern": "./apps/*/"
-  //   },
-  //   {
-  //     "pattern": "./packages/*/"
-  //   },
-  //   {
-  //     "pattern": "./looling/*/"
-  //   }
-  // ],
-  // "prettier.ignorePath": ".gitignore",
   "tailwindCSS.experimental.classRegex": [
     ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
     ["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
@@ -60,16 +35,19 @@
     "next/dist/client/router.d.ts"
   ],
   "typescript.tsdk": "node_modules/typescript/lib",
-  "[typescriptreact]": {
+  "[javascript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[jsonc]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
   "[typescript]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
-  "[jsonc]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[yaml]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome"
   }
 }

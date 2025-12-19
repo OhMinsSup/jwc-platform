@@ -44,7 +44,13 @@
       "recommended": true,
       "suspicious": {
         "noConsole": "off",
-        "noDocumentCookie": "off"
+        "noDocumentCookie": "off",
+        "noUnknownAtRules": {
+          "level": "warn",
+          "options": {
+            "ignore": ["tailwind"]
+          }
+        }
       },
       "correctness": {
         "useExhaustiveDependencies": "info"
