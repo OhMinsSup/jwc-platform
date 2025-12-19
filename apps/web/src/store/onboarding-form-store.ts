@@ -11,10 +11,6 @@ import { devtools } from "zustand/middleware";
 // Re-export types from schema
 export type { Department, Gender, StayType, TfTeam, TshirtSize };
 
-// ============================================================
-// Steps 설정
-// ============================================================
-
 export const STEPS = [
 	"welcome",
 	"personal",
@@ -62,10 +58,6 @@ export const getPrevStep = (currentSlug: StepSlug): StepSlug | null => {
 	return currentIndex > 0 ? (STEPS[currentIndex - 1] ?? null) : null;
 };
 
-// ============================================================
-// 각 스텝별 데이터 타입
-// ============================================================
-
 /** 개인 정보 (Step 1) */
 export interface PersonalInfo {
 	name: string;
@@ -93,10 +85,6 @@ export interface SupportInfo {
 export interface AdditionalInfo {
 	tshirtSize: TshirtSize | null;
 }
-
-// ============================================================
-// Store 타입 정의
-// ============================================================
 
 interface OnboardingFormState {
 	// 현재 스텝
@@ -137,10 +125,6 @@ export interface OnboardingFormStore
 	extends OnboardingFormState,
 		OnboardingFormActions {}
 
-// ============================================================
-// 초기값
-// ============================================================
-
 const initialPersonalInfo: PersonalInfo = {
 	name: "",
 	phone: "",
@@ -164,10 +148,6 @@ const initialSupportInfo: SupportInfo = {
 const initialAdditionalInfo: AdditionalInfo = {
 	tshirtSize: null,
 };
-
-// ============================================================
-// 유효성 검사 함수
-// ============================================================
 
 function validatePersonalInfo(data: PersonalInfo): boolean {
 	return !!(
@@ -211,10 +191,6 @@ function validateFormComplete(state: OnboardingFormState): boolean {
 		validateAdditionalInfo(state.additionalInfo)
 	);
 }
-
-// ============================================================
-// Store 생성
-// ============================================================
 
 export const useOnboardingFormStore = create<OnboardingFormStore>()(
 	devtools(
@@ -301,10 +277,6 @@ export const useOnboardingFormStore = create<OnboardingFormStore>()(
 		}
 	)
 );
-
-// ============================================================
-// Selector hooks (성능 최적화)
-// ============================================================
 
 /** 개인정보만 선택 */
 export const usePersonalInfo = () =>

@@ -1,3 +1,5 @@
+import { Button } from "@jwc/ui";
+import { Github } from "lucide-react";
 import type { ReactNode } from "react";
 import { Logo } from "./Logo";
 
@@ -41,6 +43,15 @@ export function Navbar({ rightSlot, navSlot, statusSlot }: NavbarProps) {
 					</nav>
 				)}
 				<div className="flex items-center gap-4">
+					<Button asChild size="icon" variant="ghost">
+						<a
+							href="https://github.com/OhMinsSup/jwc-platform"
+							rel="noreferrer"
+							target="_blank"
+						>
+							<Github className="h-5 w-5" />
+						</a>
+					</Button>
 					{statusSlot}
 					{rightSlot}
 				</div>
