@@ -68,6 +68,8 @@ export const sendOnboardingWelcome = internalAction({
 				STAY_TYPE_LABELS[
 					onboarding.stayType as keyof typeof STAY_TYPE_LABELS
 				] ?? onboarding.stayType;
+			const amount = FEES[onboarding.stayType] ?? 0;
+			const accountInfo = process.env.VITE_PAID_ACCOUNT_NUMBER ?? "";
 
 			// 사이트 URL 생성
 			const baseUrl = process.env.SITE_URL ?? "https://jjuliy.vercel.app";
@@ -91,6 +93,8 @@ export const sendOnboardingWelcome = internalAction({
 			const text = interpolateTemplate(template.text, {
 				name,
 				stayType: stayTypeLabel,
+				amount: amount.toLocaleString(),
+				accountInfo,
 				siteUrl,
 			});
 
