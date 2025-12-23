@@ -111,7 +111,7 @@ export type TemplateId =
 export const MESSAGE_TEMPLATES: Record<string, MessageTemplate> = {
 	"onboarding-welcome": {
 		name: "온보딩 환영 메시지",
-		text: `[청년부 수련회]
+		text: `[죽전우리교회 청년부]\n
 {{name}}님, 수련회 신청완료\n
 금액: {{amount}}원 ({{stayType}})\n
 계좌: {{accountInfo}}\n
@@ -120,7 +120,7 @@ export const MESSAGE_TEMPLATES: Record<string, MessageTemplate> = {
 	},
 	"onboarding-update": {
 		name: "신청 정보 수정 알림",
-		text: `[청년부 수련회]
+		text: `[죽전우리교회 청년부]\n
 {{name}}님, 수정완료.\n
 금액: {{amount}}원 ({{stayType}})\n
 계좌: {{accountInfo}}\n
@@ -129,7 +129,7 @@ export const MESSAGE_TEMPLATES: Record<string, MessageTemplate> = {
 	},
 	"payment-reminder": {
 		name: "미입금 알림",
-		text: `[청년부 수련회]\n
+		text: `[죽전우리교회 청년부]\n
 {{name}}님, 회비 입금이 확인되지 않았습니다.\n
 [입금 안내]
 금액: {{amount}}원 ({{stayType}})\n
