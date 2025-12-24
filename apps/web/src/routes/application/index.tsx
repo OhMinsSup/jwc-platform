@@ -262,7 +262,7 @@ function ApplicationListPage() {
 				{/* Filters */}
 				<div className="mb-6 flex flex-col gap-4 rounded-xl border bg-card p-4 shadow-sm md:flex-row md:items-center">
 					<div className="relative flex-1">
-						<Search className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-muted-foreground" />
+						<Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 						<Input
 							className="pl-9"
 							onChange={(e) => setInputValue(e.target.value)}

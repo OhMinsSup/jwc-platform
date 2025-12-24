@@ -74,3 +74,45 @@
 - Biome 자동수정 할 때 안전한 safe 모드만을 사용한다.
 - Biome 설정 변경 시, 변경 이유와 기대 효과를 명확히 한다. 그리고 변경 후 `check:ultracite`를 실행하여 모든 파일이 설정을 준수하는지 확인한다.
 - Biome의 규칙에 맞게 코드를 수정 하려고 할 때 코드 자체의 의미가 회손되지 않고 기능이 변경되지 않도록 반드시 주의한다. 그리고 코드의 의미가 변경될 수 있는 자동수정은 피한다.
+
+## Agent Skills 규칙 (Copilot)
+
+이 레포는 Copilot Agent Skills를 `.github/skills/`에 둔다.
+
+### 저장 위치 선택(대안 비교)
+
+- 대안 A: `.github/skills/` (채택)
+	- 장점: VS Code Copilot이 표준 경로로 탐색, 레포 내 가시성 좋음
+	- 단점: `.github` 하위 문서가 늘어남
+- 대안 B: `.claude/skills/`
+	- 장점: 일부 툴링/레거시 관습과 호환
+	- 단점: Copilot 표준 경로가 아니며 팀 합의가 필요
+
+### 스킬 작성 규칙
+
+- 경로: `.github/skills/<skill-dir>/SKILL.md`
+- 스킬은 “재사용 가능한 작업 절차(워크플로우)”를 담고, 프로젝트 규칙은 이 `AGENTS.md`가 단일 소스가 된다.
+- `SKILL.md` 상단에는 YAML frontmatter를 반드시 둔다.
+	- `name`: 소문자/숫자/하이픈만, 최대 64자
+	- `description`: 언제/왜 쓰는지까지 포함해 구체적으로(최대 1024자)
+- 본문은 점진적 공개(Progressive disclosure)를 따른다.
+	- 메타데이터 → 절차/체크리스트/명령어 → 참고 링크/추가 파일
+- 본문은 500줄 이하를 권장하고, 상세 자료는 같은 디렉토리에 보조 파일로 분리한다.
+
+### 보안/품질 규칙
+
+- 스킬/예시는 비밀값을 포함하지 않는다(토큰/키/쿠키/개인정보 등).
+- 외부에서 가져온 스킬은 적용 전에 반드시 리뷰한다(명령어/파일 삭제/네트워크 요청 여부 확인).
+- 스킬은 “최소 변경”을 우선하며, 불필요한 자동 수정/대규모 포맷 변경을 지양한다.
+
+### VS Code 활성화
+
+- (프리뷰) VS Code Insiders에서 설정 `chat.useAgentSkills`를 켠다.
+- 스킬 개요/추가 규칙은 `.github/skills/README.md`를 따른다.
+
+### 현재 사용 중인 스킬
+
+- `.github/skills/jwc-workspace-validation/`
+- `.github/skills/jwc-biome-ultracite-fixing/`
+- `.github/skills/jwc-convex-backend-changes/`
+- `.github/skills/jwc-ui-shadcn-workflow/`
