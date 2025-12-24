@@ -119,7 +119,7 @@ export function CompleteStep() {
 							</div>
 							<motion.div
 								animate={{ scale: 1, rotate: 0 }}
-								className="-top-3 -right-3 absolute"
+								className="absolute -top-3 -right-3"
 								initial={{ scale: 0, rotate: -30 }}
 								transition={{ delay: 0.5, type: "spring", stiffness: 300 }}
 							>

@@ -157,3 +157,6 @@ dist
 
 # supabase
 .branches
+
+# ai-pr outputs
+.ai/

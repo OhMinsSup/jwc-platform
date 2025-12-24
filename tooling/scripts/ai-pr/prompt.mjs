@@ -1,0 +1,56 @@
+export function buildPrompts({
+	repoUrl,
+	baseRef,
+	baseCommit,
+	headRef,
+	headSha,
+	currentBranch,
+	diffStat,
+	files,
+	scope,
+	labels,
+	patches,
+}) {
+	const systemPrompt = [
+		"You are a senior software engineer writing a GitHub Pull Request.",
+		"Return ONLY valid JSON. No markdown. No extra keys.",
+		"The JSON schema:",
+		"{",
+		'  "title": string,',
+		'  "body": string,',
+		'  "labels": string[],',
+		"}",
+		"Title convention must be: type(scope): subject",
+		"- type: feat|fix|chore|refactor|docs|test|perf|build|ci|style|revert",
+		"- scope: lowercase, digits, hyphen only",
+		"- subject: concise, imperative",
+		"Body must include sections with these headings:",
+		"- Summary",
+		"- What Changed",
+		"- Risk & Rollback",
+		"- Testing",
+		"- Notes",
+		"Do not include secrets. If uncertain, say what to verify.",
+	].join("\n");
+
+	const userPrompt = [
+		`Repo: ${repoUrl}`,
+		`Base: ${baseRef} (${baseCommit})`,
+		`Head: ${headRef} (${headSha})`,
+		`Branch: ${currentBranch}`,
+		"",
+		"Diff stat:",
+		diffStat,
+		"",
+		`Changed files (max ${files.length}):`,
+		files.map((f) => `- ${f}`).join("\n"),
+		"",
+		`Suggested scope: ${scope}`,
+		`Suggested labels (path-based): ${labels.join(", ") || "(none)"}`,
+		"",
+		"Patches (truncated & sensitive files excluded):",
+		patches.join("\n"),
+	].join("\n");
+
+	return { systemPrompt, userPrompt };
+}
