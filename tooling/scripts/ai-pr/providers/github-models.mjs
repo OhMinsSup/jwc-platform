@@ -1,7 +1,8 @@
 import { fail } from "../shared.mjs";
 
 const DEFAULT_MODEL = process.env.GITHUB_MODELS_MODEL ?? "openai/gpt-4.1";
-const DEFAULT_API_VERSION = "2022-11-28";
+const DEFAULT_API_VERSION =
+	process.env.GITHUB_MODELS_API_VERSION ?? "2023-12-01";
 
 function getTokenOrFail() {
 	const token = process.env.GITHUB_MODELS_TOKEN ?? process.env.GITHUB_TOKEN;
