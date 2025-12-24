@@ -31,7 +31,8 @@
     "typecheck": "turbo run typecheck",
     "check:ultracite": "pnpm dlx ultracite@latest check",
     "fix:ultracite": "pnpm dlx ultracite@latest fix",
-    "ui-add": "turbo run ui-add"
+    "ui-add": "turbo run ui-add",
+    "pr:ai": "node tooling/scripts/ai-pr.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.10",
