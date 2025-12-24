@@ -48,8 +48,8 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
 			},
 			{
 				type: "add",
-				path: "packages/{{ name }}/tsup.config.ts",
-				templateFile: "templates/tsup.config.ts.hbs",
+				path: "packages/{{ name }}/tsdown.config.ts",
+				templateFile: "templates/tsdown.config.ts.hbs",
 			},
 			{
 				type: "add",

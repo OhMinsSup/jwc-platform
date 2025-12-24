@@ -36,7 +36,7 @@ module.exports = {
 				"tailwindcss",
 				"postcss",
 				"autoprefixer",
-				"tsup",
+				"tsdown",
 			],
 			isIgnored: true,
 		},

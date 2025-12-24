@@ -34,18 +34,18 @@
     "ui-add": "turbo run ui-add"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.8",
+    "@biomejs/biome": "^2.3.10",
     "@manypkg/cli": "^0.25.1",
-    "@turbo/gen": "^2.6.1",
+    "@turbo/gen": "^2.7.2",
     "@types/node": "^24.3.0",
     "dotenv-cli": "^11.0.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
-    "oxlint": "^1.30.0",
+    "oxlint": "^1.35.0",
     "syncpack": "^13.0.4",
-    "turbo": "^2.6.1",
+    "turbo": "^2.7.2",
     "typescript": "catalog:",
-    "ultracite": "^6.3.6"
+    "ultracite": "^6.5.0"
   },
   "packageManager": "pnpm@9.7.0",
   "engines": {

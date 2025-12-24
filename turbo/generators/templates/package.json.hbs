@@ -18,17 +18,16 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
-    "build:tsup": "tsup",
+    "build": "tsdown",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "format": "biome format --write *.ts",
     "lint": "biome lint --error-on-warnings *.ts",
     "typecheck": "tsc --noEmit",
-    "watch": "tsup --watch"
+    "watch": "tsdown --watch"
   },
   "devDependencies": {
     "@jwc/tsconfig": "workspace:*",
-    "tsup": "catalog:",
+    "tsdown": "catalog:",
     "typescript": "catalog:"
   }
 }
