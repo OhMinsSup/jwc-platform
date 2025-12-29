@@ -435,6 +435,7 @@ export const getUnpaidForReminder = internalQuery({
 	handler: async (ctx) => {
 		const now = Date.now();
 		const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
+		const SEND_COUNT_LIMIT = 1;
 
 		const unpaidUsers = await ctx.db
 			.query("onboarding")
@@ -452,7 +453,10 @@ export const getUnpaidForReminder = internalQuery({
 
 			// 2. 이미 알림을 받은 경우
 			// 최대 3회 미만이고, 마지막 발송 후 3일 지났는지 확인
-			return status.sentCount < 3 && now - status.lastSentAt >= THREE_DAYS_MS;
+			return (
+				status.sentCount < SEND_COUNT_LIMIT &&
+				now - status.lastSentAt >= THREE_DAYS_MS
+			);
 		});
 	},
 });
