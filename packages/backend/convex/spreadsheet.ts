@@ -72,8 +72,12 @@ function transformToSpreadsheetRow(
 	const attendanceDateOnly = _attendanceDate
 		? dayjs(_attendanceDate).format("YYYY년 MM월 DD일")
 		: "";
+	// const attendanceTime = _attendanceDate
+	// 	? dayjs(_attendanceDate).format("A hh:mm")
+	// 	: "";
+	// 오전 9:30, 오후 2:00 등으로 변환 근데 09:30이 오전 9:30으로 변환이 안됨... dayjs 버전 문제인가?
 	const attendanceTime = _attendanceDate
-		? dayjs(_attendanceDate).format("A hh:mm")
+		? dayjs(_attendanceDate).format("A h:mm")
 		: "";
 
 	return {
