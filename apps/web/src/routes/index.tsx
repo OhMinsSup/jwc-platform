@@ -16,11 +16,11 @@ export const Route = createFileRoute("/")({
 	head: () => ({
 		meta: [
 			{
-				title: "2026 동계 청년부 수련회 - 멸종위기사랑",
+				title: "2026 여름 청년부 수련회 - 멸종위기사랑",
 			},
 			{
 				property: "og:title",
-				content: "2026 동계 청년부 수련회 - 멸종위기사랑",
+				content: "2026 여름 청년부 수련회 - 멸종위기사랑",
 			},
 		],
 	}),
@@ -28,12 +28,12 @@ export const Route = createFileRoute("/")({
 
 /** 수련회 정보 */
 const RETREAT_INFO = {
-	title: "2026 동계 청년부 수련회",
+	title: "2026 여름 청년부 수련회",
 	theme: "멸종위기사랑",
-	date: "2026년 1월 8일(목) ~ 1월 11일(일)",
+	date: "2026년 6월 7일(일) ~ 6월 21일(일)",
 	duration: "3박 4일",
 	location: "광림 수도원",
-	deadline: "2026년 1월 8일",
+	deadline: "2026년 6월 21일",
 };
 
 function HomeComponent() {

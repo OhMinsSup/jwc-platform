@@ -194,14 +194,14 @@ const AttendanceDatePicker = ({
 			<Calendar
 				autoFocus
 				disabled={(date) => {
-					// 수련회 기간 내 날짜만 선택 가능 (2026년 1월 8-11일)
-					const minDate = new Date(2026, 0, 8);
-					const maxDate = new Date(2026, 0, 11);
+					// 수련회 기간 내 날짜만 선택 가능 (2026년 6월 25-28일)
+					const minDate = new Date(2026, 5, 25);
+					const maxDate = new Date(2026, 5, 28);
 					return date < minDate || date > maxDate;
 				}}
 				locale={ko}
 				mode="single"
-				month={new Date(2026, 0)}
+				month={new Date(2026, 5)}
 				onSelect={(date) => {
 					if (date) {
 						const time = getTimeFromDate(value);
