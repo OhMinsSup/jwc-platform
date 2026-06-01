@@ -123,11 +123,16 @@ export function SupportInfoStep() {
 	const onSubmit = (data: SupportFormData) => {
 		startTransition(async () => {
 			setSupportInfo(data);
-			setCurrentStep("confirm");
+			setCurrentStep("additional");
 			await navigate({
 				to: "/onboarding/$step",
-				params: { step: "confirm" },
+				params: { step: "additional" },
 			});
+			// setCurrentStep("confirm");
+			// await navigate({
+			// 	to: "/onboarding/$step",
+			// 	params: { step: "confirm" },
+			// });
 		});
 	};
 

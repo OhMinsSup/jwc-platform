@@ -9,7 +9,13 @@ interface StepProgressProps {
 	currentStep: StepSlug;
 }
 
-const FORM_STEPS: StepSlug[] = ["personal", "attendance", "support", "confirm"];
+const FORM_STEPS: StepSlug[] = [
+	"personal",
+	"attendance",
+	"support",
+	"additional",
+	"confirm",
+];
 
 function getIndicatorColor(isCompleted: boolean, isCurrent: boolean): string {
 	if (isCompleted) {
