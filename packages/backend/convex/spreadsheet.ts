@@ -163,6 +163,11 @@ export const syncAllToGoogleSheets = internalAction({
 			)
 		);
 
+		console.log(
+			`[Spreadsheet] Decryption completed: ${rows.filter((r) => r !== null).length} valid rows out of ${rows.length}`
+		);
+		console.log(rows);
+
 		// 복호화 실패한 데이터 제외
 		const validRows: SpreadsheetRow[] = rows.filter(
 			(row): row is SpreadsheetRow => row !== null
