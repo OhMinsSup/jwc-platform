@@ -31,4 +31,5 @@ export const AGE_GROUPS: { value: string; label: string }[] = [
 	{ value: "05또래", label: "05또래" },
 	{ value: "06또래", label: "06또래" },
 	{ value: "07또래", label: "07또래" },
+	{ value: "08또래", label: "08또래" },
 ];

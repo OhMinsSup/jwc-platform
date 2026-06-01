@@ -40,7 +40,7 @@ const floatAnimation = {
 };
 
 const highlights = [
-	{ icon: Calendar, text: "2026년 1월 8일", color: "text-blue-500" },
+	{ icon: Calendar, text: "2026년 6월 25일", color: "text-blue-500" },
 	{ icon: Users, text: "청년부 수련회", color: "text-purple-500" },
 	{ icon: MapPin, text: "광림 수도원", color: "text-green-500" },
 ];
@@ -74,7 +74,7 @@ export function WelcomeStep() {
 					>
 						<Sparkles className="h-4 w-4 text-primary" />
 						<span className="font-medium text-primary text-sm">
-							2026 청년부 겨울 수련회
+							2026 청년부 여름 수련회
 						</span>
 					</motion.div>
 				</motion.div>

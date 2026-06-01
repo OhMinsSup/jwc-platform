@@ -220,94 +220,99 @@ export const sendOnboardingUpdate = internalAction({
  */
 export const sendPaymentReminder = internalAction({
 	args: {},
-	handler: async (ctx) => {
+	handler: async () => {
 		try {
-			const AES_KEY = process.env.AES_KEY;
-			if (!AES_KEY) {
-				throw new Error("AES_KEY is not configured in environment variables");
-			}
+			// 임시로 실행 안되게 설정
+			await Promise.resolve(true);
+			console.log("[SMS] Starting sendPaymentReminder action");
+			return { count: 0 };
 
-			// 1. 대상자 조회
-			const targets = await ctx.runQuery(
-				internal.onboarding.getUnpaidForReminder
-			);
-			if (targets.length === 0) {
-				return { count: 0 };
-			}
+			// const AES_KEY = process.env.AES_KEY;
+			// if (!AES_KEY) {
+			// 	throw new Error("AES_KEY is not configured in environment variables");
+			// }
 
-			const key = await deriveKey(AES_KEY);
-			const client = getSolapiClient();
-			const baseUrl = process.env.SITE_URL ?? "https://jjuliy.vercel.app";
-			const template = MESSAGE_TEMPLATES["payment-reminder"];
+			// // 1. 대상자 조회
+			// const targets = await ctx.runQuery(
+			// 	internal.onboarding.getUnpaidForReminder
+			// );
+			// if (targets.length === 0) {
+			// 	return { count: 0 };
+			// }
 
-			if (!template) {
-				throw new Error("Template not found: payment-reminder");
-			}
+			// const key = await deriveKey(AES_KEY);
+			// const client = getSolapiClient();
+			// const baseUrl = process.env.SITE_URL ?? "https://jjuliy.vercel.app";
+			// const template = MESSAGE_TEMPLATES["payment-reminder"];
 
-			let successCount = 0;
+			// if (!template) {
+			// 	throw new Error("Template not found: payment-reminder");
+			// }
 
-			// 2. 각 대상자에게 SMS 발송
-			for (const user of targets) {
-				try {
-					// 복호화
-					const phone = await decrypt(
-						user.phone as unknown as EncryptedData,
-						key
-					);
+			// let successCount = 0;
 
-					// 단축 URL 생성
-					const targetUrl = `${baseUrl}/application/${user._id}`;
-					const shortUrlResult = await ctx.runMutation(
-						internal.shortUrl.createInternal,
-						{
-							targetUrl,
-							metadata: {
-								type: "payment-reminder",
-								onboardingId: user._id,
-							},
-						}
-					);
-					const siteUrl = `${baseUrl}/s/${shortUrlResult.code}`;
+			// // 2. 각 대상자에게 SMS 발송
+			// for (const user of targets) {
+			// 	try {
+			// 		// 복호화
+			// 		const phone = await decrypt(
+			// 			user.phone as unknown as EncryptedData,
+			// 			key
+			// 		);
 
-					const stayTypeLabel =
-						STAY_TYPE_LABELS[user.stayType as keyof typeof STAY_TYPE_LABELS] ??
-						user.stayType;
+			// 		// 단축 URL 생성
+			// 		const targetUrl = `${baseUrl}/application/${user._id}`;
+			// 		const shortUrlResult = await ctx.runMutation(
+			// 			internal.shortUrl.createInternal,
+			// 			{
+			// 				targetUrl,
+			// 				metadata: {
+			// 					type: "payment-reminder",
+			// 					onboardingId: user._id,
+			// 				},
+			// 			}
+			// 		);
+			// 		const siteUrl = `${baseUrl}/s/${shortUrlResult.code}`;
 
-					const amount = FEES[user.stayType] ?? 0;
-					const accountInfo = process.env.VITE_PAID_ACCOUNT_NUMBER ?? "";
+			// 		const stayTypeLabel =
+			// 			STAY_TYPE_LABELS[user.stayType as keyof typeof STAY_TYPE_LABELS] ??
+			// 			user.stayType;
 
-					const text = interpolateTemplate(template.text, {
-						name: user.name,
-						stayType: stayTypeLabel,
-						amount: amount.toLocaleString(),
-						accountInfo,
-						siteUrl,
-					});
+			// 		const amount = FEES[user.stayType] ?? 0;
+			// 		const accountInfo = process.env.VITE_PAID_ACCOUNT_NUMBER ?? "";
 
-					// SMS 발송
-					await client.send({
-						to: phone,
-						text,
-					});
+			// 		const text = interpolateTemplate(template.text, {
+			// 			name: user.name,
+			// 			stayType: stayTypeLabel,
+			// 			amount: amount.toLocaleString(),
+			// 			accountInfo,
+			// 			siteUrl,
+			// 		});
 
-					// 상태 업데이트
-					await ctx.runMutation(
-						internal.onboarding.updatePaymentReminderStatus,
-						{
-							onboardingId: user._id,
-						}
-					);
+			// 		// SMS 발송
+			// 		await client.send({
+			// 			to: phone,
+			// 			text,
+			// 		});
 
-					successCount += 1;
-				} catch (err) {
-					console.error(
-						`[SMS] Failed to send payment reminder to ${user._id}:`,
-						err
-					);
-				}
-			}
+			// 		// 상태 업데이트
+			// 		await ctx.runMutation(
+			// 			internal.onboarding.updatePaymentReminderStatus,
+			// 			{
+			// 				onboardingId: user._id,
+			// 			}
+			// 		);
 
-			return { count: successCount };
+			// 		successCount += 1;
+			// 	} catch (err) {
+			// 		console.error(
+			// 			`[SMS] Failed to send payment reminder to ${user._id}:`,
+			// 			err
+			// 		);
+			// 	}
+			// }
+
+			// return { count: successCount };
 		} catch (error) {
 			console.error("[SMS] Error in sendPaymentReminder:", error);
 			throw error;
