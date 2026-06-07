@@ -428,14 +428,14 @@ export const searchOnboardings = query({
 /**
  * 미입금 알림 대상자 조회 (Internal)
  * - 미입금 상태
- * - 알림 발송 조건 충족 (최초 3일 후, 이후 3일 간격, 최대 3회)
+ * - 알림 발송 조건 충족 (최초 7일 후, 이후 7일 간격)
  */
 export const getUnpaidForReminder = internalQuery({
 	args: {},
 	handler: async (ctx) => {
 		const now = Date.now();
-		const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
-		const SEND_COUNT_LIMIT = 1;
+		const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+		const SEND_COUNT_LIMIT = 3;
 
 		const unpaidUsers = await ctx.db
 			.query("onboarding")
@@ -447,15 +447,15 @@ export const getUnpaidForReminder = internalQuery({
 
 			// 1. 아직 알림을 한 번도 안 받은 경우
 			if (!status) {
-				// 신청 후 3일 지났는지 확인
-				return now - user._creationTime >= THREE_DAYS_MS;
+				// 신청 후 7일 지났는지 확인
+				return now - user._creationTime >= SEVEN_DAYS_MS;
 			}
 
 			// 2. 이미 알림을 받은 경우
-			// 최대 3회 미만이고, 마지막 발송 후 3일 지났는지 확인
+			// 최대 3회 미만이고, 마지막 발송 후 7일이 지났는지 확인
 			return (
 				status.sentCount < SEND_COUNT_LIMIT &&
-				now - status.lastSentAt >= THREE_DAYS_MS
+				now - status.lastSentAt >= SEVEN_DAYS_MS
 			);
 		});
 	},

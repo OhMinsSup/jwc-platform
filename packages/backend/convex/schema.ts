@@ -109,7 +109,7 @@ export default defineSchema({
 		tshirtSize: v.optional(tshirtSizeType),
 
 		/** 미입금 알림 발송 상태 */
-		// 3일에 한번씩 미입금자에게 알림 SMS를 보내기 위해 상태를 기록 (최대 3회)
+		// 7일에 한번씩 미입금자에게 알림 SMS를 보내기 위해 상태를 기록
 		unpaidNotificationStatus: v.optional(
 			v.object({
 				lastSentAt: v.number(), // 마지막 발송 시간 (타임스탬프)
