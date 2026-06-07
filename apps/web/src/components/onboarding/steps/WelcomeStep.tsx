@@ -83,7 +83,7 @@ export function WelcomeStep() {
 				<motion.div className="mb-6" variants={itemVariants}>
 					<h1 className="mt-1 font-bold text-4xl tracking-tight md:text-5xl">
 						<span className="bg-linear-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">
-							멸종위기사랑
+							나 찾으심?
 						</span>
 					</h1>
 				</motion.div>

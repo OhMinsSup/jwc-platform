@@ -51,7 +51,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 				content: "noindex, nofollow",
 			},
 			{
-				title: "2026 동계 청년부 수련회 - 멸종위기사랑",
+				title: "2026 여름 청년부 수련회 - 나 찾으심?",
 			},
 			{
 				name: "description",
@@ -61,7 +61,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 			{
 				name: "keywords",
 				content:
-					"청년부, 수련회, 2026, 동계수련회, 멸종위기사랑, 광림수도원, 교회수련회",
+					"청년부, 수련회, 2026, 여름수련회, 나 찾으심?, 광림수도원, 교회수련회",
 			},
 			{
 				property: "og:type",
@@ -69,7 +69,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 			},
 			{
 				property: "og:title",
-				content: "2026 동계 청년부 수련회 - 멸종위기사랑",
+				content: "2026 여름 청년부 수련회 - 나 찾으심?",
 			},
 			{
 				property: "og:description",
@@ -82,7 +82,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 			},
 			{
 				name: "twitter:title",
-				content: "2026 동계 청년부 수련회 - 멸종위기사랑",
+				content: "2026 여름 청년부 수련회 - 나 찾으심?",
 			},
 			{
 				name: "twitter:description",
