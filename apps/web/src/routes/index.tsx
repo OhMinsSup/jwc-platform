@@ -30,10 +30,10 @@ export const Route = createFileRoute("/")({
 const RETREAT_INFO = {
 	title: "2026 여름 청년부 수련회",
 	theme: "나 찾으심?",
-	date: "2026년 6월 7일(일) ~ 6월 21일(일)",
+	date: "2026년 6월 7일(일) ~ 6월 14일(일)",
 	duration: "3박 4일",
 	location: "광림 수도원",
-	deadline: "2026년 6월 21일",
+	deadline: "2026년 6월 14일",
 };
 
 function HomeComponent() {
