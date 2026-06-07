@@ -132,7 +132,8 @@ export function WelcomeStep() {
 							"group h-14 rounded-full px-10 font-medium text-base",
 							"bg-linear-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70",
 							"shadow-primary/25 shadow-xl hover:shadow-2xl hover:shadow-primary/30",
-							"transition-all duration-300"
+							"transition-all duration-300",
+							"cursor-pointer"
 						)}
 						onClick={handleStart}
 						size="lg"

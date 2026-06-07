@@ -533,7 +533,7 @@ export function AttendanceInfoStep() {
 					{/* 버튼 영역 */}
 					<motion.div className="flex gap-3 pt-4" variants={itemVariants}>
 						<Button
-							className="h-12 rounded-xl border-border/50 px-6 hover:bg-muted/50"
+							className="h-12 cursor-pointer rounded-xl border-border/50 px-6 hover:bg-muted/50"
 							onClick={handleBack}
 							type="button"
 							variant="outline"
@@ -542,7 +542,7 @@ export function AttendanceInfoStep() {
 							이전
 						</Button>
 						<Button
-							className="h-12 flex-1 rounded-xl bg-primary font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-all duration-200 hover:bg-primary/90"
+							className="h-12 flex-1 cursor-pointer rounded-xl bg-primary font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-all duration-200 hover:bg-primary/90"
 							disabled={isPending || !form.formState.isValid}
 							type="submit"
 						>

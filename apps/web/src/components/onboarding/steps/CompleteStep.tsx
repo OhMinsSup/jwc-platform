@@ -249,7 +249,8 @@ export function CompleteStep() {
 							className={cn(
 								"h-12 rounded-xl px-8 font-medium shadow-lg transition-all duration-200",
 								"bg-linear-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70",
-								"text-primary-foreground shadow-primary/20"
+								"text-primary-foreground shadow-primary/20",
+								"cursor-pointer"
 							)}
 							onClick={handleGoHome}
 						>

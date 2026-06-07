@@ -333,7 +333,7 @@ export function ConfirmStep() {
 				{/* 버튼 영역 */}
 				<motion.div className="flex gap-3 pt-6" variants={itemVariants}>
 					<Button
-						className="h-12 rounded-xl border-border/50 px-6 hover:bg-muted/50"
+						className="h-12 cursor-pointer rounded-xl border-border/50 px-6 hover:bg-muted/50"
 						disabled={isPending}
 						onClick={handleBack}
 						type="button"
@@ -346,7 +346,8 @@ export function ConfirmStep() {
 						className={cn(
 							"h-12 flex-1 rounded-xl font-medium shadow-lg transition-all duration-200",
 							"bg-linear-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70",
-							"text-primary-foreground shadow-primary/20"
+							"text-primary-foreground shadow-primary/20",
+							"cursor-pointer"
 						)}
 						disabled={isPending}
 						onClick={handleSubmit}
