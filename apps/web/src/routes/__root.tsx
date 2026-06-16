@@ -56,7 +56,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 			{
 				name: "description",
 				content:
-					"2026년 1월 8일(목) ~ 1월 11일(일) 광림 수도원에서 진행되는 청년부 수련회에 초대합니다.",
+					"2026년 6월 25일(목) ~ 6월 28일(일) 광림 수도원에서 진행되는 청년부 수련회에 초대합니다.",
 			},
 			{
 				name: "keywords",
@@ -74,7 +74,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 			{
 				property: "og:description",
 				content:
-					"2026년 1월 8일(목) ~ 1월 11일(일) 광림 수도원에서 진행되는 청년부 수련회에 초대합니다.",
+					"2026년 6월 25일(목) ~ 6월 28일(일) 광림 수도원에서 진행되는 청년부 수련회에 초대합니다.",
 			},
 			{
 				name: "twitter:card",
@@ -87,7 +87,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 			{
 				name: "twitter:description",
 				content:
-					"2026년 1월 8일(목) ~ 1월 11일(일) 광림 수도원에서 진행되는 청년부 수련회에 초대합니다.",
+					"2026년 6월 25일(목) ~ 6월 28일(일) 광림 수도원에서 진행되는 청년부 수련회에 초대합니다.",
 			},
 		],
 		links: [
