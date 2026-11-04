@@ -1,14 +1,17 @@
-import { DEFINITION_LIMITS, parseFormDefinition } from "@jwc/form-core";
-import type { FormDefinition } from "@jwc/form-core";
-import { retreat2026Definition } from "@jwc/form-core/samples";
+import {
+	DEFINITION_LIMITS,
+	parseFormDefinition,
+} from "@jwc/form-core/definition/definition";
+import type { FormDefinition } from "@jwc/form-core/definition/definition";
+import { retreat2026Definition } from "@jwc/form-core/samples/retreat-2026";
 import { describe, expect, it } from "vite-plus/test";
 
-import type { EditorAction } from "../src/form-builder/model/actions";
-import { moveTarget } from "../src/form-builder/model/derive";
-import { nextFieldId } from "../src/form-builder/model/ids";
-import { validateDefinition } from "../src/form-builder/model/issues";
-import { toEditable } from "../src/form-builder/model/load";
-import { editorReducer } from "../src/form-builder/model/reducer";
+import type { EditorAction } from "../src/features/form-builder/model/actions";
+import { moveTarget } from "../src/features/form-builder/model/derive";
+import { nextFieldId } from "../src/features/form-builder/model/ids";
+import { validateDefinition } from "../src/features/form-builder/model/issues";
+import { toEditable } from "../src/features/form-builder/model/load";
+import { editorReducer } from "../src/features/form-builder/model/reducer";
 
 function retreat(): FormDefinition {
 	const parsed = parseFormDefinition(retreat2026Definition);

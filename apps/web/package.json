@@ -3,7 +3,7 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"auth:schema": "pnpm dlx @better-auth/cli@latest generate --output ./db/schema/auth.ts",
+		"auth:schema": "pnpm dlx @better-auth/cli@latest generate --output ./db/better-auth.generated.ts",
 		"build": "vp build",
 		"db:generate": "void db generate",
 		"db:migrate": "void db migrate",
@@ -15,8 +15,15 @@
 		"typecheck:tsc": "void prepare && tsc --noEmit"
 	},
 	"dependencies": {
+		"@jwc/analytics": "workspace:*",
+		"@jwc/common": "workspace:*",
 		"@jwc/form-core": "workspace:*",
+		"@jwc/google": "workspace:*",
+		"@jwc/observability": "workspace:*",
+		"@jwc/security": "workspace:*",
+		"@jwc/submission-store": "workspace:*",
 		"@jwc/ui": "workspace:*",
+		"@jwc/ui-patterns": "workspace:*",
 		"@tanstack/react-router": "^1.170.46",
 		"@tanstack/react-start": "^1.169.4",
 		"better-auth": "^1.7.15",

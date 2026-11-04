@@ -1,6 +1,7 @@
-import { parseFormDefinition } from "@jwc/form-core";
-import type { Condition, FormDefinition } from "@jwc/form-core";
-import { retreat2026Definition } from "@jwc/form-core/samples";
+import type { Condition } from "@jwc/form-core/definition/condition";
+import { parseFormDefinition } from "@jwc/form-core/definition/definition";
+import type { FormDefinition } from "@jwc/form-core/definition/definition";
+import { retreat2026Definition } from "@jwc/form-core/samples/retreat-2026";
 import { describe, expect, it } from "vite-plus/test";
 
 import {
@@ -9,13 +10,13 @@ import {
 	toDraft,
 	valueChoicesOf,
 	withOp,
-} from "../src/form-builder/model/conditions";
-import { updateOptionRefs } from "../src/form-builder/model/option-references";
+} from "../src/features/form-builder/model/conditions";
+import { updateOptionRefs } from "../src/features/form-builder/model/option-references";
 import {
 	referencesTo,
 	removeField,
 	renameField,
-} from "../src/form-builder/model/references";
+} from "../src/features/form-builder/model/references";
 
 function retreat(): FormDefinition {
 	const parsed = parseFormDefinition(retreat2026Definition);

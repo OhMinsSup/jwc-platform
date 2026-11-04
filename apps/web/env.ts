@@ -21,8 +21,6 @@ export default defineEnv({
 	GOOGLE_PRIVATE_KEY: string(),
 	/** 응답을 저장할 스프레드시트 (폼마다 탭 1개) */
 	GOOGLE_SPREADSHEET_ID: string(),
-	/** Apps Script onEdit 웹훅 서명 키 */
-	SHEETS_WEBHOOK_SECRET: string(),
 
 	/** SMS: live면 실제 발송, log면 로그만 남김 (개발 안전장치) */
 	SMS_MODE: oneOf(["live", "log"]).default("log"),
@@ -30,6 +28,15 @@ export default defineEnv({
 	SOLAPI_API_SECRET: string().optional(),
 	SOLAPI_SENDER: string().optional(),
 
-	/** 관리자 가입 허용 여부 (첫 계정 생성 후 false 권장) */
+	/** PostHog 프로젝트 키(phc_…, 공개 키). 없으면 분석/오류 추적/리플레이를 보내지 않는다 */
+	POSTHOG_KEY: string().optional(),
+	/** PostHog 수집 주소 (예: https://us.i.posthog.com, EU는 https://eu.i.posthog.com) */
+	POSTHOG_HOST: url().default("https://us.i.posthog.com"),
+
+	/** Cloudflare Turnstile(봇 방지). 둘 다 있으면 공개 제출에 Turnstile 통과가 필요하다 */
+	TURNSTILE_SITE_KEY: string().optional(),
+	TURNSTILE_SECRET_KEY: string().optional(),
+
+	/** 첫 관리자 부트스트랩 허용 여부: 관리자 계정이 하나도 없을 때만 초대 코드 없이 가입할 수 있다 */
 	ADMIN_SIGNUP_ENABLED: boolean().default(true),
 });

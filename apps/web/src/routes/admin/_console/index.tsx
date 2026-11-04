@@ -1,15 +1,15 @@
+import { EmptyState } from "@jwc/ui-patterns/components/empty-state";
+import { PageHeader } from "@jwc/ui-patterns/components/page-header";
+import { StatGrid } from "@jwc/ui-patterns/components/stat-card";
+import type { Stat } from "@jwc/ui-patterns/components/stat-card";
 import { createFileRoute } from "@tanstack/react-router";
 import { FilePlus2 } from "lucide-react";
 
-import { CreateFormDialog } from "../../../components/admin/create-form-dialog";
-import { EmptyState } from "../../../components/admin/empty-state";
-import { FormList } from "../../../components/admin/form-list";
-import type { FormSummary } from "../../../components/admin/form-list";
-import { PageHeader } from "../../../components/admin/page-header";
-import { StatGrid } from "../../../components/admin/stat-card";
-import type { Stat } from "../../../components/admin/stat-card";
-import { listFormsFn } from "../../../functions/admin";
-import { formatCount } from "../../../lib/format";
+import { listFormsFn } from "../../../features/forms/functions/admin";
+import { CreateFormDialog } from "../../../features/forms/ui/create-form-dialog";
+import { FormList } from "../../../features/forms/ui/form-list";
+import type { FormSummary } from "../../../features/forms/ui/form-list";
+import { formatCount } from "../../../platform/format";
 
 export const Route = createFileRoute("/admin/_console/")({
 	head: () => ({ meta: [{ title: "폼 · JWC Forms" }] }),

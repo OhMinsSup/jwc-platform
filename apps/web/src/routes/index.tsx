@@ -2,8 +2,8 @@ import { Button } from "@jwc/ui/components/button";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 
-import { PublicShell } from "../components/shell";
-import { listOpenFormsFn } from "../functions/public";
+import { listOpenFormsFn } from "../features/forms/functions/public";
+import { PublicShell } from "../platform/ui/public-shell";
 
 export const Route = createFileRoute("/")({
 	loader: () => listOpenFormsFn(),

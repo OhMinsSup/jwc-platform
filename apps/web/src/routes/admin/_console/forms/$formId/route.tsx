@@ -1,3 +1,5 @@
+import { CopyButton } from "@jwc/ui-patterns/components/copy-button";
+import { PageHeader } from "@jwc/ui-patterns/components/page-header";
 import { Button } from "@jwc/ui/components/button";
 import {
 	createFileRoute,
@@ -9,14 +11,12 @@ import {
 import { ChevronRight, ExternalLink, Loader2, Sheet } from "lucide-react";
 import { useState } from "react";
 
-import { CopyButton } from "../../../../../components/admin/copy-button";
-import { FormTabs } from "../../../../../components/admin/form-tabs";
-import { PageHeader } from "../../../../../components/admin/page-header";
-import { StatusBadge } from "../../../../../components/admin/status-badge";
 import {
 	getFormSummaryFn,
 	setFormStatusFn,
-} from "../../../../../functions/admin";
+} from "../../../../../features/forms/functions/admin";
+import { FormStatusBadge } from "../../../../../features/forms/ui/form-status-badge";
+import { FormTabs } from "../../../../../features/forms/ui/form-tabs";
 
 /** 폼 안의 모든 화면(편집/미리보기/응답)이 공유하는 머리: 위치, 상태, 폼 단위 동작, 탭 */
 export const Route = createFileRoute("/admin/_console/forms/$formId")({
@@ -140,7 +140,7 @@ function FormLayout() {
 				}
 				description={
 					<span className="flex flex-wrap items-center gap-x-3 gap-y-1">
-						<StatusBadge status={form.status} />
+						<FormStatusBadge status={form.status} />
 						<PublicLink slug={form.slug} />
 					</span>
 				}

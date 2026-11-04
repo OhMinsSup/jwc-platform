@@ -1,8 +1,10 @@
 import { Badge } from "@jwc/ui/components/badge";
 import { createFileRoute, notFound } from "@tanstack/react-router";
+import { useEffect } from "react";
 
-import { PublicShell } from "../../components/shell";
-import { getSubmissionViewFn } from "../../functions/public";
+import { getSubmissionViewFn } from "../../features/submissions/functions";
+import { track } from "../../platform/analytics/client";
+import { PublicShell } from "../../platform/ui/public-shell";
 
 export const Route = createFileRoute("/r/$id")({
 	loader: async ({ params }) => {
@@ -18,21 +20,12 @@ export const Route = createFileRoute("/r/$id")({
 	component: SubmissionPage,
 });
 
-/** 답변 목록. 시트 반영 전이면 안내 문구만 */
+/** 답변 목록 (저장소에 저장된 뒤에만 이 화면에 온다) */
 function AnswerList({
-	syncing,
 	items,
 }: {
-	syncing: boolean;
 	items: readonly { label: string; value: string }[];
 }) {
-	if (syncing) {
-		return (
-			<p className="text-muted-foreground rounded-xl border p-6 text-center">
-				신청 내용을 반영하는 중입니다. 잠시 후 새로고침해주세요.
-			</p>
-		);
-	}
 	return (
 		<dl className="divide-y rounded-xl border px-5">
 			{items.map((item) => (
@@ -52,6 +45,9 @@ function AnswerList({
 
 function SubmissionPage() {
 	const view = Route.useLoaderData();
+	useEffect(() => {
+		track("submission_viewed");
+	}, []);
 	return (
 		<PublicShell>
 			<div className="mb-6 flex items-start justify-between gap-4">
@@ -69,7 +65,7 @@ function SubmissionPage() {
 				)}
 			</div>
 
-			<AnswerList items={view.items} syncing={view.syncing} />
+			<AnswerList items={view.items} />
 
 			{view.amount !== null && !view.paid && (
 				<section className="bg-muted/30 mt-6 rounded-xl border p-5 text-sm">

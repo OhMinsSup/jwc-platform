@@ -1,6 +1,6 @@
 import { createRouter } from "@tanstack/react-router";
 
-import { NotFound, RouteError } from "./components/route-states";
+import { NotFound, RouteError } from "./platform/ui/route-states";
 import { routeTree } from "./routeTree.gen";
 
 export function getRouter() {

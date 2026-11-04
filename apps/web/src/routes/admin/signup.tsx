@@ -1,35 +1,49 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 
-import { AuthCard } from "../../components/auth-card";
-import { authClient } from "../../lib/auth-client";
+import { signUpAdminFn } from "../../features/admin-access/functions";
+import { ADMIN_PASSWORD_MIN_LENGTH } from "../../features/admin-access/model/admin-access";
+import { AuthCard } from "../../platform/ui/auth-card";
+import type { AuthFieldDef } from "../../platform/ui/auth-card";
 
 export const Route = createFileRoute("/admin/signup")({
 	head: () => ({ meta: [{ title: "관리자 가입" }] }),
 	component: SignupPage,
 });
 
+/** 가입 입력 항목 (AuthCard가 데이터로 받는다) */
+const SIGNUP_FIELDS: AuthFieldDef[] = [
+	{ name: "name", label: "이름", type: "text", autoComplete: "name" },
+	{
+		name: "email",
+		label: "이메일",
+		type: "email",
+		autoComplete: "email",
+		hint: "초대받은 이메일 주소를 입력하세요",
+	},
+	{
+		name: "password",
+		label: "비밀번호",
+		type: "password",
+		autoComplete: "new-password",
+		minLength: ADMIN_PASSWORD_MIN_LENGTH,
+		hint: `${ADMIN_PASSWORD_MIN_LENGTH}자 이상`,
+	},
+	{
+		name: "inviteCode",
+		label: "초대 코드",
+		type: "text",
+		autoComplete: "off",
+		optional: true,
+		hint: "관리자 화면에서 발급한 코드입니다. 첫 관리자를 만들 때만 비워 둡니다",
+	},
+];
+
 function SignupPage() {
 	const navigate = useNavigate();
 	return (
 		<AuthCard
-			description="처음 한 번만 필요합니다."
-			fields={[
-				{ name: "name", label: "이름", type: "text", autoComplete: "name" },
-				{
-					name: "email",
-					label: "이메일",
-					type: "email",
-					autoComplete: "email",
-					hint: "관리자 허용 목록에 등록된 주소만 가입할 수 있습니다",
-				},
-				{
-					name: "password",
-					label: "비밀번호",
-					type: "password",
-					autoComplete: "new-password",
-					hint: "10자 이상",
-				},
-			]}
+			description="기존 관리자에게 받은 초대 코드로 가입합니다."
+			fields={SIGNUP_FIELDS}
 			footer={
 				<p className="text-muted-foreground text-center text-sm">
 					<Link
@@ -40,14 +54,17 @@ function SignupPage() {
 					</Link>
 				</p>
 			}
-			onSubmit={async ({ name = "", email = "", password = "" }) => {
-				const { error } = await authClient.signUp.email({
-					name,
-					email,
-					password,
+			onSubmit={async ({
+				name = "",
+				email = "",
+				password = "",
+				inviteCode = "",
+			}) => {
+				const result = await signUpAdminFn({
+					data: { name, email, password, inviteCode },
 				});
-				if (error) {
-					return error.message ?? "가입할 수 없습니다";
+				if (!result.ok) {
+					return result.message;
 				}
 				await navigate({ to: "/admin" });
 				return null;

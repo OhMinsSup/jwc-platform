@@ -1,18 +1,18 @@
-import type { FormDefinition } from "@jwc/form-core";
-import { blankDefinition } from "@jwc/form-core/samples";
+import type { FormDefinition } from "@jwc/form-core/definition/definition";
+import { blankDefinition } from "@jwc/form-core/samples/blank";
 import { Button } from "@jwc/ui/components/button";
 import { createFileRoute, notFound, useRouter } from "@tanstack/react-router";
 import { TriangleAlert } from "lucide-react";
 import { useCallback, useState } from "react";
 
-import { toEditable } from "../../../../../form-builder/model/load";
-import { FormBuilder } from "../../../../../form-builder/ui/form-builder";
-import type { CommandOutcome } from "../../../../../form-builder/ui/form-builder";
+import { toEditable } from "../../../../../features/form-builder/model/load";
+import { FormBuilder } from "../../../../../features/form-builder/ui/form-builder";
+import type { CommandOutcome } from "../../../../../features/form-builder/ui/use-editor-session";
 import {
 	getFormEditorFn,
 	publishFormFn,
 	saveDraftFn,
-} from "../../../../../functions/admin";
+} from "../../../../../features/forms/functions/admin";
 
 /** 저장 후 다시 읽을 라우트: 공통 머리(제목)만. 편집기 데이터는 다시 읽지 않는다 */
 const LAYOUT_ROUTE_ID = "/admin/_console/forms/$formId";

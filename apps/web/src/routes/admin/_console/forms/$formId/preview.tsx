@@ -1,15 +1,16 @@
-import { firstPageId } from "@jwc/form-core";
-import type { FormDefinition, PageStep } from "@jwc/form-core";
+import { keysOf } from "@jwc/common/object";
+import type { FormDefinition } from "@jwc/form-core/definition/definition";
+import { firstPageId } from "@jwc/form-core/logic/visibility";
+import type { PageStep } from "@jwc/form-core/logic/visibility";
+import { EmptyState } from "@jwc/ui-patterns/components/empty-state";
+import { SegmentedControl } from "@jwc/ui-patterns/components/segmented-control";
 import { Button } from "@jwc/ui/components/button";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Eye, RotateCcw, TriangleAlert } from "lucide-react";
 import { useState } from "react";
 
-import { EmptyState } from "../../../../../components/admin/empty-state";
-import { SegmentedControl } from "../../../../../components/admin/segmented-control";
-import { FormRunner } from "../../../../../form-engine/form-runner";
-import { getDraftPreviewFn } from "../../../../../functions/admin";
-import { keysOf } from "../../../../../lib/object";
+import { FormRunner } from "../../../../../features/form-engine/form-runner";
+import { getDraftPreviewFn } from "../../../../../features/forms/functions/admin";
 
 export const Route = createFileRoute("/admin/_console/forms/$formId/preview")({
 	loader: async ({ params }) => {

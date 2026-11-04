@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 
-import { AuthCard } from "../../components/auth-card";
-import { authClient } from "../../lib/auth-client";
+import { authClient } from "../../platform/auth-client";
+import { AuthCard } from "../../platform/ui/auth-card";
 
 export const Route = createFileRoute("/admin/login")({
 	head: () => ({ meta: [{ title: "관리자 로그인" }] }),

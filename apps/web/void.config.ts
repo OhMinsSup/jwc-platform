@@ -1,6 +1,6 @@
 import { defineConfig } from "void/config";
 
-import { QUEUES } from "./src/server/queue-config";
+import { QUEUES } from "./src/platform/server/queue-config";
 
 const queues = Object.values(QUEUES);
 

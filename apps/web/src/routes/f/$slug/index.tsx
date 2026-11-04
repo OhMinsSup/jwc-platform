@@ -1,12 +1,18 @@
-import type { PageStep } from "@jwc/form-core";
+import type { PageStep } from "@jwc/form-core/logic/visibility";
+import { CenteredMessage } from "@jwc/ui-patterns/components/centered-message";
 import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { z } from "zod";
 
-import { CenteredMessage } from "../../../components/route-states";
-import { PublicShell } from "../../../components/shell";
-import { FormRunner } from "../../../form-engine/form-runner";
-import { stepFromSearch, stepToSearch } from "../../../form-engine/steps";
-import { getPublicFormFn } from "../../../functions/public";
+import { FormRunner } from "../../../features/form-engine/form-runner";
+import {
+	stepFromSearch,
+	stepLabel,
+	stepToSearch,
+} from "../../../features/form-engine/steps";
+import { getPublicFormFn } from "../../../features/forms/functions/public";
+import { track } from "../../../platform/analytics/client";
+import { PublicShell } from "../../../platform/ui/public-shell";
 
 export const Route = createFileRoute("/f/$slug/")({
 	validateSearch: z.object({ step: z.string().max(40).optional() }),
@@ -27,6 +33,18 @@ function FormPage() {
 	const { slug, status, definition } = Route.useLoaderData();
 	const { step } = Route.useSearch();
 	const navigate = useNavigate({ from: Route.fullPath });
+	const current = stepFromSearch(definition, step);
+	const label = stepLabel(definition, current);
+	useEffect(() => {
+		track("form_viewed", { formSlug: slug });
+	}, [slug]);
+	useEffect(() => {
+		track("form_step_viewed", {
+			formSlug: slug,
+			step: label,
+			stepCount: definition.pages.length,
+		});
+	}, [slug, label, definition.pages.length]);
 
 	if (status !== "open") {
 		return (
@@ -51,7 +69,7 @@ function FormPage() {
 				definition={definition}
 				onStepChange={onStepChange}
 				slug={slug}
-				step={stepFromSearch(definition, step)}
+				step={current}
 			/>
 		</PublicShell>
 	);

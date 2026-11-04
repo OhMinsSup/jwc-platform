@@ -1,9 +1,9 @@
 import { defineQueue } from "void";
 
-import { errorMessage, log } from "../src/server/log";
-import type { SmsMessage } from "../src/server/messages";
-import { deliverSms } from "../src/server/services/notify";
-import { SmsSendError } from "../src/server/solapi";
+import type { SmsMessage } from "../src/features/submissions/server/messages";
+import { deliverSms } from "../src/features/submissions/server/notify";
+import { classifyError } from "../src/platform/server/errors/classify";
+import { captureException, log } from "../src/platform/server/log";
 
 /** 배치/재시도 옵션은 void.config.ts(QUEUES 상수)에서 선언한다. */
 
@@ -16,17 +16,21 @@ export default defineQueue<SmsMessage>(async (batch) => {
 				submissionId: message.body.submissionId,
 				kind: message.body.kind,
 				result,
+				traceId: message.body.traceId,
 			});
 			message.ack();
 		} catch (error) {
-			const retryable = !(error instanceof SmsSendError) || error.retryable;
-			log.error("sms.failed", {
+			const failure = classifyError(error);
+			log[failure.spec.level]("sms.failed", {
 				submissionId: message.body.submissionId,
 				kind: message.body.kind,
-				retryable,
-				error: errorMessage(error),
+				code: failure.code,
+				attempts: message.attempts,
+				error: failure.internalMessage,
+				traceId: message.body.traceId,
 			});
-			if (retryable) {
+			captureException(failure, "queue.sms");
+			if (failure.spec.retryable) {
 				message.retry();
 			} else {
 				message.ack();

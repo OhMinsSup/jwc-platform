@@ -15,8 +15,8 @@ import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AdminSignupRouteImport } from './routes/admin/signup'
 import { Route as RIdRouteImport } from './routes/r/$id'
 import { Route as AdminConsoleIndexRouteImport } from './routes/admin/_console/index'
+import { Route as AdminConsoleAdminsRouteImport } from './routes/admin/_console/admins'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
-import { Route as ApiWebhooksSheetsRouteImport } from './routes/api/webhooks/sheets'
 import { Route as FSlugIndexRouteImport } from './routes/f/$slug/index'
 import { Route as FSlugDoneRouteImport } from './routes/f/$slug/done'
 import { Route as AdminConsoleFormsFormIdRouteRouteImport } from './routes/admin/_console/forms/$formId/route'
@@ -54,14 +54,14 @@ const AdminConsoleIndexRoute = AdminConsoleIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminConsoleRouteRoute,
 } as any)
+const AdminConsoleAdminsRoute = AdminConsoleAdminsRouteImport.update({
+  id: '/admins',
+  path: '/admins',
+  getParentRoute: () => AdminConsoleRouteRoute,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiWebhooksSheetsRoute = ApiWebhooksSheetsRouteImport.update({
-  id: '/api/webhooks/sheets',
-  path: '/api/webhooks/sheets',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FSlugIndexRoute = FSlugIndexRouteImport.update({
@@ -105,8 +105,8 @@ export interface FileRoutesByFullPath {
   '/admin/login': typeof AdminLoginRoute
   '/admin/signup': typeof AdminSignupRoute
   '/r/$id': typeof RIdRoute
+  '/admin/admins': typeof AdminConsoleAdminsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/webhooks/sheets': typeof ApiWebhooksSheetsRoute
   '/f/$slug/done': typeof FSlugDoneRoute
   '/admin/': typeof AdminConsoleIndexRoute
   '/f/$slug/': typeof FSlugIndexRoute
@@ -120,8 +120,8 @@ export interface FileRoutesByTo {
   '/admin/login': typeof AdminLoginRoute
   '/admin/signup': typeof AdminSignupRoute
   '/r/$id': typeof RIdRoute
+  '/admin/admins': typeof AdminConsoleAdminsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/webhooks/sheets': typeof ApiWebhooksSheetsRoute
   '/f/$slug/done': typeof FSlugDoneRoute
   '/admin': typeof AdminConsoleIndexRoute
   '/f/$slug': typeof FSlugIndexRoute
@@ -136,8 +136,8 @@ export interface FileRoutesById {
   '/admin/login': typeof AdminLoginRoute
   '/admin/signup': typeof AdminSignupRoute
   '/r/$id': typeof RIdRoute
+  '/admin/_console/admins': typeof AdminConsoleAdminsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/webhooks/sheets': typeof ApiWebhooksSheetsRoute
   '/f/$slug/done': typeof FSlugDoneRoute
   '/admin/_console/': typeof AdminConsoleIndexRoute
   '/f/$slug/': typeof FSlugIndexRoute
@@ -154,8 +154,8 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/admin/signup'
     | '/r/$id'
+    | '/admin/admins'
     | '/api/auth/$'
-    | '/api/webhooks/sheets'
     | '/f/$slug/done'
     | '/admin/'
     | '/f/$slug/'
@@ -169,8 +169,8 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/admin/signup'
     | '/r/$id'
+    | '/admin/admins'
     | '/api/auth/$'
-    | '/api/webhooks/sheets'
     | '/f/$slug/done'
     | '/admin'
     | '/f/$slug'
@@ -184,8 +184,8 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/admin/signup'
     | '/r/$id'
+    | '/admin/_console/admins'
     | '/api/auth/$'
-    | '/api/webhooks/sheets'
     | '/f/$slug/done'
     | '/admin/_console/'
     | '/f/$slug/'
@@ -202,7 +202,6 @@ export interface RootRouteChildren {
   AdminSignupRoute: typeof AdminSignupRoute
   RIdRoute: typeof RIdRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
-  ApiWebhooksSheetsRoute: typeof ApiWebhooksSheetsRoute
   FSlugDoneRoute: typeof FSlugDoneRoute
   FSlugIndexRoute: typeof FSlugIndexRoute
 }
@@ -251,18 +250,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminConsoleIndexRouteImport
       parentRoute: typeof AdminConsoleRouteRoute
     }
+    '/admin/_console/admins': {
+      id: '/admin/_console/admins'
+      path: '/admins'
+      fullPath: '/admin/admins'
+      preLoaderRoute: typeof AdminConsoleAdminsRouteImport
+      parentRoute: typeof AdminConsoleRouteRoute
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
       fullPath: '/api/auth/$'
       preLoaderRoute: typeof ApiAuthSplatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/webhooks/sheets': {
-      id: '/api/webhooks/sheets'
-      path: '/api/webhooks/sheets'
-      fullPath: '/api/webhooks/sheets'
-      preLoaderRoute: typeof ApiWebhooksSheetsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/f/$slug/': {
@@ -330,11 +329,13 @@ const AdminConsoleFormsFormIdRouteRouteWithChildren =
   )
 
 interface AdminConsoleRouteRouteChildren {
+  AdminConsoleAdminsRoute: typeof AdminConsoleAdminsRoute
   AdminConsoleIndexRoute: typeof AdminConsoleIndexRoute
   AdminConsoleFormsFormIdRouteRoute: typeof AdminConsoleFormsFormIdRouteRouteWithChildren
 }
 
 const AdminConsoleRouteRouteChildren: AdminConsoleRouteRouteChildren = {
+  AdminConsoleAdminsRoute: AdminConsoleAdminsRoute,
   AdminConsoleIndexRoute: AdminConsoleIndexRoute,
   AdminConsoleFormsFormIdRouteRoute:
     AdminConsoleFormsFormIdRouteRouteWithChildren,
@@ -350,7 +351,6 @@ const rootRouteChildren: RootRouteChildren = {
   AdminSignupRoute: AdminSignupRoute,
   RIdRoute: RIdRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
-  ApiWebhooksSheetsRoute: ApiWebhooksSheetsRoute,
   FSlugDoneRoute: FSlugDoneRoute,
   FSlugIndexRoute: FSlugIndexRoute,
 }

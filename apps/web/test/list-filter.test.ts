@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vite-plus/test";
 
-import { countByStatus, matchesQuery } from "../src/lib/list-filter";
+import {
+	countByStatus,
+	matchesQuery,
+} from "../src/features/forms/model/list-filter";
 
 describe(matchesQuery, () => {
 	it("passes everything for a blank query", () => {

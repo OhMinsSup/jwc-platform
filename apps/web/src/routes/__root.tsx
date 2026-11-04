@@ -7,9 +7,15 @@ import {
 } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 
+import { getClientConfigFn } from "../platform/functions/client-config";
+import { AnalyticsBridge } from "../platform/ui/analytics-bridge";
+
 import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({
+	// 공개 설정은 배포 사이에 바뀌지 않으므로 한 번만 읽는다
+	loader: () => getClientConfigFn(),
+	staleTime: Number.POSITIVE_INFINITY,
 	head: () => ({
 		meta: [
 			{ charSet: "utf-8" },
@@ -30,12 +36,18 @@ export const Route = createRootRoute({
 			{ rel: "stylesheet", href: appCss },
 		],
 	}),
-	component: () => (
+	component: RootComponent,
+});
+
+function RootComponent() {
+	const { analytics } = Route.useLoaderData();
+	return (
 		<RootDocument>
+			<AnalyticsBridge config={analytics} />
 			<Outlet />
 		</RootDocument>
-	),
-});
+	);
+}
 
 function RootDocument({ children }: { children: ReactNode }) {
 	return (

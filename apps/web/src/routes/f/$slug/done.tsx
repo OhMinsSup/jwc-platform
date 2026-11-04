@@ -3,7 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { CircleCheck } from "lucide-react";
 import { z } from "zod";
 
-import { PublicShell } from "../../../components/shell";
+import { PublicShell } from "../../../platform/ui/public-shell";
 
 export const Route = createFileRoute("/f/$slug/done")({
 	validateSearch: z.object({

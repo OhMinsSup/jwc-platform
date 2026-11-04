@@ -1,13 +1,13 @@
 import { createHmac } from "node:crypto";
 
+import { jsonBody, recordingFetch, rejectionOf } from "@jwc/common/testing";
 import { describe, expect, it } from "vite-plus/test";
 
 import {
 	createSolapiSender,
 	SmsSendError,
 	solapiAuthHeader,
-} from "../src/server/solapi";
-import { jsonBody, recordingFetch, rejectionOf } from "./fakes";
+} from "../src/platform/server/solapi";
 
 const config = { apiKey: "KEY", apiSecret: "SECRET", sender: "0212345678" };
 

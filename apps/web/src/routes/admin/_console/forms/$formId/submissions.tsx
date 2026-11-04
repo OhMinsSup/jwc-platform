@@ -1,18 +1,21 @@
+import { keysOf } from "@jwc/common/object";
+import { EmptyState } from "@jwc/ui-patterns/components/empty-state";
+import { SearchInput } from "@jwc/ui-patterns/components/search-input";
+import { SegmentedControl } from "@jwc/ui-patterns/components/segmented-control";
+import { StatGrid } from "@jwc/ui-patterns/components/stat-card";
+import type { Stat } from "@jwc/ui-patterns/components/stat-card";
 import { createFileRoute, notFound, useRouter } from "@tanstack/react-router";
 import { Inbox, SearchX } from "lucide-react";
 import { useState } from "react";
 
-import { EmptyState } from "../../../../../components/admin/empty-state";
-import { SearchInput } from "../../../../../components/admin/search-input";
-import { SegmentedControl } from "../../../../../components/admin/segmented-control";
-import { StatGrid } from "../../../../../components/admin/stat-card";
-import type { Stat } from "../../../../../components/admin/stat-card";
-import { SubmissionsTable } from "../../../../../components/admin/submissions-table";
-import type { SubmissionRow } from "../../../../../components/admin/submissions-table";
-import { listSubmissionsFn, markPaidFn } from "../../../../../functions/admin";
-import { formatCount } from "../../../../../lib/format";
-import { matchesQuery } from "../../../../../lib/list-filter";
-import { keysOf } from "../../../../../lib/object";
+import { matchesQuery } from "../../../../../features/forms/model/list-filter";
+import {
+	listSubmissionsFn,
+	markPaidFn,
+} from "../../../../../features/submissions/functions";
+import { SubmissionsTable } from "../../../../../features/submissions/ui/submissions-table";
+import type { SubmissionRow } from "../../../../../features/submissions/ui/submissions-table";
+import { formatCount } from "../../../../../platform/format";
 
 export const Route = createFileRoute(
 	"/admin/_console/forms/$formId/submissions",
