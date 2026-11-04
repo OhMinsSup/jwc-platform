@@ -1,6 +1,6 @@
 import type { Answers } from "./answers/value";
 import type { FormDefinition } from "./definition/definition";
-import { normalizePhone } from "./field-types";
+import { normalizePhone } from "./field-types/text";
 
 /**
  * 중복 제출 판정용 정규화 키 (해시 이전 단계).

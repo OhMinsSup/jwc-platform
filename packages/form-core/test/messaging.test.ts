@@ -2,12 +2,12 @@ import { describe, expect, it } from "vite-plus/test";
 
 import {
 	computeAmount,
-	formatInTimeZone,
 	isReminderDue,
 	messageVariables,
 	renderTemplate,
 	templateFor,
-} from "../src";
+} from "../src/messaging";
+import { formatInTimeZone } from "../src/time";
 import { retreat, validRetreatAnswers } from "./fixtures";
 
 const DAY = 86_400_000;

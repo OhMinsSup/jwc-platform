@@ -1,6 +1,6 @@
 import type { FormDefinition } from "../definition/definition";
 import { isDisplayOnly } from "../definition/fields";
-import { checkFieldValue } from "../field-types";
+import { checkFieldValue } from "../field-types/values";
 import { resolveVisibility } from "../logic/visibility";
 import type { Answers } from "./value";
 import { isEmptyAnswer } from "./value";

@@ -1,0 +1,28 @@
+{
+	"name": "@jwc/google",
+	"version": "0.1.0",
+	"private": true,
+	"description": "Google API 최소 클라이언트: 서비스 계정 JWT/토큰 공급자, Sheets v4 REST(요청별 재시도 정책). fetch 주입으로 계약 테스트 가능. 테스트용 가짜 Sheets는 ./testing.",
+	"type": "module",
+	"exports": {
+		"./service-account": "./src/service-account.ts",
+		"./sheets-client": "./src/sheets-client.ts",
+		"./testing": "./src/testing.ts"
+	},
+	"scripts": {
+		"test": "vp test run --passWithNoTests",
+		"typecheck": "jwc-typecheck --noEmit",
+		"typecheck:tsc": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@jwc/common": "workspace:*",
+		"zod": "catalog:"
+	},
+	"devDependencies": {
+		"@jwc/tsconfig": "workspace:*",
+		"@jwc/typecheck": "workspace:*",
+		"@types/node": "catalog:",
+		"typescript": "catalog:",
+		"vite-plus": "catalog:"
+	}
+}

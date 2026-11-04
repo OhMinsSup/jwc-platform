@@ -5,7 +5,7 @@ import type {
 	ReminderRule,
 } from "./definition/definition";
 import type { BuiltinTemplateKey } from "./definition/reserved";
-import { formatFieldValue } from "./field-types";
+import { formatFieldValue } from "./field-types/values";
 
 const TEMPLATE_TOKEN = /\{\{\s*(?<key>[a-z][a-z0-9_]*)\s*\}\}/gu;
 const DAY_MS = 86_400_000;

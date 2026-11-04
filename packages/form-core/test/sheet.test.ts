@@ -1,12 +1,8 @@
 import { describe, expect, it } from "vite-plus/test";
 
-import {
-	headerRow,
-	interpretCellEdit,
-	parseSheetRow,
-	toSheetRow,
-	validateAnswers,
-} from "../src";
+import { validateAnswers } from "../src/answers/validate";
+import { headerRow } from "../src/sheet/columns";
+import { parseSheetRow, toSheetRow } from "../src/sheet/rows";
 import { retreat, validRetreatAnswers } from "./fixtures";
 
 // 2026-05-01 12:00:00 KST
@@ -66,18 +62,11 @@ describe("시트 코덱", () => {
 		expect(row.at(-1)).toBe("sub_1");
 	});
 
-	it("셀 수정 해석: 납입여부/필드/읽기전용/잘못된 값", () => {
-		expect(interpretCellEdit(definition, "납입여부", "납입")).toStrictEqual({
-			kind: "paid",
-			paid: true,
-		});
-		expect(interpretCellEdit(definition, "숙박형태", "무박")).toStrictEqual({
-			kind: "field",
-			fieldId: "stay_type",
-			value: "day",
-		});
-		expect(interpretCellEdit(definition, "응답 ID", "x").kind).toBe("readonly");
-		expect(interpretCellEdit(definition, "성별", "모름").kind).toBe("invalid");
-		expect(interpretCellEdit(definition, "없는헤더", "x").kind).toBe("unknown");
+	it("paid가 없으면 납입여부 칸을 비워(null) 기존 값을 보존한다", () => {
+		const headers = headerRow(definition);
+		const withoutPaid = { ...record, paid: undefined };
+		const row = toSheetRow(definition, headers, withoutPaid);
+		expect(row[headers.indexOf("납입여부")]).toBeNull();
+		expect(row[headers.indexOf("응답 ID")]).toBe("sub_1");
 	});
 });

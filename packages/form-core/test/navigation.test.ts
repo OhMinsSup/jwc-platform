@@ -1,12 +1,8 @@
 import { describe, expect, it } from "vite-plus/test";
 
-import {
-	firstPageId,
-	nextStep,
-	parseFormDefinition,
-	previousPageId,
-} from "../src";
-import type { FormDefinition } from "../src";
+import { parseFormDefinition } from "../src/definition/definition";
+import type { FormDefinition } from "../src/definition/definition";
+import { firstPageId, nextStep, previousPageId } from "../src/logic/visibility";
 import { retreat, validRetreatAnswers } from "./fixtures";
 
 function withConditionalPage(): FormDefinition {

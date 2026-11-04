@@ -32,6 +32,3 @@ export function formatFieldValue(field: FieldDef, value: AnswerValue): string {
 export function parseFieldText(field: FieldDef, text: string): ValueCheck {
 	return checkFieldValue(field, specOf(field).fromText(field, text));
 }
-
-export { labelOf } from "./choice";
-export { formatPhone, normalizePhone } from "./text";

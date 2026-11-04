@@ -5,8 +5,7 @@
 	"description": "폼 정의(데이터)에서 검증, 조건 분기, 시트 코덱, 메시지 변수를 파생하는 순수 함수 모음. I/O 없음.",
 	"type": "module",
 	"exports": {
-		".": "./src/index.ts",
-		"./samples": "./src/samples/index.ts"
+		"./*": "./src/*.ts"
 	},
 	"scripts": {
 		"test": "vp test run",

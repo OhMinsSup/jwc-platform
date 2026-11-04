@@ -5,8 +5,6 @@ import { checkFieldRules, checkNotifications } from "./integrity-rules";
 import type { DefinitionShape, IntegrityIssue } from "./integrity-types";
 import { RESERVED_TEMPLATE_KEYS } from "./reserved";
 
-export type { DefinitionShape, IntegrityIssue } from "./integrity-types";
-
 type Check = (definition: DefinitionShape) => IntegrityIssue[];
 
 function checkUniqueIds(definition: DefinitionShape): IntegrityIssue[] {

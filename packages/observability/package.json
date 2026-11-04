@@ -1,0 +1,27 @@
+{
+	"name": "@jwc/observability",
+	"version": "0.1.0",
+	"private": true,
+	"description": "관측성: 요청 범위(requestId), 이벤트 카탈로그 기반 허용 목록 로거, 오류 추적/제품 이벤트 PostHog 서버 전송(HTTP batch), 워커 진입점 감싸기. 이벤트 표는 앱이 데이터로 넘긴다.",
+	"type": "module",
+	"exports": {
+		".": "./src/logger.ts",
+		"./catalog": "./src/catalog.ts",
+		"./posthog": "./src/posthog.ts",
+		"./scope": "./src/scope.ts",
+		"./worker": "./src/worker.ts"
+	},
+	"scripts": {
+		"test": "vp test run",
+		"typecheck": "jwc-typecheck --noEmit",
+		"typecheck:tsc": "tsc --noEmit"
+	},
+	"devDependencies": {
+		"@jwc/common": "workspace:*",
+		"@jwc/tsconfig": "workspace:*",
+		"@jwc/typecheck": "workspace:*",
+		"@types/node": "catalog:",
+		"typescript": "catalog:",
+		"vite-plus": "catalog:"
+	}
+}

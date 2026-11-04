@@ -57,3 +57,8 @@ src/
 - 타입: `pnpm -C packages/ui typecheck` (tsrs, 미지원 플랫폼은 tsc로 자동 폴백)
 - 린트/포맷: 루트에서 `pnpm check` (패키지별 lint 스크립트는 없다)
 - 생성 코드 특성상 일부 규칙은 루트 `vite.config.ts`의 `packages/ui/src/**` override에서 꺼져 있다. `ui-add`는 받은 파일에 `vp check --fix`를 실행한다.
+
+## 재노출 금지
+
+- 생성된 컴포넌트가 다른 패키지를 그대로 재노출만 하면(예: shadcn `direction.tsx`) 받지 않거나 지운다. 린트 `jwc/no-reexport`가 막는다 (ADR-0007).
+- 여러 컴포넌트를 조합한 패턴은 이 패키지가 아니라 `@jwc/ui-patterns`에 둔다.

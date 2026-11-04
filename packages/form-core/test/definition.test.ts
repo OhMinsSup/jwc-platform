@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vite-plus/test";
 
-import { parseFormDefinition } from "../src";
-import { retreat2026Definition } from "../src/samples";
+import { parseFormDefinition } from "../src/definition/definition";
+import { retreat2026Definition } from "../src/samples/retreat-2026";
 
 const clone = () => structuredClone(retreat2026Definition);
 

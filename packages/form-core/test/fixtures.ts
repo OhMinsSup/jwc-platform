@@ -1,6 +1,6 @@
-import { parseFormDefinition } from "../src";
-import type { FormDefinition } from "../src";
-import { retreat2026Definition } from "../src/samples";
+import { parseFormDefinition } from "../src/definition/definition";
+import type { FormDefinition } from "../src/definition/definition";
+import { retreat2026Definition } from "../src/samples/retreat-2026";
 
 export function retreat(): FormDefinition {
 	const parsed = parseFormDefinition(retreat2026Definition);

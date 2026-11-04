@@ -1,0 +1,27 @@
+{
+	"name": "@jwc/ui-patterns",
+	"version": "0.1.0",
+	"private": true,
+	"description": "@jwc/ui(shadcn base-nova) 위에 만든 재사용 UI 패턴: 페이지 머리, 요약 수치, 빈 상태, 상태 배지, 세그먼트 선택, 복사 버튼, 검색 입력, 가운데 안내, 폼 행/입력/섹션, 선택 컨트롤, 확인 대화상자, 라이브 영역. 의미 색 토큰(brand/success/warning)은 ./styles.css.",
+	"type": "module",
+	"exports": {
+		"./components/*": "./src/components/*.tsx",
+		"./styles.css": "./src/styles/patterns.css"
+	},
+	"scripts": {
+		"typecheck": "jwc-typecheck --noEmit",
+		"typecheck:tsc": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@jwc/ui": "workspace:*",
+		"lucide-react": "catalog:",
+		"react": "catalog:react19"
+	},
+	"devDependencies": {
+		"@jwc/tsconfig": "workspace:*",
+		"@jwc/typecheck": "workspace:*",
+		"@types/node": "catalog:",
+		"@types/react": "catalog:react19",
+		"typescript": "catalog:"
+	}
+}

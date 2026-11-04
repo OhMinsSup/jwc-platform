@@ -2,10 +2,10 @@ import { describe, expect, it } from "vite-plus/test";
 
 import {
 	REQUIRED_MESSAGE,
-	resolveVisibility,
 	validateAnswers,
 	validatePage,
-} from "../src";
+} from "../src/answers/validate";
+import { resolveVisibility } from "../src/logic/visibility";
 import { retreat, validRetreatAnswers } from "./fixtures";
 
 describe(validateAnswers, () => {
