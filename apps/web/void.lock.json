@@ -1,0 +1,63 @@
+{
+	"version": 1,
+	"source": {
+		"main": "./server.ts",
+		"queues": {
+			"producers": [
+				{
+					"queue": "jwc-form-sheets",
+					"binding": "QUEUE_SHEETS"
+				},
+				{
+					"queue": "jwc-form-sms",
+					"binding": "QUEUE_SMS"
+				}
+			],
+			"consumers": [
+				{
+					"queue": "jwc-form-sheets",
+					"max_batch_size": 5,
+					"max_retries": 8,
+					"retry_delay": 30
+				},
+				{
+					"queue": "jwc-form-sms",
+					"max_batch_size": 5,
+					"max_retries": 5,
+					"retry_delay": 60
+				}
+			]
+		}
+	},
+	"resolved": {
+		"compatibility_date": "2026-02-24",
+		"main": "./server.ts",
+		"queues": {
+			"producers": [
+				{
+					"queue": "jwc-form-sheets",
+					"binding": "QUEUE_SHEETS"
+				},
+				{
+					"queue": "jwc-form-sms",
+					"binding": "QUEUE_SMS"
+				}
+			],
+			"consumers": [
+				{
+					"queue": "jwc-form-sheets",
+					"max_batch_size": 5,
+					"max_retries": 8,
+					"retry_delay": 30
+				},
+				{
+					"queue": "jwc-form-sms",
+					"max_batch_size": 5,
+					"max_retries": 5,
+					"retry_delay": 60
+				}
+			]
+		}
+	},
+	"text": "{\n  \"compatibility_date\": \"2026-02-24\",\n  \"main\": \"./server.ts\",\n  \"queues\": {\n    \"producers\": [\n      {\n        \"queue\": \"jwc-form-sheets\",\n        \"binding\": \"QUEUE_SHEETS\"\n      },\n      {\n        \"queue\": \"jwc-form-sms\",\n        \"binding\": \"QUEUE_SMS\"\n      }\n    ],\n    \"consumers\": [\n      {\n        \"queue\": \"jwc-form-sheets\",\n        \"max_batch_size\": 5,\n        \"max_retries\": 8,\n        \"retry_delay\": 30\n      },\n      {\n        \"queue\": \"jwc-form-sms\",\n        \"max_batch_size\": 5,\n        \"max_retries\": 5,\n        \"retry_delay\": 60\n      }\n    ]\n  }\n}\n"
+}

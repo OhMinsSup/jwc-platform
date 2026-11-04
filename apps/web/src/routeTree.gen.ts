@@ -9,139 +9,206 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as OnboardingRouteRouteImport } from './routes/onboarding/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ApplicationIndexRouteImport } from './routes/application/index'
-import { Route as SCodeRouteImport } from './routes/s/$code'
-import { Route as OnboardingStepRouteImport } from './routes/onboarding/$step'
-import { Route as ApplicationIdRouteImport } from './routes/application/$id'
-import { Route as ApiWebhookSpreadsheetRouteImport } from './routes/api/webhook/spreadsheet'
+import { Route as AdminConsoleRouteRouteImport } from './routes/admin/_console/route'
+import { Route as AdminLoginRouteImport } from './routes/admin/login'
+import { Route as AdminSignupRouteImport } from './routes/admin/signup'
+import { Route as RIdRouteImport } from './routes/r/$id'
+import { Route as AdminConsoleIndexRouteImport } from './routes/admin/_console/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ApiWebhooksSheetsRouteImport } from './routes/api/webhooks/sheets'
+import { Route as FSlugIndexRouteImport } from './routes/f/$slug/index'
+import { Route as FSlugDoneRouteImport } from './routes/f/$slug/done'
+import { Route as AdminConsoleFormsFormIdRouteRouteImport } from './routes/admin/_console/forms/$formId/route'
+import { Route as AdminConsoleFormsFormIdIndexRouteImport } from './routes/admin/_console/forms/$formId/index'
+import { Route as AdminConsoleFormsFormIdPreviewRouteImport } from './routes/admin/_console/forms/$formId/preview'
+import { Route as AdminConsoleFormsFormIdSubmissionsRouteImport } from './routes/admin/_console/forms/$formId/submissions'
 
-const OnboardingRouteRoute = OnboardingRouteRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApplicationIndexRoute = ApplicationIndexRouteImport.update({
-  id: '/application/',
-  path: '/application/',
+const AdminConsoleRouteRoute = AdminConsoleRouteRouteImport.update({
+  id: '/admin/_console',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SCodeRoute = SCodeRouteImport.update({
-  id: '/s/$code',
-  path: '/s/$code',
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin/login',
+  path: '/admin/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const OnboardingStepRoute = OnboardingStepRouteImport.update({
-  id: '/$step',
-  path: '/$step',
-  getParentRoute: () => OnboardingRouteRoute,
-} as any)
-const ApplicationIdRoute = ApplicationIdRouteImport.update({
-  id: '/application/$id',
-  path: '/application/$id',
+const AdminSignupRoute = AdminSignupRouteImport.update({
+  id: '/admin/signup',
+  path: '/admin/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiWebhookSpreadsheetRoute = ApiWebhookSpreadsheetRouteImport.update({
-  id: '/api/webhook/spreadsheet',
-  path: '/api/webhook/spreadsheet',
+const RIdRoute = RIdRouteImport.update({
+  id: '/r/$id',
+  path: '/r/$id',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminConsoleIndexRoute = AdminConsoleIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminConsoleRouteRoute,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiWebhooksSheetsRoute = ApiWebhooksSheetsRouteImport.update({
+  id: '/api/webhooks/sheets',
+  path: '/api/webhooks/sheets',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FSlugIndexRoute = FSlugIndexRouteImport.update({
+  id: '/f/$slug/',
+  path: '/f/$slug/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FSlugDoneRoute = FSlugDoneRouteImport.update({
+  id: '/f/$slug/done',
+  path: '/f/$slug/done',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminConsoleFormsFormIdRouteRoute =
+  AdminConsoleFormsFormIdRouteRouteImport.update({
+    id: '/forms/$formId',
+    path: '/forms/$formId',
+    getParentRoute: () => AdminConsoleRouteRoute,
+  } as any)
+const AdminConsoleFormsFormIdIndexRoute =
+  AdminConsoleFormsFormIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AdminConsoleFormsFormIdRouteRoute,
+  } as any)
+const AdminConsoleFormsFormIdPreviewRoute =
+  AdminConsoleFormsFormIdPreviewRouteImport.update({
+    id: '/preview',
+    path: '/preview',
+    getParentRoute: () => AdminConsoleFormsFormIdRouteRoute,
+  } as any)
+const AdminConsoleFormsFormIdSubmissionsRoute =
+  AdminConsoleFormsFormIdSubmissionsRouteImport.update({
+    id: '/submissions',
+    path: '/submissions',
+    getParentRoute: () => AdminConsoleFormsFormIdRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/onboarding': typeof OnboardingRouteRouteWithChildren
-  '/application/$id': typeof ApplicationIdRoute
-  '/onboarding/$step': typeof OnboardingStepRoute
-  '/s/$code': typeof SCodeRoute
-  '/application': typeof ApplicationIndexRoute
+  '/admin': typeof AdminConsoleRouteRouteWithChildren
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/signup': typeof AdminSignupRoute
+  '/r/$id': typeof RIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/webhook/spreadsheet': typeof ApiWebhookSpreadsheetRoute
+  '/api/webhooks/sheets': typeof ApiWebhooksSheetsRoute
+  '/f/$slug/done': typeof FSlugDoneRoute
+  '/admin/': typeof AdminConsoleIndexRoute
+  '/f/$slug/': typeof FSlugIndexRoute
+  '/admin/forms/$formId': typeof AdminConsoleFormsFormIdRouteRouteWithChildren
+  '/admin/forms/$formId/preview': typeof AdminConsoleFormsFormIdPreviewRoute
+  '/admin/forms/$formId/submissions': typeof AdminConsoleFormsFormIdSubmissionsRoute
+  '/admin/forms/$formId/': typeof AdminConsoleFormsFormIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/onboarding': typeof OnboardingRouteRouteWithChildren
-  '/application/$id': typeof ApplicationIdRoute
-  '/onboarding/$step': typeof OnboardingStepRoute
-  '/s/$code': typeof SCodeRoute
-  '/application': typeof ApplicationIndexRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/signup': typeof AdminSignupRoute
+  '/r/$id': typeof RIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/webhook/spreadsheet': typeof ApiWebhookSpreadsheetRoute
+  '/api/webhooks/sheets': typeof ApiWebhooksSheetsRoute
+  '/f/$slug/done': typeof FSlugDoneRoute
+  '/admin': typeof AdminConsoleIndexRoute
+  '/f/$slug': typeof FSlugIndexRoute
+  '/admin/forms/$formId/preview': typeof AdminConsoleFormsFormIdPreviewRoute
+  '/admin/forms/$formId/submissions': typeof AdminConsoleFormsFormIdSubmissionsRoute
+  '/admin/forms/$formId': typeof AdminConsoleFormsFormIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/onboarding': typeof OnboardingRouteRouteWithChildren
-  '/application/$id': typeof ApplicationIdRoute
-  '/onboarding/$step': typeof OnboardingStepRoute
-  '/s/$code': typeof SCodeRoute
-  '/application/': typeof ApplicationIndexRoute
+  '/admin/_console': typeof AdminConsoleRouteRouteWithChildren
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/signup': typeof AdminSignupRoute
+  '/r/$id': typeof RIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/webhook/spreadsheet': typeof ApiWebhookSpreadsheetRoute
+  '/api/webhooks/sheets': typeof ApiWebhooksSheetsRoute
+  '/f/$slug/done': typeof FSlugDoneRoute
+  '/admin/_console/': typeof AdminConsoleIndexRoute
+  '/f/$slug/': typeof FSlugIndexRoute
+  '/admin/_console/forms/$formId': typeof AdminConsoleFormsFormIdRouteRouteWithChildren
+  '/admin/_console/forms/$formId/preview': typeof AdminConsoleFormsFormIdPreviewRoute
+  '/admin/_console/forms/$formId/submissions': typeof AdminConsoleFormsFormIdSubmissionsRoute
+  '/admin/_console/forms/$formId/': typeof AdminConsoleFormsFormIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/onboarding'
-    | '/application/$id'
-    | '/onboarding/$step'
-    | '/s/$code'
-    | '/application'
+    | '/admin'
+    | '/admin/login'
+    | '/admin/signup'
+    | '/r/$id'
     | '/api/auth/$'
-    | '/api/webhook/spreadsheet'
+    | '/api/webhooks/sheets'
+    | '/f/$slug/done'
+    | '/admin/'
+    | '/f/$slug/'
+    | '/admin/forms/$formId'
+    | '/admin/forms/$formId/preview'
+    | '/admin/forms/$formId/submissions'
+    | '/admin/forms/$formId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/onboarding'
-    | '/application/$id'
-    | '/onboarding/$step'
-    | '/s/$code'
-    | '/application'
+    | '/admin/login'
+    | '/admin/signup'
+    | '/r/$id'
     | '/api/auth/$'
-    | '/api/webhook/spreadsheet'
+    | '/api/webhooks/sheets'
+    | '/f/$slug/done'
+    | '/admin'
+    | '/f/$slug'
+    | '/admin/forms/$formId/preview'
+    | '/admin/forms/$formId/submissions'
+    | '/admin/forms/$formId'
   id:
     | '__root__'
     | '/'
-    | '/onboarding'
-    | '/application/$id'
-    | '/onboarding/$step'
-    | '/s/$code'
-    | '/application/'
+    | '/admin/_console'
+    | '/admin/login'
+    | '/admin/signup'
+    | '/r/$id'
     | '/api/auth/$'
-    | '/api/webhook/spreadsheet'
+    | '/api/webhooks/sheets'
+    | '/f/$slug/done'
+    | '/admin/_console/'
+    | '/f/$slug/'
+    | '/admin/_console/forms/$formId'
+    | '/admin/_console/forms/$formId/preview'
+    | '/admin/_console/forms/$formId/submissions'
+    | '/admin/_console/forms/$formId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  OnboardingRouteRoute: typeof OnboardingRouteRouteWithChildren
-  ApplicationIdRoute: typeof ApplicationIdRoute
-  SCodeRoute: typeof SCodeRoute
-  ApplicationIndexRoute: typeof ApplicationIndexRoute
+  AdminConsoleRouteRoute: typeof AdminConsoleRouteRouteWithChildren
+  AdminLoginRoute: typeof AdminLoginRoute
+  AdminSignupRoute: typeof AdminSignupRoute
+  RIdRoute: typeof RIdRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
-  ApiWebhookSpreadsheetRoute: typeof ApiWebhookSpreadsheetRoute
+  ApiWebhooksSheetsRoute: typeof ApiWebhooksSheetsRoute
+  FSlugDoneRoute: typeof FSlugDoneRoute
+  FSlugIndexRoute: typeof FSlugIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/onboarding': {
-      id: '/onboarding'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof OnboardingRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -149,40 +216,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/application/': {
-      id: '/application/'
-      path: '/application'
-      fullPath: '/application'
-      preLoaderRoute: typeof ApplicationIndexRouteImport
+    '/admin/_console': {
+      id: '/admin/_console'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminConsoleRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/s/$code': {
-      id: '/s/$code'
-      path: '/s/$code'
-      fullPath: '/s/$code'
-      preLoaderRoute: typeof SCodeRouteImport
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/admin/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/onboarding/$step': {
-      id: '/onboarding/$step'
-      path: '/$step'
-      fullPath: '/onboarding/$step'
-      preLoaderRoute: typeof OnboardingStepRouteImport
-      parentRoute: typeof OnboardingRouteRoute
-    }
-    '/application/$id': {
-      id: '/application/$id'
-      path: '/application/$id'
-      fullPath: '/application/$id'
-      preLoaderRoute: typeof ApplicationIdRouteImport
+    '/admin/signup': {
+      id: '/admin/signup'
+      path: '/admin/signup'
+      fullPath: '/admin/signup'
+      preLoaderRoute: typeof AdminSignupRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/webhook/spreadsheet': {
-      id: '/api/webhook/spreadsheet'
-      path: '/api/webhook/spreadsheet'
-      fullPath: '/api/webhook/spreadsheet'
-      preLoaderRoute: typeof ApiWebhookSpreadsheetRouteImport
+    '/r/$id': {
+      id: '/r/$id'
+      path: '/r/$id'
+      fullPath: '/r/$id'
+      preLoaderRoute: typeof RIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/_console/': {
+      id: '/admin/_console/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminConsoleIndexRouteImport
+      parentRoute: typeof AdminConsoleRouteRoute
     }
     '/api/auth/$': {
       id: '/api/auth/$'
@@ -191,29 +258,101 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/webhooks/sheets': {
+      id: '/api/webhooks/sheets'
+      path: '/api/webhooks/sheets'
+      fullPath: '/api/webhooks/sheets'
+      preLoaderRoute: typeof ApiWebhooksSheetsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/f/$slug/': {
+      id: '/f/$slug/'
+      path: '/f/$slug'
+      fullPath: '/f/$slug/'
+      preLoaderRoute: typeof FSlugIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/f/$slug/done': {
+      id: '/f/$slug/done'
+      path: '/f/$slug/done'
+      fullPath: '/f/$slug/done'
+      preLoaderRoute: typeof FSlugDoneRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/_console/forms/$formId': {
+      id: '/admin/_console/forms/$formId'
+      path: '/forms/$formId'
+      fullPath: '/admin/forms/$formId'
+      preLoaderRoute: typeof AdminConsoleFormsFormIdRouteRouteImport
+      parentRoute: typeof AdminConsoleRouteRoute
+    }
+    '/admin/_console/forms/$formId/': {
+      id: '/admin/_console/forms/$formId/'
+      path: '/'
+      fullPath: '/admin/forms/$formId/'
+      preLoaderRoute: typeof AdminConsoleFormsFormIdIndexRouteImport
+      parentRoute: typeof AdminConsoleFormsFormIdRouteRoute
+    }
+    '/admin/_console/forms/$formId/preview': {
+      id: '/admin/_console/forms/$formId/preview'
+      path: '/preview'
+      fullPath: '/admin/forms/$formId/preview'
+      preLoaderRoute: typeof AdminConsoleFormsFormIdPreviewRouteImport
+      parentRoute: typeof AdminConsoleFormsFormIdRouteRoute
+    }
+    '/admin/_console/forms/$formId/submissions': {
+      id: '/admin/_console/forms/$formId/submissions'
+      path: '/submissions'
+      fullPath: '/admin/forms/$formId/submissions'
+      preLoaderRoute: typeof AdminConsoleFormsFormIdSubmissionsRouteImport
+      parentRoute: typeof AdminConsoleFormsFormIdRouteRoute
+    }
   }
 }
 
-interface OnboardingRouteRouteChildren {
-  OnboardingStepRoute: typeof OnboardingStepRoute
+interface AdminConsoleFormsFormIdRouteRouteChildren {
+  AdminConsoleFormsFormIdPreviewRoute: typeof AdminConsoleFormsFormIdPreviewRoute
+  AdminConsoleFormsFormIdSubmissionsRoute: typeof AdminConsoleFormsFormIdSubmissionsRoute
+  AdminConsoleFormsFormIdIndexRoute: typeof AdminConsoleFormsFormIdIndexRoute
 }
 
-const OnboardingRouteRouteChildren: OnboardingRouteRouteChildren = {
-  OnboardingStepRoute: OnboardingStepRoute,
+const AdminConsoleFormsFormIdRouteRouteChildren: AdminConsoleFormsFormIdRouteRouteChildren =
+  {
+    AdminConsoleFormsFormIdPreviewRoute: AdminConsoleFormsFormIdPreviewRoute,
+    AdminConsoleFormsFormIdSubmissionsRoute:
+      AdminConsoleFormsFormIdSubmissionsRoute,
+    AdminConsoleFormsFormIdIndexRoute: AdminConsoleFormsFormIdIndexRoute,
+  }
+
+const AdminConsoleFormsFormIdRouteRouteWithChildren =
+  AdminConsoleFormsFormIdRouteRoute._addFileChildren(
+    AdminConsoleFormsFormIdRouteRouteChildren,
+  )
+
+interface AdminConsoleRouteRouteChildren {
+  AdminConsoleIndexRoute: typeof AdminConsoleIndexRoute
+  AdminConsoleFormsFormIdRouteRoute: typeof AdminConsoleFormsFormIdRouteRouteWithChildren
 }
 
-const OnboardingRouteRouteWithChildren = OnboardingRouteRoute._addFileChildren(
-  OnboardingRouteRouteChildren,
-)
+const AdminConsoleRouteRouteChildren: AdminConsoleRouteRouteChildren = {
+  AdminConsoleIndexRoute: AdminConsoleIndexRoute,
+  AdminConsoleFormsFormIdRouteRoute:
+    AdminConsoleFormsFormIdRouteRouteWithChildren,
+}
+
+const AdminConsoleRouteRouteWithChildren =
+  AdminConsoleRouteRoute._addFileChildren(AdminConsoleRouteRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  OnboardingRouteRoute: OnboardingRouteRouteWithChildren,
-  ApplicationIdRoute: ApplicationIdRoute,
-  SCodeRoute: SCodeRoute,
-  ApplicationIndexRoute: ApplicationIndexRoute,
+  AdminConsoleRouteRoute: AdminConsoleRouteRouteWithChildren,
+  AdminLoginRoute: AdminLoginRoute,
+  AdminSignupRoute: AdminSignupRoute,
+  RIdRoute: RIdRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
-  ApiWebhookSpreadsheetRoute: ApiWebhookSpreadsheetRoute,
+  ApiWebhooksSheetsRoute: ApiWebhooksSheetsRoute,
+  FSlugDoneRoute: FSlugDoneRoute,
+  FSlugIndexRoute: FSlugIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

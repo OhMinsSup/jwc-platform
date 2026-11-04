@@ -1,0 +1,44 @@
+@import "@jwc/ui/globals.css";
+
+/* @jwc/ui 컴포넌트와 이 앱의 클래스를 Tailwind가 스캔하도록 지정 */
+@source "../../../packages/ui/src";
+@source "./";
+
+/*
+ * 관리자 화면 전용 토큰.
+ * primary(버튼/포커스)는 공개 신청서와 같은 중립색을 유지하고,
+ * 브랜드 색은 "현재 위치·정체성"(로고, 활성 메뉴/탭, 강조 수치)에만 쓴다.
+ * 포털(다이얼로그/드롭다운)에서도 같은 값이 나오도록 :root에 둔다.
+ */
+:root {
+	--brand: hsl(229 72% 52%);
+	--brand-foreground: hsl(0 0% 100%);
+	--brand-soft: hsl(229 100% 97%);
+	--canvas: hsl(228 33% 98%);
+	--success: hsl(152 60% 36%);
+	--success-soft: hsl(152 60% 95%);
+	--warning: hsl(32 90% 42%);
+	--warning-soft: hsl(40 100% 95%);
+}
+
+.dark {
+	--brand: hsl(229 85% 68%);
+	--brand-foreground: hsl(229 50% 10%);
+	--brand-soft: hsl(229 40% 16%);
+	--canvas: hsl(240 10% 6%);
+	--success: hsl(152 55% 55%);
+	--success-soft: hsl(152 40% 14%);
+	--warning: hsl(38 90% 60%);
+	--warning-soft: hsl(38 40% 14%);
+}
+
+@theme inline {
+	--color-brand: var(--brand);
+	--color-brand-foreground: var(--brand-foreground);
+	--color-brand-soft: var(--brand-soft);
+	--color-canvas: var(--canvas);
+	--color-success: var(--success);
+	--color-success-soft: var(--success-soft);
+	--color-warning: var(--warning);
+	--color-warning-soft: var(--warning-soft);
+}
