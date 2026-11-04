@@ -114,7 +114,7 @@ function PageHeader(props: PageProps) {
 					페이지 {pageIndex + 1} / {pageCount}
 				</label>
 				<Input
-					className="hover:border-input focus-visible:border-input h-auto border-transparent px-2 py-1 text-lg font-semibold shadow-none"
+					className="hover:border-border-strong focus-visible:border-input -ml-2 h-auto w-[calc(100%+0.5rem)] border-transparent px-2 py-1 text-lg font-semibold shadow-none"
 					id={titleId}
 					onChange={(event) =>
 						dispatch({
@@ -154,7 +154,7 @@ function FieldList({
 	const issues = useEditorIssues();
 	if (page.fieldIds.length === 0) {
 		return (
-			<p className="text-muted-foreground rounded-lg border border-dashed p-6 text-center text-sm">
+			<p className="text-muted-foreground rounded-xl border border-dashed p-6 text-center text-sm">
 				아직 질문이 없습니다. 아래에서 질문을 추가하세요.
 			</p>
 		);
@@ -198,7 +198,7 @@ export function PageSection(props: PageSectionProps) {
 	return (
 		<section
 			aria-label={title}
-			className="bg-card scroll-mt-28 space-y-4 rounded-xl border p-4 shadow-xs sm:p-5"
+			className="bg-card scroll-mt-28 space-y-4 rounded-xl border p-4 sm:p-5"
 			id={pageDomId(page.id)}
 		>
 			<PageHeader page={page} pageCount={pageCount} pageIndex={pageIndex} />

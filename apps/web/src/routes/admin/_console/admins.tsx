@@ -1,3 +1,4 @@
+import { Callout } from "@jwc/ui-patterns/components/callout";
 import { EmptyState } from "@jwc/ui-patterns/components/empty-state";
 import { PageHeader } from "@jwc/ui-patterns/components/page-header";
 import { createFileRoute } from "@tanstack/react-router";
@@ -16,7 +17,7 @@ import { InviteForm } from "../../../features/admin-access/ui/invite-form";
 
 /** 관리자 초대와 최근 활동(감사 기록). 두 목록은 따로 실패할 수 있어 결과 값 그대로 받는다 */
 export const Route = createFileRoute("/admin/_console/admins")({
-	head: () => ({ meta: [{ title: "관리자 · JWC Forms" }] }),
+	head: () => ({ meta: [{ title: "관리자 · JWC 신청서" }] }),
 	loader: async () => {
 		const [invites, audit] = await Promise.all([
 			listInvitesFn(),
@@ -48,12 +49,9 @@ function Section({
 
 function LoadError({ message }: { message: string }) {
 	return (
-		<p
-			className="bg-destructive/10 text-destructive rounded-md px-3 py-2 text-sm"
-			role="alert"
-		>
+		<Callout role="alert" tone="danger">
 			{message}
-		</p>
+		</Callout>
 	);
 }
 

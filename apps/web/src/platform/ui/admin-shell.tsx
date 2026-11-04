@@ -12,6 +12,7 @@ import type { ReactNode } from "react";
 
 import { resetAnalytics } from "../analytics/client";
 import { authClient } from "../auth-client";
+import { TicketMark } from "./brand-mark";
 
 /** 사이드바 메뉴. 화면이 늘면 이 표에 한 줄 추가한다 */
 const NAV_ITEMS = [
@@ -46,16 +47,11 @@ function BrandMark() {
 			className="focus-visible:ring-ring flex items-center gap-2.5 rounded-md focus-visible:ring-2 focus-visible:outline-none"
 			to="/admin"
 		>
-			<span
-				aria-hidden
-				className="bg-brand text-brand-foreground flex h-8 w-8 items-center justify-center rounded-lg text-sm font-bold"
-			>
-				J
-			</span>
+			<TicketMark className="h-7 w-7 shrink-0" />
 			<span className="leading-tight">
-				<span className="block text-sm font-semibold">JWC Forms</span>
-				<span className="text-muted-foreground block text-xs">
-					청년부 신청서 관리
+				<span className="block text-[15px] font-bold">JWC 신청서</span>
+				<span className="text-muted-foreground block text-[13px]">
+					죽전우리교회 청년부
 				</span>
 			</span>
 		</Link>
@@ -74,19 +70,22 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
 						<Link
 							activeOptions={{ exact: true }}
 							aria-current={current === to ? "page" : undefined}
-							className="text-muted-foreground hover:bg-muted hover:text-foreground data-[current=true]:bg-brand-soft data-[current=true]:text-brand flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors data-[current=true]:font-medium"
+							className="text-muted-foreground hover:bg-muted hover:text-foreground data-[current=true]:bg-pressed data-[current=true]:text-foreground group/nav flex h-8 items-center gap-2.5 rounded-lg px-2.5 text-sm transition-colors data-[current=true]:font-semibold"
 							data-current={current === to}
 							onClick={onNavigate}
 							to={to}
 						>
-							<Icon aria-hidden className="h-4 w-4" />
+							<Icon
+								aria-hidden
+								className="group-data-[current=true]/nav:text-foreground h-4 w-4"
+							/>
 							{label}
 						</Link>
 					</li>
 				))}
 				<li>
 					<a
-						className="text-muted-foreground hover:bg-muted hover:text-foreground flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm"
+						className="text-muted-foreground hover:bg-muted hover:text-foreground flex h-8 items-center gap-2.5 rounded-lg px-2.5 text-sm transition-colors"
 						href="/"
 						rel="noreferrer"
 						target="_blank"
@@ -121,7 +120,7 @@ function AccountFooter({ admin }: { admin: AdminUser }) {
 				<span className="block truncate text-sm font-medium">
 					{admin.name || "관리자"}
 				</span>
-				<span className="text-muted-foreground block truncate text-xs">
+				<span className="text-muted-foreground block truncate text-[13px]">
 					{admin.email}
 				</span>
 			</span>
@@ -143,11 +142,14 @@ function SidebarBody({
 	onNavigate,
 }: {
 	admin: AdminUser;
+	/** 메뉴 시트 안: 오른쪽 위 닫기 버튼과 겹치지 않게 표식 줄 오른쪽을 비운다 */
 	onNavigate?: () => void;
 }) {
 	return (
-		<div className="flex h-full flex-col gap-6 p-4">
-			<BrandMark />
+		<div className="flex h-full flex-col gap-7 px-3 py-5">
+			<div className={onNavigate ? "pr-10" : undefined}>
+				<BrandMark />
+			</div>
 			<div className="flex-1">
 				<NavList onNavigate={onNavigate} />
 			</div>
@@ -160,7 +162,7 @@ function SidebarBody({
 function MobileTopbar({ admin }: { admin: AdminUser }) {
 	const [open, setOpen] = useState(false);
 	return (
-		<div className="bg-background/95 sticky top-0 z-30 flex h-14 items-center justify-between border-b px-4 backdrop-blur lg:hidden">
+		<div className="bg-canvas sticky top-0 z-30 flex h-14 items-center justify-between border-b px-4 lg:hidden">
 			<BrandMark />
 			<Sheet onOpenChange={setOpen} open={open}>
 				<SheetTrigger
@@ -178,8 +180,8 @@ function MobileTopbar({ admin }: { admin: AdminUser }) {
 }
 
 /**
- * 관리자 화면 골격. 큰 화면은 고정 사이드바, 작은 화면은 상단 바.
- * 본문은 옅은 바탕(canvas) 위에 흰 카드를 올려 계층을 만든다.
+ * 관리자 화면 골격 (typie 앱 구성): 사이드바는 240px로 본문과 같은 바탕 위에 있고 1px 선 하나로만 나뉜다.
+ * 상단 바 없음. 본문은 가운데 1152px 열, 흰 카드 + 1px 테두리. 작은 화면은 56px 상단 바 + 메뉴 시트.
  */
 export function AdminShell({
 	admin,
@@ -189,19 +191,19 @@ export function AdminShell({
 	children: ReactNode;
 }) {
 	return (
-		<div className="bg-canvas min-h-svh lg:grid lg:grid-cols-[16rem_1fr]">
+		<div className="bg-canvas min-h-svh lg:grid lg:grid-cols-[240px_1fr]">
 			<a
 				className="bg-background sr-only z-50 rounded-md px-3 py-2 focus:not-sr-only focus:fixed focus:top-2 focus:left-2"
 				href="#admin-main"
 			>
 				본문으로 건너뛰기
 			</a>
-			<aside className="bg-background sticky top-0 hidden h-svh border-r lg:block">
+			<aside className="bg-canvas sticky top-0 hidden h-svh border-r lg:block">
 				<SidebarBody admin={admin} />
 			</aside>
 			<MobileTopbar admin={admin} />
 			<main
-				className="mx-auto w-full max-w-6xl min-w-0 px-4 py-6 sm:px-6 lg:px-10 lg:py-10"
+				className="mx-auto w-full max-w-6xl min-w-0 px-4 py-6 sm:px-6 lg:px-10 lg:py-9"
 				id="admin-main"
 			>
 				{children}

@@ -35,15 +35,20 @@ function ReviewSection({
 	onEdit,
 }: ReviewSectionProps) {
 	return (
-		<section className="overflow-hidden rounded-xl border">
-			<header className="bg-muted/30 flex items-center justify-between border-b px-5 py-3">
-				<h2 className="font-medium">{page.title}</h2>
-				<Button onClick={() => onEdit(page.id)} size="sm" variant="ghost">
+		<section className="bg-card overflow-hidden rounded-xl border">
+			<header className="border-rule flex items-center justify-between border-b px-5 py-3">
+				<h2 className="font-semibold">{page.title}</h2>
+				<Button
+					className="-mr-2"
+					onClick={() => onEdit(page.id)}
+					size="sm"
+					variant="ghost"
+				>
 					<Pencil className="mr-1 h-3.5 w-3.5" />
 					수정
 				</Button>
 			</header>
-			<dl className="divide-y px-5">
+			<dl className="divide-rule divide-y">
 				{page.fieldIds
 					.map((id) => fields.get(id))
 					.filter(
@@ -57,7 +62,7 @@ function ReviewSection({
 						const value = visibility.answers[field.id];
 						return (
 							<div
-								className="flex justify-between gap-4 py-2.5 text-sm"
+								className="flex justify-between gap-4 px-5 py-2.5 text-sm"
 								key={field.id}
 							>
 								<dt className="text-muted-foreground">{field.label}</dt>
@@ -94,9 +99,9 @@ export function ReviewView({ definition, answers, onEdit }: ReviewViewProps) {
 					/>
 				))}
 			{amount !== null && (
-				<p className="bg-primary/5 rounded-xl border px-5 py-4 text-sm">
+				<p className="bg-raised flex items-baseline justify-between rounded-xl px-5 py-4 text-sm">
 					납부 금액{" "}
-					<strong className="ml-2 text-base">
+					<strong className="text-lg font-bold tabular-nums">
 						{amount.toLocaleString("ko-KR")}원
 					</strong>
 				</p>

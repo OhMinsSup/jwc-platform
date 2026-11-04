@@ -63,7 +63,7 @@ function StatusLine({
 export function Toolbar(props: ToolbarProps) {
 	const { saveState, busy, notice, onSave, onPublish, views } = props;
 	return (
-		<div className="bg-background/95 supports-backdrop-filter:bg-background/80 sticky top-16 z-20 rounded-xl border px-3 py-2.5 shadow-sm backdrop-blur lg:top-4">
+		<div className="bg-background sticky top-16 z-20 rounded-xl border px-3 py-2.5 lg:top-4">
 			<div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
 				{views}
 				<div className="flex flex-wrap items-center gap-x-4 gap-y-2">

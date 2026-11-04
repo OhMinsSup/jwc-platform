@@ -47,7 +47,7 @@ function SignupPage() {
 			footer={
 				<p className="text-muted-foreground text-center text-sm">
 					<Link
-						className="text-brand font-medium hover:underline"
+						className="text-foreground font-semibold underline-offset-4 hover:underline"
 						to="/admin/login"
 					>
 						이미 계정이 있다면 로그인

@@ -28,7 +28,7 @@ export const Route = createFileRoute("/admin/_console/forms/$formId")({
 		return result.data;
 	},
 	head: ({ loaderData }) => ({
-		meta: [{ title: `${loaderData?.title ?? "폼"} · JWC Forms` }],
+		meta: [{ title: `${loaderData?.title ?? "폼"} · JWC 신청서` }],
 	}),
 	component: FormLayout,
 });
@@ -97,7 +97,7 @@ function PublicLink({ slug }: { slug: string }) {
 	return (
 		<span className="inline-flex items-center gap-1">
 			<a
-				className="hover:text-foreground font-mono hover:underline"
+				className="hover:text-foreground hover:underline"
 				href={path}
 				rel="noreferrer"
 				target="_blank"
@@ -128,7 +128,7 @@ function FormLayout() {
 								/>
 							}
 							size="sm"
-							variant="ghost"
+							variant="outline"
 						>
 							<Sheet aria-hidden className="h-4 w-4" />
 							응답 시트

@@ -31,7 +31,7 @@ function LoginPage() {
 				<p className="text-muted-foreground text-center text-sm">
 					처음이신가요?{" "}
 					<Link
-						className="text-brand font-medium hover:underline"
+						className="text-foreground font-semibold underline-offset-4 hover:underline"
 						to="/admin/signup"
 					>
 						관리자 가입

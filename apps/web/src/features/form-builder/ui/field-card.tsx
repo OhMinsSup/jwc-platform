@@ -113,17 +113,18 @@ export const FieldCard = memo(function FieldCardView(props: FieldCardProps) {
 		<article
 			aria-label={field.label}
 			className={cn(
-				"bg-card scroll-mt-28 rounded-lg border transition-shadow",
-				open && "border-brand/40 ring-brand/20 shadow-sm ring-1",
+				"bg-card scroll-mt-28 rounded-xl border transition-shadow",
+				open && "border-foreground/30 ring-foreground/10 ring-1",
 				issueCount > 0 && "border-destructive/50",
 			)}
 			id={fieldDomId(field.id)}
 		>
-			<div className="flex items-center gap-1 p-2 pl-3">
+			{/* 작은 화면: 요약이 한 줄을 다 쓰고 버튼 묶음은 아래 줄 오른쪽 (제목이 버튼에 밀려 잘리지 않게) */}
+			<div className="flex flex-wrap items-center gap-1 p-2 pl-3">
 				<button
 					aria-controls={bodyId}
 					aria-expanded={open}
-					className="focus-visible:ring-ring flex min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-md py-1.5 text-left focus-visible:ring-2 focus-visible:outline-none"
+					className="focus-visible:ring-ring flex min-w-0 flex-1 basis-full cursor-pointer items-center gap-3 rounded-md py-1.5 text-left focus-visible:ring-2 focus-visible:outline-none sm:basis-0"
 					onClick={() => onToggle(field.id)}
 					type="button"
 				>

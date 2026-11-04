@@ -1,10 +1,9 @@
 import { keysOf } from "@jwc/common/object";
 import { CopyButton } from "@jwc/ui-patterns/components/copy-button";
-import { EmptyState } from "@jwc/ui-patterns/components/empty-state";
+import { CountFilter } from "@jwc/ui-patterns/components/count-filter";
 import { SearchInput } from "@jwc/ui-patterns/components/search-input";
-import { SegmentedControl } from "@jwc/ui-patterns/components/segmented-control";
 import { Link } from "@tanstack/react-router";
-import { ChevronRight, SearchX } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { formatCount, formatDateTime } from "../../../platform/format";
@@ -25,24 +24,30 @@ export interface FormSummary {
 
 const STATUSES = keysOf(FORM_STATUS_META);
 
+/** 열 배치: 제목·주소가 가장 넓고, 숫자 열은 오른쪽 정렬 */
+const ROW_GRID =
+	"sm:grid-cols-[minmax(0,1fr)_6.5rem_5rem_9.5rem_1rem] sm:gap-x-6";
+
 /**
- * 한 줄 = 카드 하나. 제목 링크가 카드 전체를 덮어(stretched link) 어디를 눌러도 열리고,
- * 복사 버튼만 그 위로 올라와 따로 동작한다.
+ * 한 줄 = 폼 하나 (카드 하나 안에서 행 구분선으로 나눈다).
+ * 제목 링크가 행 전체를 덮어(stretched link) 어디를 눌러도 열리고, 복사 버튼만 그 위로 올라와 따로 동작한다.
  */
 function FormRow({ form, origin }: { form: FormSummary; origin: string }) {
 	const publicPath = `/f/${form.slug}`;
 	return (
-		<li className="group bg-card hover:border-brand/40 relative grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-2 rounded-xl border px-4 py-3.5 shadow-xs transition-colors sm:grid-cols-[minmax(0,1fr)_7rem_6rem_9rem_1.25rem] sm:px-5">
+		<li
+			className={`group hover:bg-muted/70 relative grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1 px-5 py-3.5 transition-colors ${ROW_GRID}`}
+		>
 			<div className="min-w-0">
 				<Link
-					className="focus-visible:after:ring-ring block truncate font-semibold after:absolute after:inset-0 after:rounded-xl focus-visible:outline-none focus-visible:after:ring-2"
+					className="focus-visible:after:ring-ring block truncate font-semibold after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-inset"
 					params={{ formId: form.id }}
 					to="/admin/forms/$formId"
 				>
 					{form.title}
 				</Link>
-				<span className="text-muted-foreground mt-0.5 flex items-center gap-1 text-xs">
-					<span className="truncate font-mono">{publicPath}</span>
+				<span className="text-muted-foreground mt-0.5 flex items-center gap-1 text-[13px]">
+					<span className="truncate">{publicPath}</span>
 					<CopyButton
 						label={`${form.title} 신청 링크 복사`}
 						text={`${origin}${publicPath}`}
@@ -53,14 +58,14 @@ function FormRow({ form, origin }: { form: FormSummary; origin: string }) {
 				className="justify-self-end sm:justify-self-start"
 				status={form.status}
 			/>
-			<p className="text-sm sm:text-right">
-				<span className="font-semibold tabular-nums">
+			<p className="text-sm tabular-nums sm:text-right">
+				<span className="font-semibold">
 					{formatCount(form.submissionCount)}
 				</span>
-				<span className="text-muted-foreground ml-1 text-xs">응답</span>
+				<span className="text-muted-foreground ml-0.5">건</span>
 			</p>
-			<p className="text-muted-foreground text-right text-xs tabular-nums">
-				<span className="sr-only">수정 </span>
+			<p className="text-muted-foreground text-right text-[13px] tabular-nums">
+				<span className="sr-only">마지막 수정 </span>
 				{formatDateTime(form.updatedAt)}
 			</p>
 			<ChevronRight
@@ -75,9 +80,9 @@ function ListColumns() {
 	return (
 		<div
 			aria-hidden
-			className="text-muted-foreground hidden px-5 text-xs sm:grid sm:grid-cols-[minmax(0,1fr)_7rem_6rem_9rem_1.25rem] sm:gap-x-4"
+			className={`text-muted-foreground hidden border-b px-5 py-2.5 text-xs sm:grid ${ROW_GRID}`}
 		>
-			<span>제목 · 주소</span>
+			<span>제목 · 신청 주소</span>
 			<span>상태</span>
 			<span className="text-right">응답</span>
 			<span className="text-right">마지막 수정</span>
@@ -94,7 +99,7 @@ function useFormFilter(forms: readonly FormSummary[]) {
 			(status === "all" || f.status === status) &&
 			matchesQuery(query, f.title, f.slug),
 	);
-	const segments = [
+	const options = [
 		{ value: "all" as const, label: "전체", count: counts.get("all") },
 		...STATUSES.map((s) => ({
 			value: s,
@@ -102,45 +107,53 @@ function useFormFilter(forms: readonly FormSummary[]) {
 			count: counts.get(s),
 		})),
 	];
-	return { query, setQuery, status, setStatus, visible, segments };
+	return { query, setQuery, status, setStatus, visible, options };
 }
 
-/** 검색 + 상태 필터 + 목록. 필터링은 메모리의 목록으로 (폼 수가 적은 운영 규모) */
+/** 개수 카드(= 상태 거르개) + 검색 + 목록. 필터링은 메모리의 목록으로 (폼 수가 적은 운영 규모) */
 export function FormList({ forms }: { forms: readonly FormSummary[] }) {
-	const { query, setQuery, status, setStatus, visible, segments } =
+	const { query, setQuery, status, setStatus, visible, options } =
 		useFormFilter(forms);
 	const origin = typeof window === "undefined" ? "" : window.location.origin;
 	return (
-		<section aria-label="폼 목록" className="space-y-3">
-			<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-				<SegmentedControl
-					label="상태로 거르기"
-					onChange={setStatus}
-					segments={segments}
-					value={status}
-				/>
-				<SearchInput
-					label="제목이나 주소로 검색"
-					onChange={setQuery}
-					value={query}
-				/>
+		<section aria-label="폼 목록" className="space-y-4">
+			<CountFilter
+				label="상태로 거르기"
+				onChange={setStatus}
+				options={options}
+				value={status}
+			/>
+			<div className="bg-card rounded-xl border">
+				<div className="flex flex-wrap items-center justify-between gap-3 border-b px-5 py-3">
+					<h2 className="text-base font-semibold">
+						{status === "all"
+							? "모든 폼"
+							: `${FORM_STATUS_META[status].label} 폼`}
+						<span className="text-muted-foreground ml-1.5 font-normal tabular-nums">
+							{formatCount(visible.length)}
+						</span>
+					</h2>
+					<SearchInput
+						label="제목이나 주소로 검색"
+						onChange={setQuery}
+						value={query}
+					/>
+				</div>
+				{visible.length === 0 ? (
+					<p className="text-muted-foreground px-5 py-8 text-center text-sm">
+						조건에 맞는 폼이 없습니다. 검색어나 상태를 바꿔보세요.
+					</p>
+				) : (
+					<>
+						<ListColumns />
+						<ul className="divide-rule divide-y">
+							{visible.map((form) => (
+								<FormRow form={form} key={form.id} origin={origin} />
+							))}
+						</ul>
+					</>
+				)}
 			</div>
-			{visible.length === 0 ? (
-				<EmptyState
-					description="검색어나 상태 필터를 바꿔보세요."
-					icon={SearchX}
-					title="조건에 맞는 폼이 없습니다"
-				/>
-			) : (
-				<>
-					<ListColumns />
-					<ul className="space-y-2">
-						{visible.map((form) => (
-							<FormRow form={form} key={form.id} origin={origin} />
-						))}
-					</ul>
-				</>
-			)}
 		</section>
 	);
 }

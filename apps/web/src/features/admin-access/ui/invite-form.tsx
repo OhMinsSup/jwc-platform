@@ -49,12 +49,12 @@ function useCreateInvite() {
 /** 새 코드는 이 화면을 떠나면 다시 볼 수 없다 (서버는 해시만 저장) */
 function IssuedCode({ invite }: { invite: IssuedInvite }) {
 	return (
-		<div className="bg-brand-soft space-y-2 rounded-lg p-4">
+		<div className="bg-muted mt-4 space-y-2 rounded-xl p-4">
 			<p className="flex items-center gap-2 text-sm font-medium">
-				<KeyRound aria-hidden className="text-brand h-4 w-4" />
+				<KeyRound aria-hidden className="text-foreground h-4 w-4" />
 				{invite.email} 초대 코드
 			</p>
-			<div className="bg-background flex items-center justify-between gap-2 rounded-md border px-3 py-2">
+			<div className="bg-background flex items-center justify-between gap-2 rounded-lg border px-3 py-2">
 				<code className="font-mono text-sm break-all">{invite.code}</code>
 				<CopyButton label="초대 코드 복사" text={invite.code} />
 			</div>
@@ -69,7 +69,7 @@ function IssuedCode({ invite }: { invite: IssuedInvite }) {
 export function InviteForm() {
 	const { issued, error, pending, submit } = useCreateInvite();
 	return (
-		<div className="bg-card space-y-4 rounded-xl border p-5 shadow-xs">
+		<div className="bg-card rounded-xl border p-5">
 			<form className="space-y-3" onSubmit={submit}>
 				<div className="space-y-1.5">
 					<Label htmlFor="invite-email">초대할 이메일</Label>

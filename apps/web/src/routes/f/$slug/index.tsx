@@ -62,7 +62,7 @@ function FormPage() {
 
 	return (
 		<PublicShell>
-			<p className="text-primary mb-6 text-sm font-medium">
+			<p className="text-muted-foreground mb-4 text-sm font-semibold">
 				{definition.title}
 			</p>
 			<FormRunner

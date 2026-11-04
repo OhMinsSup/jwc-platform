@@ -136,7 +136,7 @@ export function FieldCardActions({
 	/** null = 삭제 확인 창 닫힘 */
 	const [deleteRefs, setDeleteRefs] = useState<readonly string[] | null>(null);
 	return (
-		<div className="flex shrink-0">
+		<div className="ml-auto flex shrink-0">
 			<IconButton
 				disabled={!canMoveUp}
 				icon={ArrowUp}

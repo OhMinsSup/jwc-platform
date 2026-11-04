@@ -57,7 +57,7 @@ export function FormTabs({
 								activeOptions={{ exact: true }}
 								className={cn(
 									TAB_CLASS,
-									"hover:text-foreground data-[status=active]:border-brand data-[status=active]:text-foreground",
+									"hover:text-foreground data-[status=active]:border-foreground data-[status=active]:text-foreground",
 								)}
 								params={{ formId }}
 								to={to}

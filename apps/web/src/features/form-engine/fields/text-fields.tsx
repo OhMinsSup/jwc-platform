@@ -5,7 +5,7 @@ import { Textarea } from "@jwc/ui/components/textarea";
 
 import type { FieldProps } from "./types";
 
-const INPUT_CLASS = "h-12 bg-muted/30";
+const INPUT_CLASS = "bg-card h-12 px-3.5 md:text-[15px]";
 
 function textValue(value: unknown): string {
 	return typeof value === "string" ? value : "";
@@ -41,7 +41,7 @@ export function LongTextField({
 	return (
 		<Textarea
 			aria-invalid={invalid}
-			className="bg-muted/30 min-h-28 resize-y"
+			className="bg-card min-h-28 resize-y px-3.5 py-3 md:text-[15px]"
 			id={inputId}
 			maxLength={field.maxLength}
 			onChange={(e) => onChange(e.target.value)}

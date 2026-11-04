@@ -101,8 +101,7 @@ function TabCount({ count }: { count: number }) {
 	);
 }
 
-const VIEW_TRIGGER =
-	"h-8 rounded-md px-3 data-active:bg-background data-active:shadow-xs";
+const VIEW_TRIGGER = "h-8 rounded-md px-3 data-active:bg-background";
 
 /** 편집 화면 전환 (툴바 왼쪽에 들어간다) */
 function ViewSwitch({ issues }: { issues: IssueIndex }) {

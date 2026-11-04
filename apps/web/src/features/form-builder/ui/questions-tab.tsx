@@ -1,9 +1,10 @@
 import { DEFINITION_LIMITS } from "@jwc/form-core/definition/definition";
 import type { FormDefinition } from "@jwc/form-core/definition/definition";
 import type { FieldType } from "@jwc/form-core/definition/fields";
+import { Callout } from "@jwc/ui-patterns/components/callout";
 import { ChoiceSelect } from "@jwc/ui-patterns/components/pickers";
 import { Button } from "@jwc/ui/components/button";
-import { Plus, TriangleAlert } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useCallback } from "react";
 
 import { nextFieldId, nextPageId } from "../model/ids";
@@ -31,7 +32,7 @@ function Outline({ definition }: { definition: FormDefinition }) {
 					return (
 						<li className="shrink-0" key={page.id}>
 							<a
-								className="hover:bg-muted focus-visible:ring-ring flex items-center gap-2 rounded-md px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
+								className="hover:bg-muted focus-visible:ring-ring flex items-center gap-2 rounded-lg px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
 								href={`#${pageDomId(page.id)}`}
 							>
 								<span className="text-muted-foreground tabular-nums">
@@ -77,14 +78,11 @@ function UnplacedFields({ definition }: { definition: FormDefinition }) {
 			index: Number.MAX_SAFE_INTEGER,
 		});
 	return (
-		<div
-			className="space-y-3 rounded-xl border border-amber-500/40 bg-amber-500/5 p-4"
+		<Callout
 			role="note"
+			title={`어느 페이지에도 배치되지 않은 질문이 ${unplaced.length}개 있습니다`}
+			tone="warning"
 		>
-			<p className="flex items-center gap-2 text-sm font-medium">
-				<TriangleAlert aria-hidden className="h-4 w-4 text-amber-600" />
-				어느 페이지에도 배치되지 않은 질문이 {unplaced.length}개 있습니다
-			</p>
 			<ul className="space-y-2">
 				{unplaced.map((field) => (
 					<li
@@ -105,7 +103,7 @@ function UnplacedFields({ definition }: { definition: FormDefinition }) {
 					</li>
 				))}
 			</ul>
-		</div>
+		</Callout>
 	);
 }
 
@@ -147,7 +145,7 @@ function OutlineAside({
 		<aside className="space-y-3">
 			<Outline definition={definition} />
 			<Button
-				className="hidden w-full lg:inline-flex"
+				className="text-muted-foreground hidden w-full justify-start px-3 lg:inline-flex"
 				onClick={() =>
 					cards.setAll(allOpen ? [] : definition.fields.map((f) => f.id))
 				}

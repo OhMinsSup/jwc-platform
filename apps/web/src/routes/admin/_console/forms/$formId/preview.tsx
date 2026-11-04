@@ -49,9 +49,9 @@ function PreviewFrame({
 	const [step, setStep] = useState<PageStep>(start);
 	return (
 		<div className="space-y-4">
-			<div className="bg-card flex flex-wrap items-center justify-between gap-3 rounded-xl border px-4 py-2.5 shadow-xs">
+			<div className="bg-card flex flex-wrap items-center justify-between gap-3 rounded-xl border px-4 py-2.5">
 				<p className="text-muted-foreground flex items-center gap-2 text-sm">
-					<Eye aria-hidden className="text-brand h-4 w-4" />
+					<Eye aria-hidden className="text-muted-foreground h-4 w-4" />
 					저장된 초안 기준 · 실제로 제출되지 않습니다
 				</p>
 				<div className="flex items-center gap-2">
@@ -68,7 +68,7 @@ function PreviewFrame({
 			</div>
 			<div className="bg-muted/40 rounded-2xl border p-3 sm:p-6">
 				<div
-					className={`bg-background mx-auto rounded-xl border p-5 shadow-sm transition-[max-width] sm:p-8 ${DEVICES[device].width}`}
+					className={`bg-background mx-auto rounded-xl border p-5 transition-[max-width] sm:p-8 ${DEVICES[device].width}`}
 				>
 					<FormRunner
 						definition={definition}

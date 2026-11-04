@@ -10,6 +10,7 @@ import {
 	visibleFieldsOfPage,
 } from "@jwc/form-core/logic/visibility";
 import type { PageStep } from "@jwc/form-core/logic/visibility";
+import { Callout } from "@jwc/ui-patterns/components/callout";
 import { Button } from "@jwc/ui/components/button";
 import { ArrowLeft, ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
 import { useState } from "react";
@@ -83,6 +84,7 @@ export function FormRunner({
 			onErrors={setErrors}
 			onStepChange={onStepChange}
 			page={page}
+			preview={preview}
 			slug={slug}
 		/>
 	);
@@ -116,18 +118,19 @@ function ReviewStep({
 		<div className="space-y-6">
 			<StepHeader
 				description="입력한 내용을 확인하고 제출해주세요."
+				preview={preview}
 				title="신청 내용 확인"
 			/>
 			<ReviewView answers={answers} definition={definition} onEdit={onEdit} />
 			{human.widget}
 			{submit.error && (
-				<p className="border-destructive/30 bg-destructive/5 text-destructive rounded-xl border p-4 text-sm">
+				<Callout role="alert" tone="danger">
 					{submit.error}
-				</p>
+				</Callout>
 			)}
 			<NavButtons onBack={onBack}>
 				<Button
-					className="h-12 flex-1"
+					className="h-12 flex-1 rounded-full text-[15px] font-semibold"
 					disabled={preview || submit.pending || !human.ready}
 					onClick={onSubmit}
 				>
@@ -152,6 +155,8 @@ interface PageFormProps {
 	onErrors: (errors: Record<string, string>) => void;
 	onStepChange: (step: PageStep) => void;
 	page: PageDef;
+	/** 미리보기: 관리자 화면 안에 들어가므로 제목을 h2로 (h1은 관리자 화면 것 하나) */
+	preview: boolean;
 	slug: string;
 }
 
@@ -164,6 +169,7 @@ function PageForm({
 	onErrors,
 	onStepChange,
 	page,
+	preview,
 	slug,
 }: PageFormProps) {
 	const setAnswer = useDraftStore((state) => state.setAnswer);
@@ -183,7 +189,11 @@ function PageForm({
 				goNext();
 			}}
 		>
-			<StepHeader description={page.description} title={page.title} />
+			<StepHeader
+				description={page.description}
+				preview={preview}
+				title={page.title}
+			/>
 			{fields.map((field) => (
 				<FieldView
 					error={errors[field.id]}
@@ -194,26 +204,43 @@ function PageForm({
 				/>
 			))}
 			<NavButtons onBack={onBack}>
-				<Button className="h-12 flex-1" type="submit">
-					다음
-					<ArrowRight className="ml-2 h-4 w-4" />
-				</Button>
+				<NextButton />
 			</NavButtons>
 		</form>
+	);
+}
+
+/** 입력 페이지의 주 버튼 (폼 제출 = 검증 후 다음 단계) */
+function NextButton() {
+	return (
+		<Button
+			className="h-12 flex-1 rounded-full text-[15px] font-semibold"
+			type="submit"
+		>
+			다음
+			<ArrowRight className="ml-2 h-4 w-4" />
+		</Button>
 	);
 }
 
 function StepHeader({
 	title,
 	description,
+	preview,
 }: {
 	title: string;
 	description?: string;
+	preview: boolean;
 }) {
+	const Heading = preview ? "h2" : "h1";
 	return (
-		<header className="space-y-1">
-			<h1 className="text-2xl font-bold">{title}</h1>
-			{description && <p className="text-muted-foreground">{description}</p>}
+		<header className="space-y-2">
+			<Heading className="font-display text-[26px] leading-tight font-bold tracking-[-0.03em] sm:text-[30px]">
+				{title}
+			</Heading>
+			{description && (
+				<p className="text-muted-foreground leading-relaxed">{description}</p>
+			)}
 		</header>
 	);
 }
@@ -229,7 +256,7 @@ function NavButtons({
 		<div className="flex gap-3 pt-2">
 			{onBack && (
 				<Button
-					className="h-12"
+					className="h-12 rounded-full px-5 text-[15px]"
 					onClick={onBack}
 					type="button"
 					variant="outline"

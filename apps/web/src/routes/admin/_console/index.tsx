@@ -1,7 +1,5 @@
 import { EmptyState } from "@jwc/ui-patterns/components/empty-state";
 import { PageHeader } from "@jwc/ui-patterns/components/page-header";
-import { StatGrid } from "@jwc/ui-patterns/components/stat-card";
-import type { Stat } from "@jwc/ui-patterns/components/stat-card";
 import { createFileRoute } from "@tanstack/react-router";
 import { FilePlus2 } from "lucide-react";
 
@@ -12,30 +10,19 @@ import type { FormSummary } from "../../../features/forms/ui/form-list";
 import { formatCount } from "../../../platform/format";
 
 export const Route = createFileRoute("/admin/_console/")({
-	head: () => ({ meta: [{ title: "폼 · JWC Forms" }] }),
+	head: () => ({ meta: [{ title: "폼 · JWC 신청서" }] }),
 	loader: () => listFormsFn(),
 	component: FormsPage,
 });
 
-/** 목록에서 한 번에 파생하는 요약 수치 */
-function summaryStats(forms: readonly FormSummary[]): Stat[] {
-	const open = forms.filter((form) => form.status === "open").length;
-	const responses = forms.reduce((sum, form) => sum + form.submissionCount, 0);
-	return [
-		{ label: "전체 폼", value: formatCount(forms.length) },
-		{
-			label: "접수 중",
-			value: formatCount(open),
-			tone: open > 0 ? "success" : "default",
-		},
-		{
-			label: "초안",
-			value: formatCount(
-				forms.filter((form) => form.status === "draft").length,
-			),
-		},
-		{ label: "누적 응답", value: formatCount(responses), tone: "brand" },
-	];
+/** 제목 아래 한 줄: 지금 접수 중인 폼과 쌓인 응답 (목록에서 파생) */
+function finding(forms: readonly FormSummary[]): string {
+	const open = forms.filter((form) => form.status === "open");
+	const responses = open.reduce((sum, form) => sum + form.submissionCount, 0);
+	if (open.length === 0) {
+		return "지금 접수 중인 폼이 없습니다.";
+	}
+	return `${formatCount(open.length)}개 폼이 접수 중이고, 응답이 ${formatCount(responses)}건 들어왔습니다.`;
 }
 
 function FormsPage() {
@@ -44,7 +31,7 @@ function FormsPage() {
 		<div className="space-y-8">
 			<PageHeader
 				actions={<CreateFormDialog />}
-				description="신청서를 만들고, 접수 상태와 응답을 관리합니다."
+				description={finding(forms)}
 				title="폼"
 			/>
 			{forms.length === 0 ? (
@@ -55,10 +42,7 @@ function FormsPage() {
 					title="첫 폼을 만들어보세요"
 				/>
 			) : (
-				<>
-					<StatGrid stats={summaryStats(forms)} />
-					<FormList forms={forms} />
-				</>
+				<FormList forms={forms} />
 			)}
 		</div>
 	);

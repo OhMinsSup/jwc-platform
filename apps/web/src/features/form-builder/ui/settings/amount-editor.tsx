@@ -60,7 +60,7 @@ function OptionAmounts({
 			<tbody className="divide-y">
 				{field.options.map((option) => (
 					<tr key={option.value}>
-						<th className="py-2 pr-3 font-normal" scope="row">
+						<th className="py-2 pr-3 text-left font-normal" scope="row">
 							{option.label}
 						</th>
 						<td className="py-2">

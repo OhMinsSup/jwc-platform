@@ -1,8 +1,8 @@
 import type { FormDefinition } from "@jwc/form-core/definition/definition";
 import { blankDefinition } from "@jwc/form-core/samples/blank";
+import { Callout } from "@jwc/ui-patterns/components/callout";
 import { Button } from "@jwc/ui/components/button";
 import { createFileRoute, notFound, useRouter } from "@tanstack/react-router";
-import { TriangleAlert } from "lucide-react";
 import { useCallback, useState } from "react";
 
 import { toEditable } from "../../../../../features/form-builder/model/load";
@@ -104,14 +104,12 @@ function FormEditorPage() {
 					onSave={onSave}
 				/>
 			) : (
-				<div
-					className="border-destructive/40 bg-destructive/5 space-y-3 rounded-xl border p-6"
+				<Callout
+					className="p-4"
 					role="alert"
+					title="저장된 초안의 구조가 손상되어 편집기로 열 수 없습니다."
+					tone="danger"
 				>
-					<p className="flex items-center gap-2 font-medium">
-						<TriangleAlert aria-hidden className="text-destructive h-5 w-5" />
-						저장된 초안의 구조가 손상되어 편집기로 열 수 없습니다.
-					</p>
 					<p className="text-muted-foreground text-sm">
 						빈 폼으로 다시 시작할 수 있습니다. 저장하기 전까지 기존 초안은
 						바뀌지 않습니다.
@@ -122,7 +120,7 @@ function FormEditorPage() {
 					>
 						빈 폼으로 시작
 					</Button>
-				</div>
+				</Callout>
 			)}
 		</div>
 	);

@@ -11,6 +11,14 @@ import { Check } from "lucide-react";
 
 import type { FieldProps } from "./types";
 
+/**
+ * 선택지 묶음 컨테이너 속성. 오류일 때 data-invalid를 달아 아직 고르지 않은 칩/카드 테두리를 오류색으로 바꾼다
+ * (글자 입력의 aria-invalid 표시와 같은 모양).
+ */
+function groupProps(inputId: string, invalid: boolean) {
+	return { id: inputId, "data-invalid": invalid || undefined };
+}
+
 function Chip({
 	selected,
 	onClick,
@@ -27,7 +35,7 @@ function Chip({
 				"focus-visible:ring-ring cursor-pointer rounded-full border px-5 py-2.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none",
 				selected
 					? "border-primary bg-primary text-primary-foreground"
-					: "border-border bg-muted/40 text-muted-foreground hover:bg-muted",
+					: "border-border bg-card text-muted-foreground hover:bg-muted group-data-invalid/choice:border-destructive/70",
 			)}
 			onClick={onClick}
 			type="button"
@@ -52,21 +60,21 @@ function OptionCard({
 			className={cn(
 				"focus-visible:ring-ring flex w-full cursor-pointer items-center justify-between rounded-xl border p-4 text-left transition-colors focus-visible:ring-2 focus-visible:outline-none",
 				selected
-					? "border-primary bg-primary/5"
-					: "border-border bg-muted/30 hover:bg-muted/60",
+					? "border-foreground bg-card outline-foreground outline-[0.5px] outline-solid"
+					: "border-border bg-card hover:bg-muted group-data-invalid/choice:border-destructive/70",
 			)}
 			onClick={onClick}
 			type="button"
 		>
 			<span>
-				<span className="block font-medium">{option.label}</span>
+				<span className="block font-semibold">{option.label}</span>
 				{option.description && (
 					<span className="text-muted-foreground block text-sm">
 						{option.description}
 					</span>
 				)}
 			</span>
-			{selected && <Check className="text-primary h-5 w-5" />}
+			{selected && <Check className="text-foreground h-5 w-5" />}
 		</button>
 	);
 }
@@ -75,6 +83,7 @@ function OptionCard({
 interface SingleChoiceViewProps {
 	field: FieldOf<"single_choice">;
 	inputId: string;
+	invalid: boolean;
 	onSelect: (value: string) => void;
 	selected: string | undefined;
 }
@@ -82,6 +91,7 @@ interface SingleChoiceViewProps {
 function ChoiceDropdown({
 	field,
 	inputId,
+	invalid,
 	selected,
 	onSelect,
 }: SingleChoiceViewProps) {
@@ -95,7 +105,11 @@ function ChoiceDropdown({
 			}}
 			value={selected ?? null}
 		>
-			<SelectTrigger className="bg-muted/30 h-12 w-full" id={inputId}>
+			<SelectTrigger
+				aria-invalid={invalid}
+				className="bg-card w-full px-3.5 data-[size=default]:h-12 md:text-[15px]"
+				id={inputId}
+			>
 				<SelectValue placeholder={field.placeholder ?? "선택하세요"} />
 			</SelectTrigger>
 			<SelectContent>
@@ -112,11 +126,17 @@ function ChoiceDropdown({
 function ChoiceCards({
 	field,
 	inputId,
+	invalid,
 	selected,
 	onSelect,
 }: SingleChoiceViewProps) {
 	return (
-		<div className="grid gap-3" id={inputId} role="radiogroup">
+		<div
+			{...groupProps(inputId, invalid)}
+			aria-invalid={invalid}
+			className="group/choice grid gap-3"
+			role="radiogroup"
+		>
 			{field.options.map((option) => (
 				<OptionCard
 					key={option.value}
@@ -132,11 +152,17 @@ function ChoiceCards({
 function ChoiceChips({
 	field,
 	inputId,
+	invalid,
 	selected,
 	onSelect,
 }: SingleChoiceViewProps) {
 	return (
-		<div className="flex flex-wrap gap-2" id={inputId} role="radiogroup">
+		<div
+			{...groupProps(inputId, invalid)}
+			aria-invalid={invalid}
+			className="group/choice flex flex-wrap gap-2"
+			role="radiogroup"
+		>
 			{field.options.map((option) => (
 				<Chip
 					key={option.value}
@@ -153,12 +179,14 @@ function ChoiceChips({
 export function SingleChoiceField({
 	field,
 	inputId,
+	invalid,
 	value,
 	onChange,
 }: FieldProps<FieldOf<"single_choice">>) {
 	const view: SingleChoiceViewProps = {
 		field,
 		inputId,
+		invalid,
 		onSelect: onChange,
 		selected: typeof value === "string" ? value : undefined,
 	};
@@ -174,6 +202,7 @@ export function SingleChoiceField({
 export function MultiChoiceField({
 	field,
 	inputId,
+	invalid,
 	value,
 	onChange,
 }: FieldProps<FieldOf<"multi_choice">>) {
@@ -185,7 +214,10 @@ export function MultiChoiceField({
 		onChange(next.length > 0 ? next : undefined);
 	};
 	return (
-		<div className="flex flex-wrap gap-2" id={inputId}>
+		<div
+			{...groupProps(inputId, invalid)}
+			className="group/choice flex flex-wrap gap-2"
+		>
 			{field.options.map((option) => (
 				<Chip
 					key={option.value}
@@ -202,11 +234,17 @@ export function MultiChoiceField({
 export function BooleanField({
 	field,
 	inputId,
+	invalid,
 	value,
 	onChange,
 }: FieldProps<FieldOf<"boolean">>) {
 	return (
-		<div className="flex gap-2" id={inputId} role="radiogroup">
+		<div
+			{...groupProps(inputId, invalid)}
+			aria-invalid={invalid}
+			className="group/choice flex gap-2"
+			role="radiogroup"
+		>
 			<Chip onClick={() => onChange(true)} selected={value === true}>
 				{field.trueLabel}
 			</Chip>
@@ -220,12 +258,18 @@ export function BooleanField({
 export function RatingField({
 	field,
 	inputId,
+	invalid,
 	value,
 	onChange,
 }: FieldProps<FieldOf<"rating">>) {
 	const scores = Array.from({ length: field.scale }, (_, i) => i + 1);
 	return (
-		<div className="flex flex-wrap gap-2" id={inputId} role="radiogroup">
+		<div
+			{...groupProps(inputId, invalid)}
+			aria-invalid={invalid}
+			className="group/choice flex flex-wrap gap-2"
+			role="radiogroup"
+		>
 			{scores.map((score) => (
 				<Chip
 					key={score}

@@ -9,7 +9,7 @@ export const FORM_STATUS_META = {
 	open: {
 		label: "접수 중",
 		hint: "신청을 받고 있음",
-		badgeClass: "bg-success-soft text-success",
+		badgeClass: "bg-success-soft text-success-ink",
 		dotClass: "bg-success",
 	},
 	closed: {

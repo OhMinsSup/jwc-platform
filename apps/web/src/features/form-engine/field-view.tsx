@@ -1,5 +1,6 @@
 import type { AnswerValue } from "@jwc/form-core/answers/value";
 import type { FieldDef } from "@jwc/form-core/definition/fields";
+import { Callout } from "@jwc/ui-patterns/components/callout";
 import { Label } from "@jwc/ui/components/label";
 
 import { FIELD_RENDERERS } from "./fields/registry";
@@ -19,23 +20,22 @@ export function FieldView({ field, value, error, onChange }: FieldViewProps) {
 
 	if (!Renderer) {
 		return (
-			<div className="bg-muted/30 rounded-xl border p-4">
-				<p className="font-medium">{field.label}</p>
+			<Callout title={field.label} tone="info">
 				{field.description && (
-					<p className="text-muted-foreground mt-1 text-sm whitespace-pre-line">
+					<p className="text-muted-foreground whitespace-pre-line">
 						{field.description}
 					</p>
 				)}
-			</div>
+			</Callout>
 		);
 	}
 
 	return (
 		<div aria-describedby={error ? errorId : undefined} className="space-y-3">
 			<div className="space-y-1">
-				<Label className="text-sm font-medium" htmlFor={inputId}>
+				<Label className="gap-0.5 text-[15px] font-semibold" htmlFor={inputId}>
 					{field.label}
-					{field.required && <span className="text-destructive ml-1">*</span>}
+					{field.required && <span className="text-destructive">*</span>}
 				</Label>
 				{field.description && (
 					<p className="text-muted-foreground text-sm whitespace-pre-line">

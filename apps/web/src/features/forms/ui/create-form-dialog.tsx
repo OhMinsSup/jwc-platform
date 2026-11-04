@@ -64,7 +64,7 @@ function TemplatePicker({
 				const id = `${groupId}-${template.value}`;
 				return (
 					<Label
-						className="has-data-checked:border-brand has-data-checked:bg-brand-soft flex cursor-pointer items-start gap-3 rounded-lg border p-3 font-normal transition-colors"
+						className="has-data-checked:border-foreground has-data-checked:bg-muted flex cursor-pointer items-start gap-3 rounded-lg border p-3 font-normal transition-colors"
 						htmlFor={id}
 						key={template.value}
 					>

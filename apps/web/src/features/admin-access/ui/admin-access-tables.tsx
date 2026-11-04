@@ -27,8 +27,8 @@ export interface AuditItem {
 
 /** 초대 상태 → 배지 색. 색 + 글자로 구분한다 */
 const INVITE_STATUS_CLASS: Record<InviteStatus, string> = {
-	pending: "bg-brand-soft text-brand",
-	used: "bg-success-soft text-success",
+	pending: "bg-warning-soft text-warning",
+	used: "bg-success-soft text-success-ink",
 	expired: "bg-muted text-muted-foreground",
 };
 
@@ -55,7 +55,7 @@ function TableFrame({
 	children: ReactNode;
 }) {
 	return (
-		<div className="bg-card overflow-auto rounded-xl border shadow-xs">
+		<div className="bg-card overflow-auto rounded-xl border">
 			<table className="w-full text-sm whitespace-nowrap">
 				<caption className="sr-only">{caption}</caption>
 				{children}

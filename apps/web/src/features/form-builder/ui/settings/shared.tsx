@@ -219,7 +219,7 @@ export function ToggleCard({
 	children,
 }: ToggleCardProps) {
 	return (
-		<div className="space-y-4 rounded-lg border p-4">
+		<div className="space-y-4 rounded-xl border p-4">
 			<div className="flex items-center justify-between gap-2">
 				<div>
 					<p className="text-sm font-medium">{title}</p>
