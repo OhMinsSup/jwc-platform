@@ -22,6 +22,12 @@ export default defineEnv({
 	/** 응답을 저장할 스프레드시트 (폼마다 탭 1개) */
 	GOOGLE_SPREADSHEET_ID: string(),
 
+	/**
+	 * 응답 저장소 어댑터. sheets(기본) = Google Sheets 주 DB, memory = 로컬 개발/검증 전용
+	 * (워커 isolate 메모리라 재시작하면 사라진다. 운영에서 쓰지 않는다)
+	 */
+	SUBMISSION_STORE: oneOf(["sheets", "memory"]).default("sheets"),
+
 	/** SMS: live면 실제 발송, log면 로그만 남김 (개발 안전장치) */
 	SMS_MODE: oneOf(["live", "log"]).default("log"),
 	SOLAPI_API_KEY: string().optional(),

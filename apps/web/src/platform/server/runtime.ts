@@ -5,6 +5,7 @@ import { createSheetsClient } from "@jwc/google/sheets-client";
 import type { PostHogConfig } from "@jwc/observability/posthog";
 import type { SubmissionStore } from "@jwc/submission-store";
 import { createGoogleSheetsStore } from "@jwc/submission-store/google-sheets";
+import { createMemorySubmissionStore } from "@jwc/submission-store/memory";
 import { env } from "void/env";
 
 import { createSolapiSender, loggingSender } from "./solapi";
@@ -30,15 +31,18 @@ export function dataKeys(): Promise<DataKeys> {
  * 응답 저장소. 저장소를 바꾸려면 여기서 다른 어댑터를 조립한다 (서비스는 포트에만 의존).
  */
 export function submissionStore(): SubmissionStore {
-	store ??= createGoogleSheetsStore(
-		createSheetsClient(
-			env.GOOGLE_SPREADSHEET_ID,
-			createTokenProvider({
-				email: env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-				privateKeyPem: env.GOOGLE_PRIVATE_KEY,
-			}),
-		),
-	);
+	store ??=
+		env.SUBMISSION_STORE === "memory"
+			? createMemorySubmissionStore()
+			: createGoogleSheetsStore(
+					createSheetsClient(
+						env.GOOGLE_SPREADSHEET_ID,
+						createTokenProvider({
+							email: env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+							privateKeyPem: env.GOOGLE_PRIVATE_KEY,
+						}),
+					),
+				);
 	return store;
 }
 
