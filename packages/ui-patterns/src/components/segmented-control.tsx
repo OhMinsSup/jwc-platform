@@ -40,7 +40,7 @@ export function SegmentedControl<V extends string>({
 		>
 			{segments.map((segment) => (
 				<ToggleGroupItem
-					className="text-muted-foreground data-pressed:bg-background data-pressed:text-foreground h-8 rounded-md px-3 text-sm data-pressed:shadow-xs"
+					className="text-muted-foreground data-pressed:bg-background data-pressed:text-foreground h-8 rounded-md px-3 text-sm"
 					key={segment.value}
 					value={segment.value}
 				>

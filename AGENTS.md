@@ -128,4 +128,5 @@
 - UI는 `packages/ui`(shadcn base-nova + Base UI). 결정 기록은 `docs/adr/0004`.
 - 툴체인은 Vite+(포맷/린트/테스트) + tsrs(타입) + syncpack + knip. 결정 기록은 `docs/adr/0005`.
 - 공용 패키지(`common`, `google`, `submission-store`, `observability`, `security`, `analytics`, `ui-patterns`)와 앱의 기능 단위 구조(`features/`, `platform/`), 의존 방향은 `docs/adr/0007`.
+- 디자인 언어(토큰, 글꼴, 셸, 안내 상자 `Callout`)는 `docs/adr/0008`. 색은 상태·데이터에만 쓰고, 안내/오류 상자는 손으로 만들지 않고 `Callout`을 쓴다.
 - 패키지별 규칙: `apps/web/AGENTS.md`, `packages/form-core/AGENTS.md`, `packages/ui/AGENTS.md`.

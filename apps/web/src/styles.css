@@ -7,17 +7,196 @@
 @source "./";
 
 /*
- * 앱 전용 토큰. primary(버튼/포커스)는 공개 신청서와 같은 중립색을 유지하고,
- * 브랜드 색(@jwc/ui-patterns 기본값)은 "현재 위치·정체성"(로고, 활성 메뉴/탭, 강조 수치)에만 쓴다.
+ * 이 앱의 디자인 토큰: typie.co 앱 테마(라이트/다크 한 쌍)를 따른다.
+ * - 무채색이 기본이다. 주 버튼은 잉크색 반전(#17181c / 다크에서 #f1f1f7), 면은 톤 단계로만 나눈다.
+ * - 색은 상태와 데이터에만: 초록(성공/납입/진행), 주황(주의), 빨강(위험).
+ * - 다크는 시스템 설정을 따른다 (color-scheme: light dark).
  */
 :root {
-	--canvas: hsl(228 33% 98%);
+	color-scheme: light dark;
+
+	/* 글자: 기본 / 보조 / 흐림 */
+	--foreground: #17181c;
+	--muted-foreground: #4d4e51;
+	--faint-foreground: #707174;
+	/* 면: 바탕 / 카드 / 옅은 면 / 한 단계 / 눌림 */
+	--background: #f9fafd;
+	--card: #ffffff;
+	--card-foreground: #17181c;
+	--popover: #ffffff;
+	--popover-foreground: #17181c;
+	--muted: #f3f4f7;
+	--raised: #eff0f3;
+	--pressed: #e6e7ea;
+	--secondary: #eff0f3;
+	--secondary-foreground: #17181c;
+	--accent: #eff0f3;
+	--accent-foreground: #17181c;
+	/* 선: 옅음 / 기본 / 진함 */
+	--rule: #eeeff2;
+	--border: #dfe0e3;
+	/* 입력 테두리 = 기본 선, 올렸을 때 진한 선, 포커스는 잉크 (typie 입력 상태) */
+	--input: #dfe0e3;
+	--border-strong: #d0d1d4;
+	/* 주 동작: 잉크 반전 */
+	--primary: #17181c;
+	--primary-foreground: #ffffff;
+	--ring: #17181c;
+	--destructive: #e0024e;
+
+	/* 데이터/상태 색 (typie 상태 팔레트) */
+	--brand: #00714a;
+	--brand-foreground: #ffffff;
+	--brand-soft: #effff6;
+	--brand-track: #e6e7ea;
+	--brand-ink: #005d3e;
+	--success: #00714a;
+	--success-soft: #effff6;
+	--success-ink: #005d3e;
+	--warning: #8d4500;
+	--warning-soft: #fffaea;
+	--warning-line: #f3d9a0;
+	/* 안내 상자 테두리/아이콘: 정보 파랑, 주의 주황 (typie 상태 팔레트) */
+	--info: #2f6ae0;
+	--warning-accent: #d77a00;
+	--danger-soft: #fef2f4;
+	--danger-ink: #bb0440;
+
+	--chart-1: #00714a;
+	--chart-2: #707174;
+	--chart-3: #22c55e;
+	/* 작은 컨트롤 8px(lg), 카드 12px(xl) — typie 반경 */
+	--radius: 0.5rem;
+	--canvas: #f9fafd;
 }
 
-.dark {
-	--canvas: hsl(240 10% 6%);
+@media (prefers-color-scheme: dark) {
+	:root {
+		--foreground: #f1f1f7;
+		--muted-foreground: #c6c6cc;
+		--faint-foreground: #a4a4aa;
+		--background: #0a0b0e;
+		--card: #131317;
+		--card-foreground: #f1f1f7;
+		--popover: #1d1d21;
+		--popover-foreground: #f1f1f7;
+		--muted: #1d1d21;
+		--raised: #222226;
+		--pressed: #28282c;
+		--secondary: #222226;
+		--secondary-foreground: #f1f1f7;
+		--accent: #222226;
+		--accent-foreground: #f1f1f7;
+		--rule: #2c2c31;
+		--border: #444449;
+		--input: #444449;
+		--border-strong: #606065;
+		--primary: #f1f1f7;
+		--primary-foreground: #0a0b0e;
+		--ring: #f1f1f7;
+		--destructive: #e56c7f;
+
+		--brand: #01b47b;
+		--brand-foreground: #0a0b0e;
+		--brand-soft: #03986824;
+		--brand-track: #2c2c31;
+		--brand-ink: #81deb1;
+		--success: #01b47b;
+		--success-soft: #0398684d;
+		--success-ink: #81deb1;
+		--warning: #f0bc88;
+		--warning-soft: #b86b034d;
+		--warning-line: #b86b03;
+		--info: #4d7eec;
+		--warning-accent: #d38327;
+		--danger-soft: #d545634d;
+		--danger-ink: #fcafb8;
+
+		--chart-1: #01b47b;
+		--chart-2: #a4a4aa;
+		--chart-3: #86efac;
+		--canvas: #0a0b0e;
+	}
 }
 
 @theme inline {
 	--color-canvas: var(--canvas);
+	--color-rule: var(--rule);
+	--color-raised: var(--raised);
+	--color-pressed: var(--pressed);
+	--color-border-strong: var(--border-strong);
+	--color-faint-foreground: var(--faint-foreground);
+	--color-warning-line: var(--warning-line);
+	--color-danger-soft: var(--danger-soft);
+	--color-danger-ink: var(--danger-ink);
+}
+
+/*
+ * 글꼴: UI는 SUIT Variable, 큰 제목은 Wanted Sans Variable (typie와 같은 조합, 둘 다 OFL).
+ * 글꼴 파일은 문서 head에서 jsDelivr로 불러온다 (CSP 허용 출처).
+ */
+@theme {
+	--font-sans:
+		"SUIT Variable", "SUIT", "Pretendard", -apple-system, BlinkMacSystemFont,
+		system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+	--font-heading: var(--font-sans);
+	--radius-xl: 0.75rem;
+	/* typie 앱 카드/주 버튼의 아주 옅은 그림자 (테두리 대신 떠 있는 면) */
+	--shadow-soft: 0 0 3px 0 rgb(9 9 12 / 0.04), 0 2px 8px 0 rgb(9 9 12 / 0.03);
+	--shadow-soft-sm:
+		0 0 2px 0 rgb(9 9 12 / 0.04), 0 1px 4px 0 rgb(9 9 12 / 0.03);
+	--font-display:
+		"Wanted Sans Variable", "Wanted Sans", "SUIT Variable", "Pretendard",
+		system-ui, sans-serif;
+}
+
+@layer base {
+	/* typie 본문 조판: 16px 기준 -0.24px 자간(-0.015em), 행간 1.4~1.6 */
+	body {
+		font-family: var(--font-sans);
+		letter-spacing: -0.015em;
+		/* 한글은 어절 단위로 줄바꿈 (낱글자 사이에서 끊지 않는다), 긴 주소/숫자는 넘치지 않게 */
+		word-break: keep-all;
+		overflow-wrap: break-word;
+		-webkit-font-smoothing: antialiased;
+	}
+	h1,
+	h2,
+	h3 {
+		letter-spacing: -0.025em;
+	}
+}
+
+/* 인증 화면 바탕: 30px 모눈(진한 선) + 15px 보조선(옅은 선). typie 로그인 바탕과 같은 구성 */
+@utility bg-grid {
+	background-color: var(--canvas);
+	background-image:
+		repeating-linear-gradient(
+			0deg,
+			transparent 0 29px,
+			var(--border) 29px 30px
+		),
+		repeating-linear-gradient(
+			90deg,
+			transparent 0 29px,
+			var(--border) 29px 30px
+		),
+		repeating-linear-gradient(
+			0deg,
+			transparent 0 14px,
+			var(--rule) 14px 15px,
+			transparent 15px 30px
+		),
+		repeating-linear-gradient(
+			90deg,
+			transparent 0 14px,
+			var(--rule) 14px 15px,
+			transparent 15px 30px
+		);
+	background-size: 30px 30px;
+}
+
+/* 숫자는 어디서나 고정폭 숫자 (표, 수치, 날짜) */
+.num {
+	font-variant-numeric: tabular-nums;
 }

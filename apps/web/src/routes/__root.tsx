@@ -29,9 +29,14 @@ export const Route = createRootRoute({
 				href: "https://cdn.jsdelivr.net",
 				crossOrigin: "anonymous",
 			},
+			// UI 글꼴(SUIT)과 제목 글꼴(Wanted Sans). 둘 다 가변 글꼴(OFL)이라 파일 하나로 모든 굵기를 쓴다
 			{
 				rel: "stylesheet",
-				href: "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css",
+				href: "https://cdn.jsdelivr.net/gh/sun-typeface/SUIT@2.0.5/fonts/variable/woff2/SUIT-Variable.css",
+			},
+			{
+				rel: "stylesheet",
+				href: "https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/WantedSansVariable.min.css",
 			},
 			{ rel: "stylesheet", href: appCss },
 		],
@@ -55,7 +60,7 @@ function RootDocument({ children }: { children: ReactNode }) {
 			<head>
 				<HeadContent />
 			</head>
-			<body className="bg-background text-foreground min-h-svh font-[Pretendard,sans-serif] antialiased">
+			<body className="bg-background text-foreground min-h-svh font-sans antialiased">
 				{children}
 				<Scripts />
 			</body>

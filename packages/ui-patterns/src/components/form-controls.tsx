@@ -158,13 +158,16 @@ export function IssueList({
 	return (
 		<ul
 			className={cn(
-				"border-destructive/30 bg-destructive/5 text-destructive space-y-1 rounded-md border p-3 text-sm",
+				"border-destructive bg-destructive/5 space-y-1 rounded-md border px-3 py-2.5 text-sm",
 				className,
 			)}
 		>
 			{issues.map((issue) => (
 				<li className="flex gap-2" key={issue}>
-					<CircleAlert aria-hidden className="mt-0.5 h-4 w-4 shrink-0" />
+					<CircleAlert
+						aria-hidden
+						className="text-destructive mt-0.5 h-4 w-4 shrink-0"
+					/>
 					<span>{issue}</span>
 				</li>
 			))}
@@ -195,7 +198,7 @@ export function Section({
 	return (
 		<section
 			aria-labelledby={headingId}
-			className="bg-card scroll-mt-24 rounded-xl border p-5 shadow-xs sm:p-6"
+			className="bg-card scroll-mt-24 rounded-xl border p-5 sm:p-6"
 			id={id}
 		>
 			<div className="flex items-start justify-between gap-4">
