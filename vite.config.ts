@@ -90,6 +90,86 @@ const PROJECT_STYLE: OxlintConfig["rules"] = {
 	"typescript/strict-void-return": "off",
 };
 
+/**
+ * 의존 방향 (ADR-0007): packages → (앱 모름), 앱 platform → (기능 모름), 기능의 domain/model → (I/O 모름).
+ * 어기는 import는 린트 오류로 막는다.
+ */
+const IO_MODULES = [
+	"void",
+	"void/*",
+	"react",
+	"react-dom",
+	"@tanstack/*",
+	"@jwc/google/*",
+	"@jwc/observability",
+	"@jwc/observability/*",
+	"@jwc/security/*",
+	"@jwc/analytics",
+	"@jwc/ui/*",
+	"@jwc/ui-patterns/*",
+];
+
+const LAYER_RULES: OxlintOverride[] = [
+	{
+		// 공용 패키지는 앱을 모른다 (재사용/교체 가능하게)
+		files: ["packages/*/src/**"],
+		rules: {
+			"no-restricted-imports": [
+				"error",
+				{
+					patterns: [
+						{
+							group: ["**/apps/**"],
+							message: "패키지는 앱 코드를 import하지 않는다",
+						},
+					],
+				},
+			],
+		},
+	},
+	{
+		// 공통 기반(platform)은 기능(features)을 모른다. 기능이 platform을 쓴다
+		files: ["apps/web/src/platform/**"],
+		rules: {
+			"no-restricted-imports": [
+				"error",
+				{
+					patterns: [
+						{
+							group: ["**/features/**"],
+							message: "platform은 features를 import하지 않는다",
+						},
+					],
+				},
+			],
+		},
+	},
+	{
+		// 순수 판단 계층: 데이터만 받고 돌려준다 (I/O, UI, 서버 모듈 금지)
+		files: [
+			"apps/web/src/features/*/domain/**",
+			"apps/web/src/features/*/model/**",
+		],
+		rules: {
+			"no-restricted-imports": [
+				"error",
+				{
+					patterns: [
+						{
+							group: IO_MODULES,
+							message: "domain/model은 순수 함수만 둔다 (I/O·UI 모듈 금지)",
+						},
+						{
+							group: ["**/server/**", "**/ui/**", "**/platform/**"],
+							message: "domain/model은 바깥 계층을 import하지 않는다",
+						},
+					],
+				},
+			],
+		},
+	},
+];
+
 const OVERRIDES: OxlintOverride[] = [
 	{
 		// TanStack Router는 `throw redirect()` / `throw notFound()`로 흐름을 제어한다 (Error가 아닌 값을 던지는 것이 API)
@@ -133,18 +213,15 @@ const OVERRIDES: OxlintOverride[] = [
 		},
 	},
 	{
-		// Google Apps Script 런타임: 전역 함수/var가 의도된 형태라 일반 JS 규칙이 맞지 않는다
-		files: ["apps/web/scripts/apps-script/**"],
-		rules: {
-			"no-var": "off",
-			"func-style": "off",
-			"unicorn/filename-case": "off",
-		},
-	},
-	{
 		// 테스트는 시나리오 단위로 길어진다 (함수 길이 제한은 제품 코드 기준)
 		// toBe(true) → toBeTruthy()는 단언을 약하게 만든다 (1, "a"도 통과). 정확한 값 비교를 유지한다.
-		files: ["**/*.test.{ts,tsx,mjs}"],
+		files: [
+			"**/*.test.{ts,tsx,mjs}",
+			"apps/web/test/**",
+			// 패키지가 내보내는 테스트 지원 코드 (계약 테스트, 가짜 클라이언트)
+			"packages/*/src/contract.ts",
+			"packages/*/src/testing.ts",
+		],
 		plugins: ["vitest"],
 		rules: {
 			"max-lines-per-function": "off",
@@ -183,10 +260,20 @@ export default defineConfig({
 	},
 	lint: {
 		...presets,
+		// 레포 전용 규칙 (tooling/lint-plugins/jwc.ts): jwc/no-reexport
+		jsPlugins: ["./tooling/lint-plugins/jwc.ts"],
 		ignorePatterns: IGNORE_PATTERNS,
 		options: { typeAware: true, typeCheck: false },
-		overrides: [...(presets.overrides ?? []), ...OVERRIDES],
-		rules: { ...presets.rules, ...PROJECT_LIMITS, ...PROJECT_STYLE },
+		overrides: [...(presets.overrides ?? []), ...OVERRIDES, ...LAYER_RULES],
+		rules: {
+			...presets.rules,
+			...PROJECT_LIMITS,
+			...PROJECT_STYLE,
+			// 배럴/재노출 금지 (모든 심볼은 정의한 파일에서 import)
+			"jwc/no-reexport": "error",
+			// 위 규칙이 더 엄격하게 대신한다
+			"oxc/no-barrel-file": "off",
+		},
 	},
 	staged: {
 		// 커밋 전: 스테이징된 파일만 포맷 + 안전한 자동 수정 + 린트
@@ -196,7 +283,13 @@ export default defineConfig({
 		// 각 패키지의 테스트 설정을 그대로 쓴다 (앱 플러그인을 테스트에 싣지 않기 위해)
 		projects: [
 			"apps/web/vitest.config.ts",
+			"packages/analytics",
+			"packages/common",
 			"packages/form-core",
+			"packages/google",
+			"packages/observability",
+			"packages/security",
+			"packages/submission-store",
 			"tooling/typecheck",
 		],
 	},
