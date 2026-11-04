@@ -29,7 +29,7 @@
 - 끈 규칙: `func-style`, `react/function-component-definition`(함수 선언 코드베이스), `react-perf/jsx-no-new-function-as-prop`, `prefer-arrow-callback`(memo 함수 이름 = DevTools 이름), `typescript/promise-function-async`(자동 수정이 동기 throw를 reject로 바꿈), `unicorn/prefer-query-selector`(자동 수정이 `getElementById`를 이스케이프 없는 선택자로 바꿈), `typescript/strict-void-return`(no-misused-promises와 중복).
 - 옵션 조정: `strict-boolean-expressions`는 nullable string/boolean만 허용(숫자·객체·유니온은 검사), `no-confusing-void-expression`은 화살표 축약 허용, `no-use-before-define`은 함수 선언 제외, `no-misused-promises`는 JSX 속성만 제외.
 - 테스트: `prefer-to-be-truthy|falsy` 끔 (`toBe(true)`보다 약한 단언). `prefer-strict-equal`은 켜고 기존 테스트를 `toStrictEqual`로 바꿨다.
-- 경로별: `packages/ui/src/**`(shadcn 생성 코드), `apps/web/src/routes/**`(`throw redirect()/notFound()`), Apps Script.
+- 경로별: `packages/ui/src/**`(shadcn 생성 코드), `apps/web/src/routes/**`(`throw redirect()/notFound()`). (Apps Script 예외는 ADR-0006에서 스크립트와 함께 제거)
 - 버전 고정: ultracite는 8.1.0 (8.1.1은 번들 oxlint 1.89에 없는 규칙을 참조해 설정 로딩이 실패한다).
 
 ## 이번 정리에서 지운 것

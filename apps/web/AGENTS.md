@@ -2,29 +2,39 @@
 
 TanStack Start + void(Cloudflare Workers). 공개 신청 화면, 관리자 콘솔, 큐/크론 소비자.
 
-## 구조
+## 구조 (ADR-0007)
 
-| 경로                              | 역할                                                                                                                                                           |
-| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `db/schema/*`                     | D1 Drizzle 스키마 (auth, forms, submissions). 변경 후 `pnpm db:generate` → 마이그레이션 커밋                                                                   |
-| `src/routes/`                     | 파일 라우트. `admin/_console/*`는 서버에서 세션+허용목록 검사                                                                                                  |
-| `src/functions/`                  | 서버 함수 경계. 입력은 zod로 검증, 결과는 `Result<T>` 값으로 반환                                                                                              |
-| `src/server/services/`            | 유스케이스 (submit, sync, notify, reminders, webhook, admin-forms)                                                                                             |
-| `src/server/repositories/`        | D1 접근만                                                                                                                                                      |
-| `src/server/google/`, `solapi.ts` | 외부 API 클라이언트 (fetch 주입 가능, 계약 테스트 있음)                                                                                                        |
-| `src/server/runtime.ts`           | env를 읽는 유일한 곳                                                                                                                                           |
-| `src/form-engine/`                | 정의 기반 렌더러. 필드 타입 → 컴포넌트 테이블                                                                                                                  |
-| `src/components/admin/`           | 관리자 공통 UI (셸, 페이지 머리, 상태 배지, 요약 수치, 필터, 빈 상태). 메뉴/탭/상태색은 각 파일 상단의 표에서 추가한다. 브랜드/상태 색 토큰은 `src/styles.css` |
-| `src/form-builder/`               | 관리자 폼 편집기 (ADR-0003). `model/` = 순수 리듀서/참조 연쇄/파생 인덱스(테스트 대상), `ui/` = 컴포넌트                                                       |
-| `queues/`, `crons/`               | 소비자/작업. 운영 연결은 `server.ts` + `void.config.ts` (ADR-0002)                                                                                             |
-| `scripts/apps-script/Code.gs`     | 시트 onEdit → 서명된 웹훅                                                                                                                                      |
+기능 단위 폴더(`features/`)와 공통 기반(`platform/`)으로 나눈다. 새 기능은 `features/<이름>/` 폴더 하나로 추가한다.
+
+| 경로                                | 역할                                                                                                                                                                                                                     |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `src/features/<기능>/domain/`       | 순수 판단 함수 (I/O·UI 금지, 린트로 강제). 데이터만 받고 돌려준다                                                                                                                                                        |
+| `src/features/<기능>/model/`        | 순수 표/변환 (라벨, 상태 메타, 필터)                                                                                                                                                                                     |
+| `src/features/<기능>/server/`       | 해석기(서비스) + D1 저장소(`*-repository.ts`). domain의 결과를 실행만 한다                                                                                                                                               |
+| `src/features/<기능>/functions*.ts` | 서버 함수 경계. zod 검증 → `toResult` → 서비스. 바꾸는 관리자 작업은 `audited(...)`로 감사 기록                                                                                                                          |
+| `src/features/<기능>/ui/`           | 기능 전용 컴포넌트 (재사용 가능한 것은 `@jwc/ui-patterns`로)                                                                                                                                                             |
+| `features/forms`                    | 폼 생성/초안/발행/상태, 정의 로드, 폼 목록 UI                                                                                                                                                                            |
+| `features/submissions`              | 제출 계획/알림 대상(domain), 제출·알림·미입금·신청 내역·관리자 목록·납입 변경(server), 응답 표(ui)                                                                                                                       |
+| `features/admin-access`             | Better Auth 설정·세션·`adminOnly`, 초대/가입(domain+server), 감사 기록, 관리자 화면 UI                                                                                                                                   |
+| `features/form-builder`             | 관리자 폼 편집기 (ADR-0003). `model/` = 순수 리듀서/참조 연쇄/파생 인덱스                                                                                                                                                |
+| `features/form-engine`              | 정의 기반 공개 폼 렌더러. 필드 타입 → 컴포넌트 표                                                                                                                                                                        |
+| `src/platform/server/`              | 공통 기반: `runtime.ts`(env를 읽는 유일한 곳, 어댑터 조립), `log.ts`, `errors/`(오류 카탈로그), `telemetry/`(서버 이벤트 카탈로그), `security/`(정책 표), `server-fn.ts`(`toResult`), `validation.ts`, 큐 설정/워커 분배 |
+| `src/platform/analytics/`           | 클라이언트 이벤트/기능 플래그 카탈로그 + `@jwc/analytics` 바인딩                                                                                                                                                         |
+| `src/platform/ui/`                  | 셸(관리자/공개), 인증 카드, 라우트 상태 화면                                                                                                                                                                             |
+| `src/routes/`                       | 파일 라우트 (TanStack 규칙상 여기 고정). 로더는 기능의 서버 함수를 부른다                                                                                                                                                |
+| `db/schema/*`                       | D1 Drizzle 스키마. 변경 후 `pnpm db:generate` → 마이그레이션 검토(순서/데이터 복사)                                                                                                                                      |
+| `queues/`, `crons/`                 | 소비자/작업. 운영 연결은 `server.ts` + `void.config.ts` (ADR-0002)                                                                                                                                                       |
+
+의존 방향 (린트 `no-restricted-imports`로 강제): `routes → features → platform → packages`. platform은 features를, domain/model은 I/O·UI·바깥 계층을, packages는 앱을 import하지 않는다.
 
 ## 규칙
 
-- 답변 원문을 D1에 저장하지 않는다. 큐 payload는 항상 `encryptJson`으로 암호화한다.
-- 로그에 전화번호/본문/토큰을 남기지 않는다 (`log`가 마스킹하지만 넘기지 않는 것이 원칙).
+- 답변/납입 여부의 원본은 응답 저장소다. D1에는 답변·연락처·납입 여부를 저장하지 않는다(키/멱등/락만). 큐 payload는 항상 `encryptJson`으로 암호화한다.
+- 서비스는 `SubmissionStore` 포트에만 의존한다. 공급자(Google) 오류 타입은 어댑터 밖으로 내보내지 않는다(`SubmissionStoreError`로 변환).
+- 로그/분석 이벤트는 카탈로그(서버 `platform/server/telemetry/events.ts`, 클라이언트 `platform/analytics/events.ts`)에 필드를 먼저 선언한다. 답변·이름·전화번호·문자 본문·토큰은 필드로 두지 않는다.
+- 실패는 오류 카탈로그 코드로 분류한다. 사용자에게는 `DomainError`의 문장만 보이고, 그 밖의 오류 문장은 내부 로그로만 남긴다.
 - `queues/*.ts`의 옵션 export와 `crons/*.ts`의 `cron`은 void가 정적으로 읽으므로 리터럴만 쓴다.
-- 큐 옵션(배치/재시도)은 `src/server/queue-config.ts` 한 곳에서 바꾼다.
+- 큐 옵션(배치/재시도)은 `src/platform/server/queue-config.ts` 한 곳에서 바꾼다.
 
 ## 명령
 

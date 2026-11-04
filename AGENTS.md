@@ -75,6 +75,7 @@
 - 자동수정은 safe(`--fix`)만 쓴다. safe 수정도 의미를 바꿀 수 있으므로 적용 후 diff를 읽고 `pnpm typecheck`/`pnpm test`를 다시 돌린다. 의미가 바뀔 수 있는 자동수정은 피한다.
 - 규칙 설정을 바꿀 때는 변경 이유와 기대 효과를 `vite.config.ts` 주석에 적고, 변경 후 `pnpm check`로 모든 파일이 설정을 준수하는지 확인한다.
 - 의도된 예외는 해당 줄에 `// oxlint-disable-next-line <plugin/rule> -- <이유>`로 남긴다. 파일 단위 disable은 쓰지 않는다.
+- **배럴 파일과 재노출 금지**: `export * from`, `export { x } from`, import한 것을 다시 `export`하는 것 모두 금지한다(다른 패키지에서 가져온 것 포함). 모든 심볼은 정의한 파일에서 직접 import하고, 패키지는 모듈별 subpath export(`@jwc/form-core/answers/validate`)로 공개한다. 린트 `jwc/no-reexport`(`tooling/lint-plugins/jwc.ts`)가 강제한다.
 - 테스트 import는 `vite-plus/test`에서 가져온다. 두 패키지 이상이 쓰는 의존성은 `pnpm-workspace.yaml`의 catalog로만 버전을 정한다.
 
 ## Agent Skills 규칙 (Copilot)
@@ -121,9 +122,10 @@
 ## 아키텍처 요약 (2026-11 재작성)
 
 - 배포: void.cloud (Cloudflare Workers) + TanStack Start. 결정 기록은 `docs/adr/0001`, `docs/adr/0002`.
-- 폼 구성 데이터(정의/버전)는 D1, 응답 본문은 Google Sheets가 원본, D1에는 응답 인덱스만 둔다.
+- 폼 구성 데이터(정의/버전)는 D1. 응답(답변/납입 여부)은 `SubmissionStore` 포트 뒤의 저장소(기본 Google Sheets)가 원본이고, D1에는 응답 키(유니크/멱등/락)와 발송 기록만 둔다 (`docs/adr/0006`).
 - 폼 동작은 `packages/form-core`의 순수 함수가 정의(JSON)에서 파생한다. 라벨/옵션/금액을 코드 상수로 두지 않는다.
 - 부수효과(D1, Sheets, SMS, 큐)는 `apps/web/src/server/` 아래에만 둔다. env는 `src/server/runtime.ts`에서만 읽는다.
 - UI는 `packages/ui`(shadcn base-nova + Base UI). 결정 기록은 `docs/adr/0004`.
 - 툴체인은 Vite+(포맷/린트/테스트) + tsrs(타입) + syncpack + knip. 결정 기록은 `docs/adr/0005`.
+- 공용 패키지(`common`, `google`, `submission-store`, `observability`, `security`, `analytics`, `ui-patterns`)와 앱의 기능 단위 구조(`features/`, `platform/`), 의존 방향은 `docs/adr/0007`.
 - 패키지별 규칙: `apps/web/AGENTS.md`, `packages/form-core/AGENTS.md`, `packages/ui/AGENTS.md`.
