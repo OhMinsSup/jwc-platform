@@ -1,125 +1,59 @@
 # packages/ui AGENTS.md
 
-이 문서는 `packages/ui`(=@jwc/ui) 패키지에서 작업할 때의 규칙과 구조를 설명합니다.
+`packages/ui`(=@jwc/ui) 패키지에서 작업할 때의 규칙과 구조입니다. 저장소 루트 `AGENTS.md`(공통 규칙)를 우선으로 따릅니다.
 
-- 범위: 이 파일은 UI 패키지(디자인 시스템/컴포넌트 라이브러리) 전용 가이드입니다.
-- 상위 규칙: 저장소 루트의 `AGENTS.md`(공통 규칙)를 우선으로 따릅니다.
+## 기반
 
----
+- shadcn/ui **base-nova** 스타일, 프리미티브는 **Base UI**(`@base-ui/react`). Radix는 쓰지 않는다.
+- React 19, Tailwind v4 CSS-first (별도 `tailwind.config` 없음).
+- 아이콘은 `lucide-react`만 사용합니다. 텍스트에 이모지를 넣지 않습니다.
 
-## Problem 1-Pager (작성 후 작업 시작)
+## 구조
 
-작업 전에 아래를 5–10줄로 메모합니다.
+```text
+src/
+  components/   # shadcn 컴포넌트 (파일 하나 = 컴포넌트 묶음 하나, kebab-case)
+  hooks/        # UI 공통 훅 (use-mobile 등)
+  lib/          # cn() 등 유틸
+  styles/
+    globals.css # 디자인 토큰(@theme)과 전역 스타일의 단일 소스
+```
 
-- 배경: 왜 바꾸는가
-- 문제: 지금 무엇이 불편/오류인가
-- 목표: 어떤 사용자/개발자 가치를 달성하는가
-- 비목표: 이번 변경에서 하지 않을 것
-- 제약: Tailwind v4 토큰/기존 컴포넌트/호환성/패키지 exports
+## 공개 경로 (package.json `exports`)
 
----
+| import                      | 파일                        |
+| --------------------------- | --------------------------- |
+| `@jwc/ui/components/<name>` | `src/components/<name>.tsx` |
+| `@jwc/ui/hooks/<name>`      | `src/hooks/<name>.ts`       |
+| `@jwc/ui/lib/<name>`        | `src/lib/<name>.ts`         |
+| `@jwc/ui/globals.css`       | `src/styles/globals.css`    |
 
-## 꼭 기억할 요소 (UI 작업 핵심 규칙)
+- 배럴(`@jwc/ui`) import는 없다. 항상 위 subpath로 가져온다.
+- 파일 이름을 바꾸면 소비측 import가 깨진다. 바꾸기 전에 `grep -rn "@jwc/ui/components/<name>" apps`로 영향 범위를 확인한다.
 
-- 이 패키지는 shadcn/ui 패턴 기반입니다. 새 UI가 필요하면 먼저 `src/components/shadcn/`에 있는 기존 컴포넌트를 확인합니다.
-- 아이콘은 `lucide-react`만 사용합니다. 텍스트에 이모지/이모티콘을 넣지 않습니다.
-- 공통 컴포넌트 우선: 새로운 UI를 만들기 전에 `src/components/shadcn/`와 `src/components/hooks/`의 기존 구현을 먼저 재사용합니다.
-- 새 컴포넌트 생성 전 확인: 기존에 없는 컴포넌트가 필요하면, “정말 공통 컴포넌트로 만들지”를 먼저 사용자(요청자)에게 확인합니다.
+## Base UI 사용 시 주의 (Radix와 다른 점)
 
----
+| 주제              | Base UI                                                                                                                 |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| 다른 요소로 렌더  | `asChild` 대신 `render` prop. 링크를 버튼 모양으로: `<Button nativeButton={false} render={<Link to="/" />}>`            |
+| 트리거            | `<DialogTrigger render={<Button />}>열기</DialogTrigger>`                                                               |
+| Select 표시값     | Root에 `items`(값→라벨)를 넘겨야 트리거에 라벨이 보인다. "선택 없음"은 `undefined`가 아니라 `null` (undefined는 비제어) |
+| 콜백              | `onValueChange(value, eventDetails)`. Select는 `value`가 `null`일 수 있다                                               |
+| ToggleGroup       | 값이 배열 (`value={[v]}`, `onValueChange(next: string[])`)                                                              |
+| 메뉴 항목         | `onSelect`가 아니라 `onClick` (onSelect는 DOM 텍스트 선택 이벤트라 실행되지 않는다)                                     |
+| 상태 속성         | `data-active`(탭), `data-pressed`(토글), `data-checked`(체크/라디오), `data-open`/`data-closed`(오버레이)               |
+| AlertDialogAction | 일반 버튼이라 자동으로 닫히지 않는다. 닫기는 호출부가 상태로 처리한다 (`AlertDialogCancel`은 닫힘)                      |
+| 기본 크기         | Button `h-8`, Input `h-8`, SelectTrigger `w-fit`. 꽉 채우려면 `w-full`을 준다                                           |
 
-## 폴더 구조 분석 (packages/ui)
+## 변경 규칙
 
-### 1) 진입점과 공개 API
+- 새 UI는 먼저 `src/components/`의 기존 컴포넌트 조합으로 해결한다. 새 공통 컴포넌트가 필요하면 요청자에게 먼저 확인한다.
+- 추가는 `pnpm -C packages/ui ui-add`(shadcn CLI, base-nova)로 받고, 손으로 고친 부분은 커밋 메시지에 남긴다.
+- className 병합은 `cn()`, 변형은 `cva`.
+- 색/반경/폰트는 `globals.css`의 토큰을 쓴다. 앱 전용 토큰(브랜드 색 등)은 앱의 `src/styles.css`에 둔다.
 
-- 단일 진입점: `src/index.ts`
-  - shadcn 컴포넌트 대부분을 `export * from "./components/shadcn/..."` 형태로 재노출합니다.
-  - 훅/유틸/아이콘도 함께 재노출합니다.
-- 패키지 exports map: `package.json`의 `exports`
-  - ESM exports 경로가 고정되어 있으므로 파일 이동/이름 변경은 영향이 큽니다.
-  - 예: `@jwc/ui/components/shadcn/button`, `@jwc/ui/lib/utils`, `@jwc/ui/globals.css`
+## 검증
 
-권장 import:
-- 컴포넌트: `import { Button } from "@jwc/ui"` 또는 `import { Button } from "@jwc/ui/components/shadcn/button"`
-- 유틸: `import { cn } from "@jwc/ui/lib/utils"`
-- 훅: `import { useToast } from "@jwc/ui/components/hooks/use-toast"`
-
-### 2) 컴포넌트 레이어
-
-- `src/components/shadcn/`
-  - Radix UI + Tailwind 기반의 shadcn 스타일 컴포넌트 집합.
-  - 공통 패턴:
-    - className 병합은 반드시 `cn()` 사용 (`@jwc/ui/lib/utils`).
-    - 변형/사이즈는 `class-variance-authority(cva)`로 정의.
-    - 컴포넌트 슬롯은 필요 시 `@radix-ui/react-slot`의 `Slot`(예: Button의 `asChild`) 사용.
-    - client 전용이면 파일 상단에 `"use client"`.
-- `src/components/hooks/`
-  - UI 관련 훅(예: `useIsMobile`, `useToast`).
-  - 브라우저 API 접근이 있으면 훅에서만 하고, 서버 컴포넌트에 누수되지 않게 합니다.
-
-### 3) 스타일과 토큰
-
-- 전역 스타일: `globals.css`
-  - Tailwind v4 방식으로 `@theme inline`에서 디자인 토큰을 정의합니다.
-  - 색상/반경/애니메이션 등은 CSS 변수로 관리합니다.
-  - 새로운 색/그림자/폰트 하드코딩은 피하고, 가능하면 기존 토큰을 확장합니다.
-- Tailwind 설정: `tailwind.config.ts`
-  - 대부분 토큰은 `globals.css`에 있으므로 이 파일은 content 경로/Intellisense 목적이 큽니다.
-
-### 4) 아이콘
-
-- 아이콘 집합: `src/components/shadcn/icons.tsx`
-  - `lucide-react`의 아이콘들을 `Icons` 오브젝트로 래핑해서 제공합니다.
-  - UI에서 아이콘이 필요하면 우선 `Icons.*`를 사용하고, 없으면 추가하되 이름을 의도적으로 짓습니다.
-
-### 5) 유틸리티
-
-- `src/lib/utils/cn.ts`
-  - `cx`(CVA) + `tailwind-merge` 조합으로 className을 안전하게 합칩니다.
-- `src/lib/utils/truncate.ts`
-  - 문자열 축약 유틸.
-
----
-
-## 변경 규칙 (Do / Don’t)
-
-Do:
-- 기존 컴포넌트/훅/유틸 재사용을 먼저 시도합니다.
-- public API 변경(특히 `package.json#exports`, `src/index.ts` exports 변경)은 영향 범위를 먼저 조사합니다.
-- 컴포넌트는 가능한 한 “작고 명시적”으로 유지합니다.
-- 타입은 엄격하게 유지하고, `typecheck`로 확인합니다.
-
-Don’t:
-- 임의의 새 색상/폰트/그림자 토큰을 하드코딩하지 않습니다.
-- 이모지 사용 금지(아이콘은 lucide).
-- 파일 이동/경로 변경으로 imports/exports를 깨지 않도록 주의합니다.
-
----
-
-## 새 컴포넌트 추가 절차
-
-1) 먼저 기존 컴포넌트로 조합 가능한지 확인
-- `src/components/shadcn/`에서 유사 컴포넌트 탐색
-- `src/components/hooks/`에서 필요한 로직 훅이 이미 있는지 확인
-
-2) 새 컴포넌트가 정말 필요하면
-- 공통 컴포넌트로 만들지(이 패키지에 추가할지) 먼저 확인합니다.
-- 추가가 승인되면:
-  - `pnpm -C packages/ui ui-add`(shadcn CLI) 사용을 우선 고려
-  - 필요 시 `src/index.ts`와 `package.json#exports`에 노출 정책을 맞춥니다.
-
----
-
-## 로컬 검증 체크리스트
-
-- `pnpm -C packages/ui typecheck`
-- `pnpm -C packages/ui lint`
-- (필요 시) `pnpm -C packages/ui format`
-
----
-
-## 작업 시 주의할 영향 범위
-
-- `src/index.ts`는 “배럴(export barrel)”이라 변경이 곧 소비측 변경으로 이어집니다.
-- `package.json#exports`는 소비 앱들이 직접 import하는 경로이므로 변경 시 즉시 빌드가 깨질 수 있습니다.
-- `globals.css`는 테마/토큰의 단일 진실 소스에 가깝습니다. 토큰 추가/변경은 사이드이펙트를 염두에 둡니다.
+- 타입: `pnpm -C packages/ui typecheck` (tsrs, 미지원 플랫폼은 tsc로 자동 폴백)
+- 린트/포맷: 루트에서 `pnpm check` (패키지별 lint 스크립트는 없다)
+- 생성 코드 특성상 일부 규칙은 루트 `vite.config.ts`의 `packages/ui/src/**` override에서 꺼져 있다. `ui-add`는 받은 파일에 `vp check --fix`를 실행한다.

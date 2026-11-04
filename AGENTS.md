@@ -67,13 +67,15 @@
 - 근거 없는 최적화나 추상화를 도입하지 않는다.
 - 광범위한 예외를 남용하지 않는다.
 
-## Biome 규칙 (Biome Rules)
+## 정적 검사 규칙 (Vite+ / syncpack / knip)
 
-- Biome 설정(`biome.json`)을 준수한다.
-- Biome 자동수정(`fix:ultracite`)을 사용하여 코드를 포맷팅/정리한다.
-- Biome 자동수정 할 때 안전한 safe 모드만을 사용한다.
-- Biome 설정 변경 시, 변경 이유와 기대 효과를 명확히 한다. 그리고 변경 후 `check:ultracite`를 실행하여 모든 파일이 설정을 준수하는지 확인한다.
-- Biome의 규칙에 맞게 코드를 수정 하려고 할 때 코드 자체의 의미가 회손되지 않고 기능이 변경되지 않도록 반드시 주의한다. 그리고 코드의 의미가 변경될 수 있는 자동수정은 피한다.
+- 포맷/린트/테스트는 Vite+(`vp`) 하나로 한다. 설정은 루트 `vite.config.ts` 하나뿐이다(`fmt`/`lint`/`staged`, 규칙 기반은 ultracite 프리셋). 패키지별 린트/포맷 설정이나 `lint`/`format` 스크립트를 만들지 않고, 예외는 `OVERRIDES`에 경로와 이유를 함께 둔다.
+- 검사는 `pnpm check`, 자동수정은 `pnpm fix`(`vp check --fix`), 테스트는 `pnpm test`(`vp test run`). 의존성 버전은 `pnpm check:deps`(syncpack), 안 쓰는 파일/export/의존성은 `pnpm check:unused`(knip). 전체 검증은 `pnpm verify`.
+- 타입 검증은 `pnpm typecheck`(tsrs, 미지원 플랫폼은 tsc 폴백). 비교가 필요하면 `pnpm typecheck:tsc`. 린트의 타입 정보 규칙은 켜되 타입 검사 자체는 tsrs가 맡는다.
+- 자동수정은 safe(`--fix`)만 쓴다. safe 수정도 의미를 바꿀 수 있으므로 적용 후 diff를 읽고 `pnpm typecheck`/`pnpm test`를 다시 돌린다. 의미가 바뀔 수 있는 자동수정은 피한다.
+- 규칙 설정을 바꿀 때는 변경 이유와 기대 효과를 `vite.config.ts` 주석에 적고, 변경 후 `pnpm check`로 모든 파일이 설정을 준수하는지 확인한다.
+- 의도된 예외는 해당 줄에 `// oxlint-disable-next-line <plugin/rule> -- <이유>`로 남긴다. 파일 단위 disable은 쓰지 않는다.
+- 테스트 import는 `vite-plus/test`에서 가져온다. 두 패키지 이상이 쓰는 의존성은 `pnpm-workspace.yaml`의 catalog로만 버전을 정한다.
 
 ## Agent Skills 규칙 (Copilot)
 
@@ -82,21 +84,21 @@
 ### 저장 위치 선택(대안 비교)
 
 - 대안 A: `.github/skills/` (채택)
-	- 장점: VS Code Copilot이 표준 경로로 탐색, 레포 내 가시성 좋음
-	- 단점: `.github` 하위 문서가 늘어남
+  - 장점: VS Code Copilot이 표준 경로로 탐색, 레포 내 가시성 좋음
+  - 단점: `.github` 하위 문서가 늘어남
 - 대안 B: `.claude/skills/`
-	- 장점: 일부 툴링/레거시 관습과 호환
-	- 단점: Copilot 표준 경로가 아니며 팀 합의가 필요
+  - 장점: 일부 툴링/레거시 관습과 호환
+  - 단점: Copilot 표준 경로가 아니며 팀 합의가 필요
 
 ### 스킬 작성 규칙
 
 - 경로: `.github/skills/<skill-dir>/SKILL.md`
 - 스킬은 “재사용 가능한 작업 절차(워크플로우)”를 담고, 프로젝트 규칙은 이 `AGENTS.md`가 단일 소스가 된다.
 - `SKILL.md` 상단에는 YAML frontmatter를 반드시 둔다.
-	- `name`: 소문자/숫자/하이픈만, 최대 64자
-	- `description`: 언제/왜 쓰는지까지 포함해 구체적으로(최대 1024자)
+  - `name`: 소문자/숫자/하이픈만, 최대 64자
+  - `description`: 언제/왜 쓰는지까지 포함해 구체적으로(최대 1024자)
 - 본문은 점진적 공개(Progressive disclosure)를 따른다.
-	- 메타데이터 → 절차/체크리스트/명령어 → 참고 링크/추가 파일
+  - 메타데이터 → 절차/체크리스트/명령어 → 참고 링크/추가 파일
 - 본문은 500줄 이하를 권장하고, 상세 자료는 같은 디렉토리에 보조 파일로 분리한다.
 
 ### 보안/품질 규칙
@@ -113,6 +115,15 @@
 ### 현재 사용 중인 스킬
 
 - `.github/skills/jwc-workspace-validation/`
-- `.github/skills/jwc-biome-ultracite-fixing/`
-- `.github/skills/jwc-convex-backend-changes/`
+- `.github/skills/jwc-lint-fixing/`
 - `.github/skills/jwc-ui-shadcn-workflow/`
+
+## 아키텍처 요약 (2026-11 재작성)
+
+- 배포: void.cloud (Cloudflare Workers) + TanStack Start. 결정 기록은 `docs/adr/0001`, `docs/adr/0002`.
+- 폼 구성 데이터(정의/버전)는 D1, 응답 본문은 Google Sheets가 원본, D1에는 응답 인덱스만 둔다.
+- 폼 동작은 `packages/form-core`의 순수 함수가 정의(JSON)에서 파생한다. 라벨/옵션/금액을 코드 상수로 두지 않는다.
+- 부수효과(D1, Sheets, SMS, 큐)는 `apps/web/src/server/` 아래에만 둔다. env는 `src/server/runtime.ts`에서만 읽는다.
+- UI는 `packages/ui`(shadcn base-nova + Base UI). 결정 기록은 `docs/adr/0004`.
+- 툴체인은 Vite+(포맷/린트/테스트) + tsrs(타입) + syncpack + knip. 결정 기록은 `docs/adr/0005`.
+- 패키지별 규칙: `apps/web/AGENTS.md`, `packages/form-core/AGENTS.md`, `packages/ui/AGENTS.md`.
