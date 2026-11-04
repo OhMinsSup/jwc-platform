@@ -1,8 +1,7 @@
 {
-  "recommendations": [
-    "expo.vscode-expo-tools",
-    "yoavbls.pretty-ts-errors",
-    "bradlc.vscode-tailwindcss",
-    "biomejs.biome"
-  ]
+	"recommendations": [
+		"yoavbls.pretty-ts-errors",
+		"bradlc.vscode-tailwindcss",
+		"VoidZero.vite-plus-extension-pack"
+	]
 }

@@ -3,52 +3,44 @@ packages:
   - "packages/*"
   - "tooling/*"
 
+# 두 패키지 이상이 쓰는 의존성은 catalog에서만 버전을 정한다 (syncpack이 `pnpm check:deps`로 검사)
 catalog:
-  zod: ^4.1.13
-  "next": 16.1.1
-  "@tanstack/react-query": ^5.75.5
-
-  # sentry
-  "@sentry/nextjs": ^9.34.0
-
-  # tools
-  typescript: ^5.9.3
-  tailwindcss: ^4.1.3
-  postcss: ^8.5.1
-  autoprefixer: ^10.4.20
-  tsup: ^8.3.6 # @deperecated
-  tsdown: ^0.18.2
-
-  #convex
-  convex: ^1.30.0
-  # NOTE: @convex-dev/better-auth@0.9.7은 better-auth@1.3.43을 요구함
-  # 1.4.x에서는 passkey 플러그인이 @better-auth/passkey로 분리되어 호환되지 않음
-  better-auth: 1.3.34
-  "@convex-dev/better-auth": ^0.9.9
-  "@better-auth/expo": 1.3.34
+  # 타입 검증: tsrs(Rust)를 기본으로, 미검증 플랫폼은 tsc로 폴백 (tooling/typecheck)
+  # tsrs는 검증된 버전으로 고정한다 (올릴 때 tooling/typecheck 테스트로 확인)
+  tsrs: 0.20.1-ts7.1.0-beta
+  typescript: ^7.0.2
+  "@types/node": ^26.6.6
+  # 포맷/린트/테스트는 Vite+(vp) 하나로. vite-plus를 올릴 때 아래 oxlint/oxfmt/vitest와
+  # 루트 overrides의 vite도 함께 올린다 (`vp toolchain`으로 번들 버전 확인)
+  vite-plus: 1.4.0
+  oxlint: 1.89.0
+  oxfmt: 0.74.0
+  vitest: 5.0.5
+  # 린트 규칙 프리셋. 프리셋 규칙이 oxlint 버전에 묶여 있어 Vite+ 번들 oxlint와 맞는 버전으로 고정한다
+  ultracite: 8.1.0
+  knip: ^6.44.1
+  syncpack: ^15.3.3
+  zod: ^4.6.7
+  lucide-react: ^1.66.0
 
 catalogs:
-  react18:
-    react: 18.3.1
-    react-dom: 18.3.1
-    "@types/react": ^18.3.11
-    "@types/react-dom": ^18.3.1
+  frontend:
+    "@tailwindcss/vite": ^4.3.3
+    tailwindcss: ^4.3.3
   react19:
-    react: 19.2.3
-    react-dom: 19.2.3
-    "@types/react": ^19.2.7
-    "@types/react-dom": ^19.2.3
-  orpc:
-    "@orpc/client": "^1.2.0"
-    "@orpc/openapi": "^1.2.0"
-    "@orpc/react": "^1.2.0"
-    "@orpc/react-query": "^1.2.0"
-    "@orpc/server": "^1.2.0"
-    "@orpc/zod": "^1.2.0"
-  prisma6:
-    "@prisma/client": ^6.10.1
-    "@prisma/adapter-d1": ^6.10.1
-    prisma: ^6.10.1
-  auth:
-    better-auth: ^1.2.12
-    "@better-auth/cli": ^1.2.12
+    react: ^19.3.1
+    react-dom: ^19.3.1
+    "@types/react": ^19.3.0
+    "@types/react-dom": ^19.3.0
+
+# Vite+가 쓰는 Vite/Vitest와 같은 사본을 모든 패키지가 쓰도록 고정한다
+# (Vite 사본이 둘이면 TanStack Start의 instanceof 검사가 깨질 수 있다). vite-plus 버전과 함께 올린다.
+overrides:
+  vite: npm:@voidzero-dev/vite-plus-core@1.4.0
+  vitest: "catalog:"
+
+# 위 vite 별칭은 패키지 버전이 1.4.0(Vite+ 코어)으로 보여 플러그인들의 `vite@^8` peer 검사가 오탐한다.
+# 실제 번들 Vite는 8.x다(`vp toolchain`).
+peerDependencyRules:
+  allowAny:
+    - vite

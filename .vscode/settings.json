@@ -1,39 +1,41 @@
 {
-  "github.copilot.chat.codeGeneration.useInstructionFiles": true,
-  "chat.useAgentsMdFile": true,
-  "chat.useAgentSkills": true,
-  "prettier.enable": false,
-  "css.lint.unknownAtRules": "ignore",
-  "editor.codeActionsOnSave": {
-  "source.organizeImports.biome": "explicit",
-    "source.fixAll.biome": "explicit"
-  },
-  "editor.defaultFormatter": "biomejs.biome",
-  "editor.formatOnSave": true,
-  "tailwindCSS.experimental.classRegex": [
-    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
-    ["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
-  ],
-  "tailwindCSS.experimental.configFile": "packages/ui/globals.css",
-  "typescript.enablePromptUseWorkspaceTsdk": true,
-  "typescript.preferences.autoImportFileExcludePatterns": [
-    "next/router.d.ts",
-    "next/dist/client/router.d.ts"
-  ],
-  "typescript.tsdk": "node_modules/typescript/lib",
-  "[javascript]": {
-    "editor.defaultFormatter": "biomejs.biome"
-  },
-  "[json]": {
-    "editor.defaultFormatter": "biomejs.biome"
-  },
-  "[jsonc]": {
-    "editor.defaultFormatter": "biomejs.biome"
-  },
-  "[typescript]": {
-    "editor.defaultFormatter": "biomejs.biome"
-  },
-  "[typescriptreact]": {
-    "editor.defaultFormatter": "biomejs.biome"
-  }
+	"github.copilot.chat.codeGeneration.useInstructionFiles": true,
+	"chat.useAgentsMdFile": true,
+	"chat.useAgentSkills": true,
+	"prettier.enable": false,
+	"biome.enabled": false,
+	"css.lint.unknownAtRules": "ignore",
+	"editor.defaultFormatter": "oxc.oxc-vscode",
+	"editor.formatOnSave": true,
+	"editor.formatOnSaveMode": "file",
+	"editor.codeActionsOnSave": {
+		"source.fixAll.oxc": "explicit"
+	},
+	"oxc.disableNestedConfig": true,
+	"oxc.fmt.disableNestedConfig": true,
+	"tailwindCSS.experimental.classRegex": [
+		["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+		["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
+	],
+	"tailwindCSS.experimental.configFile": "packages/ui/src/styles/globals.css",
+	"typescript.enablePromptUseWorkspaceTsdk": true,
+	"typescript.tsdk": "node_modules/typescript/lib",
+	"[javascript]": {
+		"editor.defaultFormatter": "oxc.oxc-vscode"
+	},
+	"[javascriptreact]": {
+		"editor.defaultFormatter": "oxc.oxc-vscode"
+	},
+	"[json]": {
+		"editor.defaultFormatter": "oxc.oxc-vscode"
+	},
+	"[jsonc]": {
+		"editor.defaultFormatter": "oxc.oxc-vscode"
+	},
+	"[typescript]": {
+		"editor.defaultFormatter": "oxc.oxc-vscode"
+	},
+	"[typescriptreact]": {
+		"editor.defaultFormatter": "oxc.oxc-vscode"
+	}
 }

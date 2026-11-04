@@ -158,5 +158,5 @@ dist
 # supabase
 .branches
 
-# ai-pr outputs
-.ai/
+# void CLI가 루트에서 실행될 때 만드는 로컬 상태 (토큰 포함)
+.void/

@@ -1,63 +1,43 @@
 {
-  "name": "jwc-forms",
-  "private": true,
-  "keywords": [
-    "jwc"
-  ],
-  "license": "ISC",
-  "author": "OhMinsSup",
-  "workspaces": [
-    "apps/*",
-    "packages/*",
-    "tooling/*"
-  ],
-  "scripts": {
-    "bootstrap": "husky",
-    "build": "turbo run build",
-    "clean": "git clean -xdf node_modules",
-    "clean:workspaces": "turbo run clean",
-    "dev": "turbo watch dev --continue",
-    "auth:generate": "pnpm -F @jwc/backend auth:generate",
-    "boundaries": "turbo boundaries",
-    "convex:dev": "turbo -F @jwc/backend convex:dev",
-    "convex:setup": "turbo -F @jwc/backend convex:setup",
-    "format": "turbo run format",
-    "gen:init": "turbo gen init",
-    "postinstall": "pnpm lint:ws",
-    "lint-staged": "lint-staged",
-    "lint": "turbo run lint && manypkg check",
-    "lint:ws": "pnpm dlx sherif@latest",
-    "lint:syncpack": "syncpack lint",
-    "typecheck": "turbo run typecheck",
-    "check:ultracite": "pnpm dlx ultracite@latest check",
-    "fix:ultracite": "pnpm dlx ultracite@latest fix",
-    "ui-add": "turbo run ui-add",
-    "pr:ai": "node tooling/scripts/ai-pr.mjs"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "^2.3.10",
-    "@manypkg/cli": "^0.25.1",
-    "@turbo/gen": "^2.7.2",
-    "@types/node": "^24.3.0",
-    "dotenv-cli": "^11.0.0",
-    "husky": "^9.1.7",
-    "lint-staged": "^16.2.7",
-    "oxlint": "^1.35.0",
-    "syncpack": "^13.0.4",
-    "turbo": "^2.7.2",
-    "typescript": "catalog:",
-    "ultracite": "^6.5.0"
-  },
-  "packageManager": "pnpm@9.7.0",
-  "engines": {
-    "bun": ">=1.0",
-    "node": ">=20.16.0"
-  },
-  "lint-staged": {
-    "*": [
-      "pnpm run lint",
-      "pnpm run format",
-      "pnpm run typecheck"
-    ]
-  }
+	"name": "jwc-forms",
+	"private": true,
+	"keywords": [
+		"jwc"
+	],
+	"license": "ISC",
+	"author": "OhMinsSup",
+	"type": "module",
+	"scripts": {
+		"build": "turbo run build",
+		"check": "vp check",
+		"check:deps": "syncpack lint",
+		"check:unused": "knip",
+		"clean": "git clean -xdf node_modules",
+		"dev": "turbo run dev",
+		"fix": "vp check --fix",
+		"fix:deps": "syncpack fix",
+		"format": "vp fmt",
+		"lint": "vp lint",
+		"lint:ws": "pnpm dlx sherif@latest",
+		"prepare": "vp config --hooks --no-agent",
+		"test": "vp test run",
+		"typecheck": "turbo run typecheck",
+		"typecheck:tsc": "turbo run typecheck:tsc",
+		"verify": "pnpm check && pnpm check:deps && pnpm check:unused && pnpm typecheck && pnpm test"
+	},
+	"devDependencies": {
+		"@types/node": "catalog:",
+		"knip": "catalog:",
+		"oxfmt": "catalog:",
+		"oxlint": "catalog:",
+		"syncpack": "catalog:",
+		"turbo": "^2.11.10",
+		"typescript": "catalog:",
+		"ultracite": "catalog:",
+		"vite-plus": "catalog:"
+	},
+	"engines": {
+		"node": ">=24"
+	},
+	"packageManager": "pnpm@10.34.9"
 }

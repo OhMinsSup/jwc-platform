@@ -1,100 +1,32 @@
 {
-  "$schema": "https://turborepo.org/schema.json",
-  "ui": "tui",
-  "tasks": {
-    "topo": {
-      "dependsOn": ["^topo"]
-    },
-    "dev": {
-      "dependsOn": ["^dev"],
-      "cache": false,
-      "persistent": false
-    },
-    "build": {
-      "dependsOn": ["^build"],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**",
-        "next-env.d.ts",
-        "dist/**",
-        ".tanstack/**",
-        "convex/_generated/**",
-        ".output/**"
-      ]
-    },
-    "format": {
-      "outputLogs": "new-only"
-    },
-    "lint": {
-      "dependsOn": ["^topo", "^build"]
-    },
-    "typecheck": {
-      "dependsOn": ["^topo", "^build"],
-      "outputs": [".cache/tsbuildinfo.json"]
-    },
-    "generate:types": {
-      "cache": false
-    },
-    "generate:importmap": {
-      "cache": false
-    },
-    "clean": {
-      "cache": false
-    },
-    "//#clean": {
-      "cache": false
-    },
-    "codegen": {
-      "cache": false
-    },
-    "ui-add": {
-      "cache": false,
-      "interactive": true
-    },
-    "convex:setup": {
-      "cache": false
-    },
-    "convex:dev": {
-      "cache": false,
-      "persistent": true
-    },
-    "convex:deploy": {
-      "cache": false
-    },
-    "auth:generate": {
-      "cache": false
-    }
-  },
-  "globalEnv": [
-    "VITE_PAID_ACCOUNT_NUMBER",
-    "VITE_SENTRY_DSN",
-    "GOOGLE_CLIENT_EMAIL",
-    "GOOGLE_PRIVATE_KEY",
-    "GOOGLE_SHEET_TITLE",
-    "GOOGLE_SHEET_ID",
-    "AES_KEY",
-    "BETTER_AUTH_SECRET",
-    "WEBHOOK_SECRET",
-    "SENTRY_AUTH_TOKEN",
-    "SENTRY_PROJECT",
-    "SENTRY_ORG",
-    "VITE_CONVEX_SITE_URL",
-    "VITE_CONVEX_URL",
-    "VITE_SITE_URL",
-    "SITE_URL",
-    "CONVEX_DEPLOY_KEY",
-    "CONVEX_SITE_URL",
-    "CONVEX_URL",
-    "SOLAPI_API_KEY",
-    "SOLAPI_API_SECRET",
-    "SOLAPI_SENDER_PHONE"
-  ],
-  "globalPassThroughEnv": [
-    "NODE_ENV",
-    "CI",
-    "VERCEL",
-    "VERCEL_ENV",
-    "VERCEL_URL",
-    "npm_lifecycle_event"
-  ]
+	"$schema": "https://turborepo.org/schema.json",
+	"ui": "tui",
+	"tasks": {
+		"dev": {
+			"cache": false,
+			"persistent": true
+		},
+		"build": {
+			"dependsOn": ["^build"],
+			"outputs": ["dist/**", ".void/**"]
+		},
+		"typecheck": {
+			"dependsOn": ["^typecheck"],
+			"outputs": [".cache/tsbuildinfo.json"]
+		},
+		"typecheck:tsc": {
+			"dependsOn": ["^typecheck:tsc"],
+			"outputs": [".cache/tsbuildinfo.json"]
+		},
+		"clean": {
+			"cache": false
+		}
+	},
+	"globalPassThroughEnv": [
+		"NODE_ENV",
+		"CI",
+		"CLOUDFLARE_API_TOKEN",
+		"VOID_TOKEN",
+		"VOID_API_URL"
+	]
 }
