@@ -1,3 +1,5 @@
+-- void:allow-destructive
+-- (의도된 삭제: submissions 데이터는 submission_keys로, message_log는 새 표로 먼저 옮긴 뒤 지운다)
 -- ADR-0006: submissions(응답 인덱스 + 상태) → submission_keys(유니크 키만).
 -- 순서가 중요하다: 옛 message_log는 submissions를 ON DELETE cascade로 참조하므로,
 -- submissions를 먼저 지우면 발송 기록이 함께 지워진다. 데이터를 옮기고 참조를 바꾼 뒤 마지막에 지운다.
