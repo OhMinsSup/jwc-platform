@@ -11,3 +11,8 @@ export function formatDateTime(epochMs: number): string {
 export function formatCount(value: number): string {
 	return value.toLocaleString("ko-KR");
 }
+
+/** 금액 → "65,000원" (단위는 붙여 쓰고, 화면에서는 숫자보다 작게/회색으로 둘 수 있게 숫자만 따로도 쓴다) */
+export function formatWon(value: number): string {
+	return `${value.toLocaleString("ko-KR")}원`;
+}

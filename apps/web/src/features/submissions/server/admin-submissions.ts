@@ -13,6 +13,8 @@ import {
 	publishedFormById,
 	storeTargetOf,
 } from "../../forms/server/definitions";
+import { paymentDueOf } from "../domain/payment-due";
+import type { PaymentDue } from "../domain/payment-due";
 import { listStoredKeys, reminderHistory } from "./submission-keys-repository";
 
 const PREVIEW_COLUMN_LIMIT = 6;
@@ -22,7 +24,7 @@ interface PreviewColumn {
 	label: string;
 }
 
-interface SubmissionRowView {
+interface SubmissionRowView extends PaymentDue {
 	cells: Record<string, string>;
 	id: string;
 	issueHeaders: string[];
@@ -43,7 +45,7 @@ function toRowView(
 	record: StoredSubmission,
 	columns: readonly PreviewColumn[],
 	fields: ReadonlyMap<string, FieldDef>,
-	meta: { submittedAt: string; reminderCount: number },
+	meta: PaymentDue & { submittedAt: string; reminderCount: number },
 ): SubmissionRowView {
 	const cells: Record<string, string> = {};
 	for (const column of columns) {
@@ -83,12 +85,24 @@ export async function listSubmissionRows(formId: string) {
 					? ""
 					: formatInTimeZone(submitted, definition.timezone),
 			reminderCount: history.get(record.id)?.sentCount ?? 0,
+			...paymentDueOf(definition, record.answers),
 		});
 	});
 	return {
 		title: definition.title,
 		columns,
 		rows,
+		/** 회비 설정 (없으면 null): 입금 계좌, 옵션별 금액이면 그 질문 이름, 미입금 알림 규칙 */
+		payment: definition.payment
+			? {
+					account: definition.payment.account,
+					groupLabel:
+						definition.payment.amount.kind === "byOption"
+							? (fields.get(definition.payment.amount.fieldId)?.label ?? null)
+							: null,
+					reminder: definition.payment.reminder ?? null,
+				}
+			: null,
 		spreadsheetUrl: spreadsheetUrl(),
 	};
 }

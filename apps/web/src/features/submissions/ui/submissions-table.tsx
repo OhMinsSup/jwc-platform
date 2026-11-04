@@ -1,63 +1,23 @@
 import { cn } from "@jwc/ui/lib/utils";
-import { Check, Loader2, TriangleAlert } from "lucide-react";
+import type { ReactNode } from "react";
 
-interface SubmissionColumn {
-	id: string;
-	label: string;
-}
-
-export interface SubmissionRow {
-	cells: Record<string, string>;
-	id: string;
-	/** 시트에서 해석하지 못한 값이 있는 컬럼 이름 (운영자가 시트를 잘못 고친 경우) */
-	issueHeaders: string[];
-	paid: boolean;
-	reminderCount: number;
-	submittedAt: string;
-}
-
-interface PaidToggleProps {
-	name: string;
-	onToggle: (row: SubmissionRow) => void;
-	pending: boolean;
-	row: SubmissionRow;
-}
-
-/** 납입 상태 = 누르면 바뀌는 상태 버튼 (aria-pressed). 색 + 아이콘 + 글자로 구분 */
-function PaidToggle({ row, name, pending, onToggle }: PaidToggleProps) {
-	return (
-		<button
-			aria-label={`${name} 납입 여부`}
-			aria-pressed={row.paid}
-			className={cn(
-				"focus-visible:ring-ring inline-flex h-7 cursor-pointer items-center gap-1 rounded-full border px-2.5 text-xs font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:cursor-wait disabled:opacity-60",
-				row.paid
-					? "bg-success-soft text-success border-transparent"
-					: "text-muted-foreground hover:text-foreground border-dashed hover:border-solid",
-			)}
-			disabled={pending}
-			onClick={() => onToggle(row)}
-			type="button"
-		>
-			{pending ? (
-				<Loader2 aria-hidden className="h-3 w-3 animate-spin" />
-			) : (
-				row.paid && <Check aria-hidden className="h-3 w-3" />
-			)}
-			{row.paid ? "납입" : "미납"}
-		</button>
-	);
-}
+import { formatWon } from "../../../platform/format";
+import { SubmissionCards } from "./submission-cards";
+import { IssueMark, PaidToggle, rowName } from "./submission-row";
+import type { SubmissionColumn, SubmissionRow } from "./submission-row";
 
 interface SubmissionsTableProps {
 	columns: readonly SubmissionColumn[];
+	/** 표 위 머리줄 (제목, 검색) */
+	header: ReactNode;
 	onTogglePaid: (row: SubmissionRow) => void;
 	pendingId: string | null;
 	rows: readonly SubmissionRow[];
 }
 
+/** 머리줄: 채움 띠 없이 12px 회색, 아래 1px 선 하나 (표 안에서 가장 진한 선) */
 const TH =
-	"bg-muted/60 px-4 py-2.5 text-left font-medium text-muted-foreground text-xs";
+	"bg-card border-b px-4 py-2.5 text-left font-normal text-muted-foreground text-xs";
 
 function TableHead({ columns }: { columns: readonly SubmissionColumn[] }) {
 	return (
@@ -76,7 +36,10 @@ function TableHead({ columns }: { columns: readonly SubmissionColumn[] }) {
 					제출일시
 				</th>
 				<th className={cn(TH, "text-right")} scope="col">
-					알림
+					회비
+				</th>
+				<th className={cn(TH, "text-right")} scope="col">
+					안내 문자
 				</th>
 				<th className={TH} scope="col">
 					납입
@@ -93,30 +56,10 @@ interface RowProps {
 	row: SubmissionRow;
 }
 
-/** 첫 열(이름 등)이 비어 있거나 없을 때 버튼 이름 */
-const FALLBACK_ROW_NAME = "응답";
-
-/** 납입 버튼 이름: 첫 열 값. 빈 문자열도 비어 있음으로 본다 */
-function rowName(row: SubmissionRow, first: SubmissionColumn | undefined) {
-	const cell = first === undefined ? undefined : row.cells[first.id];
-	return cell === undefined || cell === "" ? FALLBACK_ROW_NAME : cell;
-}
-
-/** 시트 값 확인 필요 표시. 아이콘 + 화면 낭독기용 문장 + 툴팁 */
-function IssueMark({ headers }: { headers: readonly string[] }) {
-	const label = `시트 값 확인 필요: ${headers.join(", ")}`;
-	return (
-		<span className="text-warning mr-1 inline-flex align-[-2px]" title={label}>
-			<TriangleAlert aria-hidden className="h-3.5 w-3.5" />
-			<span className="sr-only">{label}</span>
-		</span>
-	);
-}
-
 function Row({ row, columns, pending, onTogglePaid }: RowProps) {
 	const [first] = columns;
 	return (
-		<tr className="hover:bg-muted/40">
+		<tr className="hover:bg-muted/70">
 			{columns.map((column, index) => (
 				<td
 					className={cn(
@@ -133,6 +76,13 @@ function Row({ row, columns, pending, onTogglePaid }: RowProps) {
 			))}
 			<td className="text-muted-foreground px-4 py-2.5 tabular-nums">
 				{row.submittedAt.slice(0, 16)}
+			</td>
+			<td className="px-4 py-2.5 text-right tabular-nums">
+				{row.amount === null ? (
+					<span className="text-muted-foreground">—</span>
+				) : (
+					formatWon(row.amount)
+				)}
 			</td>
 			<td className="text-muted-foreground px-4 py-2.5 text-right tabular-nums">
 				{row.reminderCount}회
@@ -153,25 +103,36 @@ function Row({ row, columns, pending, onTogglePaid }: RowProps) {
 export function SubmissionsTable({
 	columns,
 	rows,
+	header,
 	pendingId,
 	onTogglePaid,
 }: SubmissionsTableProps) {
 	return (
-		<div className="bg-card max-h-[70vh] overflow-auto rounded-xl border shadow-xs">
-			<table className="w-full text-sm whitespace-nowrap">
-				<TableHead columns={columns} />
-				<tbody className="divide-y">
-					{rows.map((row) => (
-						<Row
-							columns={columns}
-							key={row.id}
-							onTogglePaid={onTogglePaid}
-							pending={pendingId === row.id}
-							row={row}
-						/>
-					))}
-				</tbody>
-			</table>
+		<div className="bg-card overflow-hidden rounded-xl border">
+			{header}
+			{/* 넓은 화면: 표 / 좁은 화면: 응답 카드 목록 (가로 스크롤 없이 읽히게) */}
+			<SubmissionCards
+				columns={columns}
+				onTogglePaid={onTogglePaid}
+				pendingId={pendingId}
+				rows={rows}
+			/>
+			<div className="hidden max-h-[70vh] overflow-auto md:block">
+				<table className="w-full text-sm whitespace-nowrap">
+					<TableHead columns={columns} />
+					<tbody className="divide-rule divide-y">
+						{rows.map((row) => (
+							<Row
+								columns={columns}
+								key={row.id}
+								onTogglePaid={onTogglePaid}
+								pending={pendingId === row.id}
+								row={row}
+							/>
+						))}
+					</tbody>
+				</table>
+			</div>
 		</div>
 	);
 }
