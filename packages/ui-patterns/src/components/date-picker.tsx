@@ -7,7 +7,7 @@ import {
 } from "@jwc/ui/components/popover";
 import { cn } from "@jwc/ui/lib/utils";
 import { CalendarDays } from "lucide-react";
-import { useState } from "react";
+import { useId, useRef, useState } from "react";
 import type { Matcher } from "react-day-picker";
 import { ko } from "react-day-picker/locale";
 
@@ -48,6 +48,9 @@ export interface DatePickerProps {
 	value: string | undefined;
 }
 
+/** 달력에서 Tab으로 들어가는 날짜 칸 (고른 날짜, 없으면 오늘/첫 선택 가능일) */
+const DAY_FOCUS_TARGET = '[role="grid"] button[tabindex="0"]';
+
 /** min/max → 달력에서 막을 날짜 */
 function disabledDays(min: string | undefined, max: string | undefined) {
 	const matchers: Matcher[] = [];
@@ -83,13 +86,14 @@ function CalendarPanel({
 	return (
 		<>
 			<Calendar
-				autoFocus
 				className={CALENDAR_SIZES[size]}
 				defaultMonth={selected ?? parseLocalDate(min)}
 				disabled={disabledDays(min, max)}
 				locale={ko}
 				mode="single"
-				onSelect={(day) => onCommit(day ? toLocalDateString(day) : undefined)}
+				onSelect={(day) => onCommit(toLocalDateString(day))}
+				// 고른 날짜를 다시 눌러도 선택이 풀리지 않게 한다 (지우기는 아래 버튼으로만)
+				required
 				selected={selected}
 			/>
 			{clearable && selected && (
@@ -105,6 +109,40 @@ function CalendarPanel({
 				</div>
 			)}
 		</>
+	);
+}
+
+/**
+ * 바깥 <label htmlFor>가 있으면(id) 라벨이 버튼 이름을 대신해 고른 날짜가 읽히지 않는다.
+ * 그때는 날짜 텍스트를 설명으로 이어 "마감 일시, 버튼, 2026.06.25 (목)"처럼 읽히게 한다.
+ */
+function describedByIds(
+	id: string | undefined,
+	valueId: string,
+	describedBy: string | undefined,
+) {
+	const ids = [id === undefined ? undefined : valueId, describedBy];
+	return ids.filter(Boolean).join(" ") || undefined;
+}
+
+/**
+ * 팝오버 본문. 열릴 때 초점은 Base UI 기본값(첫 버튼 = "이전 달로 이동")이 아니라
+ * 날짜 칸으로 보낸다: 키보드 사용자가 바로 화살표로 고를 수 있게. 못 찾으면 기본 동작(true).
+ */
+function CalendarPopup(props: CalendarPanelProps) {
+	const panel = useRef<HTMLDivElement>(null);
+	const focusDay = () =>
+		panel.current?.querySelector<HTMLElement>(DAY_FOCUS_TARGET) ?? true;
+	return (
+		<PopoverContent
+			align="start"
+			className="w-auto p-0"
+			initialFocus={focusDay}
+		>
+			<div ref={panel}>
+				<CalendarPanel {...props} />
+			</div>
+		</PopoverContent>
 	);
 }
 
@@ -140,6 +178,7 @@ export function DatePicker({
 	className,
 }: DatePickerProps) {
 	const [open, setOpen] = useState(false);
+	const valueId = useId();
 	const selected = parseLocalDate(value);
 	const commit = (next: string | undefined) => {
 		onChange(next);
@@ -150,7 +189,7 @@ export function DatePicker({
 			<PopoverTrigger
 				render={
 					<Button
-						aria-describedby={describedBy}
+						aria-describedby={describedByIds(id, valueId, describedBy)}
 						aria-invalid={invalid}
 						className={triggerClass(Boolean(selected), size, className)}
 						id={id}
@@ -159,20 +198,18 @@ export function DatePicker({
 				}
 			>
 				<CalendarDays aria-hidden className="text-muted-foreground size-4" />
-				<span className="truncate tabular-nums">
+				<span className="truncate tabular-nums" id={valueId}>
 					{selected ? LABELS[size](selected) : placeholder}
 				</span>
 			</PopoverTrigger>
-			<PopoverContent align="start" className="w-auto p-0">
-				<CalendarPanel
-					clearable={clearable}
-					max={max}
-					min={min}
-					onCommit={commit}
-					selected={selected}
-					size={size}
-				/>
-			</PopoverContent>
+			<CalendarPopup
+				clearable={clearable}
+				max={max}
+				min={min}
+				onCommit={commit}
+				selected={selected}
+				size={size}
+			/>
 		</Popover>
 	);
 }

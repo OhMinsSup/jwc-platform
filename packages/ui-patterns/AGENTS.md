@@ -1,6 +1,6 @@
 # packages/ui-patterns AGENTS.md
 
-@jwc/ui(shadcn base-nova) 위에 만든 재사용 UI 패턴: 페이지 머리, 요약 수치, 빈 상태, 상태 배지, 세그먼트 선택, 복사 버튼, 검색 입력, 가운데 안내, 폼 행/입력/섹션, 선택 컨트롤, 확인 대화상자, 라이브 영역. 의미 색 토큰(brand/success/warning)은 ./styles.css.
+@jwc/ui(shadcn base-nova) 위에 만든 재사용 UI 패턴: 페이지 머리, 요약 수치, 빈 상태, 상태 배지, 세그먼트 선택, 복사 버튼, 검색 입력, 가운데 안내, 폼 행/입력/섹션, 선택 컨트롤, 확인 대화상자, 라이브 영역, 안내 상자, 날짜/시각 선택기. 의미 색 토큰(brand/success/warning)은 ./styles.css.
 
 저장소 루트 `AGENTS.md`(공통 규칙)와 `docs/adr/0007`(패키지 경계)을 우선으로 따른다.
 
@@ -19,4 +19,6 @@
 ## 검증
 
 - `pnpm -C packages/ui-patterns typecheck`
-- 타입 검사로 확인 (테스트 대상 로직이 없는 UI 패턴)
+- `pnpm -C packages/ui-patterns test`: 순수 함수(`test/*.test.ts`)와 동작이 있는 컴포넌트(`test/*.test.tsx`, jsdom + Testing Library)
+- 컴포넌트 테스트는 역할/이름으로 찾는다(`getByRole`). 접근 가능한 이름이 곧 테스트 선택자다
+- Base UI 팝오버/선택은 초점을 다음 프레임에 옮긴다: 고정 대기 대신 `waitFor`로 초점 도착을 기다린다. Select는 jsdom에서 키보드(↓)로 연다

@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vite-plus/test";
 
@@ -17,6 +17,21 @@ const day = (label: string) =>
  * 선택 목록은 키보드(↓)로 연다. jsdom에서는 Base UI Select를 마우스로 열면
  * 두 번째 테스트부터 열리지 않는다 (실제 브라우저의 마우스 동작은 E2E가 확인한다).
  */
+/**
+ * 키보드로 달력을 열고 초점이 날짜 칸에 올 때까지 기다린다.
+ * Base UI는 초기 초점을 다음 애니메이션 프레임에 옮기므로 바로 확인하면 아직 트리거에 있을 수 있다.
+ */
+async function openCalendarWithKeyboard(
+	user: ReturnType<typeof userEvent.setup>,
+	selectedLabel: string,
+) {
+	screen.getByRole("button").focus();
+	await user.keyboard("{Enter}");
+	await waitFor(() => {
+		expect(document.activeElement).toBe(day(selectedLabel));
+	});
+}
+
 async function openSelect(
 	user: ReturnType<typeof userEvent.setup>,
 	name: string,
@@ -78,6 +93,59 @@ describe(DatePicker, () => {
 		await user.click(screen.getByRole("button"));
 		await user.click(screen.getByRole("button", { name: "날짜 지우기" }));
 		expect(onChange).toHaveBeenCalledWith(undefined);
+	});
+});
+
+describe("DatePicker 키보드와 스크린리더", () => {
+	it("키보드로 열면 고른 날짜에 초점이 간다 (이전 달 버튼이 아니라)", async () => {
+		const user = userEvent.setup();
+		render(<DatePicker onChange={vi.fn<OnChange>()} value="2026-06-25" />);
+		await openCalendarWithKeyboard(user, "2026년 6월 25일");
+		expect(document.activeElement?.getAttribute("aria-label")).toBe(
+			"2026년 6월 25일 목요일, 선택됨",
+		);
+	});
+
+	it("고른 날짜를 다시 골라도 값이 지워지지 않는다", async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn<OnChange>();
+		render(<DatePicker onChange={onChange} value="2026-06-25" />);
+		await openCalendarWithKeyboard(user, "2026년 6월 25일");
+		await user.keyboard("{Enter}");
+		expect(onChange).toHaveBeenCalledWith("2026-06-25");
+		expect(onChange).not.toHaveBeenCalledWith(undefined);
+	});
+
+	it("Esc로 닫으면 초점이 트리거로 돌아온다", async () => {
+		const user = userEvent.setup();
+		render(<DatePicker onChange={vi.fn<OnChange>()} value="2026-06-25" />);
+		const trigger = screen.getByRole("button");
+		await openCalendarWithKeyboard(user, "2026년 6월 25일");
+		await user.keyboard("{Escape}");
+		expect(screen.queryByRole("grid")).toBeNull();
+		await waitFor(() => {
+			expect(document.activeElement).toBe(trigger);
+		});
+	});
+
+	it("바깥 라벨이 이름이 되고, 고른 날짜는 설명으로 읽힌다", () => {
+		render(
+			<>
+				<label htmlFor="closes">마감 일시</label>
+				<DatePicker
+					describedBy="hint"
+					id="closes"
+					onChange={vi.fn<OnChange>()}
+					value="2026-06-25"
+				/>
+				<p id="hint">비우면 마감 없음</p>
+			</>,
+		);
+		const trigger = screen.getByRole("button", { name: "마감 일시" });
+		const description = (trigger.getAttribute("aria-describedby") ?? "")
+			.split(" ")
+			.map((id) => document.getElementById(id)?.textContent);
+		expect(description).toStrictEqual(["2026.06.25 (목)", "비우면 마감 없음"]);
 	});
 });
 
