@@ -209,6 +209,8 @@ function CalendarDayButton({
 				!modifiers.range_end &&
 				!modifiers.range_middle
 			}
+			// 손으로 고침: 생성 코드가 ref를 연결하지 않아 화살표 키로 옮긴 날짜에 초점이 가지 않았다
+			ref={ref}
 			size="icon"
 			variant="ghost"
 			{...props}

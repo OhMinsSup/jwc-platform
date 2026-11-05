@@ -106,6 +106,19 @@ describe("DatePicker 키보드와 스크린리더", () => {
 		);
 	});
 
+	it("화살표로 날짜를 옮기면 초점이 따라가고 Enter로 고른다", async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn<OnChange>();
+		render(<DatePicker onChange={onChange} value="2026-06-25" />);
+		await openCalendarWithKeyboard(user, "2026년 6월 25일");
+		await user.keyboard("{ArrowRight}");
+		await waitFor(() => {
+			expect(document.activeElement).toBe(day("2026년 6월 26일"));
+		});
+		await user.keyboard("{Enter}");
+		expect(onChange).toHaveBeenCalledWith("2026-06-26");
+	});
+
 	it("고른 날짜를 다시 골라도 값이 지워지지 않는다", async () => {
 		const user = userEvent.setup();
 		const onChange = vi.fn<OnChange>();
