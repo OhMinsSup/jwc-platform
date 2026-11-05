@@ -8,10 +8,14 @@ import type { KnipConfig } from "knip";
  * "안 쓰는데 남겨 둔" 코드를 숨기려고 ignore를 늘리지 않는다. 그런 것은 지우거나 리포트에 남긴다.
  */
 const config: KnipConfig = {
-	// 로컬 에이전트 스킬(레포에 추적하지 않음)
+	// 에이전트 스킬 (외부 원본을 그대로 커밋, 레포 코드가 아님)
 	ignore: [".agents/**"],
 	workspaces: {
-		".": {},
+		".": {
+			// vitest의 선택 peer(jsdom)를 루트에도 두어 모든 패키지가 같은 vitest 사본을 쓰게 한다.
+			// 루트 코드가 import하지 않으므로 knip이 사용처를 보지 못한다 (pnpm-workspace.yaml catalog 주석 참고)
+			ignoreDependencies: ["jsdom"],
+		},
 		"apps/web": {
 			entry: [
 				// void가 정적으로 읽는 런타임 진입점 (워커, 환경 스키마, 큐/크론 소비자)

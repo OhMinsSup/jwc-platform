@@ -13,6 +13,13 @@ import { ChoiceSelect } from "./pickers";
 
 const DEFAULT_STEP_MINUTES = 30;
 
+/**
+ * 접근 가능한 이름: id가 있으면 바깥 <label htmlFor>가 이름이 되므로 덮지 않는다.
+ * id가 없으면(날짜·시각 선택기 안처럼) 칸 이름을 직접 붙인다.
+ */
+const nameWithoutLabel = (id: string | undefined, name: string) =>
+	id === undefined ? name : undefined;
+
 /** 선택 트리거 크기 (Select 트리거는 data-size 높이를 쓰므로 같은 선택자로 덮는다) */
 const TRIGGER_SIZES: Record<PickerSize, string> = {
 	default: "bg-card min-w-24",
@@ -47,6 +54,7 @@ function SlotSelect(props: TimePickerProps & { step: number }) {
 			disabled={props.disabled}
 			id={props.id}
 			invalid={props.invalid}
+			label={nameWithoutLabel(props.id, "시각")}
 			onChange={props.onChange}
 			placeholder="시각 선택"
 			value={props.value}
@@ -76,6 +84,7 @@ export function TimePicker(props: TimePickerProps) {
 				disabled={disabled}
 				id={id}
 				invalid={invalid}
+				label={nameWithoutLabel(id, "시")}
 				onChange={(hour) =>
 					onChange(toTimeString(Number(hour), time?.minute ?? 0))
 				}

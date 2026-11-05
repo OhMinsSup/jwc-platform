@@ -27,6 +27,7 @@
 	},
 	"devDependencies": {
 		"@types/node": "catalog:",
+		"jsdom": "catalog:",
 		"knip": "catalog:",
 		"oxfmt": "catalog:",
 		"oxlint": "catalog:",
