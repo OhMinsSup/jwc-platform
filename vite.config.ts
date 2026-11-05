@@ -231,7 +231,7 @@ const OVERRIDES: OxlintOverride[] = [
 	},
 ];
 
-/** 레포 코드가 아닌 것: 로컬 에이전트 스킬(추적하지 않음), 생성물, 마이그레이션 SQL */
+/** 레포 코드가 아닌 것: 에이전트 스킬(외부 원본, .claude는 로컬 링크), 생성물, 마이그레이션 SQL */
 const IGNORE_PATTERNS = [
 	...(core.ignorePatterns ?? []),
 	".claude/**",

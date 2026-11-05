@@ -160,3 +160,6 @@ dist
 
 # void CLI가 루트에서 실행될 때 만드는 로컬 상태 (토큰 포함)
 .void/
+
+# Claude Code가 .agents/skills를 찾도록 로컬에서 만드는 링크 모음 (스킬 원본은 .agents/에 커밋)
+.claude/
