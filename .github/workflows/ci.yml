@@ -1,0 +1,39 @@
+# PR과 main 푸시마다 로컬과 같은 전체 검증(pnpm verify)과 웹 빌드를 돌린다.
+# 비밀값은 쓰지 않는다 (배포는 이 워크플로의 범위가 아니다).
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      # pnpm 버전은 package.json의 packageManager를 따른다
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: 의존성 설치
+        run: pnpm install --frozen-lockfile
+
+      - name: 전체 검증 (포맷/린트, 의존성 버전, 미사용 코드, 타입, 테스트)
+        run: pnpm verify
+
+      - name: 웹 빌드
+        run: pnpm -C apps/web build
