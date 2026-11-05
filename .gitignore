@@ -163,3 +163,7 @@ dist
 
 # Claude Code가 .agents/skills를 찾도록 로컬에서 만드는 링크 모음 (스킬 원본은 .agents/에 커밋)
 .claude/
+
+# Playwright 결과물 (실패 시 trace)
+test-results/
+playwright-report/

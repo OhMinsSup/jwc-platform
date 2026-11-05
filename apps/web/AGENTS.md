@@ -39,4 +39,5 @@ TanStack Start + void(Cloudflare Workers). 공개 신청 화면, 관리자 콘�
 ## 명령
 
 - `pnpm -C apps/web dev` / `build` / `test` / `typecheck`
+- `pnpm -C apps/web test:e2e`: 공개 신청 E2E(Playwright). 5179 포트에 개발 서버를 띄우고 메모리 응답 저장소를 쓴다. 로컬 D1에는 E2E 전용 폼(`e2e-public-form`)만 지우고 다시 넣는다 (`e2e/seed.ts`). 처음 한 번 `pnpm -C apps/web exec playwright install chromium`
 - `pnpm -C apps/web db:generate` → `void db migrate` (로컬) → `void deploy` (원격 적용)

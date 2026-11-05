@@ -229,6 +229,17 @@ const OVERRIDES: OxlintOverride[] = [
 			"vitest/prefer-to-be-truthy": "off",
 		},
 	},
+	{
+		// E2E는 Vitest가 아니라 Playwright다. vitest 규칙의 자동 수정은 `expect`/`test`를
+		// vitest에서 import하도록 바꿔 테스트를 깨뜨린다 (safe 수정이 의미를 바꾸는 사례).
+		files: ["apps/web/e2e/**"],
+		plugins: ["vitest"],
+		rules: {
+			"max-lines-per-function": "off",
+			"vitest/consistent-test-filename": "off",
+			"vitest/prefer-importing-vitest-globals": "off",
+		},
+	},
 ];
 
 /** 레포 코드가 아닌 것: 에이전트 스킬(외부 원본, .claude는 로컬 링크), 생성물, 마이그레이션 SQL */

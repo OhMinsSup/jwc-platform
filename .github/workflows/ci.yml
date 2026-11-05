@@ -37,3 +37,50 @@ jobs:
 
       - name: 웹 빌드
         run: pnpm -C apps/web build
+
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: 의존성 설치
+        run: pnpm install --frozen-lockfile
+
+      - name: Playwright Chromium 설치
+        run: pnpm -C apps/web exec playwright install --with-deps --only-shell chromium
+
+      # 비밀값이 아닌 더미 값만 쓴다: 응답은 메모리 저장소, SMS는 로그 모드라 Google/SMS로 나가지 않는다.
+      # DATA_KEY는 형식(base64 32바이트)만 맞춘 0 바이트 키다.
+      - name: E2E용 로컬 환경 파일
+        working-directory: apps/web
+        run: |
+          cat > .env <<'ENV'
+          SITE_URL=http://localhost:5179
+          BETTER_AUTH_SECRET=e2e-only-not-a-secret-0123456789abcdef
+          ADMIN_EMAILS=e2e@example.com
+          DATA_KEY=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+          GOOGLE_SERVICE_ACCOUNT_EMAIL=e2e@example.com
+          GOOGLE_PRIVATE_KEY=unused-in-memory-store
+          GOOGLE_SPREADSHEET_ID=unused-in-memory-store
+          SUBMISSION_STORE=memory
+          SMS_MODE=log
+          ENV
+
+      - name: 공개 신청 E2E
+        run: pnpm -C apps/web test:e2e
+
+      - name: 실패 시 trace 보관
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: apps/web/test-results/
+          retention-days: 7
