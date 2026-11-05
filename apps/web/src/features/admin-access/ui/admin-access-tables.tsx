@@ -1,7 +1,7 @@
 import { cn } from "@jwc/ui/lib/utils";
 import type { ReactNode } from "react";
 
-import { formatDateTime } from "../../../platform/format";
+import { DateTimeText } from "../../../platform/ui/date-time-text";
 import {
 	AUDIT_ACTION_LABELS,
 	INVITE_STATUS_LABELS,
@@ -101,10 +101,10 @@ export function InvitesTable({ invites }: { invites: readonly InviteItem[] }) {
 					<tr className="hover:bg-muted/40" key={invite.id}>
 						<td className={cn(TD, "font-medium")}>{invite.email}</td>
 						<td className={cn(TD, "text-muted-foreground tabular-nums")}>
-							{formatDateTime(invite.createdAt)}
+							<DateTimeText value={invite.createdAt} />
 						</td>
 						<td className={cn(TD, "text-muted-foreground tabular-nums")}>
-							{formatDateTime(invite.expiresAt)}
+							<DateTimeText value={invite.expiresAt} />
 						</td>
 						<td className={TD}>
 							<InviteBadge status={invite.status} />
@@ -139,7 +139,7 @@ export function AuditTable({ entries }: { entries: readonly AuditItem[] }) {
 				{entries.map((entry) => (
 					<tr className="hover:bg-muted/40" key={entry.id}>
 						<td className={cn(TD, "text-muted-foreground tabular-nums")}>
-							{formatDateTime(entry.at)}
+							<DateTimeText value={entry.at} />
 						</td>
 						<td className={cn(TD, "font-medium")}>
 							{auditLabel(entry.action)}

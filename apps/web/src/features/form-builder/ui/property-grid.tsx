@@ -1,4 +1,6 @@
 import type { FieldDef } from "@jwc/form-core/definition/fields";
+import { DatePicker } from "@jwc/ui-patterns/components/date-picker";
+import { DateTimePicker } from "@jwc/ui-patterns/components/date-time-picker";
 import {
 	FormRow,
 	NumberInput,
@@ -62,20 +64,26 @@ function TextProperty({ spec, value, ids, onChange }: InputProps<"text">) {
 	);
 }
 
-/** 브라우저 기본 선택기의 값 형식(YYYY-MM-DD, YYYY-MM-DDTHH:mm)이 정의 형식과 같다 */
+/** 날짜 범위(min/max) 속성. 선택기의 값 형식(YYYY-MM-DD, YYYY-MM-DDTHH:mm)이 정의 형식과 같다 */
 function DateProperty({
 	spec,
 	value,
 	ids,
 	onChange,
 }: InputProps<"date" | "datetime">) {
-	return (
-		<Input
-			{...ariaOf(ids)}
-			onChange={(e) => onChange(e.target.value || undefined)}
-			type={spec.kind === "date" ? "date" : "datetime-local"}
-			value={asText(value)}
-		/>
+	const common = {
+		clearable: true,
+		describedBy: ids.describedBy,
+		id: ids.inputId,
+		invalid: ids.invalid,
+		onChange,
+		value: asText(value) || undefined,
+	};
+	// 범위 경계는 분 단위로 정확히 고를 수 있게 1분 간격
+	return spec.kind === "date" ? (
+		<DatePicker {...common} />
+	) : (
+		<DateTimePicker {...common} stepMinutes={1} />
 	);
 }
 

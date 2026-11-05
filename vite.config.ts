@@ -290,6 +290,7 @@ export default defineConfig({
 			"packages/observability",
 			"packages/security",
 			"packages/submission-store",
+			"packages/ui-patterns",
 			"tooling/typecheck",
 		],
 	},

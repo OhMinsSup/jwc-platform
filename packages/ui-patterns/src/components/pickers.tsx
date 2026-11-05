@@ -54,6 +54,7 @@ interface ChoiceSelectProps {
 	choices: readonly Choice[];
 	className?: string;
 	describedBy?: string;
+	disabled?: boolean;
 	id?: string;
 	invalid?: boolean;
 	/** 보이는 라벨이 없을 때의 접근 가능한 이름 */
@@ -78,9 +79,11 @@ export function ChoiceSelect(props: ChoiceSelectProps) {
 		invalid,
 		id,
 		describedBy,
+		disabled,
 	} = props;
 	return (
 		<Select
+			disabled={disabled}
 			// items: 트리거에 값(opt_1) 대신 라벨을 보여준다. null = 선택 없음(placeholder)
 			items={choices}
 			onValueChange={(next) => {

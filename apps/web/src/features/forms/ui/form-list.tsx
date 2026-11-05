@@ -6,7 +6,8 @@ import { Link } from "@tanstack/react-router";
 import { ChevronRight } from "lucide-react";
 import { useMemo, useState } from "react";
 
-import { formatCount, formatDateTime } from "../../../platform/format";
+import { formatCount } from "../../../platform/format";
+import { DateTimeText } from "../../../platform/ui/date-time-text";
 import { FORM_STATUS_META } from "../model/form-status";
 import type { FormStatus } from "../model/form-status";
 import { countByStatus, matchesQuery } from "../model/list-filter";
@@ -66,7 +67,7 @@ function FormRow({ form, origin }: { form: FormSummary; origin: string }) {
 			</p>
 			<p className="text-muted-foreground text-right text-[13px] tabular-nums">
 				<span className="sr-only">마지막 수정 </span>
-				{formatDateTime(form.updatedAt)}
+				<DateTimeText value={form.updatedAt} />
 			</p>
 			<ChevronRight
 				aria-hidden

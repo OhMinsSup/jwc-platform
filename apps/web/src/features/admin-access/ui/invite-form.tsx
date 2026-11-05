@@ -8,7 +8,7 @@ import { KeyRound, Loader2, UserPlus } from "lucide-react";
 import { useState } from "react";
 import type { SubmitEvent } from "react";
 
-import { formatDateTime } from "../../../platform/format";
+import { DateTimeText } from "../../../platform/ui/date-time-text";
 import { createInviteFn } from "../functions";
 
 /** RFC 5321 주소 길이 상한 (서버 검증과 같은 값) */
@@ -59,8 +59,9 @@ function IssuedCode({ invite }: { invite: IssuedInvite }) {
 				<CopyButton label="초대 코드 복사" text={invite.code} />
 			</div>
 			<p className="text-muted-foreground text-xs">
-				{formatDateTime(invite.expiresAt)}까지 한 번만 쓸 수 있습니다. 이 코드는
-				지금만 보이니 복사해서 전달하세요.
+				<DateTimeText value={invite.expiresAt} />
+				까지 한 번만 쓸 수 있습니다. 이 코드는 지금만 보이니 복사해서
+				전달하세요.
 			</p>
 		</div>
 	);

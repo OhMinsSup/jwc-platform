@@ -2,6 +2,7 @@ import { cn } from "@jwc/ui/lib/utils";
 import type { ReactNode } from "react";
 
 import { formatWon } from "../../../platform/format";
+import { DateTimeText } from "../../../platform/ui/date-time-text";
 import { SubmissionCards } from "./submission-cards";
 import { IssueMark, PaidToggle, rowName } from "./submission-row";
 import type { SubmissionColumn, SubmissionRow } from "./submission-row";
@@ -75,7 +76,7 @@ function Row({ row, columns, pending, onTogglePaid }: RowProps) {
 				</td>
 			))}
 			<td className="text-muted-foreground px-4 py-2.5 tabular-nums">
-				{row.submittedAt.slice(0, 16)}
+				<DateTimeText value={row.submittedAt} />
 			</td>
 			<td className="px-4 py-2.5 text-right tabular-nums">
 				{row.amount === null ? (

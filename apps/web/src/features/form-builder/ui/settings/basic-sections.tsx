@@ -1,6 +1,6 @@
 import type { FormDefinition } from "@jwc/form-core/definition/definition";
+import { DateTimePicker } from "@jwc/ui-patterns/components/date-time-picker";
 import { FormRow, Section } from "@jwc/ui-patterns/components/form-controls";
-import { Button } from "@jwc/ui/components/button";
 import { Input } from "@jwc/ui/components/input";
 import { Textarea } from "@jwc/ui/components/textarea";
 import { useId, useMemo } from "react";
@@ -96,6 +96,9 @@ function MetaTextField({
 	);
 }
 
+/** 마감 날짜만 골랐을 때의 시각: 그날이 끝날 때 */
+const DEADLINE_DEFAULT_TIME = "23:59";
+
 function ClosesAtField({
 	value,
 	set,
@@ -109,22 +112,16 @@ function ClosesAtField({
 			label="마감 일시"
 		>
 			{(ids) => (
-				<div className="flex gap-2">
-					<Input
-						aria-describedby={ids.describedBy}
-						id={ids.inputId}
-						onChange={(event) =>
-							set("closesAt", event.target.value || undefined)
-						}
-						type="datetime-local"
-						value={value ?? ""}
-					/>
-					{value && (
-						<Button onClick={() => set("closesAt", undefined)} variant="ghost">
-							지우기
-						</Button>
-					)}
-				</div>
+				// 날짜만 고르면 그날 23:59 마감 (가장 흔한 의도). 지우기는 달력 안에서
+				<DateTimePicker
+					clearable
+					defaultTime={DEADLINE_DEFAULT_TIME}
+					describedBy={ids.describedBy}
+					id={ids.inputId}
+					onChange={(next) => set("closesAt", next)}
+					stepMinutes={1}
+					value={value}
+				/>
 			)}
 		</FormRow>
 	);
@@ -177,7 +174,8 @@ export function BasicSection({ definition }: { definition: FormDefinition }) {
 			title="기본 정보"
 		>
 			{HEAD_TEXT_FIELDS.map(text)}
-			<div className="grid gap-4 sm:grid-cols-2">
+			{/* 마감 일시(날짜+시+분 세 칸)가 잘리지 않도록 시간대보다 넓게 */}
+			<div className="grid gap-4 sm:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
 				<ClosesAtField set={set} value={definition.closesAt} />
 				<TimezoneField set={set} value={definition.timezone} />
 			</div>

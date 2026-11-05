@@ -1,4 +1,5 @@
 import { formatWon } from "../../../platform/format";
+import { DateTimeText } from "../../../platform/ui/date-time-text";
 import { IssueMark, PaidToggle, rowName } from "./submission-row";
 import type { SubmissionColumn, SubmissionRow } from "./submission-row";
 
@@ -65,7 +66,7 @@ export function SubmissionCards({
 								</span>
 							)}
 							<span>안내 문자 {row.reminderCount}회</span>
-							<span>{row.submittedAt.slice(0, 16)}</span>
+							<DateTimeText value={row.submittedAt} />
 						</p>
 					</li>
 				);

@@ -1,17 +1,18 @@
 import type { FieldOf } from "@jwc/form-core/definition/fields";
-import { Input } from "@jwc/ui/components/input";
+import { DatePicker } from "@jwc/ui-patterns/components/date-picker";
+import { DateTimePicker } from "@jwc/ui-patterns/components/date-time-picker";
+import { TimePicker } from "@jwc/ui-patterns/components/time-picker";
 
 import type { FieldProps } from "./types";
 
 /**
- * 네이티브 날짜/시간 입력을 쓴다: 모바일 OS 피커, 접근성, min/max/step 검증을 공짜로 얻는다.
- * 값은 타임존 없는 로컬 문자열("YYYY-MM-DDTHH:mm")로 다루므로 브라우저 타임존 영향을 받지 않는다.
+ * 날짜/시간 질문은 전용 선택기(@jwc/ui-patterns)를 쓴다: 한국어 달력 + 오전/오후 시각 선택으로
+ * 브라우저마다 다른 네이티브 입력 모양을 없앤다.
+ * 값 형식은 그대로 타임존 없는 로컬 문자열("YYYY-MM-DD", "HH:mm", "YYYY-MM-DDTHH:mm")이고,
+ * min/max/간격 검증은 form-core가 맡는다 (선택기는 범위 밖 날짜를 미리 막아 줄 뿐).
  */
-const CLASS = "bg-card h-12 px-3.5 md:text-[15px]";
-const SECONDS_PER_MINUTE = 60;
-
-const asString = (value: unknown) => (typeof value === "string" ? value : "");
-const orUndefined = (text: string) => (text === "" ? undefined : text);
+const asString = (value: unknown) =>
+	typeof value === "string" && value !== "" ? value : undefined;
 
 export function DateField({
 	field,
@@ -21,14 +22,13 @@ export function DateField({
 	onChange,
 }: FieldProps<FieldOf<"date">>) {
 	return (
-		<Input
-			aria-invalid={invalid}
-			className={CLASS}
+		<DatePicker
 			id={inputId}
+			invalid={invalid}
 			max={field.max}
 			min={field.min}
-			onChange={(e) => onChange(orUndefined(e.target.value))}
-			type="date"
+			onChange={onChange}
+			size="lg"
 			value={asString(value)}
 		/>
 	);
@@ -42,13 +42,12 @@ export function TimeField({
 	onChange,
 }: FieldProps<FieldOf<"time">>) {
 	return (
-		<Input
-			aria-invalid={invalid}
-			className={CLASS}
+		<TimePicker
 			id={inputId}
-			onChange={(e) => onChange(orUndefined(e.target.value))}
-			step={field.stepMinutes * SECONDS_PER_MINUTE}
-			type="time"
+			invalid={invalid}
+			onChange={onChange}
+			size="lg"
+			stepMinutes={field.stepMinutes}
 			value={asString(value)}
 		/>
 	);
@@ -62,15 +61,14 @@ export function DateTimeField({
 	onChange,
 }: FieldProps<FieldOf<"datetime">>) {
 	return (
-		<Input
-			aria-invalid={invalid}
-			className={CLASS}
+		<DateTimePicker
 			id={inputId}
+			invalid={invalid}
 			max={field.max}
 			min={field.min}
-			onChange={(e) => onChange(orUndefined(e.target.value.slice(0, 16)))}
-			step={field.stepMinutes * SECONDS_PER_MINUTE}
-			type="datetime-local"
+			onChange={onChange}
+			size="lg"
+			stepMinutes={field.stepMinutes}
 			value={asString(value)}
 		/>
 	);

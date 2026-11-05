@@ -4,6 +4,7 @@ import { useEffect } from "react";
 
 import { getSubmissionViewFn } from "../../features/submissions/functions";
 import { track } from "../../platform/analytics/client";
+import { DateTimeText } from "../../platform/ui/date-time-text";
 import { PublicShell } from "../../platform/ui/public-shell";
 
 export const Route = createFileRoute("/r/$id")({
@@ -73,7 +74,7 @@ function SubmissionPage() {
 						신청 내역
 					</h1>
 					<p className="text-faint-foreground mt-2 text-[13px] tabular-nums">
-						신청일시 {view.submittedAt}
+						신청일시 <DateTimeText value={view.submittedAt} />
 					</p>
 				</div>
 				{view.amount !== null && (

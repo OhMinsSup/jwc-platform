@@ -22,6 +22,8 @@ catalog:
   syncpack: ^15.3.3
   zod: ^4.6.7
   lucide-react: ^1.66.0
+  # 달력: @jwc/ui(Calendar)와 @jwc/ui-patterns(한국어 로캘, Matcher 타입)가 함께 쓴다
+  react-day-picker: ^10.0.2
 
 catalogs:
   frontend:
