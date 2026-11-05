@@ -7,28 +7,28 @@ packages:
 catalog:
   # 타입 검증: tsrs(Rust)를 기본으로, 미검증 플랫폼은 tsc로 폴백 (tooling/typecheck)
   # tsrs는 검증된 버전으로 고정한다 (올릴 때 tooling/typecheck 테스트로 확인)
-  tsrs: 0.20.1-ts7.1.0-beta
+  tsrs: 0.21.0-ts7.1.0-beta
   typescript: ^7.0.2
   "@types/node": ^26.6.6
   # 포맷/린트/테스트는 Vite+(vp) 하나로. vite-plus를 올릴 때 아래 oxlint/oxfmt/vitest와
   # 루트 overrides의 vite도 함께 올린다 (`vp toolchain`으로 번들 버전 확인)
-  vite-plus: 1.4.0
-  oxlint: 1.89.0
-  oxfmt: 0.74.0
-  vitest: 5.0.5
+  vite-plus: 1.5.0
+  oxlint: 1.91.0
+  oxfmt: 0.76.0
+  vitest: 5.1.0
   # 린트 규칙 프리셋. 프리셋 규칙이 oxlint 버전에 묶여 있어 Vite+ 번들 oxlint와 맞는 버전으로 고정한다
-  ultracite: 8.1.0
+  ultracite: 8.1.1
   knip: ^6.44.1
   syncpack: ^15.3.3
   zod: ^4.6.7
-  lucide-react: ^1.66.0
+  lucide-react: ^1.68.0
   # 달력: @jwc/ui(Calendar)와 @jwc/ui-patterns(한국어 로캘, Matcher 타입)가 함께 쓴다
   react-day-picker: ^10.0.2
 
 catalogs:
   frontend:
-    "@tailwindcss/vite": ^4.3.3
-    tailwindcss: ^4.3.3
+    "@tailwindcss/vite": ^4.3.4
+    tailwindcss: ^4.3.4
   react19:
     react: ^19.3.1
     react-dom: ^19.3.1
@@ -38,10 +38,10 @@ catalogs:
 # Vite+가 쓰는 Vite/Vitest와 같은 사본을 모든 패키지가 쓰도록 고정한다
 # (Vite 사본이 둘이면 TanStack Start의 instanceof 검사가 깨질 수 있다). vite-plus 버전과 함께 올린다.
 overrides:
-  vite: npm:@voidzero-dev/vite-plus-core@1.4.0
+  vite: npm:@voidzero-dev/vite-plus-core@1.5.0
   vitest: "catalog:"
 
-# 위 vite 별칭은 패키지 버전이 1.4.0(Vite+ 코어)으로 보여 플러그인들의 `vite@^8` peer 검사가 오탐한다.
+# 위 vite 별칭은 패키지 버전이 1.5.0(Vite+ 코어)으로 보여 플러그인들의 `vite@^8` peer 검사가 오탐한다.
 # 실제 번들 Vite는 8.x다(`vp toolchain`).
 peerDependencyRules:
   allowAny:

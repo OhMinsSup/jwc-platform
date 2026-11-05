@@ -63,14 +63,18 @@ function TurnstileWidget({
 }) {
 	const container = useRef<HTMLDivElement>(null);
 	useEffect(() => {
-		let widgetId: string | null = null;
-		let cancelled = false;
+		// 비동기 mount와 정리 함수가 함께 보는 상태는 지역 변수 재할당 대신 객체 하나에 둔다
+		// (React Compiler immutability 규칙: async 함수 안에서 바깥 변수를 재할당하지 않는다)
+		const widget: { id: string | null; cancelled: boolean } = {
+			id: null,
+			cancelled: false,
+		};
 		const mount = async () => {
 			const api = await loadTurnstile();
-			if (cancelled || !container.current) {
+			if (widget.cancelled || !container.current) {
 				return;
 			}
-			widgetId = api.render(container.current, {
+			widget.id = api.render(container.current, {
 				sitekey: siteKey,
 				callback: (token) => {
 					onToken(token);
@@ -85,9 +89,9 @@ function TurnstileWidget({
 		};
 		void mount();
 		return () => {
-			cancelled = true;
-			if (widgetId !== null) {
-				window.turnstile?.remove(widgetId);
+			widget.cancelled = true;
+			if (widget.id !== null) {
+				window.turnstile?.remove(widget.id);
 			}
 		};
 	}, [siteKey, onToken]);
