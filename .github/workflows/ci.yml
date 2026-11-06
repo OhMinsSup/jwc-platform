@@ -32,6 +32,10 @@ jobs:
       - name: 의존성 설치
         run: pnpm install --frozen-lockfile
 
+      # 타입 기반 린트도 .void/tsconfig.json을 읽으므로 verify보다 먼저 생성한다.
+      - name: Void 타입·설정 준비
+        run: pnpm --filter web run codegen
+
       - name: 전체 검증 (포맷/린트, 의존성 버전, 미사용 코드, 타입, 테스트)
         run: pnpm verify
 

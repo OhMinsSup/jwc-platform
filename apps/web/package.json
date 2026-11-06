@@ -5,6 +5,7 @@
 	"scripts": {
 		"auth:schema": "pnpm dlx @better-auth/cli@latest generate --output ./db/better-auth.generated.ts",
 		"build": "vp build",
+		"codegen": "void prepare",
 		"db:generate": "void db generate",
 		"db:migrate": "void db migrate",
 		"deploy": "void deploy",

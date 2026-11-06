@@ -115,18 +115,19 @@ pnpm -C apps/web exec void db execute --remote 'SELECT id, slug, status FROM for
 
 ## 5. 변경 검증과 DB 변경
 
-| 검증               | 명령                                | 범위                                       |
-| ------------------ | ----------------------------------- | ------------------------------------------ |
-| 포맷·린트          | `pnpm check`                        | Vite+ 공통 설정                            |
-| 안전한 자동 수정   | `pnpm fix`                          | 적용 후 diff를 읽고 타입·테스트 재검증     |
-| 의존성 버전        | `pnpm check:deps`                   | syncpack                                   |
-| 미사용 코드·의존성 | `pnpm check:unused`                 | knip                                       |
-| 타입               | `pnpm typecheck`                    | tsrs, 미지원 플랫폼에서는 tsc              |
-| 단위·계약 테스트   | `pnpm test`                         | Vite+ 테스트                               |
-| 전체 기본 검증     | `pnpm verify`                       | 위 검사 중 자동 수정 제외. 빌드·E2E는 별도 |
-| 웹 빌드            | `pnpm -C apps/web build`            | Workers용 앱 빌드                          |
-| E2E 준비           | `pnpm -C apps/web test:e2e:install` | Chromium과 실행 의존성 설치                |
-| E2E                | `pnpm -C apps/web test:e2e`         | 공개 신청 성공·실패, 관리자 인증 흐름      |
+| 검증                | 명령                                | 범위                                                  |
+| ------------------- | ----------------------------------- | ----------------------------------------------------- |
+| Void 타입·설정 생성 | `pnpm -C apps/web codegen`          | 새 clone에서 타입 기반 린트 전에 실행. CI도 먼저 수행 |
+| 포맷·린트           | `pnpm check`                        | Vite+ 공통 설정                                       |
+| 안전한 자동 수정    | `pnpm fix`                          | 적용 후 diff를 읽고 타입·테스트 재검증                |
+| 의존성 버전         | `pnpm check:deps`                   | syncpack                                              |
+| 미사용 코드·의존성  | `pnpm check:unused`                 | knip                                                  |
+| 타입                | `pnpm typecheck`                    | tsrs, 미지원 플랫폼에서는 tsc                         |
+| 단위·계약 테스트    | `pnpm test`                         | Vite+ 테스트                                          |
+| 전체 기본 검증      | `pnpm verify`                       | 위 검사 중 자동 수정 제외. 빌드·E2E는 별도            |
+| 웹 빌드             | `pnpm -C apps/web build`            | Workers용 앱 빌드                                     |
+| E2E 준비            | `pnpm -C apps/web test:e2e:install` | Chromium과 실행 의존성 설치                           |
+| E2E                 | `pnpm -C apps/web test:e2e`         | 공개 신청 성공·실패, 관리자 인증 흐름                 |
 
 현재 GitHub Actions는 PR과 `main` 푸시에서 전체 검증·웹 빌드와 E2E를 실행한다. E2E는 5179 포트, `.void/e2e`의 로컬 D1, 메모리 응답을 사용하며 실제 문자는 보내지 않는다. 실패 trace는 CI artifact로 7일 보관한다. CI 성공은 실제 Sheets·Solapi 수신 검증을 대신하지 않는다. 현재 자동 배포 job은 없다.
 
