@@ -152,7 +152,6 @@ function SubmissionsPage() {
 					account={payment.account}
 					groupLabel={payment.groupLabel}
 					onShowUnpaid={() => setFilter("unpaid")}
-					reminder={payment.reminder}
 					summary={summarizePayment(rows)}
 				/>
 			)}

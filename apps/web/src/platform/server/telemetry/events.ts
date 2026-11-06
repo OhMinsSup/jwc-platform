@@ -29,9 +29,6 @@ export const SERVER_EVENTS = {
 	"sms.failed": {
 		fields: ["submissionId", "kind", "code", "attempts", "error", "traceId"],
 	},
-	"reminder.completed": { fields: ["queued"], analytics: true },
-	"reminder.form_failed": { fields: ["formId", "code", "error"] },
-	"reminder.unkeyed_records": { fields: ["formId", "count"] },
 	"admin.invite_created": { fields: ["inviteId"], analytics: true },
 	"admin.signed_up": { fields: ["userId", "path"], analytics: true },
 	/** reason = 내부 거절 사유, authCode = Better Auth 오류 코드 (이메일/코드는 남기지 않는다) */

@@ -39,9 +39,6 @@ function TableHead({ columns }: { columns: readonly SubmissionColumn[] }) {
 				<th className={cn(TH, "text-right")} scope="col">
 					회비
 				</th>
-				<th className={cn(TH, "text-right")} scope="col">
-					안내 문자
-				</th>
 				<th className={TH} scope="col">
 					납입
 				</th>
@@ -84,9 +81,6 @@ function Row({ row, columns, pending, onTogglePaid }: RowProps) {
 				) : (
 					formatWon(row.amount)
 				)}
-			</td>
-			<td className="text-muted-foreground px-4 py-2.5 text-right tabular-nums">
-				{row.reminderCount}회
 			</td>
 			<td className="px-4 py-2.5">
 				<PaidToggle

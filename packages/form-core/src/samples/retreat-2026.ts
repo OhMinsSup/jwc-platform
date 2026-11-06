@@ -171,15 +171,12 @@ export const retreat2026Definition: FormDefinitionInput = {
 			fieldId: "stay_type",
 			amounts: { full: 65_000, n2d3: 55_000, n1d2: 45_000, day: 35_000 },
 		},
-		reminder: { firstAfterDays: 7, intervalDays: 7, maxCount: 3 },
 	},
 	notifications: {
 		onCreate:
 			"[죽전우리교회 청년부]\n{{name}}님, 수련회 신청완료\n금액: {{amount}}원 ({{stay_type}})\n계좌: {{account}}\n{{link}}",
 		onUpdate:
 			"[죽전우리교회 청년부]\n{{name}}님, 수정완료.\n금액: {{amount}}원 ({{stay_type}})\n계좌: {{account}}\n{{link}}",
-		onReminder:
-			"[죽전우리교회 청년부]\n{{name}}님, 회비 입금이 확인되지 않았습니다.\n금액: {{amount}}원 ({{stay_type}})\n계좌: {{account}}\n{{link}}",
 	},
 	completionMessage:
 		"신청이 완료되었습니다. 문자로 안내드린 계좌로 회비를 입금해주세요.",

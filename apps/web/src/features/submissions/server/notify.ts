@@ -1,6 +1,7 @@
 import { decryptJson, encryptJson } from "@jwc/common/crypto";
 import { randomId } from "@jwc/common/encoding";
 import type { Answers } from "@jwc/form-core/answers/value";
+import { NotificationKindSchema } from "@jwc/form-core/definition/definition";
 import type { FormDefinition } from "@jwc/form-core/definition/definition";
 import { currentRequestId } from "@jwc/observability/scope";
 import { queues } from "void/queues";
@@ -14,7 +15,7 @@ import {
 } from "../../../platform/server/runtime";
 import { composeSms } from "../domain/submission-plan";
 import type { NotificationIntent } from "../domain/submission-plan";
-import { SmsPayloadSchema } from "./messages";
+import { SmsMessageSchema, SmsPayloadSchema } from "./messages";
 import type { SmsMessage } from "./messages";
 import { findMessageByKey, recordDelivery } from "./submission-keys-repository";
 
@@ -50,9 +51,14 @@ export async function enqueueNotification(
 
 /** sms 큐 소비: 이미 보낸 키면 건너뛴다 (at-least-once 큐에서 중복 발송 방지) */
 export async function deliverSms(
-	message: SmsMessage,
+	rawMessage: unknown,
 	now: number,
-): Promise<"sent" | "duplicate"> {
+): Promise<"sent" | "duplicate" | "discarded"> {
+	const message = SmsMessageSchema.parse(rawMessage);
+	const kind = NotificationKindSchema.safeParse(message.kind);
+	if (!kind.success) {
+		return "discarded";
+	}
 	if (await findMessageByKey(message.idempotencyKey)) {
 		return "duplicate";
 	}
@@ -65,7 +71,7 @@ export async function deliverSms(
 	await recordDelivery({
 		id: randomId(),
 		submissionId: message.submissionId,
-		kind: message.kind,
+		kind: kind.data,
 		idempotencyKey: message.idempotencyKey,
 		status: mode === "live" ? "sent" : "logged",
 		providerMessageId: result.messageId,

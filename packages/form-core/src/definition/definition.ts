@@ -39,17 +39,10 @@ const AmountSchema = z.discriminatedUnion("kind", [
 	}),
 ]);
 
-const ReminderRuleSchema = z.object({
-	firstAfterDays: z.number().int().min(1).max(60),
-	intervalDays: z.number().int().min(1).max(60),
-	maxCount: z.number().int().min(1).max(10),
-});
-
 const PaymentSchema = z.object({
 	/** 입금 계좌 안내 문구 (예: "카카오뱅크 3333-00-0000000 홍길동") */
 	account: z.string().trim().min(1, "입금 계좌를 입력해주세요").max(100),
 	amount: AmountSchema,
-	reminder: ReminderRuleSchema.optional(),
 });
 
 const template = z
@@ -61,7 +54,6 @@ const template = z
 const NotificationsSchema = z.object({
 	onCreate: template.optional(),
 	onUpdate: template.optional(),
-	onReminder: template.optional(),
 });
 
 const BaseDefinitionSchema = z.object({
@@ -107,8 +99,8 @@ export type FormDefinition = z.output<typeof FormDefinitionSchema>;
 export type FormDefinitionInput = z.input<typeof FormDefinitionSchema>;
 export type PageDef = z.infer<typeof PageSchema>;
 export type PaymentDef = z.infer<typeof PaymentSchema>;
-export type ReminderRule = z.infer<typeof ReminderRuleSchema>;
-export type NotificationKind = keyof z.infer<typeof NotificationsSchema>;
+export const NotificationKindSchema = NotificationsSchema.keyof();
+export type NotificationKind = z.infer<typeof NotificationKindSchema>;
 
 export type DefinitionParseResult =
 	| { ok: true; definition: FormDefinition }

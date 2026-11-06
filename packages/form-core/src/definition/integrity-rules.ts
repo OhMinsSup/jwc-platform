@@ -11,9 +11,7 @@ function hasTemplate(template: string | undefined): boolean {
 
 function hasAnyTemplate(notifications: Notifications): boolean {
 	return (
-		hasTemplate(notifications?.onCreate) ||
-		hasTemplate(notifications?.onUpdate) ||
-		hasTemplate(notifications?.onReminder)
+		hasTemplate(notifications?.onCreate) || hasTemplate(notifications?.onUpdate)
 	);
 }
 
@@ -22,25 +20,11 @@ export function checkNotifications(
 	definition: DefinitionShape,
 ): IntegrityIssue[] {
 	const { notifications } = definition;
-	const hasReminderTemplate = hasTemplate(notifications?.onReminder);
-	const hasReminderRule = Boolean(definition.payment?.reminder);
 	const issues: IntegrityIssue[] = [];
 	if (hasAnyTemplate(notifications) && !definition.contact) {
 		issues.push({
 			path: ["contact"],
 			message: "알림을 보내려면 contact.phoneFieldId가 필요합니다",
-		});
-	}
-	if (hasReminderRule && !hasReminderTemplate) {
-		issues.push({
-			path: ["notifications", "onReminder"],
-			message: "미입금 알림 규칙에는 onReminder 템플릿이 필요합니다",
-		});
-	}
-	if (hasReminderTemplate && !hasReminderRule) {
-		issues.push({
-			path: ["payment", "reminder"],
-			message: "onReminder 템플릿에는 payment.reminder 규칙이 필요합니다",
 		});
 	}
 	return issues;

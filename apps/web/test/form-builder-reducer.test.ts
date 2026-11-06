@@ -155,28 +155,18 @@ describe("pages", () => {
 });
 
 describe("coupled settings", () => {
-	it("turning SMS off also clears notifications and the reminder rule", () => {
+	it("turning SMS off clears notifications and preserves payment settings", () => {
 		const next = run(retreat(), { type: "sms/set", phoneFieldId: null });
 		expect(next.contact).toBeUndefined();
 		expect(next.notifications).toBeUndefined();
-		expect(next.payment?.reminder).toBeUndefined();
+		expect(next.payment).toStrictEqual(retreat().payment);
 		expect(parseFormDefinition(next).ok).toBe(true);
 	});
 
-	it("reminder toggles rule and template together", () => {
-		const off = run(retreat(), { type: "reminder/set", enabled: false });
-		expect(off.notifications?.onReminder).toBeUndefined();
-		expect(parseFormDefinition(off).ok).toBe(true);
-		const on = run(off, { type: "reminder/set", enabled: true });
-		expect(on.payment?.reminder).toBeDefined();
-		expect(on.notifications?.onReminder).toBeDefined();
-		expect(parseFormDefinition(on).ok).toBe(true);
-	});
-
-	it("disabling payment drops the reminder template too", () => {
+	it("disabling payment preserves signup and update notifications", () => {
 		const next = run(retreat(), { type: "payment/set", enabled: false });
 		expect(next.payment).toBeUndefined();
-		expect(next.notifications?.onReminder).toBeUndefined();
+		expect(next.notifications).toStrictEqual(retreat().notifications);
 		expect(parseFormDefinition(next).ok).toBe(true);
 	});
 });

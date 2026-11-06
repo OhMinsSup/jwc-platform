@@ -15,7 +15,7 @@ import {
 } from "../../forms/server/definitions";
 import { paymentDueOf } from "../domain/payment-due";
 import type { PaymentDue } from "../domain/payment-due";
-import { listStoredKeys, reminderHistory } from "./submission-keys-repository";
+import { listStoredKeys } from "./submission-keys-repository";
 
 const PREVIEW_COLUMN_LIMIT = 6;
 
@@ -29,7 +29,6 @@ interface SubmissionRowView extends PaymentDue {
 	id: string;
 	issueHeaders: string[];
 	paid: boolean;
-	reminderCount: number;
 	submittedAt: string;
 }
 
@@ -45,7 +44,7 @@ function toRowView(
 	record: StoredSubmission,
 	columns: readonly PreviewColumn[],
 	fields: ReadonlyMap<string, FieldDef>,
-	meta: PaymentDue & { submittedAt: string; reminderCount: number },
+	meta: PaymentDue & { submittedAt: string },
 ): SubmissionRowView {
 	const cells: Record<string, string> = {};
 	for (const column of columns) {
@@ -64,7 +63,7 @@ function toRowView(
 }
 
 /**
- * 관리자 응답 목록: 답변/납입 여부는 저장소(원본) 1회 읽기, 제출 시각은 D1 키, 알림 횟수는 발송 기록에서 파생.
+ * 관리자 응답 목록: 답변/납입 여부는 저장소(원본) 1회 읽기, 제출 시각은 D1 키에서 읽는다.
  * 표시는 저장소 순서를 따른다.
  */
 export async function listSubmissionRows(formId: string) {
@@ -75,7 +74,6 @@ export async function listSubmissionRows(formId: string) {
 		listStoredKeys(formId),
 	]);
 	const createdAt = new Map(keys.map((key) => [key.id, key.createdAt]));
-	const history = await reminderHistory(records.map((record) => record.id));
 	const fields = new Map(definition.fields.map((field) => [field.id, field]));
 	const rows = records.map((record) => {
 		const submitted = createdAt.get(record.id);
@@ -84,7 +82,6 @@ export async function listSubmissionRows(formId: string) {
 				submitted === undefined
 					? ""
 					: formatInTimeZone(submitted, definition.timezone),
-			reminderCount: history.get(record.id)?.sentCount ?? 0,
 			...paymentDueOf(definition, record.answers),
 		});
 	});
@@ -92,7 +89,7 @@ export async function listSubmissionRows(formId: string) {
 		title: definition.title,
 		columns,
 		rows,
-		/** 회비 설정 (없으면 null): 입금 계좌, 옵션별 금액이면 그 질문 이름, 미입금 알림 규칙 */
+		/** 회비 설정 (없으면 null): 입금 계좌, 옵션별 금액이면 그 질문 이름 */
 		payment: definition.payment
 			? {
 					account: definition.payment.account,
@@ -100,7 +97,6 @@ export async function listSubmissionRows(formId: string) {
 						definition.payment.amount.kind === "byOption"
 							? (fields.get(definition.payment.amount.fieldId)?.label ?? null)
 							: null,
-					reminder: definition.payment.reminder ?? null,
 				}
 			: null,
 		spreadsheetUrl: spreadsheetUrl(),

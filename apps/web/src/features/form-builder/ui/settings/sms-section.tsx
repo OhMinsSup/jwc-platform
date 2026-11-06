@@ -21,7 +21,7 @@ import {
 	ToggleCard,
 } from "./shared";
 
-/** SMS 섹션에서 다루는 알림 (미입금 알림은 결제 섹션이 규칙과 함께 관리) */
+/** 신청·수정 완료 알림 */
 const SMS_TEMPLATES: readonly {
 	kind: NotificationKind;
 	label: string;
@@ -76,7 +76,7 @@ function SmsOffConfirm({
 	return (
 		<ConfirmDialog
 			confirmLabel="끄기"
-			description="작성한 알림 문구와 미입금 알림 설정이 함께 지워집니다."
+			description="작성한 신청·수정 완료 알림 문구가 지워집니다."
 			onCancel={onClose}
 			onConfirm={() => {
 				dispatch({ type: "sms/set", phoneFieldId: null });

@@ -102,7 +102,7 @@ export function planSubmissionWrite(
 }
 
 /** 템플릿과 연락처가 있을 때만 알림을 만든다 */
-export function notificationFor(
+function notificationFor(
 	definition: FormDefinition,
 	answers: Answers,
 	intent: NotificationIntent,

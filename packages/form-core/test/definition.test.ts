@@ -78,3 +78,33 @@ describe(parseFormDefinition, () => {
 		expect(issuesOf(input).join(",")).toContain("contact.phoneFieldId");
 	});
 });
+
+describe("이전 정의 호환성", () => {
+	it("기존 미입금 알림 설정을 제거해 읽고 신청·수정 알림과 회비는 유지한다", () => {
+		const legacy = {
+			...clone(),
+			payment: {
+				...retreat2026Definition.payment,
+				reminder: { firstAfterDays: 7, intervalDays: 7, maxCount: 3 },
+			},
+			notifications: {
+				...retreat2026Definition.notifications,
+				onReminder: "기존 미입금 안내",
+			},
+		};
+		const parsed = parseFormDefinition(legacy);
+		expect(parsed.ok).toBe(true);
+		if (!parsed.ok) {
+			throw new Error("이전 정의를 읽을 수 없습니다");
+		}
+		expect(parsed.definition.payment).not.toHaveProperty("reminder");
+		expect(parsed.definition.notifications).not.toHaveProperty("onReminder");
+		expect(parsed.definition.payment?.amount).toStrictEqual(
+			legacy.payment.amount,
+		);
+		expect(parsed.definition.notifications).toMatchObject({
+			onCreate: legacy.notifications.onCreate,
+			onUpdate: legacy.notifications.onUpdate,
+		});
+	});
+});

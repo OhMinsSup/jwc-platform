@@ -2,16 +2,12 @@ import { describe, expect, it } from "vite-plus/test";
 
 import {
 	computeAmount,
-	isReminderDue,
 	messageVariables,
 	renderTemplate,
 	templateFor,
 } from "../src/messaging";
 import { formatInTimeZone } from "../src/time";
 import { retreat, validRetreatAnswers } from "./fixtures";
-
-const DAY = 86_400_000;
-const RULE = { firstAfterDays: 7, intervalDays: 7, maxCount: 3 };
 
 describe("메시지", () => {
 	const definition = retreat();
@@ -37,36 +33,6 @@ describe("메시지", () => {
 
 	it("알 수 없는 변수는 빈 문자열", () => {
 		expect(renderTemplate("a{{nope}}b", {})).toBe("ab");
-	});
-});
-
-describe(isReminderDue, () => {
-	const base = { submittedAt: 0, paid: false, sentCount: 0, lastSentAt: null };
-
-	it("첫 알림은 제출 후 firstAfterDays 경과 시점부터", () => {
-		expect(isReminderDue(base, RULE, 7 * DAY - 1)).toBe(false);
-		expect(isReminderDue(base, RULE, 7 * DAY)).toBe(true);
-	});
-
-	it("이후는 간격 기준, 최대 횟수/납입 시 중단", () => {
-		expect(
-			isReminderDue(
-				{ ...base, sentCount: 1, lastSentAt: 10 * DAY },
-				RULE,
-				16 * DAY,
-			),
-		).toBe(false);
-		expect(
-			isReminderDue(
-				{ ...base, sentCount: 1, lastSentAt: 10 * DAY },
-				RULE,
-				17 * DAY,
-			),
-		).toBe(true);
-		expect(
-			isReminderDue({ ...base, sentCount: 3, lastSentAt: 0 }, RULE, 100 * DAY),
-		).toBe(false);
-		expect(isReminderDue({ ...base, paid: true }, RULE, 100 * DAY)).toBe(false);
 	});
 });
 

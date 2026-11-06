@@ -4,7 +4,6 @@ import type {
 	NotificationKind,
 	PageDef,
 	PaymentDef,
-	ReminderRule,
 } from "@jwc/form-core/definition/definition";
 import type {
 	ChoiceOption,
@@ -73,8 +72,6 @@ export type SettingsAction =
 	  }
 	| { type: "payment/set"; enabled: boolean }
 	| { type: "payment/update"; patch: PaymentPatch }
-	| { type: "reminder/set"; enabled: boolean }
-	| { type: "reminder/update"; patch: Partial<ReminderRule> }
 	| { type: "reset"; definition: FormDefinition };
 
 export type EditorAction = FieldAction | PageAction | SettingsAction;

@@ -1,17 +1,5 @@
 import { messageLog, submissionKeys } from "@schema";
-import {
-	and,
-	count,
-	db,
-	eq,
-	inArray,
-	isNotNull,
-	isNull,
-	lt,
-	max,
-	or,
-	sql,
-} from "void/db";
+import { and, db, eq, isNotNull, isNull, lt, or, sql } from "void/db";
 
 /**
  * 응답 키(D1). 답변/상태는 응답 저장소가 원본이고, 여기에는 유니크·멱등·동시성 제어만 둔다.
@@ -78,7 +66,7 @@ export async function findKey(
 		.get();
 }
 
-/** 저장소에 한 번이라도 저장된 키 (목록/알림 대상) */
+/** 저장소에 한 번이라도 저장된 키 (목록) */
 export async function listStoredKeys(
 	formId: string,
 ): Promise<SubmissionKeyRow[]> {
@@ -131,41 +119,6 @@ export async function releaseWriteLock(id: string): Promise<void> {
 		.update(submissionKeys)
 		.set({ writeLockUntil: null })
 		.where(eq(submissionKeys.id, id));
-}
-
-export interface ReminderHistory {
-	lastSentAt: number | null;
-	sentCount: number;
-}
-
-/** 미입금 알림 이력은 발송 사실(message_log)에서 파생한다 */
-export async function reminderHistory(
-	submissionIds: readonly string[],
-): Promise<Map<string, ReminderHistory>> {
-	if (submissionIds.length === 0) {
-		return new Map();
-	}
-	const rows = await db
-		.select({
-			submissionId: messageLog.submissionId,
-			sentCount: count(),
-			lastSentAt: max(messageLog.createdAt),
-		})
-		.from(messageLog)
-		.where(
-			and(
-				inArray(messageLog.submissionId, [...submissionIds]),
-				eq(messageLog.kind, "onReminder"),
-				inArray(messageLog.status, ["sent", "logged"]),
-			),
-		)
-		.groupBy(messageLog.submissionId);
-	return new Map(
-		rows.map((row) => [
-			row.submissionId,
-			{ sentCount: row.sentCount, lastSentAt: row.lastSentAt },
-		]),
-	);
 }
 
 export type MessageLogInsert = typeof messageLog.$inferInsert;

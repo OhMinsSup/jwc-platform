@@ -24,7 +24,7 @@ function detailLine(row: SubmissionRow, columns: readonly SubmissionColumn[]) {
 
 /**
  * 좁은 화면용 응답 목록. 표의 가로 스크롤 대신 응답 하나 = 카드 한 줄 묶음:
- * 이름 + 납입 버튼 / 주요 답변 / 회비 · 안내 문자 · 제출일시.
+ * 이름 + 납입 버튼 / 주요 답변 / 회비 · 제출일시.
  */
 export function SubmissionCards({
 	columns,
@@ -65,7 +65,6 @@ export function SubmissionCards({
 									{formatWon(row.amount)}
 								</span>
 							)}
-							<span>안내 문자 {row.reminderCount}회</span>
 							<DateTimeText value={row.submittedAt} />
 						</p>
 					</li>

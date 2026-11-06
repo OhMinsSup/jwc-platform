@@ -1,8 +1,8 @@
 import type { CloudEnv, QueueBatch } from "void";
 
-import paymentReminders, {
-	cron as paymentReminderCron,
-} from "../../../crons/payment-reminders";
+import maintenance, {
+	cron as maintenanceCron,
+} from "../../../crons/maintenance";
 import smsConsumer from "../../../queues/sms";
 import { log } from "./log";
 import { QUEUES } from "./queue-config";
@@ -30,7 +30,7 @@ type QueueHandler = (
 
 /** cron 표현식 → 작업 */
 const CRON_JOBS: { cron: string; run: ScheduledHandler }[] = [
-	{ cron: paymentReminderCron, run: paymentReminders },
+	{ cron: maintenanceCron, run: maintenance },
 ];
 
 /** Cloudflare 큐 이름 → 소비자 */

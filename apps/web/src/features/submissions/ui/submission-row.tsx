@@ -18,7 +18,6 @@ export interface SubmissionRow {
 	/** 시트에서 해석하지 못한 값이 있는 컬럼 이름 (운영자가 시트를 잘못 고친 경우) */
 	issueHeaders: string[];
 	paid: boolean;
-	reminderCount: number;
 	submittedAt: string;
 }
 

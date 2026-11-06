@@ -1,14 +1,9 @@
 import type { Answers } from "./answers/value";
-import type {
-	FormDefinition,
-	NotificationKind,
-	ReminderRule,
-} from "./definition/definition";
+import type { FormDefinition, NotificationKind } from "./definition/definition";
 import type { BuiltinTemplateKey } from "./definition/reserved";
 import { formatFieldValue } from "./field-types/values";
 
 const TEMPLATE_TOKEN = /\{\{\s*(?<key>[a-z][a-z0-9_]*)\s*\}\}/gu;
-const DAY_MS = 86_400_000;
 
 /** 결제 금액. 결제 설정이 없거나 금액을 정할 수 없으면 null */
 export function computeAmount(
@@ -72,26 +67,4 @@ export function templateFor(
 	kind: NotificationKind,
 ): string | undefined {
 	return definition.notifications?.[kind];
-}
-
-export interface ReminderState {
-	lastSentAt: number | null;
-	paid: boolean;
-	sentCount: number;
-	submittedAt: number;
-}
-
-/** 미입금 알림 발송 시점인지 판단 (순수 함수, now 주입) */
-export function isReminderDue(
-	state: ReminderState,
-	rule: ReminderRule,
-	now: number,
-): boolean {
-	if (state.paid || state.sentCount >= rule.maxCount) {
-		return false;
-	}
-	if (state.lastSentAt === null) {
-		return now - state.submittedAt >= rule.firstAfterDays * DAY_MS;
-	}
-	return now - state.lastSentAt >= rule.intervalDays * DAY_MS;
 }

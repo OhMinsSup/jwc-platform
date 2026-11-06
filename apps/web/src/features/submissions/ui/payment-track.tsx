@@ -3,19 +3,12 @@ import { Button } from "@jwc/ui/components/button";
 import { formatCount, formatWon } from "../../../platform/format";
 import type { PaymentSummary } from "../model/payment";
 
-interface ReminderRule {
-	firstAfterDays: number;
-	intervalDays: number;
-	maxCount: number;
-}
-
 interface PaymentTrackProps {
 	/** 입금 계좌 (정의의 payment.account) */
 	account: string;
 	/** 옵션별 금액일 때 그 질문 이름 (예: "숙박 형태") */
 	groupLabel: string | null;
 	onShowUnpaid: () => void;
-	reminder: ReminderRule | null;
 	summary: PaymentSummary;
 }
 
@@ -26,12 +19,6 @@ function collectedPercent(summary: PaymentSummary): number {
 	return summary.expected === 0
 		? 0
 		: (summary.collected / summary.expected) * PERCENT;
-}
-
-function reminderSentence(rule: ReminderRule | null): string {
-	return rule
-		? `미납자에게는 신청 ${rule.firstAfterDays}일 뒤부터 ${rule.intervalDays}일마다, 최대 ${rule.maxCount}번 안내 문자가 갑니다.`
-		: "미입금 안내 문자는 설정되어 있지 않습니다.";
 }
 
 /** 머리 수치: 화면의 질문("누가 아직 안 냈나")에 답하는 가장 큰 숫자 */
@@ -146,7 +133,6 @@ export function PaymentTrack({
 	summary,
 	account,
 	groupLabel,
-	reminder,
 	onShowUnpaid,
 }: PaymentTrackProps) {
 	return (
@@ -171,8 +157,6 @@ export function PaymentTrack({
 			<Groups groupLabel={groupLabel} summary={summary} />
 			<p className="text-muted-foreground border-t pt-4 text-[13px]">
 				입금 계좌 <span className="text-foreground">{account}</span>
-				<span aria-hidden> · </span>
-				{reminderSentence(reminder)}
 			</p>
 		</section>
 	);

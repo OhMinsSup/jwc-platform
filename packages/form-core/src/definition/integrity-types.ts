@@ -10,12 +10,11 @@ export interface DefinitionShape {
 	contact?: { phoneFieldId: string };
 	fields: FieldDef[];
 	identity: { fieldId: string };
-	notifications?: { onCreate?: string; onUpdate?: string; onReminder?: string };
+	notifications?: { onCreate?: string; onUpdate?: string };
 	pages: { id: string; fieldIds: string[]; showIf?: FieldDef["showIf"] }[];
 	payment?: {
 		amount:
 			| { kind: "fixed"; value: number }
 			| { kind: "byOption"; fieldId: string; amounts: Record<string, number> };
-		reminder?: unknown;
 	};
 }
