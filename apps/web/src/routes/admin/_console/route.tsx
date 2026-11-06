@@ -1,18 +1,19 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { useEffect } from "react";
 
-import { getAdminSessionFn } from "../../../features/admin-access/functions";
+import { getAdminAccessFn } from "../../../features/admin-access/functions";
+import { ADMIN_AUTH_DESTINATIONS } from "../../../features/admin-access/model/admin-auth";
 import { identifyAdmin } from "../../../platform/analytics/client";
 import { AdminShell } from "../../../platform/ui/admin-shell";
 
 /** /admin/* 보호 레이아웃. 서버에서 세션 + 허용 목록을 검사한다. */
 export const Route = createFileRoute("/admin/_console")({
 	beforeLoad: async () => {
-		const admin = await getAdminSessionFn();
-		if (!admin) {
-			throw redirect({ to: "/admin/login" });
+		const decision = await getAdminAccessFn();
+		if (decision.kind !== "ready") {
+			throw redirect({ to: ADMIN_AUTH_DESTINATIONS[decision.kind] });
 		}
-		return { admin };
+		return { admin: decision.admin };
 	},
 	component: ConsoleLayout,
 });

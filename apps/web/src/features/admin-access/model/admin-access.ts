@@ -2,9 +2,6 @@
  * 관리자 접근(가입/초대/감사 기록) 공용 데이터. 서버와 화면이 같은 표를 쓴다.
  */
 
-/** 관리자 비밀번호 최소 길이 (Better Auth 설정과 가입 화면이 같은 값을 쓴다) */
-export const ADMIN_PASSWORD_MIN_LENGTH = 10;
-
 /** 감사 기록 작업 → 화면 이름. 새 작업은 이 표에 한 줄 추가 */
 export const AUDIT_ACTION_LABELS = {
 	"form.created": "폼 생성",

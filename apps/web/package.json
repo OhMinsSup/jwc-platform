@@ -12,6 +12,7 @@
 		"preview": "vp preview",
 		"test": "vp test run",
 		"test:e2e": "playwright test",
+		"test:e2e:install": "playwright install --with-deps --only-shell chromium",
 		"typecheck": "void prepare && jwc-typecheck --noEmit && jwc-typecheck --noEmit -p e2e",
 		"typecheck:tsc": "void prepare && tsc --noEmit && tsc --noEmit -p e2e"
 	},
@@ -30,6 +31,7 @@
 		"better-auth": "^1.7.17",
 		"drizzle-orm": "^0.45.4",
 		"lucide-react": "catalog:",
+		"qrcode.react": "^4.2.0",
 		"react": "catalog:react19",
 		"react-dom": "catalog:react19",
 		"zod": "catalog:",

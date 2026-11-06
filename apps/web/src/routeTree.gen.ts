@@ -11,8 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminConsoleRouteRouteImport } from './routes/admin/_console/route'
+import { Route as AdminForgotPasswordRouteImport } from './routes/admin/forgot-password'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
+import { Route as AdminSetupTwoFactorRouteImport } from './routes/admin/setup-two-factor'
 import { Route as AdminSignupRouteImport } from './routes/admin/signup'
+import { Route as AdminTwoFactorRouteImport } from './routes/admin/two-factor'
+import { Route as AdminVerifyPhoneRouteImport } from './routes/admin/verify-phone'
 import { Route as RIdRouteImport } from './routes/r/$id'
 import { Route as AdminConsoleIndexRouteImport } from './routes/admin/_console/index'
 import { Route as AdminConsoleAdminsRouteImport } from './routes/admin/_console/admins'
@@ -34,14 +38,34 @@ const AdminConsoleRouteRoute = AdminConsoleRouteRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminForgotPasswordRoute = AdminForgotPasswordRouteImport.update({
+  id: '/admin/forgot-password',
+  path: '/admin/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/admin/login',
   path: '/admin/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminSetupTwoFactorRoute = AdminSetupTwoFactorRouteImport.update({
+  id: '/admin/setup-two-factor',
+  path: '/admin/setup-two-factor',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminSignupRoute = AdminSignupRouteImport.update({
   id: '/admin/signup',
   path: '/admin/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminTwoFactorRoute = AdminTwoFactorRouteImport.update({
+  id: '/admin/two-factor',
+  path: '/admin/two-factor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminVerifyPhoneRoute = AdminVerifyPhoneRouteImport.update({
+  id: '/admin/verify-phone',
+  path: '/admin/verify-phone',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RIdRoute = RIdRouteImport.update({
@@ -102,8 +126,12 @@ const AdminConsoleFormsFormIdSubmissionsRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminConsoleRouteRouteWithChildren
+  '/admin/forgot-password': typeof AdminForgotPasswordRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/setup-two-factor': typeof AdminSetupTwoFactorRoute
   '/admin/signup': typeof AdminSignupRoute
+  '/admin/two-factor': typeof AdminTwoFactorRoute
+  '/admin/verify-phone': typeof AdminVerifyPhoneRoute
   '/r/$id': typeof RIdRoute
   '/admin/admins': typeof AdminConsoleAdminsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -117,8 +145,12 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin/forgot-password': typeof AdminForgotPasswordRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/setup-two-factor': typeof AdminSetupTwoFactorRoute
   '/admin/signup': typeof AdminSignupRoute
+  '/admin/two-factor': typeof AdminTwoFactorRoute
+  '/admin/verify-phone': typeof AdminVerifyPhoneRoute
   '/r/$id': typeof RIdRoute
   '/admin/admins': typeof AdminConsoleAdminsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -133,8 +165,12 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin/_console': typeof AdminConsoleRouteRouteWithChildren
+  '/admin/forgot-password': typeof AdminForgotPasswordRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/setup-two-factor': typeof AdminSetupTwoFactorRoute
   '/admin/signup': typeof AdminSignupRoute
+  '/admin/two-factor': typeof AdminTwoFactorRoute
+  '/admin/verify-phone': typeof AdminVerifyPhoneRoute
   '/r/$id': typeof RIdRoute
   '/admin/_console/admins': typeof AdminConsoleAdminsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -151,8 +187,12 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/admin/forgot-password'
     | '/admin/login'
+    | '/admin/setup-two-factor'
     | '/admin/signup'
+    | '/admin/two-factor'
+    | '/admin/verify-phone'
     | '/r/$id'
     | '/admin/admins'
     | '/api/auth/$'
@@ -166,8 +206,12 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin/forgot-password'
     | '/admin/login'
+    | '/admin/setup-two-factor'
     | '/admin/signup'
+    | '/admin/two-factor'
+    | '/admin/verify-phone'
     | '/r/$id'
     | '/admin/admins'
     | '/api/auth/$'
@@ -181,8 +225,12 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin/_console'
+    | '/admin/forgot-password'
     | '/admin/login'
+    | '/admin/setup-two-factor'
     | '/admin/signup'
+    | '/admin/two-factor'
+    | '/admin/verify-phone'
     | '/r/$id'
     | '/admin/_console/admins'
     | '/api/auth/$'
@@ -198,8 +246,12 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminConsoleRouteRoute: typeof AdminConsoleRouteRouteWithChildren
+  AdminForgotPasswordRoute: typeof AdminForgotPasswordRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  AdminSetupTwoFactorRoute: typeof AdminSetupTwoFactorRoute
   AdminSignupRoute: typeof AdminSignupRoute
+  AdminTwoFactorRoute: typeof AdminTwoFactorRoute
+  AdminVerifyPhoneRoute: typeof AdminVerifyPhoneRoute
   RIdRoute: typeof RIdRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   FSlugDoneRoute: typeof FSlugDoneRoute
@@ -222,6 +274,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminConsoleRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/forgot-password': {
+      id: '/admin/forgot-password'
+      path: '/admin/forgot-password'
+      fullPath: '/admin/forgot-password'
+      preLoaderRoute: typeof AdminForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/login': {
       id: '/admin/login'
       path: '/admin/login'
@@ -229,11 +288,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/setup-two-factor': {
+      id: '/admin/setup-two-factor'
+      path: '/admin/setup-two-factor'
+      fullPath: '/admin/setup-two-factor'
+      preLoaderRoute: typeof AdminSetupTwoFactorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/signup': {
       id: '/admin/signup'
       path: '/admin/signup'
       fullPath: '/admin/signup'
       preLoaderRoute: typeof AdminSignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/two-factor': {
+      id: '/admin/two-factor'
+      path: '/admin/two-factor'
+      fullPath: '/admin/two-factor'
+      preLoaderRoute: typeof AdminTwoFactorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/verify-phone': {
+      id: '/admin/verify-phone'
+      path: '/admin/verify-phone'
+      fullPath: '/admin/verify-phone'
+      preLoaderRoute: typeof AdminVerifyPhoneRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/r/$id': {
@@ -347,8 +427,12 @@ const AdminConsoleRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminConsoleRouteRoute: AdminConsoleRouteRouteWithChildren,
+  AdminForgotPasswordRoute: AdminForgotPasswordRoute,
   AdminLoginRoute: AdminLoginRoute,
+  AdminSetupTwoFactorRoute: AdminSetupTwoFactorRoute,
   AdminSignupRoute: AdminSignupRoute,
+  AdminTwoFactorRoute: AdminTwoFactorRoute,
+  AdminVerifyPhoneRoute: AdminVerifyPhoneRoute,
   RIdRoute: RIdRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   FSlugDoneRoute: FSlugDoneRoute,

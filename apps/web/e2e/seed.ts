@@ -5,6 +5,8 @@ import path from "node:path";
 
 import { parseFormDefinition } from "@jwc/form-core/definition/definition";
 
+import { adminSeedSql } from "./auth-fixture";
+import { assertE2EDatabase } from "./database";
 import { E2E_DEFINITION, E2E_FORM } from "./fixture";
 
 const PUBLISHED_BY = "e2e";
@@ -34,11 +36,13 @@ export function seedSql(now: number): string {
 }
 
 /** Playwright globalSetup: 로컬 D1에 마이그레이션을 적용하고 E2E 폼을 넣는다 (다른 데이터는 건드리지 않는다) */
-export default function globalSetup() {
+export default async function globalSetup() {
+	assertE2EDatabase();
 	const dir = mkdtempSync(path.join(tmpdir(), "jwc-e2e-"));
 	const file = path.join(dir, "seed.sql");
 	try {
-		writeFileSync(file, seedSql(Date.now()));
+		const now = Date.now();
+		writeFileSync(file, `${seedSql(now)}\n${await adminSeedSql(now)}`);
 		execFileSync("pnpm", ["exec", "void", "db", "migrate"], {
 			stdio: "inherit",
 		});
@@ -48,4 +52,7 @@ export default function globalSetup() {
 	} finally {
 		rmSync(dir, { force: true, recursive: true });
 	}
+	return () => {
+		rmSync(".void/local-d1.json", { force: true });
+	};
 }

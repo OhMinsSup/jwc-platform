@@ -1,33 +1,63 @@
+import { sql } from "drizzle-orm";
 import { index, integer, sqliteTable, text, uniqueIndex } from "void/schema-d1";
 
-/**
- * D1 스키마 (단일 모듈). void가 이 파일을 drizzle 스키마로 읽고 `@schema`로 연결한다.
- * 묶음(배럴) 파일을 두지 않기 위해 표 정의를 한 파일에 둔다 (ADR-0007).
- * 표: Better Auth 코어 / 폼·버전 / 응답 키·발송 기록 / 보안(속도 제한·초대·감사)
- */
+/** D1 단일 정의 모듈. void가 @schema로 읽는다 (ADR-0007). */
 
 /* ───────── auth ───────── */
 
-/**
- * Better Auth 코어 테이블 (sqlite).
- * 컬럼 구성은 Better Auth 1.7 drizzle 어댑터 기대값과 일치해야 한다.
- * 변경 시 `pnpm auth:schema`로 생성한 결과와 비교할 것.
- */
+/** Better Auth SQLite 스키마. 변경 시 플러그인 스키마와 비교한다. */
 const timestamps = {
 	createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
 	updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
 };
 
-export const user = sqliteTable("user", {
-	id: text("id").primaryKey(),
-	name: text("name").notNull(),
-	email: text("email").notNull().unique(),
-	emailVerified: integer("email_verified", { mode: "boolean" })
-		.notNull()
-		.default(false),
-	image: text("image"),
-	...timestamps,
-});
+export const user = sqliteTable(
+	"user",
+	{
+		id: text("id").primaryKey(),
+		name: text("name").notNull(),
+		email: text("email").notNull().unique(),
+		emailVerified: integer("email_verified", { mode: "boolean" })
+			.notNull()
+			.default(false),
+		image: text("image"),
+		phoneNumber: text("phone_number").unique(),
+		phoneNumberVerified: integer("phone_number_verified", { mode: "boolean" })
+			.notNull()
+			.default(false),
+		twoFactorEnabled: integer("two_factor_enabled", { mode: "boolean" })
+			.notNull()
+			.default(false),
+		bootstrapAdmin: integer("bootstrap_admin", { mode: "boolean" })
+			.notNull()
+			.default(false),
+		...timestamps,
+	},
+	(table) => [
+		uniqueIndex("user_bootstrap_uq")
+			.on(table.bootstrapAdmin)
+			.where(sql`${table.bootstrapAdmin} = 1`),
+	],
+);
+
+export const twoFactor = sqliteTable(
+	"two_factor",
+	{
+		id: text("id").primaryKey(),
+		userId: text("user_id")
+			.notNull()
+			.references(() => user.id, { onDelete: "cascade" }),
+		secret: text("secret").notNull(),
+		backupCodes: text("backup_codes").notNull(),
+		verified: integer("verified", { mode: "boolean" }).default(true),
+		failedVerificationCount: integer("failed_verification_count").default(0),
+		lockedUntil: integer("locked_until", { mode: "timestamp_ms" }),
+	},
+	(table) => [
+		uniqueIndex("two_factor_user_uq").on(table.userId),
+		index("two_factor_secret_idx").on(table.secret),
+	],
+);
 
 export const session = sqliteTable(
 	"session",
@@ -84,11 +114,7 @@ export const verification = sqliteTable(
 
 /* ───────── forms ───────── */
 
-/**
- * 폼 구성 데이터는 DB(D1)에 둔다.
- * - forms: 편집 중인 초안(draft)과 현재 발행 버전 포인터
- * - form_versions: 발행된 정의 스냅샷 (불변)
- */
+/** 폼 초안과 발행된 정의 스냅샷. */
 export const forms = sqliteTable("forms", {
 	id: text("id").primaryKey(),
 	slug: text("slug").notNull().unique(),
@@ -128,11 +154,7 @@ export const formVersions = sqliteTable(
 
 /* ───────── submissions ───────── */
 
-/**
- * 응답 "키". 답변과 상태(납입 여부 등)는 응답 저장소(SubmissionStore, 기본 Google Sheets)가 원본이다.
- * 여기에는 저장소가 못 하는 일만 둔다: 원자적 유니크 판정(폼 + 식별값), 알림 멱등 키용 revision,
- * 같은 응답의 동시 쓰기를 막는 임대 락. 답변/연락처/납입 여부는 저장하지 않는다.
- */
+/** 응답 원본은 SubmissionStore. D1에는 유니크 키, 알림 revision, 쓰기 락만 둔다. */
 export const submissionKeys = sqliteTable(
 	"submission_keys",
 	{
@@ -160,10 +182,7 @@ export const submissionKeys = sqliteTable(
 	],
 );
 
-/**
- * SMS 발송 사실. idempotencyKey로 중복 발송을 막는다 (큐는 at-least-once).
- * 미입금 알림 횟수/마지막 시각은 이 표에서 파생한다(별도 카운터를 두지 않는다).
- */
+/** SMS 발송 사실. 큐의 중복 발송은 idempotencyKey로 막고 알림 상태는 여기서 파생한다. */
 export const messageLog = sqliteTable(
 	"message_log",
 	{
@@ -188,10 +207,7 @@ export const messageLog = sqliteTable(
 
 /* ───────── security ───────── */
 
-/**
- * 고정 창(fixed window) 요청 수 제한. 키는 `<규칙>:<대상 해시>` (IP 원문은 저장하지 않는다).
- * 만료된 행은 크론이 지운다.
- */
+/** 고정 창 요청 제한. 키는 규칙 + 대상 HMAC이며 만료 행은 크론이 지운다. */
 export const rateLimitBuckets = sqliteTable(
 	"rate_limit_buckets",
 	{
@@ -202,10 +218,7 @@ export const rateLimitBuckets = sqliteTable(
 	(table) => [index("rate_limit_buckets_window_idx").on(table.windowStart)],
 );
 
-/**
- * 관리자 초대. 코드는 해시만 저장하고(원문은 만들 때 한 번만 보여 준다) 이메일에 묶인 1회용이다.
- * 가입은 유효한 초대(또는 첫 관리자 부트스트랩)로만 가능하다.
- */
+/** 이메일에 묶인 일회용 초대. 코드 원문은 저장하지 않는다. */
 export const adminInvites = sqliteTable(
 	"admin_invites",
 	{
@@ -225,9 +238,7 @@ export const adminInvites = sqliteTable(
 	(table) => [index("admin_invites_email_idx").on(table.email)],
 );
 
-/**
- * 관리자 작업 감사 기록. 개인정보(답변, 연락처)는 남기지 않고 대상 id와 작업 종류만 남긴다.
- */
+/** 관리자 감사 기록. 개인정보 없이 대상 id와 작업 종류만 남긴다. */
 export const auditLog = sqliteTable(
 	"audit_log",
 	{

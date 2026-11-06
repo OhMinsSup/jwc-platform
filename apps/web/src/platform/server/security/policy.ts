@@ -17,6 +17,9 @@ export const RATE_LIMITS = {
 	submit: { max: 10, windowMs: 10 * MINUTE_MS },
 	submission_view: { max: 60, windowMs: 10 * MINUTE_MS },
 	admin_auth: { max: 10, windowMs: 10 * MINUTE_MS },
+	admin_two_factor: { max: 10, windowMs: 10 * MINUTE_MS },
+	admin_sms: { max: 3, windowMs: 10 * MINUTE_MS },
+	admin_sms_verify: { max: 10, windowMs: 10 * MINUTE_MS },
 } as const;
 
 export type RateLimitRule = keyof typeof RATE_LIMITS;
@@ -28,6 +31,73 @@ const MAX_BODY_BYTES = 1_048_576;
  * 요청 판정 정책. 관리자 가입은 초대 코드를 검사하는 서버 함수로만 한다
  * (Better Auth의 공개 가입 엔드포인트는 막고, 로그인은 속도 제한).
  */
+const AUTH_RULES: RequestPolicy<RateLimitRule>["rules"] = [
+	{
+		prefix: "/api/auth/two-factor/disable",
+		action: {
+			kind: "reject",
+			status: 403,
+			message: "관리자 2단계 인증은 해제할 수 없습니다",
+		},
+	},
+	{
+		prefix: "/api/auth/two-factor/",
+		action: { kind: "rate_limit", rule: "admin_two_factor" },
+	},
+	{
+		prefix: "/api/auth/phone-number/",
+		action: {
+			kind: "reject",
+			status: 403,
+			message: "관리자 인증 화면을 이용해주세요",
+		},
+	},
+	{
+		prefix: "/api/auth/sign-in/phone-number",
+		action: {
+			kind: "reject",
+			status: 403,
+			message: "관리자 로그인 화면을 이용해주세요",
+		},
+	},
+	{
+		prefix: "/api/auth/send-verification-email",
+		action: {
+			kind: "reject",
+			status: 403,
+			message: "SMS 인증을 이용해주세요",
+		},
+	},
+	{
+		prefix: "/api/auth/request-password-reset",
+		action: {
+			kind: "reject",
+			status: 403,
+			message: "SMS 인증을 이용해주세요",
+		},
+	},
+	{
+		prefix: "/api/auth/reset-password",
+		action: {
+			kind: "reject",
+			status: 403,
+			message: "SMS 인증을 이용해주세요",
+		},
+	},
+	{
+		prefix: "/api/auth/sign-up/",
+		action: {
+			kind: "reject",
+			status: 403,
+			message: "관리자 가입 화면을 이용해주세요",
+		},
+	},
+	{
+		prefix: "/api/auth/sign-in/",
+		action: { kind: "rate_limit", rule: "admin_auth" },
+	},
+];
+
 export function requestPolicy(
 	siteOrigin: string,
 ): RequestPolicy<RateLimitRule> {
@@ -35,20 +105,7 @@ export function requestPolicy(
 		siteOrigin,
 		guardedPrefixes: ["/_serverFn/", "/api/"],
 		maxBodyBytes: MAX_BODY_BYTES,
-		rules: [
-			{
-				prefix: "/api/auth/sign-up/",
-				action: {
-					kind: "reject",
-					status: 403,
-					message: "가입은 초대 코드로만 할 수 있습니다",
-				},
-			},
-			{
-				prefix: "/api/auth/sign-in/",
-				action: { kind: "rate_limit", rule: "admin_auth" },
-			},
-		],
+		rules: AUTH_RULES,
 	};
 }
 

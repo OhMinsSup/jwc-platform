@@ -21,6 +21,30 @@ function post(path: string): Request {
 }
 
 describe("앱 요청 정책", () => {
+	it.each([
+		"/api/auth/send-verification-email",
+		"/api/auth/request-password-reset",
+		"/api/auth/phone-number/verify",
+		"/api/auth/sign-in/phone-number",
+	])("사용하지 않는 공개 인증 경로는 차단한다: %s", (path) => {
+		expect(judgeRequest(post(path), POLICY)).toMatchObject({
+			kind: "reject",
+			status: 403,
+		});
+	});
+
+	it("2단계 인증도 영속 속도 제한한다", () => {
+		expect(
+			judgeRequest(post("/api/auth/two-factor/verify-totp"), POLICY),
+		).toStrictEqual({ kind: "rate_limit", rule: "admin_two_factor" });
+	});
+
+	it("2단계 인증 해제는 HTTP 경계에서도 거절한다", () => {
+		expect(
+			judgeRequest(post("/api/auth/two-factor/disable"), POLICY),
+		).toMatchObject({ kind: "reject", status: 403 });
+	});
+
 	it("Better Auth 공개 가입 엔드포인트는 막는다 (초대 코드 서버 함수로만 가입)", () => {
 		expect(judgeRequest(post("/api/auth/sign-up/email"), POLICY)).toMatchObject(
 			{

@@ -55,7 +55,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Playwright Chromium 설치
-        run: pnpm -C apps/web exec playwright install --with-deps --only-shell chromium
+        run: pnpm -C apps/web test:e2e:install
 
       # 비밀값이 아닌 더미 값만 쓴다: 응답은 메모리 저장소, SMS는 로그 모드라 Google/SMS로 나가지 않는다.
       # DATA_KEY는 형식(base64 32바이트)만 맞춘 0 바이트 키다.
@@ -74,7 +74,7 @@ jobs:
           SMS_MODE=log
           ENV
 
-      - name: 공개 신청 E2E
+      - name: 공개 신청 및 관리자 인증 E2E
         run: pnpm -C apps/web test:e2e
 
       - name: 실패 시 trace 보관

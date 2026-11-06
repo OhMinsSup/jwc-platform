@@ -95,7 +95,8 @@ export function InviteForm() {
 						</Button>
 					</div>
 					<p className="text-muted-foreground text-xs" id="invite-email-hint">
-						관리자 허용 목록(ADMIN_EMAILS)에 있는 주소만 초대할 수 있습니다.
+						ADMIN_EMAILS와 ADMIN_PHONES에 이메일·인증 번호가 등록된 관리자만
+						초대할 수 있습니다.
 					</p>
 				</div>
 				{error && (

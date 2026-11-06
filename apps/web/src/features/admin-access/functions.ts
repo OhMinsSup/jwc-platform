@@ -6,6 +6,7 @@ import { z } from "zod";
 import { enforceRateLimit } from "../../platform/server/security/rate-limit";
 import { toResult } from "../../platform/server/server-fn";
 import { MAX_EMAIL_LENGTH } from "../../platform/server/validation";
+import { AdminSignupSchema } from "./domain/admin-input";
 import {
 	createInvite,
 	recentInvites,
@@ -13,19 +14,14 @@ import {
 } from "./server/admin-access";
 import { adminOnly } from "./server/admin-only";
 import { audited, recentAdminActions } from "./server/audit";
-import { currentAdmin } from "./server/session";
+import { currentAdminAccess } from "./server/session";
 
 /**
  * 관리자 접근 기능의 서버 함수 경계 (세션, 초대, 가입, 감사 기록 조회).
  */
 
-const MAX_NAME_LENGTH = 50;
-/** Better Auth 기본 최대 비밀번호 길이 */
-const MAX_PASSWORD_LENGTH = 128;
-const MAX_INVITE_CODE_LENGTH = 64;
-
-export const getAdminSessionFn = createServerFn({ method: "GET" }).handler(() =>
-	currentAdmin(),
+export const getAdminAccessFn = createServerFn({ method: "GET" }).handler(() =>
+	currentAdminAccess(),
 );
 
 /** 관리자 초대 발급. 원문 코드는 이 응답에서 한 번만 돌려준다 */
@@ -59,17 +55,10 @@ export const listAuditFn = createServerFn({ method: "GET" })
 
 /**
  * 공개 관리자 가입 경계 (로그인 전이라 adminOnly가 없다).
- * 경계에서는 길이만 제한하고, 형식/정책 판단은 서비스가 한다 — 어떤 거절이든 같은 문장으로 돌려주기 위해.
+ * 입력 스키마가 형식·크기와 번호를 정규화하고, 가입 모듈이 허용 목록·초대·비밀번호 정책 거절을 처리한다.
  */
 export const signUpAdminFn = createServerFn({ method: "POST" })
-	.validator(
-		z.object({
-			name: z.string().trim().min(1).max(MAX_NAME_LENGTH),
-			email: z.string().trim().max(MAX_EMAIL_LENGTH),
-			password: z.string().max(MAX_PASSWORD_LENGTH),
-			inviteCode: z.string().trim().max(MAX_INVITE_CODE_LENGTH).optional(),
-		}),
-	)
+	.validator(AdminSignupSchema)
 	.handler(({ data }) =>
 		toResult("admin.signUp", async () => {
 			const now = Date.now();

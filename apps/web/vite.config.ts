@@ -4,12 +4,12 @@ import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import { voidPlugin } from "void";
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
 	plugins: [
 		// voidPlugin은 반드시 프레임워크 플러그인보다 앞에 둔다 (void 공식 가이드)
-		voidPlugin(),
+		voidPlugin({ persistTo: mode === "e2e" ? ".void/e2e" : undefined }),
 		tailwindcss(),
 		tanstackStart(),
 		react(),
 	],
-});
+}));

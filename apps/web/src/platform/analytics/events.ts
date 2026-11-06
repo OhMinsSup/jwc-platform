@@ -33,7 +33,10 @@ export function replayAllowedOn(pathname: string): boolean {
 
 /** 신청 내역 주소(/r/<id>)의 id는 열람 권한 역할을 하므로 분석 도구로 보내지 않는다 */
 const SUBMISSION_PATH = /\/r\/[^/?#]+/gu;
+const AUTH_QUERY = /(?<path>(?:\/admin|\/api\/auth)(?:\/[^?#]*)?)[?#].*$/u;
 
 export function sanitizeUrl(url: string): string {
-	return url.replaceAll(SUBMISSION_PATH, "/r/:id");
+	return url
+		.replaceAll(SUBMISSION_PATH, "/r/:id")
+		.replace(AUTH_QUERY, "$<path>");
 }

@@ -1,6 +1,7 @@
 import { formText } from "@jwc/common/form-data";
 import { Callout } from "@jwc/ui-patterns/components/callout";
 import { Button } from "@jwc/ui/components/button";
+import { Field, FieldGroup } from "@jwc/ui/components/field";
 import { Input } from "@jwc/ui/components/input";
 import { Label } from "@jwc/ui/components/label";
 import { Loader2 } from "lucide-react";
@@ -14,13 +15,17 @@ export interface AuthFieldDef {
 	hint?: string;
 	label: string;
 	minLength?: number;
+	maxLength?: number;
+	inputMode?: "numeric" | "text";
+	pattern?: string;
 	name: string;
 	/** true면 비워 둘 수 있다 (기본: 필수) */
 	optional?: boolean;
-	type: "text" | "email" | "password";
+	type: "text" | "email" | "password" | "tel";
 }
 
 interface AuthCardProps {
+	children?: ReactNode;
 	description?: string;
 	fields: AuthFieldDef[];
 	footer?: ReactNode;
@@ -33,7 +38,7 @@ interface AuthCardProps {
 function AuthField({ field }: { field: AuthFieldDef }) {
 	const hintId = `${field.name}-hint`;
 	return (
-		<div className="space-y-1">
+		<Field>
 			<Label
 				className="text-muted-foreground gap-1 text-[13px] font-normal"
 				htmlFor={field.name}
@@ -49,6 +54,9 @@ function AuthField({ field }: { field: AuthFieldDef }) {
 				className="bg-card h-[38px] rounded-md px-3"
 				id={field.name}
 				minLength={field.minLength}
+				maxLength={field.maxLength}
+				inputMode={field.inputMode}
+				pattern={field.pattern}
 				name={field.name}
 				required={field.optional !== true}
 				type={field.type}
@@ -58,7 +66,7 @@ function AuthField({ field }: { field: AuthFieldDef }) {
 					{field.hint}
 				</p>
 			)}
-		</div>
+		</Field>
 	);
 }
 
@@ -99,29 +107,20 @@ export function AuthCard({
 	submitLabel,
 	footer,
 	onSubmit,
+	children,
 }: AuthCardProps) {
-	const [error, setError] = useState<string | null>(null);
-	const [pending, setPending] = useState(false);
-	async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
-		event.preventDefault();
-		const data = new FormData(event.currentTarget);
-		const values = Object.fromEntries(
-			fields.map((field) => [field.name, formText(data, field.name)]),
-		);
-		setPending(true);
-		setError(await onSubmit(values));
-		setPending(false);
-	}
+	const { error, pending, handleSubmit } = useAuthSubmission(fields, onSubmit);
 	return (
 		<main className="bg-grid flex min-h-svh items-center justify-center p-5">
 			<div className="bg-card shadow-soft w-full max-w-[400px] rounded-xl px-6 py-10 sm:p-12">
-				<form className="space-y-6" onSubmit={handleSubmit}>
+				<form className="flex flex-col gap-6" onSubmit={handleSubmit}>
 					<AuthHeading description={description} title={title} />
-					<div className="space-y-3">
+					{children}
+					<FieldGroup>
 						{fields.map((field) => (
 							<AuthField field={field} key={field.name} />
 						))}
-					</div>
+					</FieldGroup>
 					<AuthError message={error} />
 					<Button
 						className="shadow-soft-sm h-[38px] w-full font-semibold"
@@ -138,4 +137,40 @@ export function AuthCard({
 			</div>
 		</main>
 	);
+}
+
+async function submitAuth(
+	onSubmit: AuthCardProps["onSubmit"],
+	values: Record<string, string>,
+) {
+	try {
+		return await onSubmit(values);
+	} catch (error) {
+		if (!(error instanceof Error)) {
+			throw error;
+		}
+		return "요청을 처리하지 못했습니다. 연결을 확인한 뒤 다시 시도해주세요";
+	}
+}
+
+function useAuthSubmission(
+	fields: AuthFieldDef[],
+	onSubmit: AuthCardProps["onSubmit"],
+) {
+	const [error, setError] = useState<string | null>(null);
+	const [pending, setPending] = useState(false);
+	async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
+		event.preventDefault();
+		if (pending) {
+			return;
+		}
+		const data = new FormData(event.currentTarget);
+		const values = Object.fromEntries(
+			fields.map((field) => [field.name, formText(data, field.name)]),
+		);
+		setPending(true);
+		setError(await submitAuth(onSubmit, values));
+		setPending(false);
+	}
+	return { error, pending, handleSubmit };
 }

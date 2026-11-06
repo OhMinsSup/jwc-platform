@@ -1,33 +1,28 @@
 import { getRequestHeaders } from "@tanstack/react-start/server";
 
 import { UnauthorizedError } from "../../../platform/server/errors/unauthorized-error";
-import { getAuth, isAllowedAdmin } from "./auth";
+import { decideAdminAccess } from "../domain/admin-auth-state";
+import type {
+	AdminAccessDecision,
+	AdminIdentity,
+} from "../domain/admin-auth-state";
+import { adminRegistration, getAuth } from "./auth";
 
-export interface AdminUser {
-	email: string;
-	id: string;
-	name: string;
-}
-
-/** 세션이 있고, 현재도 허용 목록에 있는 관리자만 반환 (목록에서 빠지면 즉시 접근 차단) */
-export async function currentAdmin(): Promise<AdminUser | null> {
+/** 매 요청에서 세션과 현재 등록 정보로 접근 결정을 계산한다. */
+export async function currentAdminAccess(): Promise<AdminAccessDecision> {
 	const session = await getAuth().api.getSession({
 		headers: getRequestHeaders(),
 	});
-	if (!(session && isAllowedAdmin(session.user.email))) {
-		return null;
-	}
-	return {
-		id: session.user.id,
-		email: session.user.email,
-		name: session.user.name,
-	};
+	return decideAdminAccess({
+		user: session?.user ?? null,
+		registration: session ? adminRegistration(session.user.email) : null,
+	});
 }
 
-export async function requireAdmin(): Promise<AdminUser> {
-	const admin = await currentAdmin();
-	if (!admin) {
+export async function requireAdmin(): Promise<AdminIdentity> {
+	const decision = await currentAdminAccess();
+	if (decision.kind !== "ready") {
 		throw new UnauthorizedError();
 	}
-	return admin;
+	return decision.admin;
 }

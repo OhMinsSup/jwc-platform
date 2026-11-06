@@ -12,6 +12,8 @@ export default defineEnv({
 	BETTER_AUTH_SECRET: string(),
 	/** 관리자 가입/접근 허용 이메일 (쉼표 구분) */
 	ADMIN_EMAILS: string(),
+	/** 관리자별 인증 번호. 이메일=휴대전화번호, 쉼표 구분. */
+	ADMIN_PHONES: string().default(""),
 
 	/** 개인정보 암호화/해시용 마스터 키 (base64, 32바이트) — HKDF로 용도별 키 파생 */
 	DATA_KEY: string(),

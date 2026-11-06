@@ -3,6 +3,13 @@ import { describe, expect, it } from "vite-plus/test";
 import { replayAllowedOn, sanitizeUrl } from "../src/platform/analytics/events";
 
 describe(sanitizeUrl, () => {
+	it.each([
+		"/admin/verify-phone?code=secret",
+		"/api/auth/phone-number/verify?code=secret",
+	])("인증 URL의 토큰을 분석 도구로 보내지 않는다: %s", (url) => {
+		expect(sanitizeUrl(url)).toBe(url.split("?")[0]);
+	});
+
 	it("신청 내역 id(열람 권한)는 지운다", () => {
 		expect(sanitizeUrl("https://x.test/r/AbC123_-xyz?ref=sms")).toBe(
 			"https://x.test/r/:id?ref=sms",

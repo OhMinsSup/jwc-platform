@@ -8,6 +8,7 @@ import { createGoogleSheetsStore } from "@jwc/submission-store/google-sheets";
 import { createMemorySubmissionStore } from "@jwc/submission-store/memory";
 import { env } from "void/env";
 
+import { DomainError } from "./errors/domain-error";
 import { createSolapiSender, loggingSender } from "./solapi";
 import type { SmsSender } from "./solapi";
 
@@ -21,6 +22,25 @@ const TRAILING_SLASH = /\/$/u;
 let keys: Promise<DataKeys> | null = null;
 let store: SubmissionStore | null = null;
 let sender: SmsSender | null = null;
+
+export function authRuntimeConfig() {
+	return {
+		siteUrl: env.SITE_URL,
+		secret: env.BETTER_AUTH_SECRET,
+		adminPhones: env.ADMIN_PHONES ?? "",
+		adminEmails: env.ADMIN_EMAILS ?? "",
+	};
+}
+
+export function authSmsSender(): SmsSender {
+	if (smsMode() !== "live") {
+		throw new DomainError(
+			"휴대전화 인증을 사용하려면 실제 SMS 발송 설정이 필요합니다",
+			{ code: "upstream_rejected" },
+		);
+	}
+	return smsSender();
+}
 
 export function dataKeys(): Promise<DataKeys> {
 	keys ??= deriveDataKeys(env.DATA_KEY);
@@ -83,14 +103,6 @@ export function submissionLink(submissionId: string): string {
 
 export function spreadsheetUrl(): string {
 	return `https://docs.google.com/spreadsheets/d/${env.GOOGLE_SPREADSHEET_ID}/edit`;
-}
-
-export function adminEmails(): ReadonlySet<string> {
-	return new Set(
-		env.ADMIN_EMAILS.split(",")
-			.map((email) => email.trim().toLowerCase())
-			.filter(Boolean),
-	);
 }
 
 export function adminSignupEnabled(): boolean {

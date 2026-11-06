@@ -4,7 +4,7 @@
 
 - 폼 구성 데이터 → D1 (불변 버전으로 발행)
 - 응답 → 응답 저장소 어댑터 (기본 Google Sheets = 주 DB, 폼마다 탭 1개). 운영자가 시트에서 고친 값(납입 여부 등)이 그대로 원본이다
-- 관리자 → Better Auth (허용 이메일 + 초대 코드로만 가입, 감사 기록)
+- 관리자 → Better Auth (허용 이메일 + 초대 가입, SMS 가입 확인 + 필수 TOTP, 감사 기록)
 - 관측 → 구조화 로그(requestId) + PostHog(분석/오류 추적/마스킹된 리플레이/기능 플래그, 선택)
 - 알림 → Solapi SMS (신청/수정/미입금 알림), 큐로 비동기 처리
 
@@ -38,7 +38,7 @@ tooling/lint-plugins          레포 전용 린트 규칙 (배럴/재노출 금�
 ```bash
 pnpm install
 cd apps/web
-cp /dev/null .env   # 아래 표대로 채운다 (void는 .env 한 개만 읽는다)
+cp ../../.env.example .env   # 아래 표대로 채운다 (void는 .env 한 개만 읽는다)
 pnpm exec void db migrate
 pnpm dev            # http://localhost:5173 , 관리자: /admin/signup
 ```
@@ -59,6 +59,7 @@ pnpm dev            # http://localhost:5173 , 관리자: /admin/signup
 | ------------------------------------------------------ | ------------------------------------------------------------------------------------ |
 | `SITE_URL`                                             | 공개 주소 (로컬은 `http://localhost:5173`)                                           |
 | `BETTER_AUTH_SECRET`                                   | `openssl rand -hex 32`                                                               |
+| `ADMIN_PHONES`                                         | 관리자별 SMS 인증 번호. `admin@example.org=01012345678` 형식으로 쉼표 구분           |
 | `ADMIN_EMAILS`                                         | 관리자 이메일, 쉼표 구분                                                             |
 | `ADMIN_SIGNUP_ENABLED`                                 | 첫 관리자 부트스트랩 허용 (계정이 0개일 때만 초대 코드 없이 가입). 이후 `false` 권장 |
 | `DATA_KEY`                                             | `openssl rand -base64 32` (분실 시 연락처 복호화 불가)                               |
@@ -80,10 +81,29 @@ pnpm exec void deploy                          # 마이그레이션 적용 포�
 
 배포 후 할 일:
 
-1. `/admin/signup`에서 첫 관리자 계정 생성(부트스트랩) → `ADMIN_SIGNUP_ENABLED=false`로 바꾸고 재배포. 다른 관리자는 관리자 화면 "관리자" 메뉴에서 초대 코드로 가입
-2. 관리자 화면에서 폼 생성 → 편집기에서 페이지/질문/설정 구성 → 발행 (시트 탭과 헤더가 자동 준비됨)
-3. ADR-0002 §3의 미확인 가정(큐 생성, Solapi 실발송)을 확인
+1. HTTPS `SITE_URL`, `ADMIN_EMAILS`, 이메일별 번호 `ADMIN_PHONES`를 설정한다. 최초 관리자도 여기에 본인의 이메일과 번호를 등록한다.
+2. Solapi 등록 발신번호와 `SOLAPI_API_KEY`, `SOLAPI_API_SECRET`, `SOLAPI_SENDER`를 설정하고 실제 인증 문자 발송을 위해 `SMS_MODE=live`를 사용한다. 이 설정은 기존 신청 알림 문자에도 적용된다.
+3. 계정이 0개이고 `ADMIN_SIGNUP_ENABLED=true`이면 `/admin/signup`에서 초대 코드 없이 가입한다. 이메일·비밀번호와 등록된 번호를 입력하고, SMS 인증 후 계정을 만든다.
+4. 이메일·비밀번호로 로그인하고 인증 앱(TOTP)을 등록한다. 복구 코드는 안전한 곳에 보관한다. 최초 가입 후 `ADMIN_SIGNUP_ENABLED=false`로 닫을 수 있다.
+5. 다른 관리자는 초대 코드로 가입한다. 초대 전에 `ADMIN_EMAILS`와 `ADMIN_PHONES`에 이메일과 번호를 등록한다. 기존 계정도 SMS 확인과 TOTP 등록을 마쳐야 관리자 기능을 사용할 수 있다.
+6. 관리자 화면에서 폼을 생성하고 발행한다. ADR-0002 §3의 미확인 가정도 확인한다.
 
 ## 폼 정의 예시
 
 `packages/form-core/src/samples/retreat-2026.ts`(`@jwc/form-core/samples/retreat-2026`) 참고. 필드 타입: `short_text, long_text, number, phone, email, single_choice, multi_choice, boolean, date, time, datetime, rating, statement`. 조건 표시는 `showIf`, 금액은 `payment.amount`, 문자 템플릿은 `notifications`(`{{필드id}}`, `{{amount}}`, `{{account}}`, `{{link}}`, `{{title}}`).
+
+## 인증과 복구
+
+- 이메일은 로그인 식별자로 사용하며 이메일 소유 확인을 했다고 표시하지 않는다. 가입 확인은 이메일에 연결된 사전 등록 번호의 SMS로 한다.
+- SMS 코드는 6자리, 유효 기간 5분, 오입력 한도 3회이며 한 번만 사용할 수 있다. 가입 확인과 비밀번호 복구 코드는 용도가 분리된다.
+- 문자 발송은 IP와 수신 번호 기준으로 제한한다. `SMS_MODE=log`에서는 인증 문자를 보냈다고 성공 처리하지 않는다. 코드·문자 본문·전화번호는 로그에 남기지 않는다.
+- 비밀번호 복구는 `/admin/forgot-password`에서 등록된 번호의 SMS로 한다. 비밀번호 변경은 기존 세션을 폐기하지만 TOTP 설정은 유지한다.
+- 인증 앱을 사용할 수 없으면 로그인 2단계 화면에서 일회용 복구 코드를 사용한다.
+- 기존 계정의 SMS 확인 화면은 `/admin/verify-phone`이다. 인증 후 다시 로그인한다. 등록 번호가 바뀌면 SMS 확인을 다시 거친다.
+
+## 브라우저 검증
+
+`pnpm -C apps/web test:e2e:install` 후 `pnpm -C apps/web test:e2e`를 실행한다.
+공개 신청 성공/실패와 기존 관리자 SMS 확인·TOTP 등록·복구 코드 로그인을 검증한다.
+E2E는 `.void/e2e`의 별도 D1 저장소에 가짜 계정과 만료되는 테스트용 SMS 코드를 넣는다. 실제 문자는 발송하지 않는다.
+코드 발급·오입력·만료·재사용·동시 소비는 실제 Better Auth 처리기와 가짜 SMS 발송기로 검증한다. Solapi 전송은 HTTP 계약 테스트로 검증하며 운영 수신은 실제 설정 후 별도로 확인한다.
