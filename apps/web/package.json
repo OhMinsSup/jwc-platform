@@ -8,13 +8,18 @@
 		"db:generate": "void db generate",
 		"db:migrate": "void db migrate",
 		"deploy": "void deploy",
-		"dev": "vp dev",
-		"preview": "vp preview",
+		"dev": "pnpm with-env vp dev",
+		"dev:real": "pnpm with-env:real vp dev",
+		"env:encrypt": "dotenvx encrypt --no-create --no-armor --no-native --no-1password --no-bitwarden -f ../../config/env/.env.development -fk ../../config/env/.env.keys",
+		"env:keychain": "dotenvx native up -f ../../config/env/.env.development -fk ../../config/env/.env.keys",
+		"preview": "pnpm with-env vp preview",
 		"test": "vp test run",
-		"test:e2e": "playwright test",
+		"test:e2e": "pnpm with-env playwright test",
 		"test:e2e:install": "playwright install --with-deps --only-shell chromium",
 		"typecheck": "void prepare && jwc-typecheck --noEmit && jwc-typecheck --noEmit -p e2e",
-		"typecheck:tsc": "void prepare && tsc --noEmit && tsc --noEmit -p e2e"
+		"typecheck:tsc": "void prepare && tsc --noEmit && tsc --noEmit -p e2e",
+		"with-env": "dotenvx run --strict --overload --no-armor --no-native --no-1password --no-bitwarden -f ../../config/env/development.env --",
+		"with-env:real": "dotenvx run --strict --overload --redact --no-armor --no-1password --no-bitwarden -f ../../config/env/.env.development --"
 	},
 	"dependencies": {
 		"@jwc/analytics": "workspace:*",
@@ -39,6 +44,7 @@
 	},
 	"devDependencies": {
 		"@cloudflare/workers-types": "^5.20261104.1",
+		"@dotenvx/dotenvx": "2.38.2",
 		"@jwc/typecheck": "workspace:*",
 		"@playwright/test": "^1.64.1",
 		"@tailwindcss/vite": "catalog:frontend",

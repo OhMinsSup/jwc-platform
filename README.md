@@ -33,15 +33,19 @@ tooling/lint-plugins          레포 전용 린트 규칙 (배럴/재노출 금�
 
 의존 방향: `routes → features → platform → packages` (린트로 강제). 배럴 파일과 재노출은 쓰지 않는다 — 정의한 파일에서 직접 import한다. 결정 기록: `docs/adr/0007`.
 
+개발 환경 선택부터 운영 점검·장애 복구까지는 [개발·배포·운영 가이드](docs/development-deployment-operations.md)를 참고한다.
+
 ## 로컬 개발
 
 ```bash
 pnpm install
-cd apps/web
-cp ../../.env.example .env   # 아래 표대로 채운다 (void는 .env 한 개만 읽는다)
-pnpm exec void db migrate
-pnpm dev            # http://localhost:5173 , 관리자: /admin/signup
+pnpm -C apps/web with-env void db migrate
+pnpm dev            # http://localhost:5173
 ```
+
+`dev`는 `config/env/development.env`의 공개 더미 설정을 주입한다. 응답은 메모리에 저장하고 실제 문자와 분석 이벤트는 보내지 않는다. 문자 인증은 실제 연동 환경에서 검증한다.
+
+실제 개발용 키가 필요하면 dotenvx로 암호화하고 macOS 키체인에 복호화 키를 보관한 뒤 `pnpm dev:real`을 실행한다. 설정·기존 파일 이전·복구 절차는 [개발용 비밀값 관리](docs/development-secrets.md)를 따른다. `apps/web/.env`에는 실제 값을 두지 않는다.
 
 ## 검사
 
@@ -74,10 +78,13 @@ pnpm dev            # http://localhost:5173 , 관리자: /admin/signup
 
 ```bash
 cd apps/web
-pnpm exec void auth login
+pnpm exec void connect --platform cloudflare  # 최초 대상 설정
+pnpm exec void cloudflare status              # 계정·대상 확인
 pnpm exec void secret put BETTER_AUTH_SECRET   # 표의 서버 변수마다 반복
 pnpm exec void deploy                          # 마이그레이션 적용 포함
 ```
+
+최초 배포 전 필수 설정과 이후 반복 배포·롤백은 [운영 배포 절차](docs/development-deployment-operations.md#6-최초-운영-배포)를 따른다. 현재 CI는 검증만 수행하며 자동 배포는 구성하지 않았다.
 
 배포 후 할 일:
 

@@ -14,6 +14,7 @@
 		"check:unused": "knip",
 		"clean": "git clean -xdf node_modules",
 		"dev": "turbo run dev",
+		"dev:real": "pnpm -C apps/web dev:real",
 		"fix": "vp check --fix",
 		"fix:deps": "syncpack fix",
 		"format": "vp fmt",

@@ -22,11 +22,5 @@
 			"cache": false
 		}
 	},
-	"globalPassThroughEnv": [
-		"NODE_ENV",
-		"CI",
-		"CLOUDFLARE_API_TOKEN",
-		"VOID_TOKEN",
-		"VOID_API_URL"
-	]
+	"globalPassThroughEnv": ["NODE_ENV", "CI"]
 }

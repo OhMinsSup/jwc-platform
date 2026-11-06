@@ -1,7 +1,7 @@
 import { boolean, defineEnv, email, oneOf, string, url } from "void/env";
 
 /**
- * 환경 변수 스키마 (값은 로컬 .env / 운영은 `void secret put`).
+ * 환경 변수 스키마 (로컬은 dotenvx로 주입 / 운영은 `void secret put`).
  * 비밀값에는 default를 두지 않는다.
  */
 export default defineEnv({
