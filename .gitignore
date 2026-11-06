@@ -84,13 +84,9 @@ web_modules/
 # Yarn Integrity file
 .yarn-integrity
 
-# dotenv environment variable files
-.env
-.env.development.local
-.env.test.local
-.env.production.local
-.env.production
-.env.local
+# 평문 환경 파일과 dotenvx 개인키는 커밋하지 않는다. 공개 템플릿만 추적한다.
+.env*
+!.env.example
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -158,5 +154,12 @@ dist
 # supabase
 .branches
 
-# ai-pr outputs
-.ai/
+# void CLI가 루트에서 실행될 때 만드는 로컬 상태 (토큰 포함)
+.void/
+
+# Claude Code가 .agents/skills를 찾도록 로컬에서 만드는 링크 모음 (스킬 원본은 .agents/에 커밋)
+.claude/
+
+# Playwright 결과물 (실패 시 trace)
+test-results/
+playwright-report/

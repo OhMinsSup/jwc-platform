@@ -1,0 +1,26 @@
+{
+	"name": "@jwc/common",
+	"version": "0.1.0",
+	"private": true,
+	"description": "앱/패키지 공용 순수 유틸: 인코딩(base64/hex, 상수 시간 비교, 무작위 id), Web Crypto(HKDF 용도별 키, AES-GCM, HMAC), 상수 레코드 키, FormData 텍스트 읽기. 런타임 의존성 없음.",
+	"type": "module",
+	"exports": {
+		"./crypto": "./src/crypto.ts",
+		"./encoding": "./src/encoding.ts",
+		"./form-data": "./src/form-data.ts",
+		"./object": "./src/object.ts",
+		"./testing": "./src/testing.ts"
+	},
+	"scripts": {
+		"test": "vp test run --passWithNoTests",
+		"typecheck": "jwc-typecheck --noEmit",
+		"typecheck:tsc": "tsc --noEmit"
+	},
+	"devDependencies": {
+		"@jwc/tsconfig": "workspace:*",
+		"@jwc/typecheck": "workspace:*",
+		"@types/node": "catalog:",
+		"typescript": "catalog:",
+		"vite-plus": "catalog:"
+	}
+}

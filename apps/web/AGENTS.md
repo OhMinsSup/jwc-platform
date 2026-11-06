@@ -1,88 +1,43 @@
 # apps/web AGENTS.md
 
-이 문서는 `apps/web`(웹 앱) 변경 시 따라야 할 규칙/패턴을 정리합니다.
+TanStack Start + void(Cloudflare Workers). 공개 신청 화면, 관리자 콘솔, 큐/크론 소비자.
 
-## Problem 1-Pager (필수)
+## 구조 (ADR-0007)
 
-코드를 바꾸기 전에 아래를 5–10줄로 먼저 씁니다.
+기능 단위 폴더(`features/`)와 공통 기반(`platform/`)으로 나눈다. 새 기능은 `features/<이름>/` 폴더 하나로 추가한다.
 
-- 배경: 왜 지금 바꾸는가?
-- 문제: 현재 무엇이 깨지거나 불편한가?
-- 목표: 이번 변경에서 달성할 것(측정 가능)
-- 비목표: 이번 변경에서 하지 않을 것
-- 제약: 라우팅/SSR/Convex/Auth/환경변수/배포(Vercel) 관련 제약
+| 경로                                | 역할                                                                                                                                                                                                                     |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `src/features/<기능>/domain/`       | 순수 판단 함수 (I/O·UI 금지, 린트로 강제). 데이터만 받고 돌려준다                                                                                                                                                        |
+| `src/features/<기능>/model/`        | 순수 표/변환 (라벨, 상태 메타, 필터)                                                                                                                                                                                     |
+| `src/features/<기능>/server/`       | 해석기(서비스) + D1 저장소(`*-repository.ts`). domain의 결과를 실행만 한다                                                                                                                                               |
+| `src/features/<기능>/functions*.ts` | 서버 함수 경계. zod 검증 → `toResult` → 서비스. 바꾸는 관리자 작업은 `audited(...)`로 감사 기록                                                                                                                          |
+| `src/features/<기능>/ui/`           | 기능 전용 컴포넌트 (재사용 가능한 것은 `@jwc/ui-patterns`로)                                                                                                                                                             |
+| `features/forms`                    | 폼 생성/초안/발행/상태, 정의 로드, 폼 목록 UI                                                                                                                                                                            |
+| `features/submissions`              | 제출 계획(domain), 제출·알림·신청 내역·관리자 목록·납입 변경(server), 응답 표(ui)                                                                                                                                        |
+| `features/admin-access`             | Better Auth 설정·세션·`adminOnly`, 초대/가입(domain+server), 감사 기록, 관리자 화면 UI                                                                                                                                   |
+| `features/form-builder`             | 관리자 폼 편집기 (ADR-0003). `model/` = 순수 리듀서/참조 연쇄/파생 인덱스                                                                                                                                                |
+| `features/form-engine`              | 정의 기반 공개 폼 렌더러. 필드 타입 → 컴포넌트 표                                                                                                                                                                        |
+| `src/platform/server/`              | 공통 기반: `runtime.ts`(env를 읽는 유일한 곳, 어댑터 조립), `log.ts`, `errors/`(오류 카탈로그), `telemetry/`(서버 이벤트 카탈로그), `security/`(정책 표), `server-fn.ts`(`toResult`), `validation.ts`, 큐 설정/워커 분배 |
+| `src/platform/analytics/`           | 클라이언트 이벤트/기능 플래그 카탈로그 + `@jwc/analytics` 바인딩                                                                                                                                                         |
+| `src/platform/ui/`                  | 셸(관리자/공개), 인증 카드, 라우트 상태 화면                                                                                                                                                                             |
+| `src/routes/`                       | 파일 라우트 (TanStack 규칙상 여기 고정). 로더는 기능의 서버 함수를 부른다                                                                                                                                                |
+| `db/schema/*`                       | D1 Drizzle 스키마. 변경 후 `pnpm db:generate` → 마이그레이션 검토(순서/데이터 복사)                                                                                                                                      |
+| `queues/`, `crons/`                 | 소비자/작업. 운영 연결은 `server.ts` + `void.config.ts` (ADR-0002)                                                                                                                                                       |
 
-## 스택/구조 요약
+의존 방향 (린트 `no-restricted-imports`로 강제): `routes → features → platform → packages`. platform은 features를, domain/model은 I/O·UI·바깥 계층을, packages는 앱을 import하지 않는다.
 
-- Vite + TanStack Start/Router (file-based routes)
-- Convex + React Query 통합(`@convex-dev/react-query`)
-- Better Auth + Convex plugin (`@convex-dev/better-auth`)
-- UI는 `@jwc/ui`(Tailwind preset 포함)를 사용
+## 규칙
 
-## 라우팅 규칙 (TanStack Start)
+- 답변/납입 여부의 원본은 응답 저장소다. D1에는 답변·연락처·납입 여부를 저장하지 않는다(키/멱등/락만). 큐 payload는 항상 `encryptJson`으로 암호화한다.
+- 서비스는 `SubmissionStore` 포트에만 의존한다. 공급자(Google) 오류 타입은 어댑터 밖으로 내보내지 않는다(`SubmissionStoreError`로 변환).
+- 로그/분석 이벤트는 카탈로그(서버 `platform/server/telemetry/events.ts`, 클라이언트 `platform/analytics/events.ts`)에 필드를 먼저 선언한다. 답변·이름·전화번호·문자 본문·토큰은 필드로 두지 않는다.
+- 실패는 오류 카탈로그 코드로 분류한다. 사용자에게는 `DomainError`의 문장만 보이고, 그 밖의 오류 문장은 내부 로그로만 남긴다.
+- `queues/*.ts`의 옵션 export와 `crons/*.ts`의 `cron`은 void가 정적으로 읽으므로 리터럴만 쓴다.
+- 큐 옵션(배치/재시도)은 `src/platform/server/queue-config.ts` 한 곳에서 바꾼다.
 
-- 라우트는 `src/routes/**`의 `createFileRoute(...)`로 정의합니다.
-- 리다이렉트/검색파라미터 검증은 라우트 레벨에서 처리합니다.
-  - 예: 온보딩은 `validateSearch`로 `phoneHash`를 검증
-  - 예: 잘못된 step slug는 즉시 `welcome`으로 redirect
-- 서버 핸들러는 라우트의 `server.handlers`를 사용합니다.
+## 명령
 
-## Convex/SSR 데이터 패턴
-
-- SSR/loader에서는 `convexQuery(...)` + `queryClient.ensureQueryData(...)` 패턴을 우선 사용합니다.
-- 루트 라우트(`src/routes/__root.tsx`)에서 서버에서 읽은 Better Auth 토큰을 Convex 쿼리 클라이언트에 주입합니다.
-  - 이 흐름을 우회하거나 임의로 쿠키/토큰을 직접 파싱하지 않습니다.
-
-## 인증(Auth) 규칙
-
-- `/api/auth/$` 라우트는 `reactStartHandler(request)`로 Better Auth 핸들러를 위임합니다.
-- 서버 사이드에서 Convex를 호출해야 하면 `src/lib/auth-server.ts`의 `fetchQuery/fetchMutation/fetchAction` 헬퍼를 우선 사용합니다.
-
-## Webhook 규칙
-
-- `/api/webhook/spreadsheet`는 서버 핸들러입니다.
-- 입력은 반드시 검증하고, 실패 시 명확한 상태코드/메시지로 응답합니다.
-- 시크릿 헤더(`x-webhook-secret`)는 비교 시 로깅하지 않습니다(값 자체를 절대 출력 금지).
-
-## 상태관리 (Onboarding)
-
-- 온보딩 스텝/검증은 `src/store/onboarding-form-store.ts`가 단일 소스입니다.
-- 스텝을 추가/제거하면 아래를 함께 갱신합니다.
-  - `STEPS`/`STEP_LABELS`
-  - `isValidStep`/`getNextStep`/`getPrevStep`
-  - `src/routes/onboarding/$step.tsx`의 lazy import + switch
-- 주의: 현재 store는 `isFormComplete()`에서 `additionalInfo.tshirtSize`를 요구합니다.
-  - 스텝을 비활성화/주석 처리할 경우, 완주 조건과 UI 흐름이 불일치할 수 있으니 함께 정리합니다.
-
-## 주요 라우트 메모
-
-- `/` : 홈(Convex health check로 접수 상태 표시)
-- `/onboarding` : 레이아웃 라우트, `/onboarding/welcome`로 redirect
-- `/onboarding/$step` : step slug 검증 후 각 스텝 컴포넌트 lazy-load
-- `/api/auth/$` : Better Auth 핸들러 위임
-- `/api/webhook/spreadsheet` : 스프레드시트 편집 이벤트 webhook
-- `/s/$code` : 단축 URL(SSR에서 302 redirect)
-- `/application/` : 현재 `beforeLoad`에서 `/`로 강제 redirect (의도 확인 없이 제거 금지)
-- `/application/$id` : 신청 상세(SSR loader로 데이터 조회)
-
-## 환경변수
-
-- 필수
-  - `VITE_CONVEX_URL`: Convex endpoint (없으면 라우터에서 에러 로그 발생)
-- 선택(기능에 따라 사용)
-  - `VITE_PAID_ACCOUNT_NUMBER`: 신청 상세의 입금 계좌 표기
-  - `SPREADSHEET_WEBHOOK_SECRET`: webhook 인증(설정 시 요청 헤더와 일치해야 함)
-  - `GOOGLE_SPREADSHEET_ID`: webhook에서 스프레드시트 ID 검증
-
-## 실행/검증 커맨드
-
-- 개발 서버: `pnpm -C apps/web dev`
-- 프로덕션 빌드: `pnpm -C apps/web build`
-- 프리뷰 서빙: `pnpm -C apps/web serve`
-- 워크스페이스 린트: `pnpm -w lint`
-- 워크스페이스 타입체크: `pnpm -w typecheck`
-
-## UI/스타일 규칙
-
-- 스타일은 `@jwc/ui` 프리셋 + Tailwind v4를 따릅니다.
-- Tailwind 클래스는 Biome 규칙(`useSortedClasses`)에 맞춰 정렬합니다(가능하면 `pnpm fix:ultracite` safe 모드).
+- `pnpm -C apps/web dev` / `build` / `test` / `typecheck`
+- `pnpm -C apps/web test:e2e`: 공개 신청 E2E(Playwright). 5179 포트에 개발 서버를 띄우고 메모리 응답 저장소를 쓴다. 로컬 D1에는 E2E 전용 폼(`e2e-public-form`)만 지우고 다시 넣는다 (`e2e/seed.ts`). 처음 한 번 `pnpm -C apps/web exec playwright install chromium`
+- `pnpm -C apps/web db:generate` → `void db migrate` (로컬) → `void deploy` (원격 적용)
