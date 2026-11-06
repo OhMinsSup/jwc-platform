@@ -84,7 +84,7 @@ web_modules/
 # Yarn Integrity file
 .yarn-integrity
 
-# 평문 환경 파일과 dotenvx 개인키는 커밋하지 않는다. 공개 템플릿만 추적한다.
+# 로컬 환경 파일과 이전 개인키 보관본은 커밋하지 않는다. 공개 템플릿만 추적한다.
 .env*
 !.env.example
 

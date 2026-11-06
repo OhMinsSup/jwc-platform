@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import process from "node:process";
@@ -13,37 +13,20 @@ const { PATH } = z
 	.object({ env: z.object({ PATH: z.string() }) })
 	.parse(process).env;
 const NODE_PROBE = ["node", "--input-type=module", "--eval"];
-const OFFLINE_OPTIONS = [
-	"--no-armor",
-	"--no-native",
-	"--no-1password",
-	"--no-bitwarden",
-];
-
-function runDotenvx(args: string[]) {
-	return spawnSync("pnpm", ["exec", "dotenvx", ...args], {
-		cwd: APP_DIRECTORY,
-		encoding: "utf-8",
-		env: { PATH, DOTENVX_NO_ARMOR: "true" },
-	});
-}
+const OFFLINE_PROBE = `console.log(JSON.stringify({
+	memory: process.env.SUBMISSION_STORE === "memory",
+	noSms: process.env.SMS_MODE === "log" && !process.env.SOLAPI_API_SECRET,
+	noGoogle: process.env.GOOGLE_PRIVATE_KEY === "unused-in-memory-store",
+	noAnalytics: !process.env.POSTHOG_KEY,
+	noTurnstile: !process.env.TURNSTILE_SECRET_KEY,
+	noDeploy: !process.env.CLOUDFLARE_API_TOKEN && !process.env.VOID_TOKEN
+}));`;
 
 describe("development environment", () => {
-	it("replaces inherited live settings with offline values without using a key", () => {
+	it("replaces inherited live settings with offline values", () => {
 		const result = spawnSync(
 			"pnpm",
-			[
-				"with-env",
-				...NODE_PROBE,
-				`console.log(JSON.stringify({
-					memory: process.env.SUBMISSION_STORE === "memory",
-					noSms: process.env.SMS_MODE === "log" && !process.env.SOLAPI_API_SECRET,
-					noGoogle: process.env.GOOGLE_PRIVATE_KEY === "unused-in-memory-store",
-					noAnalytics: !process.env.POSTHOG_KEY,
-					noTurnstile: !process.env.TURNSTILE_SECRET_KEY,
-					noDeploy: !process.env.CLOUDFLARE_API_TOKEN && !process.env.VOID_TOKEN
-				}));`,
-			],
+			["with-env", ...NODE_PROBE, OFFLINE_PROBE],
 			{
 				cwd: APP_DIRECTORY,
 				encoding: "utf-8",
@@ -73,45 +56,38 @@ describe("development environment", () => {
 		);
 	});
 
-	it("decrypts a fixture at process startup and stops when its key is missing", () => {
-		const directory = mkdtempSync(path.join(tmpdir(), "jwc-dotenvx-"));
+	it("loads plaintext values without expanding dollar signs or printing them", () => {
+		const directory = mkdtempSync(path.join(tmpdir(), "jwc-dotenv-"));
 		const file = path.join(directory, ".env");
-		const keys = path.join(directory, ".env.keys");
-		const fixtureValue = "test-only-encrypted-fixture";
+		const fixtureValue = "test-only-$JWC_EXPANDED-fixture";
 		try {
-			writeFileSync(file, `JWC_TEST_SECRET=${fixtureValue}\n`);
-			const encrypted = runDotenvx([
-				"encrypt",
-				...OFFLINE_OPTIONS,
-				"-f",
+			writeFileSync(
 				file,
-				"-fk",
-				keys,
-			]);
-			expect(encrypted.status).toBe(0);
-			expect(readFileSync(file, "utf-8")).not.toContain(fixtureValue);
-			const args = [
-				"run",
-				"--strict",
-				...OFFLINE_OPTIONS,
-				"-f",
-				file,
-				"-fk",
-				keys,
-				"--",
-				...NODE_PROBE,
-				`console.log(process.env.JWC_TEST_SECRET === "${fixtureValue}" ? "fixture-ok" : "fixture-invalid");`,
-			];
-			const decrypted = runDotenvx(args);
-			expect(decrypted.status).toBe(0);
-			expect(decrypted.stdout).toContain("fixture-ok");
-			rmSync(keys);
-			const missingKey = runDotenvx(args);
-			expect({
-				stopped: missingKey.status !== 0,
-				executed: missingKey.stdout.includes("fixture-ok"),
-				leaked: (missingKey.stdout + missingKey.stderr).includes(fixtureValue),
-			}).toStrictEqual({ stopped: true, executed: false, leaked: false });
+				`JWC_EXPANDED=expanded\nJWC_TEST_SECRET='${fixtureValue}'\nJWC_MULTILINE="first\\nsecond"\n`,
+			);
+			const result = spawnSync(
+				"pnpm",
+				[
+					"exec",
+					"dotenv",
+					"--no-expand",
+					"-o",
+					"-e",
+					file,
+					"--",
+					...NODE_PROBE,
+					`console.log(JSON.stringify({
+						literal: process.env.JWC_TEST_SECRET === ${JSON.stringify(fixtureValue)},
+						multiline: process.env.JWC_MULTILINE === "first\\nsecond"
+					}));`,
+				],
+				{ cwd: APP_DIRECTORY, encoding: "utf-8", env: { PATH } },
+			);
+			expect(result.status).toBe(0);
+			expect(result.stdout).toContain(
+				JSON.stringify({ literal: true, multiline: true }),
+			);
+			expect(result.stdout + result.stderr).not.toContain(fixtureValue);
 		} finally {
 			rmSync(directory, { recursive: true, force: true });
 		}

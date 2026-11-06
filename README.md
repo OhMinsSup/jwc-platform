@@ -45,7 +45,7 @@ pnpm dev            # http://localhost:5173
 
 `dev`는 `config/env/development.env`의 공개 더미 설정을 주입한다. 응답은 메모리에 저장하고 실제 문자와 분석 이벤트는 보내지 않는다. 문자 인증은 실제 연동 환경에서 검증한다.
 
-실제 개발용 키가 필요하면 dotenvx로 암호화하고 macOS 키체인에 복호화 키를 보관한 뒤 `pnpm dev:real`을 실행한다. 설정·기존 파일 이전·복구 절차는 [개발용 비밀값 관리](docs/development-secrets.md)를 따른다. `apps/web/.env`에는 실제 값을 두지 않는다.
+실제 연동은 루트 `.env.example`을 `.env`로 복사해 개발용 값을 채운 뒤 `pnpm dev:real`로 실행한다. `dotenv-cli`가 파일을 읽어 프로세스에 주입한다. 설정·이전 절차는 [개발용 비밀값 관리](docs/development-secrets.md)를 따른다. `.env`는 Git에서 제외하며 `apps/web/.env`는 별도로 만들지 않는다.
 
 ## 검사
 

@@ -1,5 +1,7 @@
 # ADR-0012: 로컬 개발 환경과 비밀값 주입
 
+이 결정의 로컬 암호화·키체인 방식은 [ADR-0013](0013-dotenv-and-ci-codegen.md)으로 대체한다. 아래 내용은 이전 결정과 검증 기록이다.
+
 ## Problem 1-Pager
 
 - 배경: 로컬 개발은 평문 `apps/web/.env`, 운영은 Cloudflare Worker Secrets를 사용한다.
