@@ -24,7 +24,7 @@ CI는 명시적 codegen 단계와 모든 검사 명령에 codegen을 결합하�
 ## 결정과 영향
 
 - `with-env`는 공개 더미 파일을, `with-env:real`은 Git에서 제외한 루트 `.env`를 읽는다. `dotenv --no-expand -o -e <파일> --`로 주입한다.
-- dotenvx 직접 의존성과 `env:encrypt`·`env:keychain`을 제거한다. 이전 로컬 실제 설정은 값 출력 없이 `.env`로 이전하며 보관본은 유지한다.
+- dotenvx 직접 의존성과 `env:encrypt`·`env:keychain`을 제거한다. 이전 로컬 실제 설정은 값 출력 없이 `.env`로 이전한다. `config/env/archive/`의 세 파일도 원래 경로에 평문으로 복구하고, 암호화 원본은 Git에서 제외한 `config/env/.env.encrypted-backup/`에 보관한다.
 - 기본 개발·테스트는 메모리 응답과 SMS 로그 모드를 유지한다. 가정은 ADR-0012와 같다.
 - `.env`는 평문이다. AI의 파일 접근 차단은 저장소 설정만으로 보장하지 않는다.
 - 운영은 Cloudflare Worker Secrets를 계속 사용한다. dotenv를 Worker 런타임에 추가하지 않는다.
@@ -36,5 +36,5 @@ CI는 명시적 codegen 단계와 모든 검사 명령에 codegen을 결합하�
 - 생성된 tsconfig가 없는 상태에서 기존 오류를 재현했고, CI의 codegen 명령 후 `pnpm verify`가 통과했다.
 - 실제 CLI 테스트에서 더미 설정 덮어쓰기, 평문 주입, `$`와 여러 줄 값 처리 및 값 미출력을 확인했다.
 - `pnpm verify`: 테스트 299개 포함 통과. 웹 빌드와 공개 신청·관리자 인증 E2E 4개도 통과했다.
-- 이전된 실제 `.env`는 값을 출력하지 않은 스키마 검사와 Git 제외 확인을 통과했다.
+- 이전된 실제 `.env`는 값을 출력하지 않은 스키마 검사와 Git 제외 확인을 통과했다. 보관본 세 파일은 복호화 전후의 값 일치, dotenv 파싱, 권한 `600`, Git 제외를 확인했다.
 - 기존 Turbo 타입 검사 캐시 output 경고와 CSS sourcemap 경고는 남아 있다. 운영 배포는 수행하지 않았다.
