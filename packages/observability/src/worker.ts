@@ -1,3 +1,10 @@
+import { OTLPLogExporter } from "@opentelemetry/exporter-logs-otlp-http";
+import { Resource } from "@opentelemetry/resources";
+import {
+	BatchLogRecordProcessor,
+	LoggerProvider,
+} from "@opentelemetry/sdk-logs";
+
 import { distinctIdFromCookie, flushToPostHog } from "./posthog";
 import type { FlushResult, PostHogConfig } from "./posthog";
 import { createScope, runInScope } from "./scope";
@@ -43,6 +50,57 @@ async function flush(
 	}
 }
 
+/**
+ * PostHog Logs exporter. It has its own provider instead of registering globally,
+ * so the app's existing console/catalog loggers never leave this process through OTLP.
+ */
+interface PostHogLogs {
+	configKey: string;
+	logger: ReturnType<LoggerProvider["getLogger"]>;
+	provider: LoggerProvider;
+}
+
+let posthogLogs: PostHogLogs | null = null;
+
+function logsFor(config: PostHogConfig): PostHogLogs {
+	const configKey = `${config.host}:${config.apiKey}`;
+	if (posthogLogs?.configKey === configKey) {
+		return posthogLogs;
+	}
+	const provider = new LoggerProvider({
+		resource: new Resource({ "service.name": "jwc-form-worker" }),
+	});
+	provider.addLogRecordProcessor(
+		new BatchLogRecordProcessor(
+			new OTLPLogExporter({
+				url: `${config.host}/i/v1/logs`,
+				headers: { Authorization: `Bearer ${config.apiKey}` },
+			}),
+		),
+	);
+	posthogLogs = {
+		configKey,
+		logger: provider.getLogger("jwc-form-posthog-log-exporter"),
+		provider,
+	};
+	return posthogLogs;
+}
+
+function emitPostHogLog(config: PostHogConfig | null, body: string): void {
+	if (!config) {
+		return;
+	}
+	logsFor(config).logger.emit({ severityText: "INFO", body });
+}
+
+async function flushPostHogLogs(config: PostHogConfig): Promise<void> {
+	try {
+		await logsFor(config).provider.forceFlush();
+	} catch {
+		// Logging delivery must not change the request or task outcome.
+	}
+}
+
 /** 요청 1개 = 범위 1개. 응답에 x-request-id를 붙여 사용자 문의와 로그를 연결할 수 있게 한다 */
 export function observeFetch<Env, Ctx extends WaitUntilContext>(
 	inner: WorkerFetch<Env, Ctx>,
@@ -56,8 +114,13 @@ export function observeFetch<Env, Ctx extends WaitUntilContext>(
 				? distinctIdFromCookie(request.headers.get("cookie"), config.apiKey)
 				: null,
 		);
+		emitPostHogLog(config, "worker.fetch_received");
 		const response = await runInScope(scope, () => inner(request, env, ctx));
+		emitPostHogLog(config, "worker.fetch_responded");
 		ctx.waitUntil(flush(scope, options));
+		if (config) {
+			ctx.waitUntil(flushPostHogLogs(config));
+		}
 		const headers = new Headers(response.headers);
 		headers.set(REQUEST_ID_HEADER, scope.requestId);
 		return new Response(response.body, {
@@ -75,10 +138,15 @@ export async function observeTask<T>(
 	run: () => Promise<T>,
 	options: ObserveOptions,
 ): Promise<T> {
+	const config = options.posthog();
 	const scope = createScope(`${label}:${crypto.randomUUID()}`);
+	emitPostHogLog(config, "worker.task_started");
 	try {
 		return await runInScope(scope, run);
 	} finally {
 		ctx.waitUntil(flush(scope, options));
+		if (config) {
+			ctx.waitUntil(flushPostHogLogs(config));
+		}
 	}
 }

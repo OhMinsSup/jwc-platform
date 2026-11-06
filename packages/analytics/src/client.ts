@@ -49,7 +49,11 @@ function initOptions(sanitizeUrl: (url: string) => string) {
 		capture_pageview: "history_change",
 		capture_pageleave: true,
 		autocapture: false,
-		capture_exceptions: true,
+		capture_exceptions: {
+			capture_unhandled_errors: true,
+			capture_unhandled_rejections: true,
+			capture_console_errors: false,
+		},
 		disable_session_recording: true,
 		session_recording: { maskAllInputs: true, maskTextSelector: "*" },
 		before_send: <T extends { properties: Record<string, unknown> }>(

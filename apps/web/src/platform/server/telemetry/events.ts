@@ -19,7 +19,9 @@ export const SERVER_EVENTS = {
 	"notification.enqueue_failed": {
 		fields: ["submissionId", "kind", "code", "error"],
 	},
+	"form.created": { fields: ["formId", "template"], analytics: true },
 	"form.published": { fields: ["formId", "version"], analytics: true },
+	"form.status_changed": { fields: ["formId", "status"], analytics: true },
 	"definition.corrupted": { fields: ["formId", "versionId", "issues"] },
 	"sms.delivered": {
 		fields: ["submissionId", "kind", "mode"],

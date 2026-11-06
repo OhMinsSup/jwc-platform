@@ -4,6 +4,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { NotFoundError } from "../../../platform/server/errors/not-found-error";
+import { log } from "../../../platform/server/log";
 import { spreadsheetUrl } from "../../../platform/server/runtime";
 import { toResult } from "../../../platform/server/server-fn";
 import { ID, SLUG } from "../../../platform/server/validation";
@@ -85,8 +86,8 @@ export const createFormFn = createServerFn({ method: "POST" })
 		}),
 	)
 	.handler(({ data, context }) =>
-		toResult("admin.createForm", () =>
-			audited(
+		toResult("admin.createForm", async () => {
+			const createdFormId = await audited(
 				context.admin,
 				(formId) => ({
 					action: "form.created",
@@ -95,8 +96,13 @@ export const createFormFn = createServerFn({ method: "POST" })
 					detail: { template: data.template },
 				}),
 				() => createForm(data, Date.now()),
-			),
-		),
+			);
+			log.info("form.created", {
+				formId: createdFormId,
+				template: data.template,
+			});
+			return createdFormId;
+		}),
 	);
 
 /** 폼 공통 레이아웃(제목/상태/탭)용 가벼운 요약 */
@@ -180,8 +186,8 @@ export const setFormStatusFn = createServerFn({ method: "POST" })
 	.middleware([adminOnly])
 	.validator(z.object({ formId: ID, status: z.enum(["open", "closed"]) }))
 	.handler(({ data, context }) =>
-		toResult("admin.setStatus", () =>
-			audited(
+		toResult("admin.setStatus", async () => {
+			await audited(
 				context.admin,
 				() => ({
 					action: "form.status_changed",
@@ -190,8 +196,12 @@ export const setFormStatusFn = createServerFn({ method: "POST" })
 					detail: { status: data.status },
 				}),
 				() => setFormStatus(data.formId, data.status, Date.now()),
-			),
-		),
+			);
+			log.info("form.status_changed", {
+				formId: data.formId,
+				status: data.status,
+			});
+		}),
 	);
 
 /** 초안 미리보기: 저장된 초안을 검증해 렌더링 가능한 정의로 돌려준다 */

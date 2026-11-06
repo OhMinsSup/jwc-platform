@@ -1,3 +1,4 @@
+import { identifyScope } from "@jwc/observability/scope";
 import { clientIpOf } from "@jwc/security/rate-limit";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeaders } from "@tanstack/react-start/server";
@@ -65,6 +66,7 @@ export const signUpAdminFn = createServerFn({ method: "POST" })
 			const headers = getRequestHeaders();
 			await enforceRateLimit("admin_auth", clientIpOf(headers), now);
 			const admin = await signUpAdmin(data, headers, now);
+			identifyScope(admin.userId);
 			// 가입한 본인이 행위자다 (가입 전에는 세션이 없다)
 			await audited(
 				{ id: admin.userId },

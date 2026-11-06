@@ -37,6 +37,14 @@ export function currentScope(): TelemetryScope | undefined {
 	return storage.getStore();
 }
 
+/** 인증이 확인된 뒤 현재 요청의 익명 ID를 안정적인 사용자 ID로 바꾼다. */
+export function identifyScope(distinctId: string): void {
+	const scope = storage.getStore();
+	if (scope) {
+		scope.distinctId = distinctId;
+	}
+}
+
 /** 현재 요청 ID (큐 메시지 traceId로 전파) */
 export function currentRequestId(): string | undefined {
 	return storage.getStore()?.requestId;

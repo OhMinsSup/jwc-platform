@@ -1,3 +1,4 @@
+import { identifyScope } from "@jwc/observability/scope";
 import { getRequestHeaders } from "@tanstack/react-start/server";
 
 import { UnauthorizedError } from "../../../platform/server/errors/unauthorized-error";
@@ -13,6 +14,9 @@ export async function currentAdminAccess(): Promise<AdminAccessDecision> {
 	const session = await getAuth().api.getSession({
 		headers: getRequestHeaders(),
 	});
+	if (session) {
+		identifyScope(session.user.id);
+	}
 	return decideAdminAccess({
 		user: session?.user ?? null,
 		registration: session ? adminRegistration(session.user.email) : null,
