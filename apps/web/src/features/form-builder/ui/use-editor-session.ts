@@ -5,18 +5,17 @@ import {
 	useDeferredValue,
 	useEffect,
 	useMemo,
-	useReducer,
 	useRef,
 	useState,
 } from "react";
-import type { RefObject } from "react";
+import { useStore } from "zustand";
 
 import { buildIndex } from "../model/derive";
 import type { EditorIndex } from "../model/derive";
 import { validateDefinition } from "../model/issues";
 import type { IssueIndex } from "../model/issues";
-import { editorReducer } from "../model/reducer";
 import type { EditorActions } from "./editor-context";
+import { createEditorStore } from "./editor-store";
 import type { SaveState } from "./toolbar";
 
 export type CommandOutcome =
@@ -54,22 +53,20 @@ function useStableIds(ids: readonly string[]): readonly string[] {
 
 /**
  * 편집 상태 + 파생 데이터.
- * - 정의는 useReducer 하나 (액션 데이터 → 순수 리듀서)
+ * - 정의와 저장 스냅샷은 인스턴스별 store 하나 (액션 데이터 → 순수 리듀서)
  * - 인덱스는 정의가 바뀔 때 한 번, 검증은 useDeferredValue로 입력보다 늦게 한 번
  */
 export function useEditorState(
 	initial: FormDefinition,
 	lockedFieldIds: readonly string[],
 ) {
-	const [definition, dispatch] = useReducer(editorReducer, initial);
-	const [saved, setSaved] = useState(initial);
-	const latest = useRef(definition);
-	const dirty = definition !== saved;
-	const dirtyRef = useRef(dirty);
-	useEffect(() => {
-		latest.current = definition;
-		dirtyRef.current = dirty;
-	}, [definition, dirty]);
+	// oxlint-disable-next-line react/hook-use-state -- store는 마운트 동안 교체하지 않는다. useState로 인스턴스 수명을 보장한다.
+	const [editor] = useState(() => createEditorStore(initial));
+	const definition = useStore(editor.store, (state) => state.definition);
+	const dirty = useStore(
+		editor.store,
+		(state) => state.definition !== state.saved,
+	);
 
 	const index: EditorIndex = useMemo(
 		() => buildIndex(definition),
@@ -86,19 +83,19 @@ export function useEditorState(
 	const stableLockedIds = useStableIds(lockedFieldIds);
 	const actions = useMemo<EditorActions>(
 		() => ({
-			dispatch,
-			getDefinition: () => latest.current,
+			dispatch: editor.dispatch,
+			getDefinition: editor.getDefinition,
 			announce: (message) => announceRef.current(message),
 			lockedFieldIds: new Set(stableLockedIds),
 		}),
-		[announceRef, stableLockedIds],
+		[editor, announceRef, stableLockedIds],
 	);
 	return {
 		definition,
 		dirty,
-		dirtyRef,
-		latest,
-		setSaved,
+		getDefinition: editor.getDefinition,
+		isDirty: editor.isDirty,
+		setSaved: editor.setSaved,
 		index,
 		issues,
 		actions,
@@ -107,8 +104,8 @@ export function useEditorState(
 }
 
 interface CommandDeps {
-	dirtyRef: RefObject<boolean>;
-	latest: RefObject<FormDefinition>;
+	getDefinition: () => FormDefinition;
+	isDirty: () => boolean;
 	markSaved: (definition: FormDefinition) => void;
 	/** 발행 전 검증 실패 시 첫 오류로 안내 */
 	onInvalid: (issues: IssueIndex) => void;
@@ -118,8 +115,8 @@ interface CommandDeps {
 
 /** 저장/발행 명령. 서버 호출 자체는 라우트가 주입한다 (부수효과는 경계에) */
 export function useEditorCommands({
-	latest,
-	dirtyRef,
+	getDefinition,
+	isDirty,
 	markSaved,
 	onSave,
 	onPublish,
@@ -129,26 +126,24 @@ export function useEditorCommands({
 	const [notice, setNotice] = useState<string | null>(null);
 
 	const save = useCallback(async (): Promise<boolean> => {
-		const snapshot = latest.current;
+		const snapshot = getDefinition();
 		setBusy(true);
 		const result = await onSave(snapshot);
 		setBusy(false);
 		setNotice(result.message);
 		if (result.ok) {
 			markSaved(snapshot);
-			// 렌더를 기다리지 않고 즉시 반영: 저장 직후 이동(미리보기)이 이탈 경고에 걸리지 않게
-			dirtyRef.current = latest.current !== snapshot;
 		}
 		return result.ok;
-	}, [latest, dirtyRef, markSaved, onSave]);
+	}, [getDefinition, markSaved, onSave]);
 
 	const ensureSaved = useCallback(
-		async () => (dirtyRef.current ? await save() : true),
-		[dirtyRef, save],
+		async () => (isDirty() ? await save() : true),
+		[isDirty, save],
 	);
 
 	const publish = useCallback(async () => {
-		const fresh = validateDefinition(latest.current);
+		const fresh = validateDefinition(getDefinition());
 		if (fresh.total > 0) {
 			setNotice(
 				`고칠 곳 ${fresh.total}건이 있어 발행할 수 없습니다. 첫 오류로 이동합니다.`,
@@ -163,7 +158,7 @@ export function useEditorCommands({
 		const result = await onPublish();
 		setBusy(false);
 		setNotice(result.message);
-	}, [latest, ensureSaved, onPublish, onInvalid]);
+	}, [getDefinition, ensureSaved, onPublish, onInvalid]);
 
 	return { busy, notice, save, ensureSaved, publish };
 }
@@ -180,7 +175,7 @@ const SAVE_KEY = "s";
 /** ⌘S / Ctrl+S → 초안 저장 (브라우저의 "페이지 저장"을 막는다) */
 export function useSaveShortcut(
 	save: () => Promise<boolean>,
-	dirtyRef: RefObject<boolean>,
+	isDirty: () => boolean,
 ): void {
 	useEffect(() => {
 		const onKey = (event: KeyboardEvent) => {
@@ -189,7 +184,7 @@ export function useSaveShortcut(
 				event.key.toLowerCase() === SAVE_KEY
 			) {
 				event.preventDefault();
-				if (dirtyRef.current) {
+				if (isDirty()) {
 					// 결과(성공/실패)는 save가 notice로 알린다
 					void save();
 				}
@@ -197,14 +192,14 @@ export function useSaveShortcut(
 		};
 		window.addEventListener("keydown", onKey);
 		return () => window.removeEventListener("keydown", onKey);
-	}, [save, dirtyRef]);
+	}, [save, isDirty]);
 }
 
 /** 저장하지 않은 변경이 있으면 앱 내 이동은 확인 창으로, 탭 닫기는 브라우저 경고로 막는다 */
-export function useLeaveGuard(dirtyRef: RefObject<boolean>) {
+export function useLeaveGuard(isDirty: () => boolean) {
 	return useBlocker({
-		shouldBlockFn: () => dirtyRef.current,
-		enableBeforeUnload: () => dirtyRef.current,
+		shouldBlockFn: isDirty,
+		enableBeforeUnload: isDirty,
 		withResolver: true,
 	});
 }

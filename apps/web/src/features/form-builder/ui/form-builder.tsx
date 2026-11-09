@@ -18,7 +18,7 @@ import {
 	TabsTrigger,
 } from "@jwc/ui/components/tabs";
 import { useCallback, useState } from "react";
-import type { ReactNode, RefObject } from "react";
+import type { ReactNode } from "react";
 
 import { buildIndex } from "../model/derive";
 import type { IssueIndex } from "../model/issues";
@@ -144,13 +144,13 @@ function EditorViews({
 
 /** "첫 오류로 이동": 탭 전환 → 카드 펼치기 → 스크롤 */
 function useShowIssues(
-	latestRef: RefObject<FormDefinition>,
+	getDefinition: () => FormDefinition,
 	cards: OpenCards,
 	setTab: (tab: Tab) => void,
 ) {
 	return useCallback(
 		(target: IssueIndex) => {
-			const where = firstIssueTarget(latestRef.current, target);
+			const where = firstIssueTarget(getDefinition(), target);
 			if (!where) {
 				return;
 			}
@@ -160,7 +160,7 @@ function useShowIssues(
 			}
 			scrollToId(where.domId);
 		},
-		[cards, latestRef, setTab],
+		[cards, getDefinition, setTab],
 	);
 }
 
@@ -235,7 +235,7 @@ export function FormBuilder({
 	const session = useEditorState(initial, lockedFieldIds);
 	const [tab, setTab] = useState<Tab>("questions");
 	const cards = useOpenCards();
-	const showIssues = useShowIssues(session.latest, cards, setTab);
+	const showIssues = useShowIssues(session.getDefinition, cards, setTab);
 	const commands = useEditorCommands({
 		...session,
 		markSaved: session.setSaved,
@@ -243,8 +243,8 @@ export function FormBuilder({
 		onPublish,
 		onInvalid: showIssues,
 	});
-	useSaveShortcut(commands.save, session.dirtyRef);
-	const blocker = useLeaveGuard(session.dirtyRef);
+	useSaveShortcut(commands.save, session.isDirty);
+	const blocker = useLeaveGuard(session.isDirty);
 	const { issues } = session;
 	const { publish: handlePublish, save: handleSave } = commands;
 	return (

@@ -12,7 +12,7 @@ import {
 	SelectValue,
 } from "@jwc/ui/components/select";
 import { Textarea } from "@jwc/ui/components/textarea";
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useMemo } from "react";
 
 import type { FieldPatch } from "../model/actions";
 import { fieldConditionSources } from "../model/derive";
@@ -85,12 +85,14 @@ function TitleInput({
 	onPatch: Patch;
 	focusOnMount: boolean;
 }) {
-	const ref = useRef<HTMLInputElement>(null);
-	useEffect(() => {
-		if (focusOnMount) {
-			ref.current?.select();
-		}
-	}, [focusOnMount]);
+	const selectTitle = useCallback(
+		(input: HTMLInputElement | null) => {
+			if (focusOnMount) {
+				input?.select();
+			}
+		},
+		[focusOnMount],
+	);
 	return (
 		<FormRow label={field.type === "statement" ? "안내 제목" : "질문 제목"}>
 			{(ids) => (
@@ -98,7 +100,7 @@ function TitleInput({
 					className="font-medium"
 					id={ids.inputId}
 					onChange={(e) => onPatch({ label: e.target.value })}
-					ref={ref}
+					ref={selectTitle}
 					value={field.label}
 				/>
 			)}
