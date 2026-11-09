@@ -14,7 +14,7 @@
 		"typecheck:tsc": "tsc --noEmit"
 	},
 	"dependencies": {
-		"posthog-js": "1.446.0"
+		"posthog-js": "1.447.4"
 	},
 	"devDependencies": {
 		"@jwc/tsconfig": "workspace:*",

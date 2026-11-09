@@ -36,15 +36,15 @@
 		"@jwc/ui": "workspace:*",
 		"@jwc/ui-patterns": "workspace:*",
 		"@tanstack/react-router": "^1.170.46",
-		"@tanstack/react-start": "^1.169.4",
-		"better-auth": "^1.7.17",
+		"@tanstack/react-start": "^1.169.5",
+		"better-auth": "^1.7.18",
 		"drizzle-orm": "^0.45.4",
 		"lucide-react": "catalog:",
 		"qrcode.react": "^4.2.0",
 		"react": "catalog:react19",
 		"react-dom": "catalog:react19",
 		"zod": "catalog:",
-		"zustand": "^5.0.16"
+		"zustand": "^5.1.0"
 	},
 	"devDependencies": {
 		"@jwc/typecheck": "workspace:*",
@@ -53,7 +53,7 @@
 		"@types/node": "catalog:",
 		"@types/react": "catalog:react19",
 		"@types/react-dom": "catalog:react19",
-		"@vitejs/plugin-react": "^6.2.1",
+		"@vitejs/plugin-react": "^6.3.0",
 		"dotenv-cli": "11.1.0",
 		"tsx": "^4.21.0",
 		"typescript": "catalog:",
