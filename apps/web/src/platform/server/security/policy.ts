@@ -121,9 +121,24 @@ export interface CspSources {
 const FONT_CDN = "https://cdn.jsdelivr.net";
 const TURNSTILE = "https://challenges.cloudflare.com";
 
+/**
+ * 항상 여는 PostHog 출처(US 수집 + 리플레이/설정 스크립트).
+ * 환경마다 키·주소 설정이 달라도 분석 요청이 CSP에 막히지 않게 고정으로 둔다.
+ */
+const POSTHOG_ORIGINS = [
+	"https://us.i.posthog.com",
+	"https://us-assets.i.posthog.com",
+] as const;
+
 /** us.i.posthog.com → us-assets.i.posthog.com (리플레이/설정 스크립트를 내려받는 주소) */
 function posthogAssetHost(host: string): string {
 	return host.replace(".i.posthog.com", "-assets.i.posthog.com");
+}
+
+/** 고정 출처 + 설정된 수집 주소(다르면)와 그 asset 주소, 중복 없이 */
+function posthogOrigins(host: string | null): string[] {
+	const configured = host === null ? [] : [host, posthogAssetHost(host)];
+	return [...new Set([...POSTHOG_ORIGINS, ...configured])];
 }
 
 /**
@@ -131,9 +146,7 @@ function posthogAssetHost(host: string): string {
  * 대신 eval 금지, 외부 출처는 목록으로 제한, 프레임 삽입/플러그인/base 변경/외부 form 전송을 막는다.
  */
 export function cspDirectives(sources: CspSources): CspDirectives {
-	const posthog = sources.posthogHost
-		? [sources.posthogHost, posthogAssetHost(sources.posthogHost)]
-		: [];
+	const posthog = posthogOrigins(sources.posthogHost);
 	const turnstile = sources.turnstile ? [TURNSTILE] : [];
 	return {
 		"default-src": ["'self'"],
