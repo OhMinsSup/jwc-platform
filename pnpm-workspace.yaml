@@ -3,6 +3,12 @@ packages:
   - "packages/*"
   - "tooling/*"
 
+allowBuilds:
+  better-sqlite3: false
+  esbuild: true
+  sharp: true
+  workerd: true
+
 # 두 패키지 이상이 쓰는 의존성은 catalog에서만 버전을 정한다 (syncpack이 `pnpm check:deps`로 검사)
 catalog:
   # 타입 검증: tsrs(Rust)를 기본으로, 미검증 플랫폼은 tsc로 폴백 (tooling/typecheck)

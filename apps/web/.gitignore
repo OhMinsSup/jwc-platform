@@ -6,3 +6,12 @@ src/routeTree.gen.ts
 .cloudflare/
 .void-wrangler.jsonc
 .dev-credentials
+node_modules
+dist
+.void
+.wrangler
+.cloudflare
+.env.*
+!.env.example
+*.tsbuildinfo
+.DS_Store
