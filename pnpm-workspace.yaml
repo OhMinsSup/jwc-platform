@@ -13,7 +13,7 @@ allowBuilds:
 catalog:
   # 타입 검증: tsrs(Rust)를 기본으로, 미검증 플랫폼은 tsc로 폴백 (tooling/typecheck)
   # tsrs는 검증된 버전으로 고정한다 (올릴 때 tooling/typecheck 테스트로 확인)
-  tsrs: 0.21.0-ts7.1.0-beta
+  tsrs: 0.23.0-ts7.1.0-beta
   typescript: ^7.0.2
   "@types/node": ^26.6.6
   # 포맷/린트/테스트는 Vite+(vp) 하나로. vite-plus를 올릴 때 아래 oxlint/oxfmt/vitest와
