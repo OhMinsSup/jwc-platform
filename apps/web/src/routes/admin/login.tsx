@@ -1,5 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 
+import { getAdminAccessFn } from "../../features/admin-access/functions";
+import { ADMIN_AUTH_DESTINATIONS } from "../../features/admin-access/model/admin-auth";
 import { authClient } from "../../platform/auth-client";
 import { AuthCard } from "../../platform/ui/auth-card";
 import type { AuthFieldDef } from "../../platform/ui/auth-card";
@@ -38,7 +40,14 @@ function LoginPage() {
 					await navigate({ to: "/admin/two-factor" });
 					return null;
 				}
-				await navigate({ to: "/admin" });
+				const decision = await getAdminAccessFn();
+				if (decision.kind === "blocked") {
+					return "이 계정에는 관리자 접근 권한이 없습니다. 관리자에게 계정 등록을 확인해주세요";
+				}
+				if (decision.kind === "signed_out") {
+					return "로그인 세션을 확인하지 못했습니다. 쿠키 허용 설정과 접속 주소를 확인한 뒤 다시 로그인해주세요";
+				}
+				await navigate({ to: ADMIN_AUTH_DESTINATIONS[decision.kind] });
 				return null;
 			}}
 			submitLabel="로그인"

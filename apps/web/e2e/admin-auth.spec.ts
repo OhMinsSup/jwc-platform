@@ -10,9 +10,9 @@ async function open(page: Page, path: string) {
 	await page.waitForLoadState("networkidle");
 }
 
-async function login(page: Page) {
+async function login(page: Page, email = E2E_ADMIN.email) {
 	await open(page, "/admin/login");
-	await page.getByLabel("이메일", { exact: true }).fill(E2E_ADMIN.email);
+	await page.getByLabel("이메일", { exact: true }).fill(email);
 	await page.getByLabel("비밀번호", { exact: true }).fill(E2E_ADMIN.password);
 	await page.getByRole("button", { name: "로그인", exact: true }).click();
 }
@@ -101,4 +101,46 @@ test("허용되지 않은 이메일의 가입은 거절하고 관리 화면을 �
 		.click();
 	await expect(page.getByRole("alert")).toContainText("인증할 수 없습니다");
 	await expect(page).toHaveURL(/\/admin\/signup$/u);
+});
+
+test("비밀번호가 맞아도 허용되지 않은 관리자에게 접근 거절을 안내한다", async ({
+	page,
+}) => {
+	const email = "unlisted@example.org";
+	executeE2ESql(
+		`UPDATE user SET email = '${email}' WHERE id = '${E2E_ADMIN.id}';`,
+	);
+	const signedIn = page.waitForResponse("**/api/auth/sign-in/email");
+	await login(page, email);
+	const response = await signedIn;
+	expect(response.status()).toBe(200);
+	await expect(page.getByRole("alert")).toContainText(
+		"관리자 접근 권한이 없습니다",
+	);
+	await expect(page).toHaveURL(/\/admin\/login$/u);
+	await expect(
+		page.getByRole("button", { name: "로그인", exact: true }),
+	).toBeEnabled();
+});
+
+test("로그인 성공 응답 뒤 세션이 없으면 쿠키와 접속 주소 확인을 안내한다", async ({
+	page,
+}) => {
+	await page.route("**/api/auth/sign-in/email", (route) =>
+		route.fulfill({
+			json: {
+				redirect: false,
+				token: "e2e-only-session-not-persisted",
+				user: { id: E2E_ADMIN.id, email: E2E_ADMIN.email },
+			},
+		}),
+	);
+	await login(page);
+	await expect(page.getByRole("alert")).toContainText(
+		"로그인 세션을 확인하지 못했습니다",
+	);
+	await expect(page).toHaveURL(/\/admin\/login$/u);
+	await expect(
+		page.getByRole("button", { name: "로그인", exact: true }),
+	).toBeEnabled();
 });
