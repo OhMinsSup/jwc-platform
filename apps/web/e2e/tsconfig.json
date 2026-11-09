@@ -2,7 +2,15 @@
 	"//": "E2E(Playwright)는 Node에서 돈다. 앱(Workers) 타입과 섞지 않도록 따로 검사한다 (pnpm typecheck)",
 	"extends": "../tsconfig.json",
 	"compilerOptions": {
+		"allowJs": true,
+		"checkJs": true,
+		"allowImportingTsExtensions": true,
 		"types": ["node"]
 	},
-	"include": ["./**/*.ts", "../playwright.config.ts"]
+	"include": [
+		"./**/*.ts",
+		"./**/*.mjs",
+		"../playwright.config.ts",
+		"../playwright.performance.config.ts"
+	]
 }

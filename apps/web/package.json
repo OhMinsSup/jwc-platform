@@ -15,6 +15,7 @@
 		"test": "vp test run",
 		"test:e2e": "pnpm with-env playwright test",
 		"test:e2e:install": "playwright install --with-deps --only-shell chromium",
+		"test:performance": "pnpm with-env playwright test --config playwright.performance.config.ts",
 		"typecheck": "void prepare && jwc-typecheck --noEmit && jwc-typecheck --noEmit -p e2e",
 		"typecheck:tsc": "void prepare && tsc --noEmit && tsc --noEmit -p e2e",
 		"with-env": "dotenv --no-expand -o -e ../../config/env/development.env --",
@@ -54,6 +55,7 @@
 		"typescript": "catalog:",
 		"vite": "^8.3.5",
 		"vite-plus": "catalog:",
-		"void": "^1.6.2"
+		"void": "^1.6.2",
+		"web-vitals": "6.2.3"
 	}
 }

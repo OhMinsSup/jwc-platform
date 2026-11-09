@@ -29,6 +29,7 @@ TanStack Start + void(Cloudflare Workers). 공개 신청 화면, 관리자 콘�
 
 ## 규칙
 
+- `useEffect`는 외부 시스템 동기화와 구독·해제에만 사용하고, 남기는 이유를 코드에서 설명한다. 파생 값은 렌더에서 계산하고, 사용자 동작은 이벤트 핸들러에서 처리하며, DOM 연결 시점 작업은 callback ref를 우선한다. Effect를 없애려고 렌더 중 I/O·ref 변경을 하거나 다른 훅으로 숨기지 않는다. 편집기의 상태와 이벤트 명령은 인스턴스별 store 하나를 읽는다 (ADR-0014).
 - 답변/납입 여부의 원본은 응답 저장소다. D1에는 답변·연락처·납입 여부를 저장하지 않는다(키/멱등/락만). 큐 payload는 항상 `encryptJson`으로 암호화한다.
 - 서비스는 `SubmissionStore` 포트에만 의존한다. 공급자(Google) 오류 타입은 어댑터 밖으로 내보내지 않는다(`SubmissionStoreError`로 변환).
 - 로그/분석 이벤트는 카탈로그(서버 `platform/server/telemetry/events.ts`, 클라이언트 `platform/analytics/events.ts`)에 필드를 먼저 선언한다. 답변·이름·전화번호·문자 본문·토큰은 필드로 두지 않는다.
@@ -40,4 +41,5 @@ TanStack Start + void(Cloudflare Workers). 공개 신청 화면, 관리자 콘�
 
 - `pnpm -C apps/web dev` / `build` / `test` / `typecheck`
 - `pnpm -C apps/web test:e2e`: 공개 신청 E2E(Playwright). 5179 포트에 개발 서버를 띄우고 메모리 응답 저장소를 쓴다. 로컬 D1에는 E2E 전용 폼(`e2e-public-form`)만 지우고 다시 넣는다 (`e2e/seed.ts`). 처음 한 번 `pnpm -C apps/web exec playwright install chromium`
+- `pnpm -C apps/web test:performance`: production 모바일 전 페이지 성능 예산(페이지별 5회, 실험실 p75). 공개 더미 바인딩·별도 D1·메모리 응답을 쓴다. `typecheck`/E2E/dev와 동시에 실행하지 않는다. 조건·범위·운영 지표의 차이는 `docs/performance/README.md`.
 - `pnpm -C apps/web db:generate` → `void db migrate` (로컬) → `void deploy` (원격 적용)

@@ -3,6 +3,14 @@ import { describe, expect, it } from "vite-plus/test";
 import { replayAllowedOn, sanitizeUrl } from "../src/platform/analytics/events";
 
 describe(sanitizeUrl, () => {
+	it("완료 화면의 신청 열람 토큰도 분석 URL에서 지운다", () => {
+		expect(
+			sanitizeUrl(
+				"https://x.test/f/retreat/done?id=private-token&updated=true#details",
+			),
+		).toBe("https://x.test/f/retreat/done");
+	});
+
 	it.each([
 		"/admin/verify-phone?code=secret",
 		"/api/auth/phone-number/verify?code=secret",

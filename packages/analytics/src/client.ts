@@ -2,12 +2,17 @@ import type { PostHog } from "posthog-js";
 
 import { allowedProps, sanitizeUrlProperties } from "./catalog";
 import type { EventCatalog, EventProps, FlagCatalog } from "./catalog";
+import {
+	PERFORMANCE_CAPTURE,
+	sanitizePerformanceProperties,
+} from "./performance";
 
 /**
  * 브라우저 PostHog 래퍼 팩토리. 키가 없거나 서버 렌더링 중이면 모든 호출이 아무 일도 하지 않는다.
  * posthog-js는 처음 init할 때 동적으로 불러온다(초기 번들 크기를 늘리지 않는다).
  *
- * 개인정보 기본값: 자동 수집 끔, 익명 프로필 없음, 세션 리플레이는 플래그 + 허용 경로에서만(모든 입력·글자 가림).
+ * 개인정보 기본값: 클릭 자동 수집 끔, 익명 프로필 없음, 성능 숫자만 수집하고 상세 DOM 정보는 버린다.
+ * 세션 리플레이는 플래그 + 허용 경로에서만(모든 입력·글자 가림).
  */
 
 export interface AnalyticsConfig {
@@ -42,13 +47,14 @@ export interface Analytics<C extends EventCatalog, F extends FlagCatalog> {
 	) => void;
 }
 
-/** posthog.init 옵션: 개인정보 기본값 (자동 수집 끔, 익명 프로필 없음, 리플레이는 꺼진 채 시작하고 모두 가림) */
+/** 개인정보 기본값: 클릭 자동 수집 끔, 성능 숫자만 수집, 리플레이는 꺼진 채 시작하고 모두 가림. */
 function initOptions(sanitizeUrl: (url: string) => string) {
 	return {
 		person_profiles: "identified_only",
 		capture_pageview: "history_change",
 		capture_pageleave: true,
 		autocapture: false,
+		capture_performance: PERFORMANCE_CAPTURE,
 		capture_exceptions: {
 			capture_unhandled_errors: true,
 			capture_unhandled_rejections: true,
@@ -60,6 +66,7 @@ function initOptions(sanitizeUrl: (url: string) => string) {
 			event: T,
 		) => {
 			sanitizeUrlProperties(event.properties, sanitizeUrl);
+			sanitizePerformanceProperties(event.properties);
 			return event;
 		},
 	} as const;

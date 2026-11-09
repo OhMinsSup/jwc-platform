@@ -19,6 +19,7 @@ const IS_CI = Boolean(
 
 export default defineConfig({
 	testDir: "./e2e",
+	testIgnore: "**/performance/**",
 	globalSetup: "./e2e/seed.ts",
 	fullyParallel: false,
 	forbidOnly: IS_CI,
