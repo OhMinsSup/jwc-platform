@@ -27,6 +27,7 @@
 		"db",
 		"crons",
 		"queues",
+		"scripts",
 		"test",
 		"env.ts",
 		"server.ts",

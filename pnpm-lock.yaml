@@ -189,6 +189,9 @@ importers:
       dotenv-cli:
         specifier: 11.1.0
         version: 11.1.0
+      tsx:
+        specifier: ^4.21.0
+        version: 4.21.0
       typescript:
         specifier: 'catalog:'
         version: 7.0.2

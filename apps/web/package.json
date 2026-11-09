@@ -21,7 +21,8 @@
 		"typecheck:tsc": "void prepare && tsc --noEmit && tsc --noEmit -p e2e",
 		"with-env": "dotenv --no-expand -o -e ../../config/env/development/.env --",
 		"with-env:test": "dotenv --no-expand -o -e ../../config/env/test/defaults.env --",
-		"with-env:performance": "dotenv --no-expand -o -e ../../config/env/performance/.dev.vars --"
+		"with-env:performance": "dotenv --no-expand -o -e ../../config/env/performance/.dev.vars --",
+		"db:seed-admin": "pnpm with-env tsx scripts/seed-dev-admin.ts"
 	},
 	"dependencies": {
 		"@jwc/analytics": "workspace:*",
@@ -53,6 +54,7 @@
 		"@types/react-dom": "catalog:react19",
 		"@vitejs/plugin-react": "^6.2.1",
 		"dotenv-cli": "11.1.0",
+		"tsx": "^4.21.0",
 		"typescript": "catalog:",
 		"vite": "^8.3.5",
 		"vite-plus": "catalog:",
