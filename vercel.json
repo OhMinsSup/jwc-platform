@@ -1,8 +1,0 @@
-{
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "pnpm turbo build --filter=web",
-  "outputDirectory": "apps/web/.output",
-  "installCommand": "pnpm install",
-  "framework": null,
-  "ignoreCommand": "npx turbo-ignore"
-}

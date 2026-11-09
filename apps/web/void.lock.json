@@ -1,0 +1,43 @@
+{
+	"version": 1,
+	"source": {
+		"main": "./server.ts",
+		"queues": {
+			"producers": [
+				{
+					"queue": "jwc-form-sms",
+					"binding": "QUEUE_SMS"
+				}
+			],
+			"consumers": [
+				{
+					"queue": "jwc-form-sms",
+					"max_batch_size": 5,
+					"max_retries": 5,
+					"retry_delay": 60
+				}
+			]
+		}
+	},
+	"resolved": {
+		"main": "./server.ts",
+		"queues": {
+			"producers": [
+				{
+					"queue": "jwc-form-sms",
+					"binding": "QUEUE_SMS"
+				}
+			],
+			"consumers": [
+				{
+					"queue": "jwc-form-sms",
+					"max_batch_size": 5,
+					"max_retries": 5,
+					"retry_delay": 60
+				}
+			]
+		},
+		"compatibility_date": "2026-02-24"
+	},
+	"text": "{\n  \"main\": \"./server.ts\",\n  \"queues\": {\n    \"producers\": [\n      {\n        \"queue\": \"jwc-form-sms\",\n        \"binding\": \"QUEUE_SMS\"\n      }\n    ],\n    \"consumers\": [\n      {\n        \"queue\": \"jwc-form-sms\",\n        \"max_batch_size\": 5,\n        \"max_retries\": 5,\n        \"retry_delay\": 60\n      }\n    ]\n  },\n  \"compatibility_date\": \"2026-02-24\"\n}\n"
+}

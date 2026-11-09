@@ -1,0 +1,29 @@
+{
+	"name": "@jwc/security",
+	"version": "0.1.0",
+	"private": true,
+	"description": "HTTP 경계 보안: 요청 판정(본문 상한, 교차 출처, 경로 정책 표), CSP/보안 헤더, 고정 창 속도 제한(저장소 포트), Turnstile 검증. 정책은 앱이 데이터로 넘긴다.",
+	"type": "module",
+	"exports": {
+		"./headers": "./src/headers.ts",
+		"./rate-limit": "./src/rate-limit.ts",
+		"./request-policy": "./src/request-policy.ts",
+		"./turnstile": "./src/turnstile.ts"
+	},
+	"scripts": {
+		"test": "vp test run",
+		"typecheck": "jwc-typecheck --noEmit",
+		"typecheck:tsc": "tsc --noEmit"
+	},
+	"dependencies": {
+		"zod": "catalog:"
+	},
+	"devDependencies": {
+		"@jwc/common": "workspace:*",
+		"@jwc/tsconfig": "workspace:*",
+		"@jwc/typecheck": "workspace:*",
+		"@types/node": "catalog:",
+		"typescript": "catalog:",
+		"vite-plus": "catalog:"
+	}
+}

@@ -1,19 +1,217 @@
 {
-  "format_on_save": "on",
-  "code_actions_on_format": {
-    "source.fixAll.biome": true,
-    "source.organizeImports.biome": true
-  },
-  "lsp": {
-    "biome": {
-      "settings": {
-        "require_config_file": true
-      }
-    }
-  },
-  "formatter": {
-    "language_server": {
-      "name": "biome"
-    }
-  }
+	"format_on_save": "on",
+	"lsp": {
+		"typescript-ls": {
+			"binary": {
+				"path": "./node_modules/typescript/bin/tsc",
+				"arguments": ["--lsp", "--stdio"]
+			}
+		},
+		"oxlint": {
+			"initialization_options": {
+				"settings": {
+					"configPath": "./vite.config.ts",
+					"disableNestedConfig": true,
+					"run": "onType",
+					"fixKind": "safe_fix"
+				}
+			}
+		},
+		"oxfmt": {
+			"initialization_options": {
+				"settings": {
+					"fmt.configPath": "./vite.config.ts",
+					"fmt.disableNestedConfig": true,
+					"run": "onSave"
+				}
+			}
+		},
+		"tailwindcss-language-server": {
+			"settings": {
+				"classFunctions": ["cn", "cva", "cx", "clsx"],
+				"experimental": {
+					"configFile": {
+						"apps/web/src/styles.css": [
+							"apps/web/**",
+							"packages/ui/**",
+							"packages/ui-patterns/**"
+						]
+					}
+				}
+			}
+		}
+	},
+	"languages": {
+		"CSS": {
+			"language_servers": [
+				"tailwindcss-intellisense-css",
+				"!vscode-css-language-server",
+				"..."
+			],
+			"format_on_save": "on",
+			"prettier": {
+				"allowed": false
+			},
+			"formatter": [
+				{
+					"language_server": {
+						"name": "oxfmt"
+					}
+				}
+			]
+		},
+		"HTML": {
+			"format_on_save": "on",
+			"prettier": {
+				"allowed": false
+			},
+			"formatter": [
+				{
+					"language_server": {
+						"name": "oxfmt"
+					}
+				}
+			]
+		},
+		"JavaScript": {
+			"language_servers": [
+				"typescript-ls",
+				"!vtsls",
+				"!typescript-language-server",
+				"..."
+			],
+			"format_on_save": "on",
+			"prettier": {
+				"allowed": false
+			},
+			"formatter": [
+				{
+					"language_server": {
+						"name": "oxfmt"
+					}
+				},
+				{
+					"code_action": "source.fixAll.oxc"
+				}
+			]
+		},
+		"JSX": {
+			"language_servers": [
+				"typescript-ls",
+				"!vtsls",
+				"!typescript-language-server",
+				"..."
+			],
+			"format_on_save": "on",
+			"prettier": {
+				"allowed": false
+			},
+			"formatter": [
+				{
+					"language_server": {
+						"name": "oxfmt"
+					}
+				},
+				{
+					"code_action": "source.fixAll.oxc"
+				}
+			]
+		},
+		"JSON": {
+			"format_on_save": "on",
+			"prettier": {
+				"allowed": false
+			},
+			"formatter": [
+				{
+					"language_server": {
+						"name": "oxfmt"
+					}
+				}
+			]
+		},
+		"JSONC": {
+			"format_on_save": "on",
+			"prettier": {
+				"allowed": false
+			},
+			"formatter": [
+				{
+					"language_server": {
+						"name": "oxfmt"
+					}
+				}
+			]
+		},
+		"Markdown": {
+			"format_on_save": "on",
+			"prettier": {
+				"allowed": false
+			},
+			"formatter": [
+				{
+					"language_server": {
+						"name": "oxfmt"
+					}
+				}
+			]
+		},
+		"TypeScript": {
+			"language_servers": [
+				"typescript-ls",
+				"!vtsls",
+				"!typescript-language-server",
+				"..."
+			],
+			"format_on_save": "on",
+			"prettier": {
+				"allowed": false
+			},
+			"formatter": [
+				{
+					"language_server": {
+						"name": "oxfmt"
+					}
+				},
+				{
+					"code_action": "source.fixAll.oxc"
+				}
+			]
+		},
+		"TSX": {
+			"language_servers": [
+				"typescript-ls",
+				"!vtsls",
+				"!typescript-language-server",
+				"..."
+			],
+			"format_on_save": "on",
+			"prettier": {
+				"allowed": false
+			},
+			"formatter": [
+				{
+					"language_server": {
+						"name": "oxfmt"
+					}
+				},
+				{
+					"code_action": "source.fixAll.oxc"
+				}
+			]
+		},
+		"YAML": {
+			"format_on_save": "on",
+			"prettier": {
+				"allowed": false
+			},
+			"formatter": [
+				{
+					"language_server": {
+						"name": "oxfmt"
+					}
+				}
+			]
+		}
+	}
 }

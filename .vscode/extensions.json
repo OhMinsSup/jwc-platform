@@ -1,8 +1,13 @@
 {
-  "recommendations": [
-    "expo.vscode-expo-tools",
-    "yoavbls.pretty-ts-errors",
-    "bradlc.vscode-tailwindcss",
-    "biomejs.biome"
-  ]
+	"recommendations": [
+		"yoavbls.pretty-ts-errors",
+		"bradlc.vscode-tailwindcss",
+		"TypeScriptTeam.native-preview",
+		"VoidZero.vite-plus-extension-pack"
+	],
+	"unwantedRecommendations": [
+		"biomejs.biome",
+		"dbaeumer.vscode-eslint",
+		"esbenp.prettier-vscode"
+	]
 }

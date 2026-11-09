@@ -1,124 +1,87 @@
-import { convexQuery } from "@convex-dev/react-query";
-import { api } from "@jwc/backend/convex/_generated/api";
-import { Button } from "@jwc/ui";
-import { useQuery } from "@tanstack/react-query";
+import { Button } from "@jwc/ui/components/button";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Calendar, Clock, MapPin } from "lucide-react";
-import {
-	ConnectionStatus,
-	Footer,
-	Navbar,
-	PageLayout,
-} from "@/components/common";
+import { ArrowRight } from "lucide-react";
+
+import { listOpenFormsFn } from "../features/forms/functions/public";
+import { pageMeta } from "../platform/metadata";
+import { PublicShell } from "../platform/ui/public-shell";
 
 export const Route = createFileRoute("/")({
-	component: HomeComponent,
-	head: () => ({
-		meta: [
-			{
-				title: "2026 여름 청년부 수련회 - 나 찾으심?",
-			},
-			{
-				property: "og:title",
-				content: "2026 여름 청년부 수련회 - 나 찾으심?",
-			},
-		],
-	}),
+	loader: () => listOpenFormsFn(),
+	head: () => ({ meta: pageMeta({ title: "행사 신청" }) }),
+	component: HomePage,
 });
 
-/** 수련회 정보 */
-const RETREAT_INFO = {
-	title: "2026 여름 청년부 수련회",
-	theme: "나 찾으심?",
-	date: "2026년 6월 7일(일) ~ 6월 14일(일)",
-	duration: "3박 4일",
-	location: "광림 수도원",
-	deadline: "2026년 6월 14일",
-};
+type OpenForm = Awaited<ReturnType<typeof listOpenFormsFn>>[number];
 
-function HomeComponent() {
-	const healthCheck = useQuery(convexQuery(api.healthCheck.get, {}));
-
-	const isConnected = healthCheck.data === "OK";
-
+/**
+ * 공개 첫 화면 (typie 히어로 구조): 가운데 큰 제목 + 한 줄 설명 + 큰 수치(접수 중인 신청서 수),
+ * 그 아래 신청서 카드 목록. 수치는 실제 목록 길이에서만 나온다.
+ */
+function HomePage() {
+	const forms = Route.useLoaderData();
 	return (
-		<PageLayout
-			footer={<Footer />}
-			header={
-				<Navbar
-					rightSlot={
-						<>
-							<ConnectionStatus
-								connectedText="신청 접수 중"
-								disconnectedText="서버 점검 중"
-								isConnected={isConnected}
-								isLoading={healthCheck.isLoading}
-								loadingText="연결 중..."
-							/>
-							<Button
-								asChild
-								className="rounded-full px-6 font-semibold"
-								size="sm"
-							>
-								<Link params={{ step: "welcome" }} to="/onboarding/$step">
-									신청하기
-								</Link>
-							</Button>
-						</>
-					}
-				/>
-			}
-		>
-			{/* Hero Section */}
-			<section className="container mx-auto px-4 py-24 md:py-32">
-				<div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-8">
-					<div className="flex flex-col justify-center space-y-8">
-						<div className="space-y-4">
-							<div className="inline-flex items-center rounded-full border px-3 py-1 font-medium text-muted-foreground text-sm">
-								<span className="mr-2 inline-block h-2 w-2 rounded-full bg-primary" />
-								{RETREAT_INFO.date}
-							</div>
-							<h1 className="font-bold text-4xl tracking-tighter sm:text-5xl xl:text-6xl/none">
-								{RETREAT_INFO.title}
-								<br />
-								<span className="text-primary">"{RETREAT_INFO.theme}"</span>
-							</h1>
-							<p className="max-w-[600px] text-muted-foreground md:text-xl">
-								함께 모여 예배하고 교제하며, 하나님의 사랑을 깊이 경험하는
-								시간에 여러분을 초대합니다.
-							</p>
-						</div>
-						<div className="flex flex-col gap-3 min-[400px]:flex-row">
-							<Button asChild className="rounded-full px-8 text-base" size="lg">
-								<Link params={{ step: "welcome" }} to="/onboarding/$step">
-									지금 신청하기
-									<ArrowRight className="ml-2 h-4 w-4" />
-								</Link>
-							</Button>
-						</div>
-						<div className="flex items-center gap-4 text-muted-foreground text-sm">
-							<div className="flex items-center gap-1">
-								<MapPin className="h-4 w-4" />
-								{RETREAT_INFO.location}
-							</div>
-							<div className="h-4 w-px bg-border" />
-							<div className="flex items-center gap-1">
-								<Clock className="h-4 w-4" />
-								마감: {RETREAT_INFO.deadline}
-							</div>
-						</div>
-					</div>
-					<div className="relative mx-auto aspect-video w-full max-w-[600px] overflow-hidden rounded-xl border bg-muted/50 shadow-xl lg:aspect-square">
-						<div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
-							{/* Placeholder for Hero Image */}
-							<div className="text-center">
-								<Calendar className="mx-auto mb-4 h-16 w-16 opacity-20" />
-								<p>수련회 포스터 / 이미지 영역</p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</section>
-		</PageLayout>
+		<PublicShell width="max-w-3xl">
+			<Hero openCount={forms.length} />
+			{forms.length === 0 ? (
+				<p className="bg-card text-muted-foreground rounded-xl border px-6 py-10 text-center">
+					지금 접수 중인 신청서가 없습니다. 새 행사가 열리면 여기에 보입니다.
+				</p>
+			) : (
+				<ul className="grid gap-3">
+					{forms.map((form) => (
+						<FormCard form={form} key={form.slug} />
+					))}
+				</ul>
+			)}
+		</PublicShell>
+	);
+}
+
+function Hero({ openCount }: { openCount: number }) {
+	return (
+		<section className="flex flex-col items-center pt-10 pb-14 text-center sm:pt-16 sm:pb-20">
+			<h1 className="font-display text-[34px] leading-[1.2] font-bold tracking-[-0.03em] text-balance sm:text-[52px]">
+				행사 신청은 여기에서
+			</h1>
+			<p className="text-muted-foreground mt-4 max-w-md text-base leading-relaxed text-pretty sm:text-lg">
+				죽전우리교회 청년부 행사를 골라 신청하세요. 신청 내역과 회비 안내는
+				문자로 보내드립니다.
+			</p>
+			<div className="mt-10 flex flex-col items-center">
+				<span className="font-display text-[40px] leading-none font-semibold tabular-nums">
+					{openCount}
+					<span className="text-muted-foreground ml-1 text-xl font-medium">
+						개
+					</span>
+				</span>
+				<span className="text-faint-foreground mt-2 text-[13px]">
+					지금 접수 중인 신청서
+				</span>
+			</div>
+		</section>
+	);
+}
+
+function FormCard({ form }: { form: OpenForm }) {
+	return (
+		<li className="bg-card flex flex-col gap-4 rounded-xl border p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+			<div className="min-w-0">
+				<h2 className="text-lg font-bold tracking-[-0.02em]">{form.title}</h2>
+				{form.description && (
+					<p className="text-muted-foreground mt-1 line-clamp-2 text-[15px]">
+						{form.description}
+					</p>
+				)}
+			</div>
+			<Button
+				className="h-10 shrink-0 rounded-full px-5 text-[15px] font-semibold"
+				nativeButton={false}
+				render={<Link params={{ slug: form.slug }} to="/f/$slug" />}
+			>
+				신청하기
+				<ArrowRight className="size-4" />
+			</Button>
+		</li>
 	);
 }

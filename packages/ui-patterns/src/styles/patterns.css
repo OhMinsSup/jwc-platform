@@ -1,0 +1,55 @@
+/*
+ * UI 패턴용 의미 색 토큰 + Tailwind 스캔 경로.
+ * 앱은 "@jwc/ui/globals.css" 다음에 이 파일을 import한다. brand는 앱이 :root에서 덮어써 정체성 색으로 바꿀 수 있다.
+ * 포털(다이얼로그/드롭다운)에서도 같은 값이 나오도록 :root에 둔다.
+ */
+@source "../components";
+
+:root {
+	--brand: hsl(229 72% 52%);
+	--brand-foreground: hsl(0 0% 100%);
+	--brand-soft: hsl(229 100% 97%);
+	/* 진행 막대의 빈 길, 옅은 면 위 글자 */
+	--brand-track: hsl(229 90% 92%);
+	--brand-ink: hsl(229 60% 28%);
+	--success: hsl(152 60% 36%);
+	--success-ink: hsl(152 60% 18%);
+	--success-soft: hsl(152 60% 95%);
+	--warning: hsl(32 90% 42%);
+	--warning-soft: hsl(40 100% 95%);
+	/* 안내 상자(Callout) 테두리/아이콘 색: 정보(파랑), 주의(주황) */
+	--info: hsl(221 75% 54%);
+	--warning-accent: hsl(34 100% 42%);
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--brand: hsl(229 85% 68%);
+		--brand-foreground: hsl(229 50% 10%);
+		--brand-soft: hsl(229 40% 16%);
+		--brand-track: hsl(229 35% 24%);
+		--brand-ink: hsl(229 85% 82%);
+		--success: hsl(152 55% 55%);
+		--success-ink: hsl(152 55% 75%);
+		--success-soft: hsl(152 40% 14%);
+		--warning: hsl(38 90% 60%);
+		--warning-soft: hsl(38 40% 14%);
+		--info: hsl(221 80% 62%);
+		--warning-accent: hsl(32 70% 49%);
+	}
+}
+
+@theme inline {
+	--color-brand: var(--brand);
+	--color-brand-foreground: var(--brand-foreground);
+	--color-brand-soft: var(--brand-soft);
+	--color-brand-track: var(--brand-track);
+	--color-brand-ink: var(--brand-ink);
+	--color-success-ink: var(--success-ink);
+	--color-success: var(--success);
+	--color-success-soft: var(--success-soft);
+	--color-warning: var(--warning);
+	--color-warning-soft: var(--warning-soft);
+	--color-info: var(--info);
+	--color-warning-accent: var(--warning-accent);
+}

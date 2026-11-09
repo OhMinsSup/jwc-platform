@@ -1,94 +1,29 @@
-import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
+/// <reference types="vite/client" />
 import {
-	fetchSession,
-	getCookieName,
-} from "@convex-dev/better-auth/react-start";
-import type { ConvexQueryClient } from "@convex-dev/react-query";
-import { createAuth } from "@jwc/backend/convex/auth";
-import appCss from "@jwc/ui/globals.css?url";
-import type { QueryClient } from "@tanstack/react-query";
-import {
-	createRootRouteWithContext,
+	createRootRoute,
 	HeadContent,
 	Outlet,
 	Scripts,
-	useRouteContext,
 } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { createServerFn } from "@tanstack/react-start";
-import { getCookie, getRequest } from "@tanstack/react-start/server";
-import type { ConvexReactClient } from "convex/react";
-import { authClient } from "@/lib/auth-client";
+import type { ReactNode } from "react";
 
-const fetchAuth = createServerFn({ method: "GET" }).handler(async () => {
-	const { session } = await fetchSession(getRequest());
-	const sessionCookieName = getCookieName(createAuth);
-	const token = getCookie(sessionCookieName);
-	return {
-		userId: session?.user.id,
-		token,
-	};
-});
+import { getClientConfigFn } from "../platform/functions/client-config";
+import { pageMeta } from "../platform/metadata";
+import { AnalyticsBridge } from "../platform/ui/analytics-bridge";
+import { NavigationProgress } from "../platform/ui/navigation-progress";
 
-export interface RouterAppContext {
-	queryClient: QueryClient;
-	convexClient: ConvexReactClient;
-	convexQueryClient: ConvexQueryClient;
-}
+import appCss from "../styles.css?url";
 
-export const Route = createRootRouteWithContext<RouterAppContext>()({
+export const Route = createRootRoute({
+	// 공개 설정은 배포 사이에 바뀌지 않으므로 한 번만 읽는다
+	loader: () => getClientConfigFn(),
+	staleTime: Number.POSITIVE_INFINITY,
 	head: () => ({
 		meta: [
-			{
-				charSet: "utf-8",
-			},
-			{
-				name: "viewport",
-				content: "width=device-width, initial-scale=1",
-			},
-			{
-				name: "robots",
-				content: "noindex, nofollow",
-			},
-			{
-				title: "2026 여름 청년부 수련회 - 나 찾으심?",
-			},
-			{
-				name: "description",
-				content:
-					"2026년 6월 25일(목) ~ 6월 28일(일) 광림 수도원에서 진행되는 청년부 수련회에 초대합니다.",
-			},
-			{
-				name: "keywords",
-				content:
-					"청년부, 수련회, 2026, 여름수련회, 나 찾으심?, 광림수도원, 교회수련회",
-			},
-			{
-				property: "og:type",
-				content: "website",
-			},
-			{
-				property: "og:title",
-				content: "2026 여름 청년부 수련회 - 나 찾으심?",
-			},
-			{
-				property: "og:description",
-				content:
-					"2026년 6월 25일(목) ~ 6월 28일(일) 광림 수도원에서 진행되는 청년부 수련회에 초대합니다.",
-			},
-			{
-				name: "twitter:card",
-				content: "summary_large_image",
-			},
-			{
-				name: "twitter:title",
-				content: "2026 여름 청년부 수련회 - 나 찾으심?",
-			},
-			{
-				name: "twitter:description",
-				content:
-					"2026년 6월 25일(목) ~ 6월 28일(일) 광림 수도원에서 진행되는 청년부 수련회에 초대합니다.",
-			},
+			{ charSet: "utf-8" },
+			{ name: "viewport", content: "width=device-width, initial-scale=1" },
+			{ name: "robots", content: "noindex, nofollow" },
+			...pageMeta({ title: "행사 신청" }),
 		],
 		links: [
 			{
@@ -96,51 +31,33 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 				href: "https://cdn.jsdelivr.net",
 				crossOrigin: "anonymous",
 			},
-			{
-				rel: "stylesheet",
-				href: "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css",
-			},
-			{
-				rel: "stylesheet",
-				href: appCss,
-			},
-			{
-				rel: "icon",
-				href: "/favicon.ico",
-			},
+			{ rel: "stylesheet", href: appCss },
 		],
 	}),
-
-	component: RootDocument,
-	beforeLoad: async (ctx) => {
-		const { token, userId } = await fetchAuth();
-		if (token) {
-			ctx.context.convexQueryClient.serverHttpClient?.setAuth(token);
-		}
-		return { userId, token };
-	},
+	component: RootComponent,
 });
 
-function RootDocument() {
-	const context = useRouteContext({ from: Route.id });
+function RootComponent() {
+	const { analytics } = Route.useLoaderData();
 	return (
-		<ConvexBetterAuthProvider
-			authClient={authClient}
-			client={context.convexClient}
-		>
-			<html lang="ko">
-				{/** biome-ignore lint/style/noHeadElement: <explanation> Head */}
-				<head>
-					<HeadContent />
-				</head>
-				<body>
-					<div className="grid h-svh grid-rows-[auto_1fr]">
-						<Outlet />
-					</div>
-					<TanStackRouterDevtools position="bottom-left" />
-					<Scripts />
-				</body>
-			</html>
-		</ConvexBetterAuthProvider>
+		<RootDocument>
+			<AnalyticsBridge config={analytics} />
+			<NavigationProgress />
+			<Outlet />
+		</RootDocument>
+	);
+}
+
+function RootDocument({ children }: { children: ReactNode }) {
+	return (
+		<html lang="ko">
+			<head>
+				<HeadContent />
+			</head>
+			<body className="bg-background text-foreground min-h-svh font-sans antialiased">
+				{children}
+				<Scripts />
+			</body>
+		</html>
 	);
 }

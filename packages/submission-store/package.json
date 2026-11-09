@@ -1,0 +1,30 @@
+{
+	"name": "@jwc/submission-store",
+	"version": "0.1.0",
+	"private": true,
+	"description": "응답 저장소 포트(SubmissionStore)와 어댑터(Google Sheets = 주 DB, 메모리 = 테스트/기준 구현). 새 저장소는 ./contract의 계약 테스트를 통과시키는 어댑터 하나로 붙인다.",
+	"type": "module",
+	"exports": {
+		".": "./src/port.ts",
+		"./contract": "./src/contract.ts",
+		"./google-sheets": "./src/google-sheets/store.ts",
+		"./memory": "./src/memory.ts"
+	},
+	"scripts": {
+		"test": "vp test run --passWithNoTests",
+		"typecheck": "jwc-typecheck --noEmit",
+		"typecheck:tsc": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@jwc/common": "workspace:*",
+		"@jwc/form-core": "workspace:*",
+		"@jwc/google": "workspace:*"
+	},
+	"devDependencies": {
+		"@jwc/tsconfig": "workspace:*",
+		"@jwc/typecheck": "workspace:*",
+		"@types/node": "catalog:",
+		"typescript": "catalog:",
+		"vite-plus": "catalog:"
+	}
+}

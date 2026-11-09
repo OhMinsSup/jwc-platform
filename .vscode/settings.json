@@ -1,39 +1,67 @@
 {
-  "github.copilot.chat.codeGeneration.useInstructionFiles": true,
-  "chat.useAgentsMdFile": true,
-  "chat.useAgentSkills": true,
-  "prettier.enable": false,
-  "css.lint.unknownAtRules": "ignore",
-  "editor.codeActionsOnSave": {
-  "source.organizeImports.biome": "explicit",
-    "source.fixAll.biome": "explicit"
-  },
-  "editor.defaultFormatter": "biomejs.biome",
-  "editor.formatOnSave": true,
-  "tailwindCSS.experimental.classRegex": [
-    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
-    ["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
-  ],
-  "tailwindCSS.experimental.configFile": "packages/ui/globals.css",
-  "typescript.enablePromptUseWorkspaceTsdk": true,
-  "typescript.preferences.autoImportFileExcludePatterns": [
-    "next/router.d.ts",
-    "next/dist/client/router.d.ts"
-  ],
-  "typescript.tsdk": "node_modules/typescript/lib",
-  "[javascript]": {
-    "editor.defaultFormatter": "biomejs.biome"
-  },
-  "[json]": {
-    "editor.defaultFormatter": "biomejs.biome"
-  },
-  "[jsonc]": {
-    "editor.defaultFormatter": "biomejs.biome"
-  },
-  "[typescript]": {
-    "editor.defaultFormatter": "biomejs.biome"
-  },
-  "[typescriptreact]": {
-    "editor.defaultFormatter": "biomejs.biome"
-  }
+	"github.copilot.chat.codeGeneration.useInstructionFiles": true,
+	"chat.useAgentsMdFile": true,
+	"chat.useAgentSkills": true,
+	"prettier.enable": false,
+	"biome.enabled": false,
+	"eslint.enable": false,
+	"npm.packageManager": "pnpm",
+	"npm.scriptRunner": "pnpm",
+	"css.lint.unknownAtRules": "ignore",
+	"files.associations": {
+		".zed/*.json": "jsonc"
+	},
+	"editor.defaultFormatter": "oxc.oxc-vscode",
+	"editor.formatOnSave": true,
+	"editor.formatOnSaveMode": "file",
+	"editor.codeActionsOnSave": {
+		"source.fixAll.oxc": "explicit",
+		"source.organizeImports": "never"
+	},
+	"oxc.configPath": "${workspaceFolder}/vite.config.ts",
+	"oxc.disableNestedConfig": true,
+	"oxc.fixKind": "safe_fix",
+	"oxc.fmt.configPath": "${workspaceFolder}/vite.config.ts",
+	"oxc.fmt.disableNestedConfig": true,
+	"tailwindCSS.classFunctions": ["cn", "cva", "cx", "clsx"],
+	"tailwindCSS.experimental.configFile": {
+		"apps/web/src/styles.css": [
+			"apps/web/**",
+			"packages/ui/**",
+			"packages/ui-patterns/**"
+		]
+	},
+	"js/ts.experimental.useTsgo": true,
+	"js/ts.tsdk.path": "node_modules/typescript",
+	"js/ts.tsdk.promptToUseWorkspaceVersion": true,
+	"[css]": {
+		"editor.defaultFormatter": "oxc.oxc-vscode"
+	},
+	"[html]": {
+		"editor.defaultFormatter": "oxc.oxc-vscode"
+	},
+	"[javascript]": {
+		"editor.defaultFormatter": "oxc.oxc-vscode"
+	},
+	"[javascriptreact]": {
+		"editor.defaultFormatter": "oxc.oxc-vscode"
+	},
+	"[json]": {
+		"editor.defaultFormatter": "oxc.oxc-vscode"
+	},
+	"[jsonc]": {
+		"editor.defaultFormatter": "oxc.oxc-vscode"
+	},
+	"[markdown]": {
+		"editor.defaultFormatter": "oxc.oxc-vscode"
+	},
+	"[typescript]": {
+		"editor.defaultFormatter": "oxc.oxc-vscode"
+	},
+	"[typescriptreact]": {
+		"editor.defaultFormatter": "oxc.oxc-vscode"
+	},
+	"[yaml]": {
+		"editor.defaultFormatter": "oxc.oxc-vscode"
+	}
 }

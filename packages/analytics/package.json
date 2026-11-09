@@ -1,0 +1,26 @@
+{
+	"name": "@jwc/analytics",
+	"version": "0.1.0",
+	"private": true,
+	"description": "브라우저 제품 분석(PostHog): 이벤트/기능 플래그 카탈로그 기반 래퍼, URL 정리, 경로+플래그 기반 세션 리플레이. posthog-js는 처음 사용할 때 동적으로 불러온다.",
+	"type": "module",
+	"exports": {
+		".": "./src/client.ts",
+		"./catalog": "./src/catalog.ts"
+	},
+	"scripts": {
+		"test": "vp test run",
+		"typecheck": "jwc-typecheck --noEmit",
+		"typecheck:tsc": "tsc --noEmit"
+	},
+	"dependencies": {
+		"posthog-js": "1.446.0"
+	},
+	"devDependencies": {
+		"@jwc/tsconfig": "workspace:*",
+		"@jwc/typecheck": "workspace:*",
+		"@types/node": "catalog:",
+		"typescript": "catalog:",
+		"vite-plus": "catalog:"
+	}
+}

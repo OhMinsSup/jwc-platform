@@ -1,0 +1,288 @@
+/* Wanted Sans 1.0.3 (SIL OFL 1.1). Unicode subsets preserved from the pinned upstream CSS.
+ * Source: https://github.com/wanteddev/wanted-sans/tree/v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split
+ * License: https://github.com/wanteddev/wanted-sans/blob/v1.0.3/LICENSE
+ */
+@font-face {
+	font-family: "Wanted Sans Variable";
+	font-style: normal;
+	font-display: swap;
+	font-weight: 400 1000;
+	src: url("https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/woff2/WantedSansVariable.split.22.woff2")
+		format("woff2-variations");
+	unicode-range:
+		U+c841-c84b, U+c84d-c86f, U+c872-c873, U+c875-c877, U+c879-c87f,
+		U+c882-c884, U+c887-c88a, U+c88d-c8c3, U+c8c5-c8df, U+c8e1-c8e8;
+}
+
+@font-face {
+	font-family: "Wanted Sans Variable";
+	font-style: normal;
+	font-display: swap;
+	font-weight: 400 1000;
+	src: url("https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/woff2/WantedSansVariable.split.23.woff2")
+		format("woff2-variations");
+	unicode-range:
+		U+c779-c77b, U+c77e-c782, U+c786, U+c78b, U+c78d, U+c78f, U+c792-c793,
+		U+c795, U+c797, U+c799-c79f, U+c7a2, U+c7a7-c7ab, U+c7ae-c7bb, U+c7bd-c7c0,
+		U+c7c2-c7c7, U+c7c9-c7dc, U+c7de-c7ff, U+c802-c803, U+c805-c807, U+c809,
+		U+c80b-c80f, U+c812, U+c814, U+c817-c81b, U+c81e-c81f, U+c821-c823,
+		U+c825-c82e, U+c830-c837, U+c839-c83b, U+c83d-c840;
+}
+
+@font-face {
+	font-family: "Wanted Sans Variable";
+	font-style: normal;
+	font-display: swap;
+	font-weight: 400 1000;
+	src: url("https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/woff2/WantedSansVariable.split.24.woff2")
+		format("woff2-variations");
+	unicode-range:
+		U+c6bb-c6bf, U+c6c2, U+c6c4, U+c6c6-c6cb, U+c6ce-c6cf, U+c6d1-c6d3,
+		U+c6d5-c6db, U+c6dd-c6df, U+c6e1-c6e7, U+c6e9-c6eb, U+c6ed-c6ef,
+		U+c6f1-c6f8, U+c6fa-c703, U+c705-c707, U+c709-c70b, U+c70d-c716, U+c718,
+		U+c71a-c71f, U+c722-c723, U+c725-c727, U+c729-c734, U+c736-c73b,
+		U+c73e-c73f, U+c741-c743, U+c745-c74b, U+c74e-c750, U+c752-c757,
+		U+c759-c773, U+c776-c777;
+}
+
+@font-face {
+	font-family: "Wanted Sans Variable";
+	font-style: normal;
+	font-display: swap;
+	font-weight: 400 1000;
+	src: url("https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/woff2/WantedSansVariable.split.25.woff2")
+		format("woff2-variations");
+	unicode-range:
+		U+c5f5-c5fb, U+c5fe, U+c602-c605, U+c607, U+c609-c60f, U+c611-c61a,
+		U+c61c-c623, U+c626-c627, U+c629-c62b, U+c62d, U+c62f-c632, U+c636, U+c638,
+		U+c63a-c63f, U+c642-c643, U+c645-c647, U+c649-c652, U+c656-c65b,
+		U+c65d-c65f, U+c661-c663, U+c665-c677, U+c679-c67b, U+c67d-c693,
+		U+c696-c697, U+c699-c69b, U+c69d-c6a3, U+c6a6, U+c6a8, U+c6aa-c6af,
+		U+c6b2-c6b3, U+c6b5-c6b7, U+c6b9-c6ba;
+}
+
+@font-face {
+	font-family: "Wanted Sans Variable";
+	font-style: normal;
+	font-display: swap;
+	font-weight: 400 1000;
+	src: url("https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/woff2/WantedSansVariable.split.26.woff2")
+		format("woff2-variations");
+	unicode-range:
+		U+c517-c527, U+c52a-c52b, U+c52d-c52f, U+c531-c538, U+c53a, U+c53c,
+		U+c53e-c543, U+c546-c547, U+c54b, U+c54d-c552, U+c556, U+c55a-c55b, U+c55d,
+		U+c55f, U+c562-c563, U+c565-c567, U+c569-c56f, U+c572, U+c574, U+c576-c57b,
+		U+c57e-c57f, U+c581-c583, U+c585-c586, U+c588-c58b, U+c58e, U+c590,
+		U+c592-c596, U+c599-c5b3, U+c5b6-c5b7, U+c5ba, U+c5be-c5c3, U+c5ca-c5cb,
+		U+c5cd, U+c5cf, U+c5d2-c5d3, U+c5d5-c5d7, U+c5d9-c5df, U+c5e1-c5e2, U+c5e4,
+		U+c5e6-c5eb, U+c5ef, U+c5f1-c5f3;
+}
+
+@font-face {
+	font-family: "Wanted Sans Variable";
+	font-style: normal;
+	font-display: swap;
+	font-weight: 400 1000;
+	src: url("https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/woff2/WantedSansVariable.split.27.woff2")
+		format("woff2-variations");
+	unicode-range:
+		U+c475-c4ef, U+c4f2-c4f3, U+c4f5-c4f7, U+c4f9-c4ff, U+c502-c50b, U+c50d-c516;
+}
+
+@font-face {
+	font-family: "Wanted Sans Variable";
+	font-style: normal;
+	font-display: swap;
+	font-weight: 400 1000;
+	src: url("https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/woff2/WantedSansVariable.split.28.woff2")
+		format("woff2-variations");
+	unicode-range:
+		U+c3d0-c3d7, U+c3da-c3db, U+c3dd-c3de, U+c3e1-c3ec, U+c3ee-c3f3,
+		U+c3f5-c42b, U+c42d-c463, U+c466-c474;
+}
+
+@font-face {
+	font-family: "Wanted Sans Variable";
+	font-style: normal;
+	font-display: swap;
+	font-weight: 400 1000;
+	src: url("https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/woff2/WantedSansVariable.split.29.woff2")
+		format("woff2-variations");
+	unicode-range:
+		U+c32b-c367, U+c36a-c36b, U+c36d-c36f, U+c371-c377, U+c37a-c37b,
+		U+c37e-c383, U+c385-c387, U+c389-c3cf;
+}
+
+@font-face {
+	font-family: "Wanted Sans Variable";
+	font-style: normal;
+	font-display: swap;
+	font-weight: 400 1000;
+	src: url("https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/woff2/WantedSansVariable.split.30.woff2")
+		format("woff2-variations");
+	unicode-range:
+		U+c26a-c26b, U+c26d-c26f, U+c271-c273, U+c275-c27b, U+c27e-c287,
+		U+c289-c28f, U+c291-c297, U+c299-c29a, U+c29c-c2a3, U+c2a5-c2a7,
+		U+c2a9-c2ab, U+c2ad-c2b3, U+c2b6, U+c2b8, U+c2ba-c2bb, U+c2bd-c2db,
+		U+c2de-c2df, U+c2e1-c2e2, U+c2e5-c2ea, U+c2ee, U+c2f0, U+c2f2-c2f5, U+c2f7,
+		U+c2fa-c2fb, U+c2fd-c2ff, U+c301-c307, U+c309-c30c, U+c30e-c312,
+		U+c315-c323, U+c325-c328, U+c32a;
+}
+
+@font-face {
+	font-family: "Wanted Sans Variable";
+	font-style: normal;
+	font-display: swap;
+	font-weight: 400 1000;
+	src: url("https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/woff2/WantedSansVariable.split.31.woff2")
+		format("woff2-variations");
+	unicode-range:
+		U+c1bc-c1c3, U+c1c5-c1df, U+c1e1-c1fb, U+c1fd-c203, U+c205-c20c, U+c20e,
+		U+c210-c217, U+c21a-c21b, U+c21d-c21e, U+c221-c227, U+c229-c22a, U+c22c,
+		U+c22e, U+c230, U+c233-c24f, U+c251-c257, U+c259-c269;
+}
+
+@font-face {
+	font-family: "Wanted Sans Variable";
+	font-style: normal;
+	font-display: swap;
+	font-weight: 400 1000;
+	src: url("https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/woff2/WantedSansVariable.split.32.woff2")
+		format("woff2-variations");
+	unicode-range:
+		U+c101-c11b, U+c11f, U+c121-c123, U+c125-c12b, U+c12e, U+c132-c137,
+		U+c13a-c13b, U+c13d-c13f, U+c141-c147, U+c14a, U+c14c-c153, U+c155-c157,
+		U+c159-c15b, U+c15d-c166, U+c169-c16f, U+c171-c177, U+c179-c18b,
+		U+c18e-c18f, U+c191-c193, U+c195-c19b, U+c19d-c19e, U+c1a0, U+c1a2-c1a4,
+		U+c1a6-c1bb;
+}
+
+@font-face {
+	font-family: "Wanted Sans Variable";
+	font-style: normal;
+	font-display: swap;
+	font-weight: 400 1000;
+	src: url("https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/woff2/WantedSansVariable.split.33.woff2")
+		format("woff2-variations");
+	unicode-range:
+		U+c049-c057, U+c059-c05b, U+c05d-c05f, U+c061-c067, U+c069-c08f,
+		U+c091-c0ab, U+c0ae-c0af, U+c0b1-c0b3, U+c0b5, U+c0b7-c0bb, U+c0be,
+		U+c0c2-c0c7, U+c0ca-c0cb, U+c0cd-c0cf, U+c0d1-c0d7, U+c0d9-c0da, U+c0dc,
+		U+c0de-c0e3, U+c0e5-c0eb, U+c0ed-c0f3, U+c0f6, U+c0f8, U+c0fa-c0ff;
+}
+
+@font-face {
+	font-family: "Wanted Sans Variable";
+	font-style: normal;
+	font-display: swap;
+	font-weight: 400 1000;
+	src: url("https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/woff2/WantedSansVariable.split.34.woff2")
+		format("woff2-variations");
+	unicode-range:
+		U+bfa7-bfaf, U+bfb1-bfc4, U+bfc6-bfcb, U+bfce-bfcf, U+bfd1-bfd3,
+		U+bfd5-bfdb, U+bfdd-c048;
+}
+
+@font-face {
+	font-family: "Wanted Sans Variable";
+	font-style: normal;
+	font-display: swap;
+	font-weight: 400 1000;
+	src: url("https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/woff2/WantedSansVariable.split.35.woff2")
+		format("woff2-variations");
+	unicode-range: U+bf07, U+bf09-bf3f, U+bf41-bf4f, U+bf52-bf54, U+bf56-bfa6;
+}
+
+@font-face {
+	font-family: "Wanted Sans Variable";
+	font-style: normal;
+	font-display: swap;
+	font-weight: 400 1000;
+	src: url("https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/woff2/WantedSansVariable.split.36.woff2")
+		format("woff2-variations");
+	unicode-range:
+		U+be56, U+be58, U+be5c-be5f, U+be62-be63, U+be65-be67, U+be69-be74,
+		U+be76-be7b, U+be7e-be7f, U+be81-be8e, U+be90, U+be92-bea7, U+bea9-becf,
+		U+bed2-bed3, U+bed5-bed6, U+bed9-bee3, U+bee6-bf06;
+}
+
+@font-face {
+	font-family: "Wanted Sans Variable";
+	font-style: normal;
+	font-display: swap;
+	font-weight: 400 1000;
+	src: url("https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/woff2/WantedSansVariable.split.37.woff2")
+		format("woff2-variations");
+	unicode-range:
+		U+bdb0-bdd3, U+bdd5-bdef, U+bdf1-be0b, U+be0d-be0f, U+be11-be13,
+		U+be15-be43, U+be46-be47, U+be49-be4b, U+be4d-be53;
+}
+
+@font-face {
+	font-family: "Wanted Sans Variable";
+	font-style: normal;
+	font-display: swap;
+	font-weight: 400 1000;
+	src: url("https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/woff2/WantedSansVariable.split.38.woff2")
+		format("woff2-variations");
+	unicode-range:
+		U+bd03, U+bd06, U+bd08, U+bd0a-bd0f, U+bd11-bd22, U+bd25-bd47, U+bd49-bd58,
+		U+bd5a-bd7f, U+bd82-bd83, U+bd85-bd87, U+bd8a-bd8f, U+bd91-bd92, U+bd94,
+		U+bd96-bd98, U+bd9a-bdaf;
+}
+
+@font-face {
+	font-family: "Wanted Sans Variable";
+	font-style: normal;
+	font-display: swap;
+	font-weight: 400 1000;
+	src: url("https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/woff2/WantedSansVariable.split.39.woff2")
+		format("woff2-variations");
+	unicode-range:
+		U+bc4e-bc83, U+bc86-bc87, U+bc89-bc8b, U+bc8d-bc93, U+bc96, U+bc98,
+		U+bc9b-bc9f, U+bca2-bca3, U+bca5-bca7, U+bca9-bcb2, U+bcb4-bcbb,
+		U+bcbe-bcbf, U+bcc1-bcc3, U+bcc5-bccc, U+bcce-bcd0, U+bcd2-bcd4,
+		U+bcd6-bcf3, U+bcf7, U+bcf9-bcfb, U+bcfd-bd02;
+}
+
+@font-face {
+	font-family: "Wanted Sans Variable";
+	font-style: normal;
+	font-display: swap;
+	font-weight: 400 1000;
+	src: url("https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/woff2/WantedSansVariable.split.40.woff2")
+		format("woff2-variations");
+	unicode-range:
+		U+bb90-bba3, U+bba5-bbab, U+bbad-bbbf, U+bbc1-bbf7, U+bbfa-bbfb,
+		U+bbfd-bbfe, U+bc01-bc07, U+bc09-bc0a, U+bc0e, U+bc10, U+bc12-bc13, U+bc17,
+		U+bc19-bc1a, U+bc1e, U+bc20-bc23, U+bc26, U+bc28, U+bc2a-bc2c, U+bc2e-bc2f,
+		U+bc32-bc33, U+bc35-bc37, U+bc39-bc3f, U+bc41-bc42, U+bc44, U+bc46-bc48,
+		U+bc4a-bc4d;
+}
+
+@font-face {
+	font-family: "Wanted Sans Variable";
+	font-style: normal;
+	font-display: swap;
+	font-weight: 400 1000;
+	src: url("https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/woff2/WantedSansVariable.split.41.woff2")
+		format("woff2-variations");
+	unicode-range:
+		U+bae6-bafb, U+bafd-bb17, U+bb19-bb33, U+bb37, U+bb39-bb3a, U+bb3d-bb43,
+		U+bb45-bb46, U+bb48, U+bb4a-bb4f, U+bb51-bb53, U+bb55-bb57, U+bb59-bb62,
+		U+bb64-bb8f;
+}
+
+@font-face {
+	font-family: "Wanted Sans Variable";
+	font-style: normal;
+	font-display: swap;
+	font-weight: 400 1000;
+	src: url("https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/woff2/WantedSansVariable.split.42.woff2")
+		format("woff2-variations");
+	unicode-range:
+		U+ba30-ba37, U+ba3a-ba3b, U+ba3d-ba3f, U+ba41-ba47, U+ba49-ba4a, U+ba4c,
+		U+ba4e-ba53, U+ba56-ba57, U+ba59-ba5b, U+ba5d-ba63, U+ba65-ba66,
+		U+ba68-ba6f, U+ba71-ba73, U+ba75-ba77, U+ba79-ba84, U+ba86, U+ba88-baa7,
+		U+baaa, U+baad-baaf, U+bab1-bab7, U+baba, U+babc, U+babe-bae5;
+}

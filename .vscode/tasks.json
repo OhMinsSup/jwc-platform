@@ -1,0 +1,47 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "JWC: generate types",
+			"type": "process",
+			"command": "pnpm",
+			"args": ["-C", "apps/web", "codegen"],
+			"options": { "cwd": "${workspaceFolder}" },
+			"problemMatcher": []
+		},
+		{
+			"label": "JWC: typecheck",
+			"type": "process",
+			"command": "pnpm",
+			"args": ["typecheck"],
+			"options": { "cwd": "${workspaceFolder}" },
+			"group": { "kind": "build", "isDefault": true },
+			"problemMatcher": ["$tsc"]
+		},
+		{
+			"label": "JWC: check",
+			"type": "process",
+			"command": "pnpm",
+			"args": ["check"],
+			"options": { "cwd": "${workspaceFolder}" },
+			"problemMatcher": []
+		},
+		{
+			"label": "JWC: test",
+			"type": "process",
+			"command": "pnpm",
+			"args": ["test"],
+			"options": { "cwd": "${workspaceFolder}" },
+			"group": "test",
+			"problemMatcher": []
+		},
+		{
+			"label": "JWC: dev",
+			"type": "process",
+			"command": "pnpm",
+			"args": ["dev"],
+			"options": { "cwd": "${workspaceFolder}" },
+			"problemMatcher": []
+		}
+	]
+}
