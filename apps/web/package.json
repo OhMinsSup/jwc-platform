@@ -22,7 +22,8 @@
 		"with-env": "dotenv --no-expand -o -e ../../config/env/development/.env --",
 		"with-env:test": "dotenv --no-expand -o -e ../../config/env/test/defaults.env --",
 		"with-env:performance": "dotenv --no-expand -o -e ../../config/env/performance/.dev.vars --",
-		"db:seed-admin": "pnpm with-env tsx scripts/seed-dev-admin.ts"
+		"db:seed-admin": "pnpm with-env tsx scripts/seed-dev-admin.ts",
+		"db:admin-code": "pnpm with-env tsx scripts/dev-admin-code.ts"
 	},
 	"dependencies": {
 		"@jwc/analytics": "workspace:*",

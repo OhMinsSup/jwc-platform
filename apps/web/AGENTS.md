@@ -44,6 +44,7 @@ TanStack Start + void(Cloudflare Workers). 공개 신청 화면, 관리자 콘�
 - `pnpm -C apps/web test:performance`: production 모바일 전 페이지 성능 예산(페이지별 5회, 실험실 p75). 공개 더미 바인딩·별도 D1·메모리 응답을 쓴다. `typecheck`/E2E/dev와 동시에 실행하지 않는다. 조건·범위·운영 지표의 차이는 `docs/performance/README.md`.
 - `pnpm -C apps/web db:generate` → `void db migrate` (로컬) → `void deploy` (원격 적용)
 - `pnpm -C apps/web db:seed-admin [-- --email <허용 목록 이메일>] [--password <비밀번호>]`: 로컬 개발 D1에 휴대전화 인증·TOTP 등록을 마친 관리자를 넣고 비밀번호·인증 키·복구 코드를 출력한다(`--password`가 없으면 무작위 비밀번호). `SITE_URL`이 localhost가 아니거나 E2E/성능 D1이 선택돼 있으면 멈추고 `--remote`는 쓰지 않는다. 실제 개발 설정을 읽으므로 AI 자동 검증에서 실행하지 않는다 (`scripts/seed-dev-admin.ts`)
+- `pnpm -C apps/web db:admin-code [-- --email <이메일>]`: seed한 관리자가 로그인할 때 입력할 현재 2단계 코드를 출력한다. TOTP 키는 저장하지 않고 `BETTER_AUTH_SECRET`+이메일에서 파생하므로 다시 seed해도 같다. seed와 같은 로컬 전용 확인을 거친다 (`scripts/dev-admin-code.ts`)
 - `pnpm env:sync`: `config/env/production/.env`를 Worker Secrets로 동기화. `pnpm deploy:production`: 동기화 후 배포. 실제 운영 파일을 읽으므로 AI 자동 검증에서 실행하지 않는다. 앱 폴더에서는 `pnpm run deploy`(`pnpm deploy`는 pnpm 내장 명령)
 
 <!--injected-by-void-v1.6.2-->

@@ -9,6 +9,7 @@ import {
 import { ADMIN_AUTH_POLICY } from "../src/features/admin-access/domain/admin-auth-policy";
 import { parseAdminDirectory } from "../src/features/admin-access/domain/admin-directory";
 import { normalizeEmail } from "../src/features/admin-access/domain/admin-signup";
+import { deriveDevTotpSecret } from "./dev-admin-totp";
 
 /**
  * 로컬 개발용 관리자 seed (순수 판단 + 자격 증명 준비).
@@ -24,7 +25,6 @@ const DEV_ADMIN = {
 } as const;
 
 const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]"]);
-const TOTP_SECRET_LENGTH = 32;
 const BACKUP_CODE = { amount: 10, length: 10, split: 5 } as const;
 const GENERATED_PASSWORD_LENGTH = 24;
 const BASE32_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
@@ -143,6 +143,7 @@ function generateBackupCodes(): string[] {
 /**
  * Better Auth two-factor 플러그인과 같은 형식으로 만든다:
  * TOTP 비밀값 원문 문자열과 복구 코드 JSON을 BETTER_AUTH_SECRET으로 symmetricEncrypt.
+ * TOTP 비밀값은 파생값이라 다시 seed해도 같고, `db:admin-code`가 같은 키로 코드를 계산한다.
  */
 export async function createDevAdminCredentials(input: {
 	email: string;
@@ -152,7 +153,7 @@ export async function createDevAdminCredentials(input: {
 	const password =
 		input.password ?? generateRandomString(GENERATED_PASSWORD_LENGTH);
 	assertPasswordPolicy(password);
-	const secret = generateRandomString(TOTP_SECRET_LENGTH);
+	const secret = deriveDevTotpSecret(input.authSecret, input.email);
 	const setupKey = base32Encode(new TextEncoder().encode(secret));
 	const backupCodes = generateBackupCodes();
 	const label = encodeURIComponent(`${DEV_ADMIN.issuer}:${input.email}`);
