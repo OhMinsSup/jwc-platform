@@ -1,0 +1,37 @@
+[
+	{
+		"label": "JWC: generate types",
+		"command": "pnpm",
+		"args": ["-C", "apps/web", "codegen"],
+		"cwd": "$ZED_WORKTREE_ROOT",
+		"allow_concurrent_runs": false
+	},
+	{
+		"label": "JWC: typecheck",
+		"command": "pnpm",
+		"args": ["typecheck"],
+		"cwd": "$ZED_WORKTREE_ROOT",
+		"allow_concurrent_runs": false
+	},
+	{
+		"label": "JWC: check",
+		"command": "pnpm",
+		"args": ["check"],
+		"cwd": "$ZED_WORKTREE_ROOT",
+		"allow_concurrent_runs": false
+	},
+	{
+		"label": "JWC: test",
+		"command": "pnpm",
+		"args": ["test"],
+		"cwd": "$ZED_WORKTREE_ROOT",
+		"allow_concurrent_runs": false
+	},
+	{
+		"label": "JWC: dev (dummy)",
+		"command": "pnpm",
+		"args": ["dev"],
+		"cwd": "$ZED_WORKTREE_ROOT",
+		"allow_concurrent_runs": false
+	}
+]

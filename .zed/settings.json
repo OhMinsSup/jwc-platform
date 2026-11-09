@@ -1,13 +1,19 @@
 {
 	"format_on_save": "on",
 	"lsp": {
+		"typescript-ls": {
+			"binary": {
+				"path": "./node_modules/typescript/bin/tsc",
+				"arguments": ["--lsp", "--stdio"]
+			}
+		},
 		"oxlint": {
 			"initialization_options": {
 				"settings": {
+					"configPath": "./vite.config.ts",
+					"disableNestedConfig": true,
 					"run": "onType",
-					"fixKind": "safe_fix",
-					"typeAware": true,
-					"unusedDisableDirectives": "deny"
+					"fixKind": "safe_fix"
 				}
 			}
 		},
@@ -15,13 +21,33 @@
 			"initialization_options": {
 				"settings": {
 					"fmt.configPath": "./vite.config.ts",
+					"fmt.disableNestedConfig": true,
 					"run": "onSave"
+				}
+			}
+		},
+		"tailwindcss-language-server": {
+			"settings": {
+				"classFunctions": ["cn", "cva", "cx", "clsx"],
+				"experimental": {
+					"configFile": {
+						"apps/web/src/styles.css": [
+							"apps/web/**",
+							"packages/ui/**",
+							"packages/ui-patterns/**"
+						]
+					}
 				}
 			}
 		}
 	},
 	"languages": {
 		"CSS": {
+			"language_servers": [
+				"tailwindcss-intellisense-css",
+				"!vscode-css-language-server",
+				"..."
+			],
 			"format_on_save": "on",
 			"prettier": {
 				"allowed": false
@@ -48,6 +74,12 @@
 			]
 		},
 		"JavaScript": {
+			"language_servers": [
+				"typescript-ls",
+				"!vtsls",
+				"!typescript-language-server",
+				"..."
+			],
 			"format_on_save": "on",
 			"prettier": {
 				"allowed": false
@@ -64,6 +96,12 @@
 			]
 		},
 		"JSX": {
+			"language_servers": [
+				"typescript-ls",
+				"!vtsls",
+				"!typescript-language-server",
+				"..."
+			],
 			"format_on_save": "on",
 			"prettier": {
 				"allowed": false
@@ -119,6 +157,12 @@
 			]
 		},
 		"TypeScript": {
+			"language_servers": [
+				"typescript-ls",
+				"!vtsls",
+				"!typescript-language-server",
+				"..."
+			],
 			"format_on_save": "on",
 			"prettier": {
 				"allowed": false
@@ -135,6 +179,12 @@
 			]
 		},
 		"TSX": {
+			"language_servers": [
+				"typescript-ls",
+				"!vtsls",
+				"!typescript-language-server",
+				"..."
+			],
 			"format_on_save": "on",
 			"prettier": {
 				"allowed": false
