@@ -48,7 +48,7 @@
 	},
 	"devDependencies": {
 		"@jwc/typecheck": "workspace:*",
-		"@playwright/test": "^1.64.1",
+		"@playwright/test": "^1.65.0",
 		"@tailwindcss/vite": "catalog:frontend",
 		"@types/node": "catalog:",
 		"@types/react": "catalog:react19",
