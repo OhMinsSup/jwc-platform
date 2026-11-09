@@ -23,7 +23,8 @@ export function PageHeader({
 		<header className="space-y-4">
 			{eyebrow}
 			<div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
-				<div className="min-w-0 space-y-1">
+				{/* 글꼴 교체로 설명 폭이 달라져도 동작 버튼의 줄은 제목 열의 기준 폭으로 정한다. */}
+				<div className="min-w-0 flex-1 basis-48 space-y-1">
 					<h1 className="font-display text-[26px] leading-tight font-bold tracking-[-0.03em] text-balance sm:text-[30px]">
 						{title}
 					</h1>

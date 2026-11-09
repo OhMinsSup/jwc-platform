@@ -20,6 +20,8 @@ production 빌드를 별도 Cloudflare preview에서 실행한다. 공개 더미
 로컬 preview에는 자산 압축이 없어서 테스트 전용 proxy가 `/assets/*.css|js`만 gzip으로 스트리밍한다. 운영 CDN의 압축 조건을 재현하는 실험이며 운영 네트워크 실측은 아니다.
 폰트는 앱과 같은 고정 버전 CDN에서 받으며 외부 로딩 실패도 검사한다.
 
+같은 명령에서 글꼴 폭 교체 회귀 검사도 실행한다. 375px·412px·1280px에서 앱 글꼴의 폭을 바꿔도 관리자 목록의 동작 버튼이 다른 줄로 이동하지 않는지 확인한다. 해당 검사만 실행하려면 `pnpm -C apps/web test:performance --grep '관리자 목록의 글꼴'`을 사용한다. Linux CI에서 발견한 원인과 재현 조건은 [ADR-0017](../adr/0017-font-swap-layout-stability.md)에 기록한다.
+
 `typecheck`/E2E/dev와 동시에 실행하면 공유 Void 메타데이터와 CPU 때문에 결과가 잘못될 수 있다.
 CI는 성능 검사 전용 runner를 사용한다. 성능 산출물은 `apps/web/test-results/**/vitals.json`이며 세션·신청 ID·답변·개인정보는 넣지 않는다.
 기능 E2E는 SMS/TOTP 성공·실패와 공개 신청 과정을 별도로 검사한다.
