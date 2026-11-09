@@ -14,7 +14,7 @@
 | 자동 검증  | `pnpm verify`, 웹 빌드, E2E         | 더미 설정·테스트 픽스처                           | 가짜 클라이언트, 메모리 응답, 로컬 D1   | 개발자·GitHub Actions           |
 | E2E 테스트 | `pnpm -C apps/web test:e2e`         | `config/env/test/defaults.env`                    | E2E 전용 D1과 메모리 응답               | 개발자·CI                       |
 | 성능 검사  | `pnpm -C apps/web test:performance` | `config/env/performance/.dev.vars`                | 성능 전용 D1과 더미 데이터              | 개발자·CI                       |
-| 운영       | `pnpm -C apps/web deploy`           | Cloudflare Worker Secrets와 리소스 바인딩         | 운영 D1·Sheets·SMS                      | 배포 권한이 있는 운영자         |
+| 운영       | `pnpm deploy:production`            | `config/env/production/.env` → Worker Secrets     | 운영 D1·Sheets·SMS                      | 배포 권한이 있는 운영자         |
 | 스테이징   | 전용 명령·배포 대상 미구성          | 별도 키·계정·리소스 필요                          | 운영과 분리한 검증 데이터 필요          | 구성 후 담당자 지정             |
 
 개발에서 `SUBMISSION_STORE=memory`이면 응답은 서버 재시작으로 사라진다. 폼 정의와 인증에 쓰는 로컬 D1은 메모리 응답 저장소와 별개다. `SMS_MODE=log`에서는 실제 SMS 인증이 성공하지 않는다. 관리자 화면 흐름은 가짜 인증 데이터를 사용하는 E2E로 검증한다.
@@ -155,7 +155,15 @@ pnpm -C apps/web exec void cloudflare status
 
 ### 6.2. 운영 설정 등록
 
-다음 표의 이름을 `void secret put`으로 각각 등록한다. 실제 값은 명령 인수·문서·채팅에 넣지 않는다.
+운영 값은 Git에서 제외한 `config/env/production/.env`에 모으고 `pnpm env:sync`로 Worker Secrets에 올린다. `production/.env.example`을 복사해 만들고 권한은 `600`으로 둔다. 실제 값은 명령 인수·문서·채팅에 넣지 않는다.
+
+```bash
+cp -n config/env/production/.env.example config/env/production/.env
+chmod 600 config/env/production/.env
+pnpm env:sync
+```
+
+`env:sync`(`void secret sync`)는 파일의 모든 키가 `apps/web/env.ts`에 선언돼 있고 값이 검증을 통과해야 진행한다. 올릴 키 이름만 보여 주고 확인을 받은 뒤 덮어쓴다. 파일에 없는 원격 Secret은 지우지 않는다. 값 하나만 바꿀 때는 `void secret put`을 계속 쓸 수 있다. 등록할 항목은 다음과 같다.
 
 | 설정                                                   | 운영에서 준비할 값·조건                                               |
 | ------------------------------------------------------ | --------------------------------------------------------------------- |
@@ -171,15 +179,14 @@ pnpm -C apps/web exec void cloudflare status
 | `POSTHOG_KEY`, `POSTHOG_HOST`                          | 선택. 분석 수집 여부와 프로젝트·수집 주소 확인                        |
 | `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`           | 선택. 사용하면 운영 도메인에 맞는 두 키 모두 등록                     |
 
-예를 들어 인증 키는 다음 명령의 가려진 입력창에서 입력한다.
+등록 결과는 값 없이 이름으로 확인한다.
 
 ```bash
-pnpm -C apps/web exec void secret put BETTER_AUTH_SECRET
 pnpm -C apps/web exec void secret list
 pnpm -C apps/web exec void env check --remote
 ```
 
-`secret list`는 값 없이 이름을 확인한다. 원격 환경 검사는 필수 비밀값의 이름 존재를 확인하며, 원격 값을 읽어 서비스 연결까지 검증하지 않는다. 로컬 `.env`는 배포 시 운영 값으로 업로드되지 않는다. 운영 설정은 Worker Secrets에서 별도로 관리한다.
+`secret list`는 값 없이 이름을 확인한다. 원격 환경 검사는 필수 비밀값의 이름 존재를 확인하며, 원격 값을 읽어 서비스 연결까지 검증하지 않는다. `void deploy` 자체는 로컬 파일을 올리지 않는다. 운영 파일은 `env:sync`를 실행할 때만 올라가며, 개발용 `development/.env`는 어떤 스크립트도 운영에 올리지 않는다.
 
 ### 6.3. 검증 후 배포
 
@@ -187,11 +194,11 @@ pnpm -C apps/web exec void env check --remote
 pnpm verify
 pnpm -C apps/web build
 pnpm -C apps/web test:e2e
-pnpm -C apps/web deploy
+pnpm deploy:production
 pnpm -C apps/web exec void project status
 ```
 
-E2E를 처음 실행하는 환경에서는 먼저 `test:e2e:install`을 실행한다. `deploy`는 저장된 배포 대상을 사용하며 빌드·리소스 준비·원격 마이그레이션·Worker 배포를 수행한다. 대상 설정을 마친 후 실행한다. Git 커밋, Worker 버전, 배포 시각과 D1 복구 지점을 값 노출 없이 배포 기록에 남긴다.
+E2E를 처음 실행하는 환경에서는 먼저 `test:e2e:install`을 실행한다. `deploy:production`은 `env:sync`가 성공한 뒤 `deploy`(`void deploy`)를 실행한다. 비밀값이 그대로면 `pnpm -C apps/web run deploy`만 실행해도 된다. 앱 폴더에서 `pnpm deploy`라고 쓰면 스크립트가 아니라 pnpm 내장 명령이 실행되므로 반드시 `run`을 붙인다. `void deploy`는 저장된 배포 대상을 사용하며 빌드·리소스 준비·원격 마이그레이션·Worker 배포를 수행한다. 대상 설정을 마친 후 실행한다. Git 커밋, Worker 버전, 배포 시각과 D1 복구 지점을 값 노출 없이 배포 기록에 남긴다.
 
 ### 6.4. 첫 관리자와 운영 확인
 
@@ -218,11 +225,11 @@ E2E를 처음 실행하는 환경에서는 먼저 `test:e2e:install`을 실행�
 1. 변경 diff와 마이그레이션을 리뷰하고 배포할 커밋을 정한다.
 2. CI의 검증·빌드·E2E 성공을 확인한다. CI를 거치지 않은 변경은 같은 검증을 먼저 실행한다.
 3. 대상 계정·Worker, 원격 설정 변경, D1과 Sheets의 복구 준비를 확인한다.
-4. 배포 담당 환경에서 `pnpm -C apps/web deploy`를 실행한다.
+4. 배포 담당 환경에서 `pnpm deploy:production`(비밀값 변경이 없으면 `pnpm -C apps/web run deploy`)을 실행한다.
 5. `void project status`로 활성 버전을 확인하고 위 운영 점검을 변경 범위에 맞춰 수행한다.
 6. 배포 결과·관찰된 문제·복구 지점을 기록한다. 실패 원인을 확인한 뒤 재배포한다.
 
-비밀값 변경은 Worker 동작에 영향을 주는 운영 변경으로 취급한다. 개발용 `.env`를 수정해도 운영 설정은 바뀌지 않는다. 원격 값은 별도로 갱신한다.
+비밀값 변경은 Worker 동작에 영향을 주는 운영 변경으로 취급한다. 개발용 `.env`를 수정해도 운영 설정은 바뀌지 않는다. 운영 값은 `production/.env`를 고친 뒤 `pnpm env:sync`로 반영한다.
 
 ## 8. 일상 운영과 장애 대응
 

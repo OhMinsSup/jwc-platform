@@ -9,7 +9,9 @@
 		"db:generate": "void db generate",
 		"db:migrate": "void db migrate",
 		"deploy": "void deploy",
+		"deploy:production": "pnpm run env:sync && pnpm run deploy",
 		"dev": "pnpm with-env vp dev",
+		"env:sync": "void secret sync ../../config/env/production/.env",
 		"preview": "pnpm with-env vp preview",
 		"test": "vp test run",
 		"test:e2e": "pnpm with-env:test playwright test",
@@ -43,7 +45,6 @@
 		"zustand": "^5.0.16"
 	},
 	"devDependencies": {
-		"@cloudflare/workers-types": "^5.20261104.1",
 		"@jwc/typecheck": "workspace:*",
 		"@playwright/test": "^1.64.1",
 		"@tailwindcss/vite": "catalog:frontend",
