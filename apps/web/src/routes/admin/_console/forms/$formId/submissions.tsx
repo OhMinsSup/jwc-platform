@@ -16,6 +16,7 @@ import { PaymentTrack } from "../../../../../features/submissions/ui/payment-tra
 import type { SubmissionRow } from "../../../../../features/submissions/ui/submission-row";
 import { SubmissionsTable } from "../../../../../features/submissions/ui/submissions-table";
 import { formatCount } from "../../../../../platform/format";
+import { ADMIN_LOADER_STALE_TIME_MS } from "../../../../../platform/route-cache";
 
 export const Route = createFileRoute(
 	"/admin/_console/forms/$formId/submissions",
@@ -27,6 +28,7 @@ export const Route = createFileRoute(
 		}
 		return result.data;
 	},
+	staleTime: ADMIN_LOADER_STALE_TIME_MS,
 	component: SubmissionsPage,
 });
 
@@ -37,6 +39,9 @@ const PAID_FILTERS = {
 	paid: { label: "납입", test: (row: SubmissionRow) => row.paid },
 } as const;
 type PaidFilter = keyof typeof PAID_FILTERS;
+
+/** 납입 여부를 보여 주는 화면은 응답 목록뿐이다. 폼 머리(제목·상태)는 다시 읽지 않는다 */
+const SUBMISSIONS_ROUTE_ID = "/admin/_console/forms/$formId/submissions";
 
 /** 납입 토글 → D1 반영 + 시트 갱신 요청 → 목록 다시 읽기 */
 function usePaidToggle() {
@@ -49,7 +54,9 @@ function usePaidToggle() {
 			data: { submissionId: row.id, paid: !row.paid },
 		});
 		setError(result.ok ? null : result.message);
-		await router.invalidate();
+		await router.invalidate({
+			filter: (match) => match.routeId === SUBMISSIONS_ROUTE_ID,
+		});
 		setPendingId(null);
 	};
 	return { pendingId, error, toggle };

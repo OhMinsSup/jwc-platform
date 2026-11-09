@@ -14,6 +14,7 @@ import {
 	InvitesTable,
 } from "../../../features/admin-access/ui/admin-access-tables";
 import { InviteForm } from "../../../features/admin-access/ui/invite-form";
+import { ADMIN_LOADER_STALE_TIME_MS } from "../../../platform/route-cache";
 
 /** 관리자 초대와 최근 활동(감사 기록). 두 목록은 따로 실패할 수 있어 결과 값 그대로 받는다 */
 export const Route = createFileRoute("/admin/_console/admins")({
@@ -25,6 +26,7 @@ export const Route = createFileRoute("/admin/_console/admins")({
 		]);
 		return { invites, audit };
 	},
+	staleTime: ADMIN_LOADER_STALE_TIME_MS,
 	component: AdminsPage,
 });
 

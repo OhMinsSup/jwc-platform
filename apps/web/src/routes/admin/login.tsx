@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 
 import { getAdminAccessFn } from "../../features/admin-access/functions";
 import { ADMIN_AUTH_DESTINATIONS } from "../../features/admin-access/model/admin-auth";
+import { adminAccessCache } from "../../features/admin-access/ui/admin-access-cache";
 import { authClient } from "../../platform/auth-client";
 import { AuthCard } from "../../platform/ui/auth-card";
 import type { AuthFieldDef } from "../../platform/ui/auth-card";
@@ -18,6 +19,8 @@ const LOGIN_FIELDS: AuthFieldDef[] = [
 
 export const Route = createFileRoute("/admin/login")({
 	head: () => ({ meta: [{ title: "관리자 로그인" }] }),
+	// 로그아웃, 세션 만료 redirect, 새 로그인은 모두 이 화면을 지난다. 이전 관리자의 접근 확인 결과를 버린다
+	onEnter: () => adminAccessCache.forget(),
 	component: LoginPage,
 });
 

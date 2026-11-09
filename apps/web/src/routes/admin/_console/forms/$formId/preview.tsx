@@ -11,6 +11,7 @@ import { useState } from "react";
 
 import { FormRunner } from "../../../../../features/form-engine/form-runner";
 import { getDraftPreviewFn } from "../../../../../features/forms/functions/admin";
+import { ADMIN_LOADER_STALE_TIME_MS } from "../../../../../platform/route-cache";
 
 export const Route = createFileRoute("/admin/_console/forms/$formId/preview")({
 	loader: async ({ params }) => {
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/admin/_console/forms/$formId/preview")({
 		}
 		return result.data;
 	},
+	staleTime: ADMIN_LOADER_STALE_TIME_MS,
 	component: PreviewPage,
 });
 
