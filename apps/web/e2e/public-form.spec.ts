@@ -60,3 +60,60 @@ test("필수 항목을 비우고 다음을 누르면 오류를 보이고 넘어�
 		page.getByRole("heading", { name: "신청 내용 확인" }),
 	).toHaveCount(0);
 });
+
+test("SSR 메타데이터를 제공하면서 공개 신청폼도 검색 비노출로 유지한다", async ({
+	page,
+}) => {
+	const response = await page.request.get(FORM_PATH);
+	expect(response.status()).toBe(200);
+	const html = await response.text();
+	expect(html).toContain("<title>E2E 신청서 | JWC 청년부</title>");
+	expect(html).toContain('name="robots" content="noindex, nofollow"');
+	expect(html).toContain(
+		'name="description" content="E2E 폼의 신청 안내입니다."',
+	);
+	await openForm(page);
+	await expect(page).toHaveTitle("E2E 신청서 | JWC 청년부");
+	await expect(page.locator('meta[property="og:title"]')).toHaveCount(1);
+	await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
+		"content",
+		"E2E 신청서 | JWC 청년부",
+	);
+	await expect(
+		page.locator('link[rel="stylesheet"][href^="https://cdn.jsdelivr.net"]'),
+	).toHaveCount(0);
+	const robots = await page.request.get("/robots.txt");
+	expect(await robots.text()).toContain("Disallow: /");
+});
+
+test("독립 질문의 입력과 함께 조건부 질문의 표시·검증도 갱신한다", async ({
+	page,
+}) => {
+	await openForm(page);
+	await expect(page.getByLabel("추가 요청 내용")).toHaveCount(0);
+	await page
+		.getByRole("button", { name: "추가 요청 있음", exact: true })
+		.click();
+	await expect(page.getByLabel("추가 요청 내용")).toBeVisible();
+	await page.getByRole("button", { name: "다음", exact: true }).click();
+	await expect(page.getByLabel("추가 요청 내용")).toHaveAttribute(
+		"aria-invalid",
+		"true",
+	);
+	await page
+		.getByRole("button", { name: "추가 요청 없음", exact: true })
+		.click();
+	await expect(page.getByLabel("추가 요청 내용")).toHaveCount(0);
+});
+
+test("폰트 CDN을 사용할 수 없어도 본문과 입력을 사용할 수 있다", async ({
+	page,
+}) => {
+	await page.route("https://cdn.jsdelivr.net/**", (route) => route.abort());
+	await openForm(page);
+	await expect(
+		page.getByRole("heading", { name: "기본 정보", exact: true }),
+	).toBeVisible();
+	await page.getByLabel("이름").fill("폰트 장애 테스트");
+	await expect(page.getByLabel("이름")).toHaveValue("폰트 장애 테스트");
+});

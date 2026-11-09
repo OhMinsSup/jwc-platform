@@ -1,6 +1,12 @@
 @import "@jwc/ui/globals.css";
 /* 의미 색 토큰(brand/success/warning)과 패턴 컴포넌트 스캔 경로 */
 @import "@jwc/ui-patterns/styles.css";
+@import "./fonts/suit.css";
+@import "./fonts/wanted-01.css";
+@import "./fonts/wanted-02.css";
+@import "./fonts/wanted-03.css";
+@import "./fonts/wanted-04.css";
+@import "./fonts/wanted-05.css";
 
 /* @jwc/ui 컴포넌트와 이 앱의 클래스를 Tailwind가 스캔하도록 지정 */
 @source "../../../packages/ui/src";
@@ -133,7 +139,7 @@
 
 /*
  * 글꼴: UI는 SUIT Variable, 큰 제목은 Wanted Sans Variable (typie와 같은 조합, 둘 다 OFL).
- * 글꼴 파일은 문서 head에서 jsDelivr로 불러온다 (CSP 허용 출처).
+ * font-face는 앱 스타일에 합치며 실제 폰트만 jsDelivr에서 받는다. font-display: swap으로 본문을 먼저 표시한다.
  */
 @theme {
 	--font-sans:

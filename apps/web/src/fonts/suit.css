@@ -1,0 +1,9 @@
+/* SUIT 2.0.5 (SIL OFL 1.1): https://github.com/sun-typeface/SUIT */
+@font-face {
+	font-family: "SUIT Variable";
+	font-style: normal;
+	font-weight: 100 900;
+	font-display: swap;
+	src: url("https://cdn.jsdelivr.net/gh/sun-typeface/SUIT@2.0.5/fonts/variable/woff2/SUIT-Variable.woff2")
+		format("woff2");
+}

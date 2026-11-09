@@ -12,6 +12,7 @@ import {
 } from "../../../features/form-engine/steps";
 import { getPublicFormFn } from "../../../features/forms/functions/public";
 import { track } from "../../../platform/analytics/client";
+import { pageMeta } from "../../../platform/metadata";
 import { PublicShell } from "../../../platform/ui/public-shell";
 
 export const Route = createFileRoute("/f/$slug/")({
@@ -24,7 +25,10 @@ export const Route = createFileRoute("/f/$slug/")({
 		return result.data;
 	},
 	head: ({ loaderData }) => ({
-		meta: [{ title: loaderData?.definition.title ?? "신청서" }],
+		meta: pageMeta({
+			title: loaderData?.definition.title ?? "신청서",
+			description: loaderData?.definition.description,
+		}),
 	}),
 	component: FormPage,
 });
@@ -35,9 +39,11 @@ function FormPage() {
 	const navigate = useNavigate({ from: Route.fullPath });
 	const current = stepFromSearch(definition, step);
 	const label = stepLabel(definition, current);
+	// 화면 노출을 외부 분석 도구에 전송한다. 로더에서는 SSR·미리 불러오기도 실행된다.
 	useEffect(() => {
 		track("form_viewed", { formSlug: slug });
 	}, [slug]);
+	// 직접 접속·뒤로 가기로 표시된 단계도 기록하므로 버튼 이벤트로 옮기지 않는다.
 	useEffect(() => {
 		track("form_step_viewed", {
 			formSlug: slug,

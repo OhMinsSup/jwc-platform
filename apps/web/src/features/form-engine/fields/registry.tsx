@@ -1,4 +1,5 @@
 import type { FieldOf, FieldType } from "@jwc/form-core/definition/fields";
+import { lazy } from "react";
 import type { ComponentType } from "react";
 
 import {
@@ -7,7 +8,6 @@ import {
 	RatingField,
 	SingleChoiceField,
 } from "./choice-fields";
-import { DateField, DateTimeField, TimeField } from "./temporal-fields";
 import {
 	EmailField,
 	LongTextField,
@@ -16,6 +16,19 @@ import {
 	ShortTextField,
 } from "./text-fields";
 import type { FieldProps } from "./types";
+
+// 날짜·시간 질문이 없는 화면은 달력과 시각 선택기 코드를 다운로드하지 않는다.
+const DateField = lazy(() =>
+	import("./temporal-fields").then((module) => ({ default: module.DateField })),
+);
+const TimeField = lazy(() =>
+	import("./temporal-fields").then((module) => ({ default: module.TimeField })),
+);
+const DateTimeField = lazy(() =>
+	import("./temporal-fields").then((module) => ({
+		default: module.DateTimeField,
+	})),
+);
 
 /** 필드 타입 → 입력 컴포넌트 테이블. switch 분기 대신 조회. */
 type RendererTable = {

@@ -3,10 +3,12 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 
 import { listOpenFormsFn } from "../features/forms/functions/public";
+import { pageMeta } from "../platform/metadata";
 import { PublicShell } from "../platform/ui/public-shell";
 
 export const Route = createFileRoute("/")({
 	loader: () => listOpenFormsFn(),
+	head: () => ({ meta: pageMeta({ title: "행사 신청" }) }),
 	component: HomePage,
 });
 

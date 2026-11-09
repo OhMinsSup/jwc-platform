@@ -8,7 +8,9 @@ import {
 import type { ReactNode } from "react";
 
 import { getClientConfigFn } from "../platform/functions/client-config";
+import { pageMeta } from "../platform/metadata";
 import { AnalyticsBridge } from "../platform/ui/analytics-bridge";
+import { NavigationProgress } from "../platform/ui/navigation-progress";
 
 import appCss from "../styles.css?url";
 
@@ -21,22 +23,13 @@ export const Route = createRootRoute({
 			{ charSet: "utf-8" },
 			{ name: "viewport", content: "width=device-width, initial-scale=1" },
 			{ name: "robots", content: "noindex, nofollow" },
-			{ title: "JWC 신청서" },
+			...pageMeta({ title: "행사 신청" }),
 		],
 		links: [
 			{
 				rel: "preconnect",
 				href: "https://cdn.jsdelivr.net",
 				crossOrigin: "anonymous",
-			},
-			// UI 글꼴(SUIT)과 제목 글꼴(Wanted Sans). 둘 다 가변 글꼴(OFL)이라 파일 하나로 모든 굵기를 쓴다
-			{
-				rel: "stylesheet",
-				href: "https://cdn.jsdelivr.net/gh/sun-typeface/SUIT@2.0.5/fonts/variable/woff2/SUIT-Variable.css",
-			},
-			{
-				rel: "stylesheet",
-				href: "https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/WantedSansVariable.min.css",
 			},
 			{ rel: "stylesheet", href: appCss },
 		],
@@ -49,6 +42,7 @@ function RootComponent() {
 	return (
 		<RootDocument>
 			<AnalyticsBridge config={analytics} />
+			<NavigationProgress />
 			<Outlet />
 		</RootDocument>
 	);

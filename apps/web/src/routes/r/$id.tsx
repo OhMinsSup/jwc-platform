@@ -4,6 +4,7 @@ import { useEffect } from "react";
 
 import { getSubmissionViewFn } from "../../features/submissions/functions";
 import { track } from "../../platform/analytics/client";
+import { pageMeta } from "../../platform/metadata";
 import { DateTimeText } from "../../platform/ui/date-time-text";
 import { PublicShell } from "../../platform/ui/public-shell";
 
@@ -15,8 +16,11 @@ export const Route = createFileRoute("/r/$id")({
 		}
 		return result.data;
 	},
-	head: ({ loaderData }) => ({
-		meta: [{ title: `신청 내역 - ${loaderData?.formTitle ?? ""}` }],
+	head: () => ({
+		meta: pageMeta({
+			title: "신청 내역",
+			description: "개인 신청 내역과 납부 안내를 확인하는 페이지입니다.",
+		}),
 	}),
 	component: SubmissionPage,
 });
@@ -60,6 +64,7 @@ function AnswerList({
 
 function SubmissionPage() {
 	const view = Route.useLoaderData();
+	// 클라이언트에 화면이 표시된 시점의 분석 전송 (SSR·로더 미리 불러오기는 제외).
 	useEffect(() => {
 		track("submission_viewed");
 	}, []);

@@ -15,10 +15,10 @@ import { Button } from "@jwc/ui/components/button";
 import { ArrowLeft, ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
 import { useState } from "react";
 
-import { FieldView } from "./field-view";
+import { DraftField } from "./field-view";
 import { useHumanCheck } from "./human-check";
 import { ReviewView } from "./review-view";
-import { useDraft, useDraftStore } from "./store";
+import { useDraft } from "./store";
 import { useSubmit } from "./use-submit";
 
 interface FormRunnerProps {
@@ -172,7 +172,6 @@ function PageForm({
 	preview,
 	slug,
 }: PageFormProps) {
-	const setAnswer = useDraftStore((state) => state.setAnswer);
 	const fields = visibleFieldsOfPage(definition, page, answers);
 	const goNext = () => {
 		const result = validatePage(definition, answers, page.id);
@@ -195,12 +194,11 @@ function PageForm({
 				title={page.title}
 			/>
 			{fields.map((field) => (
-				<FieldView
+				<DraftField
 					error={errors[field.id]}
 					field={field}
 					key={field.id}
-					onChange={(value) => setAnswer(slug, field.id, value)}
-					value={answers[field.id]}
+					slug={slug}
 				/>
 			))}
 			<NavButtons onBack={onBack}>

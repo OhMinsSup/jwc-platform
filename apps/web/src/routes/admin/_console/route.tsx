@@ -20,6 +20,7 @@ export const Route = createFileRoute("/admin/_console")({
 
 function ConsoleLayout() {
 	const { admin } = Route.useRouteContext();
+	// 서버 세션에서 확인한 관리자와 브라우저 분석 SDK의 사용자 식별을 동기화한다.
 	useEffect(() => {
 		identifyAdmin(admin.id);
 	}, [admin.id]);

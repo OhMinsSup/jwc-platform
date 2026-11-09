@@ -3,12 +3,20 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { CircleCheck } from "lucide-react";
 import { z } from "zod";
 
+import { pageMeta } from "../../../platform/metadata";
 import { PublicShell } from "../../../platform/ui/public-shell";
 
 export const Route = createFileRoute("/f/$slug/done")({
 	validateSearch: z.object({
 		id: z.string().max(40),
 		updated: z.boolean().optional(),
+	}),
+	head: () => ({
+		meta: pageMeta({
+			title: "신청 완료",
+			description:
+				"신청이 완료되었습니다. 신청 내역에서 접수 내용을 확인하세요.",
+		}),
 	}),
 	component: DonePage,
 });

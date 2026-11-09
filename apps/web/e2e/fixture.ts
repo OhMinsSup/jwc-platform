@@ -15,6 +15,7 @@ export const E2E_FORM = {
 export const E2E_DEFINITION: FormDefinitionInput = {
 	schemaVersion: 1,
 	title: "E2E 신청서",
+	description: "E2E 폼의 신청 안내입니다.",
 	timezone: "Asia/Seoul",
 	identity: { fieldId: "phone" },
 	fields: [
@@ -34,12 +35,28 @@ export const E2E_DEFINITION: FormDefinitionInput = {
 			min: "2030-01-01",
 			max: "2030-01-31",
 		},
+		{
+			id: "has_note",
+			type: "boolean",
+			label: "추가 요청 여부",
+			required: false,
+			trueLabel: "추가 요청 있음",
+			falseLabel: "추가 요청 없음",
+		},
+		{
+			id: "note",
+			type: "short_text",
+			label: "추가 요청 내용",
+			required: true,
+			maxLength: 200,
+			showIf: { op: "equals", fieldId: "has_note", value: true },
+		},
 	],
 	pages: [
 		{
 			id: "basic",
 			title: "기본 정보",
-			fieldIds: ["name", "phone", "visit_date"],
+			fieldIds: ["name", "phone", "visit_date", "has_note", "note"],
 		},
 	],
 };
