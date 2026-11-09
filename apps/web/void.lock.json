@@ -1,7 +1,16 @@
 {
 	"version": 1,
 	"source": {
+		"name": "jwc-form",
 		"main": "./server.ts",
+		"routes": [
+			{
+				"pattern": "veloss-todo.uk",
+				"custom_domain": true
+			}
+		],
+		"workers_dev": false,
+		"preview_urls": true,
 		"queues": {
 			"producers": [
 				{
@@ -20,7 +29,14 @@
 		}
 	},
 	"resolved": {
+		"name": "jwc-form",
 		"main": "./server.ts",
+		"routes": [
+			{
+				"pattern": "veloss-todo.uk",
+				"custom_domain": true
+			}
+		],
 		"queues": {
 			"producers": [
 				{
@@ -37,7 +53,18 @@
 				}
 			]
 		},
-		"compatibility_date": "2026-02-24"
+		"compatibility_date": "2026-02-24",
+		"account_id": "1192cb00021ef3aa9b5fc97a32b425b6",
+		"d1_databases": [
+			{
+				"binding": "DB",
+				"database_name": "web-db",
+				"database_id": "e6a95460-b2b4-47d4-9e0d-53370a818282",
+				"migrations_dir": "./db/migrations"
+			}
+		],
+		"workers_dev": false,
+		"preview_urls": true
 	},
-	"text": "{\n  \"main\": \"./server.ts\",\n  \"queues\": {\n    \"producers\": [\n      {\n        \"queue\": \"jwc-form-sms\",\n        \"binding\": \"QUEUE_SMS\"\n      }\n    ],\n    \"consumers\": [\n      {\n        \"queue\": \"jwc-form-sms\",\n        \"max_batch_size\": 5,\n        \"max_retries\": 5,\n        \"retry_delay\": 60\n      }\n    ]\n  },\n  \"compatibility_date\": \"2026-02-24\"\n}\n"
+	"text": "{\n  \"name\": \"jwc-form\",\n  \"main\": \"./server.ts\",\n  \"routes\": [\n    {\n      \"pattern\": \"veloss-todo.uk\",\n      \"custom_domain\": true\n    }\n  ],\n  \"queues\": {\n    \"producers\": [\n      {\n        \"queue\": \"jwc-form-sms\",\n        \"binding\": \"QUEUE_SMS\"\n      }\n    ],\n    \"consumers\": [\n      {\n        \"queue\": \"jwc-form-sms\",\n        \"max_batch_size\": 5,\n        \"max_retries\": 5,\n        \"retry_delay\": 60\n      }\n    ]\n  },\n  \"compatibility_date\": \"2026-02-24\",\n  \"account_id\": \"1192cb00021ef3aa9b5fc97a32b425b6\",\n  \"d1_databases\": [\n    {\n      \"binding\": \"DB\",\n      \"database_name\": \"web-db\",\n      \"database_id\": \"e6a95460-b2b4-47d4-9e0d-53370a818282\",\n      \"migrations_dir\": \"./db/migrations\"\n    }\n  ],\n  \"workers_dev\": false,\n  \"preview_urls\": true\n}\n"
 }

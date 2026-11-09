@@ -71,15 +71,40 @@ describe("앱 요청 정책", () => {
 });
 
 describe("앱 CSP", () => {
-	it("기본: eval 없음, 프레임 삽입/플러그인 금지, 외부 연결은 자기 출처만", () => {
+	it("기본: eval 없음, 프레임 삽입/플러그인 금지", () => {
 		const csp = buildCsp(
 			cspDirectives({ dev: false, posthogHost: null, turnstile: false }),
 		);
 		expect(csp).not.toContain("unsafe-eval");
 		expect(csp).toContain("frame-ancestors 'none'");
 		expect(csp).toContain("object-src 'none'");
-		expect(csp).toContain("connect-src 'self'; ");
 		expect(csp).toContain("frame-src 'none'");
+	});
+
+	it("PostHog 키가 없는 환경에서도 PostHog 두 출처는 연다", () => {
+		const csp = buildCsp(
+			cspDirectives({ dev: false, posthogHost: null, turnstile: false }),
+		);
+		// 환경마다 키 설정이 달라도 PostHog 요청이 CSP에 막히지 않게 두 출처는 항상 연다
+		expect(csp).toContain(
+			"connect-src 'self' https://us.i.posthog.com https://us-assets.i.posthog.com; ",
+		);
+		expect(csp).toContain(
+			"script-src 'self' 'unsafe-inline' https://us.i.posthog.com https://us-assets.i.posthog.com; ",
+		);
+	});
+
+	it("다른 PostHog 수집 주소를 쓰면 기본 두 출처에 더한다 (중복 없이)", () => {
+		const csp = buildCsp(
+			cspDirectives({
+				dev: false,
+				posthogHost: "https://eu.i.posthog.com",
+				turnstile: false,
+			}),
+		);
+		expect(csp).toContain(
+			"connect-src 'self' https://us.i.posthog.com https://us-assets.i.posthog.com https://eu.i.posthog.com https://eu-assets.i.posthog.com; ",
+		);
 	});
 
 	it("PostHog/Turnstile을 켜면 그 출처만 더한다", () => {

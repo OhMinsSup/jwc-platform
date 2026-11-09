@@ -25,6 +25,7 @@ pnpm dev
 | `pnpm -C apps/web with-env <명령>`  | `config/env/development/.env`      | 개발 설정을 사용하는 DB·설정 작업 |
 | `pnpm -C apps/web test:e2e`         | `config/env/test/defaults.env`     | 공개 더미 값으로 E2E 검증         |
 | `pnpm -C apps/web test:performance` | `config/env/performance/.dev.vars` | 공개 더미 값으로 성능 검증        |
+| `pnpm env:sync`                     | `config/env/production/.env`       | 운영 Worker Secrets 동기화        |
 
 주입 스크립트는 `dotenv --no-expand -o -e <파일> --`를 사용한다. `-o`는 파일의 값으로 상속된 환경변수를 덮는다. `--no-expand`는 값 안의 `$`를 그대로 전달한다. 여러 줄 값은 dotenv 파일의 큰따옴표와 `\n` 표현으로 작성할 수 있다.
 
@@ -71,11 +72,11 @@ dotenv는 암호문을 복호화하지 않는다. 이전 암호화 파일을 실
 
 ## 운영 배포하기
 
-먼저 [최초 운영 배포](development-deployment-operations.md#6-최초-운영-배포)에 따라 Cloudflare 계정과 배포 대상을 설정한다. 운영 값은 Worker Secrets에 개별 등록한다.
+먼저 [최초 운영 배포](development-deployment-operations.md#6-최초-운영-배포)에 따라 Cloudflare 계정과 배포 대상을 설정한다. 운영 값은 Git에서 제외한 `config/env/production/.env`(권한 `600`)에 두고 Worker Secrets로 동기화한다.
 
 ```bash
-pnpm -C apps/web exec void secret put BETTER_AUTH_SECRET
-pnpm -C apps/web deploy
+pnpm env:sync            # production/.env → Worker Secrets (키 이름 확인 후 덮어씀)
+pnpm deploy:production   # env:sync 성공 후 void deploy
 ```
 
-`secret put`의 가려진 입력창에서 값을 입력한다. 로컬 `.env`를 운영에 업로드하지 않는다. 배포 토큰은 배포 프로세스에만 제공한다.
+개발용 `development/.env`는 운영에 올리지 않는다. 배포 토큰은 배포 프로세스에만 제공한다. 앱 폴더의 배포 스크립트는 `pnpm run deploy`로 부른다(`pnpm deploy`는 pnpm 내장 명령이다).

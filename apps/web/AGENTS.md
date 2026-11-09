@@ -43,3 +43,13 @@ TanStack Start + void(Cloudflare Workers). 공개 신청 화면, 관리자 콘�
 - `pnpm -C apps/web test:e2e`: 공개 신청 E2E(Playwright). 5179 포트에 개발 서버를 띄우고 메모리 응답 저장소를 쓴다. 로컬 D1에는 E2E 전용 폼(`e2e-public-form`)만 지우고 다시 넣는다 (`e2e/seed.ts`). 처음 한 번 `pnpm -C apps/web exec playwright install chromium`
 - `pnpm -C apps/web test:performance`: production 모바일 전 페이지 성능 예산(페이지별 5회, 실험실 p75). 공개 더미 바인딩·별도 D1·메모리 응답을 쓴다. `typecheck`/E2E/dev와 동시에 실행하지 않는다. 조건·범위·운영 지표의 차이는 `docs/performance/README.md`.
 - `pnpm -C apps/web db:generate` → `void db migrate` (로컬) → `void deploy` (원격 적용)
+- `pnpm env:sync`: `config/env/production/.env`를 Worker Secrets로 동기화. `pnpm deploy:production`: 동기화 후 배포. 실제 운영 파일을 읽으므로 AI 자동 검증에서 실행하지 않는다. 앱 폴더에서는 `pnpm run deploy`(`pnpm deploy`는 pnpm 내장 명령)
+
+<!--injected-by-void-v1.6.2-->
+
+## Void
+
+- This project uses [Void](https://void.cloud), a full-stack Vite framework for Cloudflare Workers with file-based API routing, server-rendered pages, and typed backend services.
+- Use Void's CLI and typed APIs. Before working with Void, read the relevant Markdown docs in `node_modules/void/docs/`; start with `guide/quickstart.md` for setup and `reference/cli.md` for commands.
+
+<!--/injected-by-void-->

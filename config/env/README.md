@@ -2,14 +2,15 @@
 
 실제 개발용 값을 바꾸려면 `development/.env`를 수정하고 `pnpm dev`로 서버를 다시 시작한다. 이 문서의 명령은 저장소 루트 기준이다.
 
-| 구분           | 파일                       | 명령                                           | Git 포함                  |
-| -------------- | -------------------------- | ---------------------------------------------- | ------------------------- |
-| 개발           | `development/.env`         | `pnpm dev`                                     | 제외: 실제 개발용 값      |
-| 개발용 예시    | `development/.env.example` | 같은 폴더의 `.env`를 만들 때 복사              | 포함: 빈 키와 예시        |
-| E2E 테스트     | `test/defaults.env`        | `pnpm -C apps/web test:e2e`                    | 포함: 테스트 전용 더미 값 |
-| 퍼포먼스 검사  | `performance/.dev.vars`    | `pnpm -C apps/web test:performance`            | 포함: 성능 전용 더미 값   |
-| 운영 등록 항목 | `production/.env.example`  | `pnpm -C apps/web exec void secret put <이름>` | 포함: 등록할 항목의 예시  |
-| 이전 설정 보관 | `archive/`                 | 실행 시 읽지 않음                              | 전체 제외                 |
+| 구분           | 파일                       | 명령                                      | Git 포함                  |
+| -------------- | -------------------------- | ----------------------------------------- | ------------------------- |
+| 개발           | `development/.env`         | `pnpm dev`                                | 제외: 실제 개발용 값      |
+| 개발용 예시    | `development/.env.example` | 같은 폴더의 `.env`를 만들 때 복사         | 포함: 빈 키와 예시        |
+| E2E 테스트     | `test/defaults.env`        | `pnpm -C apps/web test:e2e`               | 포함: 테스트 전용 더미 값 |
+| 퍼포먼스 검사  | `performance/.dev.vars`    | `pnpm -C apps/web test:performance`       | 포함: 성능 전용 더미 값   |
+| 운영           | `production/.env`          | `pnpm env:sync`, `pnpm deploy:production` | 제외: 실제 운영 값        |
+| 운영 예시      | `production/.env.example`  | 같은 폴더의 `.env`를 만들 때 복사         | 포함: 등록할 항목의 예시  |
+| 이전 설정 보관 | `archive/`                 | 실행 시 읽지 않음                         | 전체 제외                 |
 
 단위 테스트(`pnpm test`)는 테스트 코드의 독립된 fixture를 사용한다. 실제 개발용 `.env`를 읽지 않는다. AI는 `pnpm dev` 대신 `pnpm -C apps/web test:e2e` 등 테스트 전용 명령을 사용한다.
 
@@ -23,9 +24,9 @@
 
 ## 운영 값 등록
 
-`production/.env.example`은 항목 목록이다. 실제 운영 값은 해당 Cloudflare Worker의 Secrets에 개별 등록한다. 이 파일을 자동으로 읽거나 개발용 `.env`를 운영에 업로드하는 스크립트는 없다.
+`production/.env.example`을 같은 폴더의 `.env`로 복사해 운영 값을 채우고 권한을 `600`으로 둔다. `pnpm env:sync`가 이 파일 하나만 `void secret sync`로 Worker Secrets에 올린다. 모든 키는 `apps/web/env.ts`에 선언돼 있어야 한다. 개발용 `.env`를 운영에 올리는 스크립트는 없다.
 
-배포는 `pnpm -C apps/web deploy`를 사용한다. 대상과 등록 절차는 [운영 가이드](../../docs/development-deployment-operations.md#6-최초-운영-배포)를 따른다.
+배포는 `pnpm deploy:production`(동기화 후 배포)을 사용한다. 비밀값 변경 없이 배포만 할 때는 `pnpm -C apps/web run deploy`를 쓴다. 대상과 등록 절차는 [운영 가이드](../../docs/development-deployment-operations.md#6-최초-운영-배포)를 따른다.
 
 ## 값 추가와 보관
 

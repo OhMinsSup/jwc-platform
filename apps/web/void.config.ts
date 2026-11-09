@@ -15,7 +15,15 @@ export default defineConfig({
 		compatibility_flags: ["nodejs_compat"],
 	},
 	cloudflare: {
+		// queues/sms.ts의 자동 생성 이름도 jwc-form-sms로 맞춘다 (ADR-0019).
+		name: "jwc-form",
 		main: "./server.ts",
+		// 대시보드에서 연결한 운영 도메인. 코드에 없으면 void deploy가 기존 라우트를 덮을 수 없어 멈춘다 (ADR-0020).
+		routes: [{ pattern: "veloss-todo.uk", custom_domain: true }],
+		// 공개 설정도 코드로 고정한다: 값이 없으면 void가 대시보드 상태를 덮지 못해 배포를 멈춘다.
+		// 운영은 Custom Domain으로만 받는다. 미리보기 URL은 void의 배포 전 준비 확인이 쓰므로 켠다 (ADR-0020).
+		workers_dev: false,
+		preview_urls: true,
 		queues: {
 			producers: queues.map((queue) => ({
 				queue: queue.name,
