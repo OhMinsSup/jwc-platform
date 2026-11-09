@@ -37,14 +37,6 @@ export default defineConfig({
 		url: BASE_URL,
 		reuseExistingServer: false,
 		timeout: SERVER_START_TIMEOUT_MS,
-		// 제출 출처 검사(SITE_URL)가 이 포트와 맞아야 한다. 비밀값이 필요 없는 값만 덮는다
-		env: {
-			SITE_URL: BASE_URL,
-			SUBMISSION_STORE: "memory",
-			SMS_MODE: "log",
-			ADMIN_EMAILS: "e2e@example.com",
-			ADMIN_PHONES: "e2e@example.com=01012345678",
-			BETTER_AUTH_SECRET: "e2e-only-not-a-secret-0123456789abcdef",
-		},
+		// test:e2e가 config/env/test/defaults.env를 주입한다.
 	},
 });

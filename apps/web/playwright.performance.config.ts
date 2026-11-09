@@ -3,11 +3,7 @@ import process from "node:process";
 import { defineConfig, devices } from "@playwright/test";
 import { z } from "zod";
 
-import {
-	PERFORMANCE_ACCOUNTS,
-	PERFORMANCE_ORIGIN,
-	PERFORMANCE_SECRET,
-} from "./e2e/performance/settings";
+import { PERFORMANCE_ORIGIN } from "./e2e/performance/settings";
 
 const settings = z
 	.object({
@@ -41,17 +37,6 @@ export default defineConfig({
 		url: `${PERFORMANCE_ORIGIN}/admin/login`,
 		reuseExistingServer: false,
 		timeout: 120_000,
-		env: {
-			SITE_URL: PERFORMANCE_ORIGIN,
-			SUBMISSION_STORE: "memory",
-			SMS_MODE: "log",
-			ADMIN_EMAILS: Object.values(PERFORMANCE_ACCOUNTS)
-				.map((account) => account.email)
-				.join(","),
-			ADMIN_PHONES: Object.values(PERFORMANCE_ACCOUNTS)
-				.map((account) => `${account.email}=${account.phone}`)
-				.join(","),
-			BETTER_AUTH_SECRET: PERFORMANCE_SECRET,
-		},
+		// test:performance가 config/env/performance/.dev.vars를 주입한다.
 	},
 });

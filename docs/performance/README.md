@@ -14,7 +14,7 @@ Node 24와 Chromium 설치 후 `pnpm -C apps/web test:performance`를 실행한�
 숫자가 없으면 실패하며, 다음 paint 없이 문서를 떠나는 링크의 INP는 미보고로 표시할 수 있다. 0으로 대체하지 않는다.
 보고서는 페이지별 표본·최솟값·nearest-rank p75·최댓값을 남긴다. 예산 초과나 측정 실패는 CI를 실패시킨다.
 
-production 빌드를 별도 Cloudflare preview에서 실행한다. 공개 더미 `config/env/performance/.dev.vars`만 사용하며 `.void/performance`에만 시드한다.
+production 빌드를 별도 Cloudflare preview에서 실행한다. `with-env:performance`가 공개 더미 `config/env/performance/.dev.vars`를 주입하고 preview도 같은 파일을 읽으며 `.void/performance`에만 시드한다.
 메모리 응답 저장소와 로그 SMS를 사용하고 Google Sheets·실제 SMS에는 연결하지 않는다.
 관리자 화면은 시드한 유효 세션을 서버가 검증한다. 인증 우회 코드나 실제 계정은 사용하지 않는다.
 로컬 preview에는 자산 압축이 없어서 테스트 전용 proxy가 `/assets/*.css|js`만 gzip으로 스트리밍한다. 운영 CDN의 압축 조건을 재현하는 실험이며 운영 네트워크 실측은 아니다.

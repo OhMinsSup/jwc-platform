@@ -87,6 +87,10 @@ web_modules/
 # 로컬 환경 파일과 이전 개인키 보관본은 커밋하지 않는다. 공개 템플릿만 추적한다.
 .env*
 !.env.example
+# Cloudflare 로컬 비밀값도 제외한다. 성능용 공개 더미 파일만 추적한다.
+.dev.vars*
+!/config/env/performance/.dev.vars
+/config/env/archive/
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache

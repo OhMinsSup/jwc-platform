@@ -1,6 +1,6 @@
 # ADR-0013: dotenv 주입과 CI 생성 설정 준비
 
-- 상태: 채택
+- 상태: 채택. 환경 파일 경로는 [ADR-0018](0018-environment-directories.md)로 변경한다.
 - 대체: ADR-0012의 로컬 암호화·키체인 방식
 
 ## Problem 1-Pager

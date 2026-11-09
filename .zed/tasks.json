@@ -28,7 +28,7 @@
 		"allow_concurrent_runs": false
 	},
 	{
-		"label": "JWC: dev (dummy)",
+		"label": "JWC: dev",
 		"command": "pnpm",
 		"args": ["dev"],
 		"cwd": "$ZED_WORKTREE_ROOT",

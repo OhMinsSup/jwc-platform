@@ -61,7 +61,7 @@ jobs:
       - name: Playwright Chromium 설치
         run: pnpm -C apps/web test:e2e:install
 
-      # test:e2e도 with-env를 통해 로컬과 같은 공개 더미 설정을 주입한다.
+      # test:e2e는 with-env:test로 config/env/test/defaults.env를 주입한다.
       - name: 공개 신청 및 관리자 인증 E2E
         run: pnpm -C apps/web test:e2e
 

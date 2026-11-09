@@ -50,8 +50,8 @@
 
 ## 개발 환경과 비밀값
 
-- AI의 개발·검증은 `pnpm dev`와 공개 더미 설정(`config/env/development.env`)을 사용한다.
-- 실제 `.env`와 배포 자격 증명을 읽거나 출력하지 않는다. `with-env:real`, `dev:real`은 일반 자동 검증에 사용하지 않는다.
+- AI의 개발·검증은 `pnpm test`, `pnpm -C apps/web test:e2e`와 공개 테스트 설정(`config/env/test/defaults.env`)을 사용한다.
+- 실제 `config/env/development/.env`와 배포 자격 증명을 읽거나 출력하지 않는다. `pnpm dev`와 `with-env`는 실제 개발용 설정을 읽으므로 일반 AI 자동 검증에 사용하지 않는다.
 - 사용자가 실제 연동 검증이나 비밀값 이전을 명시적으로 요청한 경우에도 값은 도구 출력·로그에 남기지 않고 성공 여부만 확인한다.
 - `.env`와 배포 토큰을 AI 작업 공간에 제공하지 않는다. dotenv는 평문 파일을 읽는 도구이며 접근 차단은 별도 사용자·컨테이너에서 강제한다. `.gitignore`만으로 접근이 격리됐다고 보고하지 않는다.
 - 설정과 복구 절차는 `docs/development-secrets.md`를 따른다.

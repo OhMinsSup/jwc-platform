@@ -5,7 +5,7 @@
 - 배경: pnpm 모노레포이며 TypeScript 7, Vite+, Tailwind CSS 4를 사용한다. CLI 타입 검증은 `jwc-typecheck`가 담당한다.
 - 문제: 기존 VS Code 설정은 레거시 TypeScript 서버 선택 방식이고, Zed는 기본 vtsls를 사용한다. TypeScript 7은 `tsserver.js`를 제공하지 않아 에디터가 다른 버전으로 폴백할 수 있다. Tailwind 설정도 앱에서 추가한 토큰을 읽지 못한다.
 - 목표: 두 에디터가 설치된 TypeScript 7과 루트 `vite.config.ts`를 읽고, 앱·공용 UI의 클래스 자동완성 및 같은 개발·검증 명령을 제공한다.
-- 비목표: 앱 동작·디자인·컴파일러 버전 변경, 개인 에디터 설정 덮어쓰기, 실제 환경 파일 사용, 서버·E2E 자동 실행.
+- 비목표: 앱 동작·디자인·컴파일러 버전 변경, 개인 에디터 설정 덮어쓰기, 실제 환경 파일 조회·연동 검증, 서버·E2E 자동 실행.
 - 제약: 저장 시 안전한 수정만 적용한다. 앱의 Workers 타입과 E2E의 Node 타입은 기존 tsconfig로 분리한다. `.void`의 생성된 타입 파일을 타입 서버 감시에서 제외하지 않는다.
 
 ## 대안과 영향도
@@ -47,12 +47,13 @@ pnpm -C apps/web codegen
 
 ## 공통 작업
 
-VS Code의 **Tasks: Run Task**, Zed의 **task: spawn**에서 `JWC:` 작업을 선택한다. 타입 생성·전체 타입 검사·포맷/린트 검사·단위 테스트·더미 환경 개발 서버를 제공한다. 프로젝트를 여는 것만으로 명령을 실행하지 않는다.
+VS Code의 **Tasks: Run Task**, Zed의 **task: spawn**에서 `JWC:` 작업을 선택한다. 타입 생성·전체 타입 검사·포맷/린트 검사·단위 테스트·개발 서버를 제공한다. 프로젝트를 여는 것만으로 명령을 실행하지 않는다.
 
 - 타입 오류 확인: `pnpm typecheck` (필요하면 `pnpm typecheck:tsc`와 비교).
 - 포맷·린트 확인: `pnpm check`. 자동수정은 `pnpm fix` 후 diff를 확인한다.
 - 단위 테스트: `pnpm test`.
-- 개발: `pnpm dev` (공개 더미 설정). 실제 `.env`를 사용하는 작업은 추가하지 않았다.
+- 개발: `pnpm dev`. 개발자가 `config/env/development/.env.example`을 참고해 준비한 `config/env/development/.env`를 읽는다. 이 파일은 Git에서 제외한다.
+- AI 자동 검증: `pnpm test`, `pnpm -C apps/web test:e2e`와 공개 테스트 설정을 사용한다. 실제 개발용 환경 파일은 읽지 않는다.
 
 앱의 타입 생성과 dev·E2E·성능 검증은 공유 Void 생성물을 쓸 수 있다. 이 작업들을 동시에 실행하지 않는다. 저장 시 에디터 진단은 CI 전체 검증을 대체하지 않는다.
 

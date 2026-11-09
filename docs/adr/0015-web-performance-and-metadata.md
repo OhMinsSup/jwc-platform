@@ -54,7 +54,7 @@
 정적 그래프 크기는 빌드 후 다음 방식으로 재현할 수 있다. 빌드는 공개 더미 설정을 사용한다.
 
 ```bash
-pnpm -C apps/web with-env pnpm -w build
+pnpm -C apps/web with-env:test pnpm -w build
 python3 - <<'PY'
 import gzip, pathlib, re
 root = pathlib.Path('apps/web/.cloudflare/output/v0/workers/default/assets/assets')

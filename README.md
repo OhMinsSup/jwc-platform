@@ -37,15 +37,17 @@ tooling/lint-plugins          레포 전용 린트 규칙 (배럴/재노출 금�
 
 ## 로컬 개발
 
+`config/env/development/.env.example`을 같은 폴더의 `.env`로 복사하고 개발용 값을 채운다. 기존 `.env`가 있으면 덮어쓰지 않는다.
+
 ```bash
 pnpm install
 pnpm -C apps/web with-env void db migrate
 pnpm dev            # http://localhost:5173
 ```
 
-`dev`는 `config/env/development.env`의 공개 더미 설정을 주입한다. 응답은 메모리에 저장하고 실제 문자와 분석 이벤트는 보내지 않는다. 문자 인증은 실제 연동 환경에서 검증한다.
+`dev`는 `config/env/development/.env`를 dotenv-cli로 주입한다. 설정을 바꾼 뒤 같은 명령으로 서버를 다시 시작한다. 실제 `.env`는 Git에서 제외하며 앱 루트에는 만들지 않는다.
 
-실제 연동은 루트 `.env.example`을 `.env`로 복사해 개발용 값을 채운 뒤 `pnpm dev:real`로 실행한다. `dotenv-cli`가 파일을 읽어 프로세스에 주입한다. 설정·이전 절차는 [개발용 비밀값 관리](docs/development-secrets.md)를 따른다. `.env`는 Git에서 제외하며 `apps/web/.env`는 별도로 만들지 않는다.
+AI·자동 검증은 실제 `.env`를 사용하지 않고 `pnpm test`, `pnpm -C apps/web test:e2e`를 실행한다. 환경별 파일과 명령은 [환경 설정 목록](config/env/README.md), 설정·이전 절차는 [개발용 비밀값 관리](docs/development-secrets.md)를 따른다.
 
 ## 검사
 

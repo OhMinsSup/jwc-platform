@@ -10,16 +10,16 @@
 		"db:migrate": "void db migrate",
 		"deploy": "void deploy",
 		"dev": "pnpm with-env vp dev",
-		"dev:real": "pnpm with-env:real vp dev",
 		"preview": "pnpm with-env vp preview",
 		"test": "vp test run",
-		"test:e2e": "pnpm with-env playwright test",
+		"test:e2e": "pnpm with-env:test playwright test",
 		"test:e2e:install": "playwright install --with-deps --only-shell chromium",
-		"test:performance": "pnpm with-env playwright test --config playwright.performance.config.ts",
+		"test:performance": "pnpm with-env:performance playwright test --config playwright.performance.config.ts",
 		"typecheck": "void prepare && jwc-typecheck --noEmit && jwc-typecheck --noEmit -p e2e",
 		"typecheck:tsc": "void prepare && tsc --noEmit && tsc --noEmit -p e2e",
-		"with-env": "dotenv --no-expand -o -e ../../config/env/development.env --",
-		"with-env:real": "dotenv --no-expand -o -e ../../.env --"
+		"with-env": "dotenv --no-expand -o -e ../../config/env/development/.env --",
+		"with-env:test": "dotenv --no-expand -o -e ../../config/env/test/defaults.env --",
+		"with-env:performance": "dotenv --no-expand -o -e ../../config/env/performance/.dev.vars --"
 	},
 	"dependencies": {
 		"@jwc/analytics": "workspace:*",
