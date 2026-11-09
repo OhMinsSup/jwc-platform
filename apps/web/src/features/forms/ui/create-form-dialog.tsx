@@ -12,7 +12,7 @@ import {
 import { Input } from "@jwc/ui/components/input";
 import { Label } from "@jwc/ui/components/label";
 import { RadioGroup, RadioGroupItem } from "@jwc/ui/components/radio-group";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouter } from "@tanstack/react-router";
 import { Loader2, Plus } from "lucide-react";
 import { useId, useState } from "react";
 import type { SubmitEvent } from "react";
@@ -109,9 +109,13 @@ function SlugField() {
 	);
 }
 
+/** 새 폼이 나타나야 하는 캐시된 화면 (다시 들어갈 때 읽는다) */
+const FORM_LIST_ROUTE_ID = "/admin/_console/";
+
 /** 제출 → 생성 → 편집 화면 이동. 실패 메시지는 값으로 받는다 */
 function useCreateForm(template: Template) {
 	const navigate = useNavigate();
+	const router = useRouter();
 	const [error, setError] = useState<string | null>(null);
 	const [pending, setPending] = useState(false);
 	const submit = async (event: SubmitEvent<HTMLFormElement>) => {
@@ -133,6 +137,10 @@ function useCreateForm(template: Template) {
 		await navigate({
 			to: "/admin/forms/$formId",
 			params: { formId: result.data },
+		});
+		// 이동한 뒤라 목록은 화면에 없다: 표시만 하고 지금 다시 읽지 않는다
+		await router.invalidate({
+			filter: (match) => match.routeId === FORM_LIST_ROUTE_ID,
 		});
 	};
 	return { error, pending, submit, clearError: () => setError(null) };

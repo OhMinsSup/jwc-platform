@@ -2,7 +2,13 @@ import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
 import { totp } from "../test/totp";
-import { E2E_ADMIN, adminSeedSql } from "./auth-fixture";
+import {
+	E2E_ADMIN,
+	adminSeedSql,
+	endReadyAdminSessionSql,
+	readyAdminSessionSql,
+	signInReadyAdmin,
+} from "./auth-fixture";
 import { executeE2ESql } from "./database";
 
 async function open(page: Page, path: string) {
@@ -143,4 +149,72 @@ test("로그인 성공 응답 뒤 세션이 없으면 쿠키와 접속 주소 �
 	await expect(
 		page.getByRole("button", { name: "로그인", exact: true }),
 	).toBeEnabled();
+});
+
+const SERVER_FN_REQUESTS = "/_serverFn/";
+
+function menuLink(page: Page, name: string) {
+	return page
+		.getByRole("navigation", { name: "관리자 메뉴" })
+		.getByRole("link", { name, exact: true });
+}
+
+async function openConsole(page: Page, baseURL: string | undefined) {
+	await signInReadyAdmin(page.context(), baseURL ?? "");
+	await page.goto("/admin");
+	await page.waitForLoadState("networkidle");
+	await expect(
+		page.getByRole("heading", { name: "폼", exact: true }),
+	).toBeVisible();
+}
+
+/**
+ * 인증을 마친 관리자의 콘솔 동작. 허용 목록의 E2E 이메일이 하나라 같은 사용자를 쓰는 위 테스트와
+ * 다른 파일로 나누면 병렬 worker끼리 사용자를 지우고 다시 넣어 서로 깨뜨린다. 그래서 이 파일에 둔다.
+ */
+test.describe("인증을 마친 관리자 콘솔", () => {
+	test.beforeEach(() => {
+		executeE2ESql(readyAdminSessionSql(Date.now()));
+	});
+
+	test("콘솔 화면 이동은 접근 확인을 다시 묻지 않고, 방금 본 화면은 다시 읽지 않는다", async ({
+		page,
+		baseURL,
+	}) => {
+		await openConsole(page, baseURL);
+		const calls: string[] = [];
+		page.on("request", (request) => {
+			if (request.url().includes(SERVER_FN_REQUESTS)) {
+				calls.push(request.url());
+			}
+		});
+		await menuLink(page, "관리자").click();
+		await expect(
+			page.getByRole("heading", { name: "관리자", exact: true }),
+		).toBeVisible();
+		await page.waitForLoadState("networkidle");
+		// 초대 목록 + 감사 기록 두 개만. 접근 확인(beforeLoad)은 첫 화면에서 확인한 결과를 쓴다
+		expect(calls).toHaveLength(2);
+		await menuLink(page, "폼").click();
+		await expect(
+			page.getByRole("heading", { name: "폼", exact: true }),
+		).toBeVisible();
+		await page.waitForLoadState("networkidle");
+		// 30초 안에 돌아온 목록은 다시 읽지 않는다
+		expect(calls).toHaveLength(2);
+	});
+
+	test("세션이 끝났으면 콘솔 화면 이동이 오류 화면 대신 로그인으로 보낸다", async ({
+		page,
+		baseURL,
+	}) => {
+		await openConsole(page, baseURL);
+		executeE2ESql(endReadyAdminSessionSql);
+		await menuLink(page, "관리자").click();
+		await expect(page).toHaveURL(/\/admin\/login$/u);
+		await expect(
+			page.getByRole("button", { name: "로그인", exact: true }),
+		).toBeVisible();
+		await expect(page.getByText("문제가 발생했습니다")).toHaveCount(0);
+	});
 });

@@ -8,10 +8,12 @@ import { CreateFormDialog } from "../../../features/forms/ui/create-form-dialog"
 import { FormList } from "../../../features/forms/ui/form-list";
 import type { FormSummary } from "../../../features/forms/ui/form-list";
 import { formatCount } from "../../../platform/format";
+import { ADMIN_LOADER_STALE_TIME_MS } from "../../../platform/route-cache";
 
 export const Route = createFileRoute("/admin/_console/")({
 	head: () => ({ meta: [{ title: "폼 · JWC 신청서" }] }),
 	loader: () => listFormsFn(),
+	staleTime: ADMIN_LOADER_STALE_TIME_MS,
 	component: FormsPage,
 });
 

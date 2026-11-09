@@ -14,8 +14,15 @@ import {
 	saveDraftFn,
 } from "../../../../../features/forms/functions/admin";
 
-/** 저장 후 다시 읽을 라우트: 공통 머리(제목)만. 편집기 데이터는 다시 읽지 않는다 */
-const LAYOUT_ROUTE_ID = "/admin/_console/forms/$formId";
+/**
+ * 저장 후 다시 읽을 라우트: 공통 머리(제목), 그리고 초안을 보여 주는 캐시된 화면(폼 목록 제목, 미리보기).
+ * 캐시된 화면은 표시만 하고 다시 들어갈 때 읽는다 (ADMIN_LOADER_STALE_TIME_MS). 편집기 데이터는 다시 읽지 않는다
+ */
+const ROUTES_SHOWING_DRAFT = new Set([
+	"/admin/_console/forms/$formId",
+	"/admin/_console/",
+	"/admin/_console/forms/$formId/preview",
+]);
 
 const RECOVERY_TITLE = "새 폼";
 
@@ -27,6 +34,11 @@ export const Route = createFileRoute("/admin/_console/forms/$formId/")({
 		}
 		return result.data;
 	},
+	/**
+	 * 편집기는 초안을 첫 렌더에만 읽으므로, 들어올 때만 새로 읽는다. 같은 화면에서의 invalidate(저장 후)는
+	 * 오래된 match를 모두 다시 읽게 하므로(staleTime 0) 이것이 없으면 저장마다 편집기 데이터를 다시 받는다.
+	 */
+	shouldReload: ({ cause }) => cause === "enter",
 	component: FormEditorPage,
 });
 
@@ -58,7 +70,7 @@ function useFormCommands(form: LoaderData) {
 				return { ok: false, message: result.message };
 			}
 			await router.invalidate({
-				filter: (match) => match.routeId === LAYOUT_ROUTE_ID,
+				filter: (match) => ROUTES_SHOWING_DRAFT.has(match.routeId),
 			});
 			return {
 				ok: true,
