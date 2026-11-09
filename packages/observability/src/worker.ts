@@ -1,5 +1,5 @@
 import { OTLPLogExporter } from "@opentelemetry/exporter-logs-otlp-http";
-import { Resource } from "@opentelemetry/resources";
+import { resourceFromAttributes } from "@opentelemetry/resources";
 import {
 	BatchLogRecordProcessor,
 	LoggerProvider,
@@ -67,17 +67,19 @@ function logsFor(config: PostHogConfig): PostHogLogs {
 	if (posthogLogs?.configKey === configKey) {
 		return posthogLogs;
 	}
+	// OpenTelemetry 3.x: Resource 클래스 대신 resourceFromAttributes, 프로세서는 생성자에서 등록하고
+	// 프로세서는 exporter를 옵션 객체로 받는다
 	const provider = new LoggerProvider({
-		resource: new Resource({ "service.name": "jwc-form-worker" }),
-	});
-	provider.addLogRecordProcessor(
-		new BatchLogRecordProcessor(
-			new OTLPLogExporter({
-				url: `${config.host}/i/v1/logs`,
-				headers: { Authorization: `Bearer ${config.apiKey}` },
+		resource: resourceFromAttributes({ "service.name": "jwc-form-worker" }),
+		processors: [
+			new BatchLogRecordProcessor({
+				exporter: new OTLPLogExporter({
+					url: `${config.host}/i/v1/logs`,
+					headers: { Authorization: `Bearer ${config.apiKey}` },
+				}),
 			}),
-		),
-	);
+		],
+	});
 	posthogLogs = {
 		configKey,
 		logger: provider.getLogger("jwc-form-posthog-log-exporter"),
