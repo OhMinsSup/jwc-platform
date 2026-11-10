@@ -88,3 +88,17 @@ test("공유 미리보기는 사이트 출처의 절대 주소로 OG 이미지�
 	expect(image.status()).toBe(200);
 	expect(image.headers()["content-type"]).toContain("image/png");
 });
+
+test("카드 설명은 덮개 위에 있어 눌러도 이동하지 않고 글을 고를 수 있다", async ({
+	page,
+}) => {
+	await page.goto("/");
+	await page.waitForLoadState("networkidle");
+	const description = page.getByText(E2E_DEFINITION.description ?? "", {
+		exact: true,
+	});
+	await description.dblclick();
+	await expect(page).toHaveURL(/\/$/u);
+	const selected = await page.evaluate(() => window.getSelection()?.toString());
+	expect(selected?.length).toBeGreaterThan(0);
+});

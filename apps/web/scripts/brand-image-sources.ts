@@ -2,6 +2,7 @@
  * 브랜드 이미지의 원본 문서(순수 함수). 렌더링·파일 쓰기는 brand-images.ts가 맡는다.
  * 모든 래스터 아이콘과 OG 이미지는 public/favicon.svg 한 벌에서 파생한다.
  */
+import { BRAND_THEME_COLORS } from "../src/platform/brand";
 
 /** 래스터 아이콘 하나: 모서리 반경(0이면 꽉 찬 정사각형)과 접수표 배율 */
 export interface IconVariant {
@@ -13,6 +14,11 @@ export interface IconVariant {
 
 const FAVICON_RADIUS = 8;
 const FAVICON_SCALE = 1.25;
+/** favicon.svg 원본 그대로의 반경·배율. ICO·OG 아이콘처럼 모양을 바꾸지 않는 렌더에 쓴다 */
+export const FAVICON_VARIANT = {
+	radius: FAVICON_RADIUS,
+	scale: FAVICON_SCALE,
+} as const;
 /** maskable 아이콘은 지름 80% 안전 영역에 접수표 모서리가 들어오도록 배율을 낮춘다 */
 const MASKABLE_SCALE = 1;
 /** iOS가 모서리를 깎으므로 꽉 찬 칸에 약간의 여백만 둔다 */
@@ -54,6 +60,9 @@ export const OG_IMAGE = {
 } as const;
 
 const DARK_MEDIA_RULE = /@media[\s\S]*?\}\s*\}/u;
+/** 크기는 렌더마다 넣으므로 원본 svg 태그에는 두지 않는다 */
+const SVG_OPEN_TAG = /<svg\b[^>]*>/u;
+const SIZE_ATTRIBUTE = /\s(?:width|height)=/u;
 
 /**
  * favicon.svg에서 다크 규칙을 빼고(래스터는 한 가지 색만 담는다) 반경·배율을 바꾼다.
@@ -67,6 +76,10 @@ export function iconSvg(
 	const scale = `scale(${FAVICON_SCALE})`;
 	if (!favicon.includes(radius) || !favicon.includes(scale)) {
 		throw new Error("favicon.svg의 rx 또는 scale 값이 예상과 다릅니다");
+	}
+	const openTag = SVG_OPEN_TAG.exec(favicon)?.[0] ?? "";
+	if (SIZE_ATTRIBUTE.test(openTag)) {
+		throw new Error("favicon.svg의 svg 태그에 width/height를 두지 않습니다");
 	}
 	return favicon
 		.replace(DARK_MEDIA_RULE, "")
@@ -140,7 +153,7 @@ ${fontCss}
 * { box-sizing: border-box; margin: 0; }
 body { width: ${OG_IMAGE.width}px; height: ${OG_IMAGE.height}px; overflow: hidden; color: #17181c;
   font-family: "SUIT Variable", sans-serif; letter-spacing: -0.015em; word-break: keep-all;
-  background: #f9fafd; background-image: linear-gradient(#eeeff2 1px, transparent 1px),
+  background: ${BRAND_THEME_COLORS.light}; background-image: linear-gradient(#eeeff2 1px, transparent 1px),
   linear-gradient(90deg, #eeeff2 1px, transparent 1px); background-size: 30px 30px;
   display: flex; align-items: center; justify-content: space-between; padding: 0 96px; }
 .copy { max-width: 560px; }
@@ -165,7 +178,7 @@ function ticketCss(): string {
   display: flex; background: #fff; border: 1px solid #dfe0e3; border-radius: 22px;
   box-shadow: 0 24px 48px -24px rgb(23 24 28 / 0.25); }
 .ticket::before, .ticket::after { content: ""; position: absolute; top: 50%; width: 36px; height: 36px;
-  margin-top: -18px; border-radius: 50%; background: #f9fafd; border: 1px solid #dfe0e3; }
+  margin-top: -18px; border-radius: 50%; background: ${BRAND_THEME_COLORS.light}; border: 1px solid #dfe0e3; }
 .ticket::before { left: -19px; clip-path: inset(0 0 0 50%); }
 .ticket::after { right: -19px; clip-path: inset(0 50% 0 0); }
 .main { flex: 1; padding: 34px 30px; display: flex; flex-direction: column; gap: 14px; }

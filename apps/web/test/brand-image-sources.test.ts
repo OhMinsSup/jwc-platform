@@ -2,7 +2,12 @@ import { readFileSync } from "node:fs";
 
 import { describe, expect, it } from "vite-plus/test";
 
-import { iconSvg, ogImageHtml, packIco } from "../scripts/brand-image-sources";
+import {
+	FAVICON_VARIANT,
+	iconSvg,
+	ogImageHtml,
+	packIco,
+} from "../scripts/brand-image-sources";
 
 const favicon = readFileSync(
 	new URL("../public/favicon.svg", import.meta.url),
@@ -26,6 +31,15 @@ describe(iconSvg, () => {
 				scale: 1.25,
 			}),
 		).toThrow("favicon.svg의 rx 또는 scale 값이 예상과 다릅니다");
+	});
+
+	it("원본 svg 태그에 크기가 이미 있으면 속성이 겹치지 않게 실패한다", () => {
+		expect(() =>
+			iconSvg(favicon.replace("<svg ", '<svg width="32" height="32" '), {
+				size: 64,
+				...FAVICON_VARIANT,
+			}),
+		).toThrow("favicon.svg의 svg 태그에 width/height를 두지 않습니다");
 	});
 });
 

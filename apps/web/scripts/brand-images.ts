@@ -9,6 +9,7 @@ import {
 	BRAND_TAGLINE,
 } from "../src/platform/brand";
 import {
+	FAVICON_VARIANT,
 	ICO_SIZES,
 	OG_IMAGE,
 	RASTER_ICONS,
@@ -74,7 +75,7 @@ async function writeIcons(browser: Browser, favicon: string): Promise<void> {
 	);
 	const images = await Promise.all(
 		ICO_SIZES.map(async (size) => {
-			const svg = iconSvg(favicon, { size, radius: 8, scale: 1.25 });
+			const svg = iconSvg(favicon, { size, ...FAVICON_VARIANT });
 			const png = await render(browser, squareHtml(svg), {
 				width: size,
 				height: size,
@@ -86,7 +87,7 @@ async function writeIcons(browser: Browser, favicon: string): Promise<void> {
 }
 
 async function writeOgImage(browser: Browser, favicon: string): Promise<void> {
-	const icon = iconSvg(favicon, { size: OG_ICON_SIZE, radius: 8, scale: 1.25 });
+	const icon = iconSvg(favicon, { size: OG_ICON_SIZE, ...FAVICON_VARIANT });
 	const copy = {
 		name: BRAND_NAME,
 		tagline: BRAND_TAGLINE,

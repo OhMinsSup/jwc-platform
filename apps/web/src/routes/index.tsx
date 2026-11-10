@@ -74,6 +74,7 @@ function Intro() {
 /**
  * 카드 전체가 눌리는 자리. 링크는 제목 하나에만 두고 after로 카드 전체를 덮는다
  * (화면 낭독기에는 "제목" 링크 하나로 읽힌다). "신청하기"는 보이는 단서일 뿐이라 숨긴다.
+ * 설명은 날짜·장소를 복사할 수 있도록 덮개 위(relative z-10)에 둔다. 설명 위를 누르면 이동하지 않는다.
  */
 function FormCard({ form }: { form: OpenForm }) {
 	return (
@@ -89,7 +90,7 @@ function FormCard({ form }: { form: OpenForm }) {
 					</Link>
 				</h3>
 				{form.description && (
-					<p className="text-muted-foreground mt-1 line-clamp-2 text-[15px]">
+					<p className="text-muted-foreground relative z-10 mt-1 line-clamp-2 text-[15px]">
 						{form.description}
 					</p>
 				)}
