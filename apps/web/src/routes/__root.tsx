@@ -7,9 +7,10 @@ import {
 } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 
-import { BRAND_THEME_COLORS } from "../platform/brand";
+import { BRAND_NAME, BRAND_THEME_COLORS } from "../platform/brand";
 import { getClientConfigFn } from "../platform/functions/client-config";
 import { pageMeta, shareCardMeta } from "../platform/metadata";
+import { NOINDEX_ROBOTS } from "../platform/search";
 import { AnalyticsBridge } from "../platform/ui/analytics-bridge";
 import { NavigationProgress } from "../platform/ui/navigation-progress";
 
@@ -23,7 +24,10 @@ export const Route = createRootRoute({
 		meta: [
 			{ charSet: "utf-8" },
 			{ name: "viewport", content: "width=device-width, initial-scale=1" },
-			{ name: "robots", content: "noindex, nofollow" },
+			// 기본은 비노출. 홈·접수 중인 공개 폼만 하위 화면에서 index로 덮는다 (ADR-0023)
+			{ name: "robots", content: NOINDEX_ROBOTS },
+			{ name: "application-name", content: BRAND_NAME },
+			{ name: "apple-mobile-web-app-title", content: BRAND_NAME },
 			...pageMeta({ title: "신청서" }),
 			// 하위 화면은 카드 종류·이미지 메타를 두지 않으므로 모든 화면의 공유 미리보기가 이 카드를 쓴다
 			...shareCardMeta(loaderData?.siteOrigin),

@@ -35,6 +35,7 @@ TanStack Start + void(Cloudflare Workers). 공개 신청 화면, 관리자 콘�
 - 로그/분석 이벤트는 카탈로그(서버 `platform/server/telemetry/events.ts`, 클라이언트 `platform/analytics/events.ts`)에 필드를 먼저 선언한다. 답변·이름·전화번호·문자 본문·토큰은 필드로 두지 않는다.
 - 실패는 오류 카탈로그 코드로 분류한다. 사용자에게는 `DomainError`의 문장만 보이고, 그 밖의 오류 문장은 내부 로그로만 남긴다.
 - `queues/*.ts`의 옵션 export와 `crons/*.ts`의 `cron`은 void가 정적으로 읽으므로 리터럴만 쓴다.
+- 검색 노출은 `platform/search.ts`가 정한다. 새 화면은 root의 noindex를 그대로 두고, 노출할 화면만 `indexableHead`·`jsonLdScript`를 쓴다. 개인 신청 내용·토큰·질의 문자열은 canonical·구조화 데이터에 넣지 않는다 (ADR-0023).
 - 큐 옵션(배치/재시도)은 `src/platform/server/queue-config.ts` 한 곳에서 바꾼다.
 
 ## 명령

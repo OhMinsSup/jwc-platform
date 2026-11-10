@@ -8,7 +8,6 @@ import {
 	BRAND_NAME,
 	BRAND_THEME_COLORS,
 } from "../src/platform/brand";
-import { PRIVATE_PATHS } from "../src/platform/server/security/policy";
 import {
 	APP_ICON_TICKET_TRANSFORM,
 	TICKET_PATHS,
@@ -84,66 +83,5 @@ describe("브랜드 아이콘·manifest 계약", () => {
 		);
 		expect(css).toContain(`--background: ${BRAND_THEME_COLORS.light};`);
 		expect(css).toContain(`--background: ${BRAND_THEME_COLORS.dark};`);
-	});
-});
-
-/** robots.txt를 User-agent 묶음별 규칙으로 나눈다 (빈 줄이 묶음 경계) */
-function robotsGroups(text: string) {
-	return text
-		.split(/\n\s*\n/u)
-		.map((block) =>
-			block
-				.split("\n")
-				.map((line) => line.trim())
-				.filter((line) => line.length > 0 && !line.startsWith("#")),
-		)
-		.filter((lines) => lines.length > 0)
-		.map((lines) => ({
-			agents: lines
-				.filter((line) => line.startsWith("User-agent:"))
-				.map((line) => line.slice("User-agent:".length).trim()),
-			rules: lines.filter((line) => !line.startsWith("User-agent:")),
-		}));
-}
-
-const LINK_PREVIEW_BOTS = [
-	"Twitterbot",
-	"Slackbot",
-	"facebookexternalhit",
-	"kakaotalk-scrap",
-	"Discordbot",
-	"TelegramBot",
-];
-
-describe("robots.txt: 검색은 막고 링크 미리보기만 연다", () => {
-	const groups = robotsGroups(publicFile("robots.txt").toString("utf-8"));
-
-	it("검색엔진(그 밖의 모든 수집기)은 전체를 막는다 (ADR-0015)", () => {
-		const others = groups.find((group) => group.agents.includes("*"));
-		expect(others?.rules).toStrictEqual(["Disallow: /"]);
-	});
-
-	it("링크 미리보기 수집기는 공개 화면을 읽되 개인정보 화면은 읽지 못한다", () => {
-		const access = LINK_PREVIEW_BOTS.map((bot) => {
-			const rules =
-				groups.find((group) => group.agents.includes(bot))?.rules ?? [];
-			const disallowed = rules
-				.filter((rule) => rule.startsWith("Disallow:"))
-				.map((rule) => rule.slice("Disallow:".length).trim());
-			return {
-				bot,
-				allowsPublic: rules.includes("Allow: /"),
-				blocksPrivate: PRIVATE_PATHS.every((privatePath) =>
-					disallowed.some((path) => privatePath.test(path)),
-				),
-			};
-		});
-		expect(access).toStrictEqual(
-			LINK_PREVIEW_BOTS.map((bot) => ({
-				bot,
-				allowsPublic: true,
-				blocksPrivate: true,
-			})),
-		);
 	});
 });

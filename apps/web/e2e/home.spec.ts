@@ -5,18 +5,82 @@ import { E2E_DEFINITION, E2E_FORM } from "./fixture";
 const HOME_DESCRIPTION =
 	"지금 접수 중인 신청서를 모았습니다. 신청서를 골라 신청하면 신청 내역과 안내를 문자로 보내드립니다.";
 
-test("첫 화면은 메인 전용 설명을 주면서 검색 비노출을 유지한다", async ({
+test("첫 화면은 메인 전용 설명과 함께 검색에 노출한다 (canonical·구조화 데이터)", async ({
 	page,
+	baseURL,
 }) => {
 	const response = await page.request.get("/");
 	expect(response.status()).toBe(200);
 	const html = await response.text();
+	const home = `${baseURL ?? ""}/`;
 	expect(html).toContain("<title>신청서 목록 | Formpass</title>");
-	expect(html).toContain('name="robots" content="noindex, nofollow"');
+	expect(html).toContain(
+		'name="robots" content="index, follow, max-image-preview:large, max-snippet:-1"',
+	);
+	expect(html).not.toContain("noindex");
+	expect(html).toContain(`rel="canonical" href="${home}"`);
+	expect(html).toContain('name="application-name" content="Formpass"');
 	expect(html).toContain(`name="description" content="${HOME_DESCRIPTION}"`);
 	expect(html).toContain(
 		`property="og:description" content="${HOME_DESCRIPTION}"`,
 	);
+	const graph =
+		/<script type="application\/ld\+json"[^>]*>(?<json>[^<]+)<\/script>/u.exec(
+			html,
+		)?.groups?.json;
+	expect(JSON.parse(graph ?? "{}")).toMatchObject({
+		"@graph": [
+			{ "@type": "WebSite", url: home, name: "Formpass" },
+			{
+				"@type": "CollectionPage",
+				mainEntity: {
+					"@type": "ItemList",
+					itemListElement: expect.arrayContaining([
+						expect.objectContaining({
+							url: `${baseURL ?? ""}/f/${E2E_FORM.slug}`,
+							name: E2E_DEFINITION.title,
+						}),
+					]),
+				},
+			},
+		],
+	});
+});
+
+test("수집기 파일: robots.txt는 개인정보 화면을 막고, sitemap·llms.txt는 공개 폼을 알린다", async ({
+	page,
+	baseURL,
+}) => {
+	const origin = baseURL ?? "";
+	const robots = await page.request.get("/robots.txt");
+	expect(robots.status()).toBe(200);
+	const rules = await robots.text();
+	expect(rules).toContain("User-agent: *\nAllow: /\n");
+	for (const path of ["/r/", "/admin", "/api/", "/_serverFn/"]) {
+		expect(rules).toContain(`Disallow: ${path}\n`);
+	}
+	expect(rules).toContain(`Sitemap: ${origin}/sitemap.xml`);
+
+	const sitemap = await page.request.get("/sitemap.xml");
+	expect(sitemap.headers()["content-type"]).toContain("application/xml");
+	const xml = await sitemap.text();
+	expect(xml).toContain(`<loc>${origin}/</loc>`);
+	expect(xml).toContain(`<loc>${origin}/f/${E2E_FORM.slug}</loc>`);
+
+	const llms = await page.request.get("/llms.txt");
+	expect(await llms.text()).toContain(
+		`[${E2E_DEFINITION.title}](${origin}/f/${E2E_FORM.slug})`,
+	);
+});
+
+test("신청 내역 화면은 수집기에 막히고 검색에 노출하지 않는다", async ({
+	page,
+}) => {
+	const response = await page.request.get("/r/e2e-no-such-id");
+	expect(response.headers()["x-robots-tag"]).toBe("noindex, nofollow");
+	const html = await response.text();
+	expect(html).toContain('name="robots" content="noindex, nofollow"');
+	expect(html).not.toContain('rel="canonical"');
 });
 
 test("접수 중인 신청서 카드를 누르면 신청 화면으로 이동한다", async ({

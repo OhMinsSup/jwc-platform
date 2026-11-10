@@ -61,14 +61,21 @@ test("필수 항목을 비우고 다음을 누르면 오류를 보이고 넘어�
 	).toHaveCount(0);
 });
 
-test("SSR 메타데이터를 제공하면서 공개 신청폼도 검색 비노출로 유지한다", async ({
+test("접수 중인 공개 신청폼은 SSR 메타와 함께 검색에 노출한다 (canonical·구조화 데이터)", async ({
 	page,
+	baseURL,
 }) => {
 	const response = await page.request.get(FORM_PATH);
 	expect(response.status()).toBe(200);
 	const html = await response.text();
+	const canonical = `${baseURL ?? ""}${FORM_PATH}`;
 	expect(html).toContain("<title>E2E 신청서 | Formpass</title>");
-	expect(html).toContain('name="robots" content="noindex, nofollow"');
+	expect(html).toContain(
+		'name="robots" content="index, follow, max-image-preview:large, max-snippet:-1"',
+	);
+	expect(html).not.toContain("noindex");
+	expect(html).toContain(`rel="canonical" href="${canonical}"`);
+	expect(html).toContain(`property="og:url" content="${canonical}"`);
 	expect(html).toContain(
 		'name="description" content="E2E 폼의 신청 안내입니다."',
 	);
@@ -82,8 +89,33 @@ test("SSR 메타데이터를 제공하면서 공개 신청폼도 검색 비노�
 	await expect(
 		page.locator('link[rel="stylesheet"][href^="https://cdn.jsdelivr.net"]'),
 	).toHaveCount(0);
-	const robots = await page.request.get("/robots.txt");
-	expect(await robots.text()).toContain("Disallow: /");
+	// 화면의 주제는 폼 제목 하나(h1), 단계 제목은 그 아래(h2)
+	await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+		"E2E 신청서",
+	);
+	await expect(
+		page.getByRole("heading", { level: 2, name: "기본 정보" }),
+	).toBeVisible();
+	const graph = await page
+		.locator('script[type="application/ld+json"]')
+		.textContent();
+	expect(JSON.parse(graph ?? "{}")).toMatchObject({
+		"@graph": [
+			{ "@type": "WebSite" },
+			{ "@type": "WebPage", url: canonical, name: "E2E 신청서" },
+			{ "@type": "BreadcrumbList" },
+		],
+	});
+});
+
+test("신청 완료 화면은 검색에 노출하지 않고 canonical도 두지 않는다", async ({
+	page,
+}) => {
+	const response = await page.request.get(`${FORM_PATH}/done?id=e2e-token`);
+	const html = await response.text();
+	expect(html).toContain('name="robots" content="noindex, nofollow"');
+	expect(html).not.toContain('rel="canonical"');
+	expect(html).not.toContain("application/ld+json");
 });
 
 test("독립 질문의 입력과 함께 조건부 질문의 표시·검증도 갱신한다", async ({

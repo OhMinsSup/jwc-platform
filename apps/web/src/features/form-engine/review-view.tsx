@@ -37,7 +37,7 @@ function ReviewSection({
 	return (
 		<section className="bg-card overflow-hidden rounded-xl border">
 			<header className="border-rule flex items-center justify-between border-b px-5 py-3">
-				<h2 className="font-semibold">{page.title}</h2>
+				<h3 className="font-semibold">{page.title}</h3>
 				<Button
 					className="-mr-2"
 					onClick={() => onEdit(page.id)}

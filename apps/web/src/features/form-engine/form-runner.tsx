@@ -84,7 +84,6 @@ export function FormRunner({
 			onErrors={setErrors}
 			onStepChange={onStepChange}
 			page={page}
-			preview={preview}
 			slug={slug}
 		/>
 	);
@@ -118,7 +117,6 @@ function ReviewStep({
 		<div className="space-y-6">
 			<StepHeader
 				description="입력한 내용을 확인하고 제출해주세요."
-				preview={preview}
 				title="신청 내용 확인"
 			/>
 			<ReviewView answers={answers} definition={definition} onEdit={onEdit} />
@@ -155,8 +153,6 @@ interface PageFormProps {
 	onErrors: (errors: Record<string, string>) => void;
 	onStepChange: (step: PageStep) => void;
 	page: PageDef;
-	/** 미리보기: 관리자 화면 안에 들어가므로 제목을 h2로 (h1은 관리자 화면 것 하나) */
-	preview: boolean;
 	slug: string;
 }
 
@@ -169,7 +165,6 @@ function PageForm({
 	onErrors,
 	onStepChange,
 	page,
-	preview,
 	slug,
 }: PageFormProps) {
 	const fields = visibleFieldsOfPage(definition, page, answers);
@@ -188,11 +183,7 @@ function PageForm({
 				goNext();
 			}}
 		>
-			<StepHeader
-				description={page.description}
-				preview={preview}
-				title={page.title}
-			/>
+			<StepHeader description={page.description} title={page.title} />
 			{fields.map((field) => (
 				<DraftField
 					error={errors[field.id]}
@@ -221,21 +212,21 @@ function NextButton() {
 	);
 }
 
+/**
+ * 단계 제목. 화면의 h1은 공개 화면에서는 폼 제목, 미리보기에서는 관리자 화면 제목이라 단계 제목은 늘 h2다.
+ */
 function StepHeader({
 	title,
 	description,
-	preview,
 }: {
 	title: string;
 	description?: string;
-	preview: boolean;
 }) {
-	const Heading = preview ? "h2" : "h1";
 	return (
 		<header className="space-y-2">
-			<Heading className="font-display text-[26px] leading-tight font-bold tracking-[-0.03em] sm:text-[30px]">
+			<h2 className="font-display text-[26px] leading-tight font-bold tracking-[-0.03em] sm:text-[30px]">
 				{title}
-			</Heading>
+			</h2>
 			{description && (
 				<p className="text-muted-foreground leading-relaxed">{description}</p>
 			)}

@@ -13,6 +13,15 @@ import {
 import { getPublicFormFn } from "../../../features/forms/functions/public";
 import { track } from "../../../platform/analytics/client";
 import { pageMeta } from "../../../platform/metadata";
+import {
+	formPath,
+	indexableHead,
+	siteOriginFrom,
+} from "../../../platform/search";
+import {
+	formStructuredData,
+	jsonLdScript,
+} from "../../../platform/structured-data";
 import { PublicShell } from "../../../platform/ui/public-shell";
 
 export const Route = createFileRoute("/f/$slug/")({
@@ -24,12 +33,28 @@ export const Route = createFileRoute("/f/$slug/")({
 		}
 		return result.data;
 	},
-	head: ({ loaderData }) => ({
-		meta: pageMeta({
+	head: ({ matches, loaderData }) => {
+		const meta = pageMeta({
 			title: loaderData?.definition.title ?? "신청서",
 			description: loaderData?.definition.description,
-		}),
-	}),
+		});
+		// 접수 중인 폼만 검색에 노출한다. 마감·접수 전 폼은 root의 noindex를 따른다 (ADR-0023)
+		if (!loaderData || loaderData.status !== "open") {
+			return { meta };
+		}
+		const origin = siteOriginFrom(matches);
+		const search = indexableHead(origin, formPath(loaderData.slug));
+		const form = {
+			slug: loaderData.slug,
+			title: loaderData.definition.title,
+			description: loaderData.definition.description ?? "",
+		};
+		return {
+			meta: [...meta, ...search.meta],
+			links: search.links,
+			scripts: origin ? [jsonLdScript(formStructuredData(origin, form))] : [],
+		};
+	},
 	component: FormPage,
 });
 
@@ -68,9 +93,10 @@ function FormPage() {
 
 	return (
 		<PublicShell>
-			<p className="text-muted-foreground mb-4 text-sm font-semibold">
+			{/* 화면의 주제(검색 결과 제목과 같은 값)는 폼 제목 하나. 단계 제목은 그 아래 h2 */}
+			<h1 className="text-muted-foreground mb-4 text-sm font-semibold">
 				{definition.title}
-			</p>
+			</h1>
 			<FormRunner
 				definition={definition}
 				onStepChange={onStepChange}

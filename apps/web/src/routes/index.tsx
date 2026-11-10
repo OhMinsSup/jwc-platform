@@ -4,18 +4,31 @@ import { ArrowRight, CalendarX } from "lucide-react";
 
 import { listOpenFormsFn } from "../features/forms/functions/public";
 import { pageMeta } from "../platform/metadata";
+import { HOME_PATH, indexableHead, siteOriginFrom } from "../platform/search";
+import { homeStructuredData, jsonLdScript } from "../platform/structured-data";
 import { PublicShell } from "../platform/ui/public-shell";
 
-/** 메신저 공유 미리보기·설명 메타용 문장. 검색 노출은 root의 noindex를 따른다 (ADR-0015) */
+/** 설명 메타·공유 미리보기·구조화 데이터가 함께 쓰는 문장. 홈은 검색에 노출한다 (ADR-0023) */
+const HOME_TITLE = "신청서 목록";
 const HOME_DESCRIPTION =
 	"지금 접수 중인 신청서를 모았습니다. 신청서를 골라 신청하면 신청 내역과 안내를 문자로 보내드립니다.";
 const LIST_HEADING_ID = "open-forms-heading";
 
 export const Route = createFileRoute("/")({
 	loader: () => listOpenFormsFn(),
-	head: () => ({
-		meta: pageMeta({ title: "신청서 목록", description: HOME_DESCRIPTION }),
-	}),
+	head: ({ matches, loaderData }) => {
+		const origin = siteOriginFrom(matches);
+		const search = indexableHead(origin, HOME_PATH);
+		const page = { title: HOME_TITLE, description: HOME_DESCRIPTION };
+		return {
+			meta: [...pageMeta(page), ...search.meta],
+			links: search.links,
+			scripts:
+				origin && loaderData
+					? [jsonLdScript(homeStructuredData(origin, page, loaderData))]
+					: [],
+		};
+	},
 	component: HomePage,
 });
 
