@@ -8,6 +8,18 @@ import { z } from "zod";
 const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
 const PRODUCTION_ENV = "config/env/production/.env";
 const SCRIPTS = z.object({ scripts: z.record(z.string(), z.string()) });
+const TURBO = z.object({
+	tasks: z.record(
+		z.string(),
+		z.object({
+			cache: z.boolean().optional(),
+			interactive: z.boolean().optional(),
+			dependsOn: z.array(z.string()).optional(),
+		}),
+	),
+});
+/** 배포 작업: 앱 스크립트를 turbo가 부른다 (ADR-0024) */
+const DEPLOY_TASKS = ["env:sync", "deploy", "deploy:production"] as const;
 
 function scriptsOf(relativePath: string) {
 	const file = new URL(`../../../${relativePath}`, import.meta.url);
@@ -46,11 +58,22 @@ describe("운영 비밀값 동기화와 배포 스크립트", () => {
 		);
 	});
 
-	it("루트에서도 같은 이름으로 앱 스크립트를 부른다", () => {
+	it("루트는 같은 이름의 turbo 작업으로 앱 스크립트를 부른다", () => {
 		const root = scriptsOf("package.json");
-		expect(root["env:sync"]).toBe("pnpm -C apps/web run env:sync");
-		expect(root["deploy:production"]).toBe(
-			"pnpm -C apps/web run deploy:production",
+		expect(DEPLOY_TASKS.map((task) => root[task])).toStrictEqual(
+			DEPLOY_TASKS.map(
+				// 배포 CLI의 인증(VOID_TOKEN, CLOUDFLARE_API_TOKEN, HOME의 로그인 설정)을 그대로 넘기려고 loose
+				(task) => `turbo run ${task} --filter=web --env-mode=loose`,
+			),
+		);
+	});
+
+	it("turbo 배포 작업은 캐시하지 않고, 확인 프롬프트에 답할 수 있게 대화형으로 돈다", () => {
+		const turbo = TURBO.parse(
+			JSON.parse(readFileSync(`${ROOT}turbo.json`, "utf-8")),
+		);
+		expect(DEPLOY_TASKS.map((task) => turbo.tasks[task])).toStrictEqual(
+			DEPLOY_TASKS.map(() => ({ cache: false, interactive: true })),
 		);
 	});
 

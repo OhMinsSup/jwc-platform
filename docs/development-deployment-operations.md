@@ -198,7 +198,7 @@ pnpm deploy:production
 pnpm -C apps/web exec void project status
 ```
 
-E2E를 처음 실행하는 환경에서는 먼저 `test:e2e:install`을 실행한다. `deploy:production`은 `env:sync`가 성공한 뒤 `deploy`(`void deploy`)를 실행한다. 비밀값이 그대로면 `pnpm -C apps/web run deploy`만 실행해도 된다. 앱 폴더에서 `pnpm deploy`라고 쓰면 스크립트가 아니라 pnpm 내장 명령이 실행되므로 반드시 `run`을 붙인다. `void deploy`는 저장된 배포 대상을 사용하며 빌드·리소스 준비·원격 마이그레이션·Worker 배포를 수행한다. 대상 설정을 마친 후 실행한다. Git 커밋, Worker 버전, 배포 시각과 D1 복구 지점을 값 노출 없이 배포 기록에 남긴다.
+E2E를 처음 실행하는 환경에서는 먼저 `test:e2e:install`을 실행한다. `deploy:production`은 `env:sync`가 성공한 뒤 `deploy`(`void deploy`)를 실행한다. 비밀값이 그대로면 `pnpm run deploy`만 실행해도 된다. 루트·앱 폴더 모두 `pnpm deploy`라고 쓰면 스크립트가 아니라 pnpm 내장 명령이 실행되므로 반드시 `run`을 붙인다. 루트의 `env:sync`·`deploy`·`deploy:production`은 `turbo run <작업> --filter=web --env-mode=loose`로 앱 스크립트를 부른다(ADR-0024). 동기화 확인 프롬프트는 turbo 화면에서 해당 작업을 고른 뒤 입력한다. `void deploy`는 저장된 배포 대상을 사용하며 빌드·리소스 준비·원격 마이그레이션·Worker 배포를 수행한다. 대상 설정을 마친 후 실행한다. Git 커밋, Worker 버전, 배포 시각과 D1 복구 지점을 값 노출 없이 배포 기록에 남긴다.
 
 ### 6.4. 첫 관리자와 운영 확인
 
@@ -225,7 +225,7 @@ E2E를 처음 실행하는 환경에서는 먼저 `test:e2e:install`을 실행�
 1. 변경 diff와 마이그레이션을 리뷰하고 배포할 커밋을 정한다.
 2. CI의 검증·빌드·E2E 성공을 확인한다. CI를 거치지 않은 변경은 같은 검증을 먼저 실행한다.
 3. 대상 계정·Worker, 원격 설정 변경, D1과 Sheets의 복구 준비를 확인한다.
-4. 배포 담당 환경에서 `pnpm deploy:production`(비밀값 변경이 없으면 `pnpm -C apps/web run deploy`)을 실행한다.
+4. 배포 담당 환경에서 `pnpm deploy:production`(비밀값 변경이 없으면 `pnpm run deploy`)을 실행한다.
 5. `void project status`로 활성 버전을 확인하고 위 운영 점검을 변경 범위에 맞춰 수행한다.
 6. 배포 결과·관찰된 문제·복구 지점을 기록한다. 실패 원인을 확인한 뒤 재배포한다.
 

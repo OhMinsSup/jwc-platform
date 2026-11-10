@@ -76,7 +76,7 @@ dotenv는 암호문을 복호화하지 않는다. 이전 암호화 파일을 실
 
 ```bash
 pnpm env:sync            # production/.env → Worker Secrets (키 이름 확인 후 덮어씀)
-pnpm deploy:production   # env:sync 성공 후 void deploy
+pnpm deploy:production   # env:sync 성공 후 void deploy (turbo 작업, ADR-0024)
 ```
 
 개발용 `development/.env`는 운영에 올리지 않는다. 배포 토큰은 배포 프로세스에만 제공한다. 앱 폴더의 배포 스크립트는 `pnpm run deploy`로 부른다(`pnpm deploy`는 pnpm 내장 명령이다).

@@ -20,6 +20,18 @@
 		},
 		"clean": {
 			"cache": false
+		},
+		"env:sync": {
+			"cache": false,
+			"interactive": true
+		},
+		"deploy": {
+			"cache": false,
+			"interactive": true
+		},
+		"deploy:production": {
+			"cache": false,
+			"interactive": true
 		}
 	},
 	"globalPassThroughEnv": ["NODE_ENV", "CI"]

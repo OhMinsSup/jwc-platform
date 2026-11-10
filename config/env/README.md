@@ -26,7 +26,7 @@
 
 `production/.env.example`을 같은 폴더의 `.env`로 복사해 운영 값을 채우고 권한을 `600`으로 둔다. `pnpm env:sync`가 이 파일 하나만 `void secret sync`로 Worker Secrets에 올린다. 모든 키는 `apps/web/env.ts`에 선언돼 있어야 한다. 개발용 `.env`를 운영에 올리는 스크립트는 없다.
 
-배포는 `pnpm deploy:production`(동기화 후 배포)을 사용한다. 비밀값 변경 없이 배포만 할 때는 `pnpm -C apps/web run deploy`를 쓴다. 대상과 등록 절차는 [운영 가이드](../../docs/development-deployment-operations.md#6-최초-운영-배포)를 따른다.
+배포는 `pnpm deploy:production`(동기화 후 배포)을 사용한다. 비밀값 변경 없이 배포만 할 때는 `pnpm run deploy`를 쓴다(루트에서도 `pnpm deploy`는 pnpm 내장 명령). 세 명령 모두 turbo 작업으로 돈다(ADR-0024). 대상과 등록 절차는 [운영 가이드](../../docs/development-deployment-operations.md#6-최초-운영-배포)를 따른다.
 
 ## 값 추가와 보관
 
