@@ -67,17 +67,17 @@ test("SSR 메타데이터를 제공하면서 공개 신청폼도 검색 비노�
 	const response = await page.request.get(FORM_PATH);
 	expect(response.status()).toBe(200);
 	const html = await response.text();
-	expect(html).toContain("<title>E2E 신청서 | JWC 청년부</title>");
+	expect(html).toContain("<title>E2E 신청서 | Formpass</title>");
 	expect(html).toContain('name="robots" content="noindex, nofollow"');
 	expect(html).toContain(
 		'name="description" content="E2E 폼의 신청 안내입니다."',
 	);
 	await openForm(page);
-	await expect(page).toHaveTitle("E2E 신청서 | JWC 청년부");
+	await expect(page).toHaveTitle("E2E 신청서 | Formpass");
 	await expect(page.locator('meta[property="og:title"]')).toHaveCount(1);
 	await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
 		"content",
-		"E2E 신청서 | JWC 청년부",
+		"E2E 신청서 | Formpass",
 	);
 	await expect(
 		page.locator('link[rel="stylesheet"][href^="https://cdn.jsdelivr.net"]'),

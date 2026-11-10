@@ -1,6 +1,8 @@
-# JWC 신청서
+# Formpass
 
-왈라폼처럼 폼을 **데이터(JSON 정의)** 로 구성하는 신청서 서비스. void.cloud(Cloudflare Workers) + TanStack Start.
+폼을 **데이터(JSON 정의)** 로 구성하는 신청 폼 서비스. void.cloud(Cloudflare Workers) + TanStack Start.
+
+> 공개 화면의 서비스 이름은 Formpass(ADR-0022)다. 저장소·패키지 이름(`jwc-form`, `@jwc/*`)과 관리자 로그인·2단계 인증 표기(`JWC 신청서`, `[JWC]`)는 그대로 둔다.
 
 - 폼 구성 데이터 → D1 (불변 버전으로 발행)
 - 응답 → 응답 저장소 어댑터 (기본 Google Sheets = 주 DB, 폼마다 탭 1개). 운영자가 시트에서 고친 값(납입 여부 등)이 그대로 원본이다

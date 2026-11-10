@@ -137,4 +137,5 @@
 - 툴체인은 Vite+(포맷/린트/테스트) + tsrs(타입) + syncpack + knip. 결정 기록은 `docs/adr/0005`.
 - 공용 패키지(`common`, `google`, `submission-store`, `observability`, `security`, `analytics`, `ui-patterns`)와 앱의 기능 단위 구조(`features/`, `platform/`), 의존 방향은 `docs/adr/0007`.
 - 디자인 언어(토큰, 글꼴, 셸, 안내 상자 `Callout`)는 `docs/adr/0008`. 색은 상태·데이터에만 쓰고, 안내/오류 상자는 손으로 만들지 않고 `Callout`을 쓴다. 날짜/시각 입력은 `DatePicker`/`TimePicker`/`DateTimePicker`, 표시는 `DateTimeText`를 쓴다 (네이티브 date 입력·문자열 slice 금지).
+- 서비스 이름(Formpass)·앱 아이콘·OG 이미지는 `docs/adr/0022`. 이름은 `apps/web/src/platform/brand.ts`, 이미지는 `public/favicon.svg`에서 `pnpm -C apps/web brand:images`로 파생한다. 관리자 인증 표기(JWC)는 바꾸지 않는다.
 - 패키지별 규칙: `apps/web/AGENTS.md`, `packages/form-core/AGENTS.md`, `packages/ui/AGENTS.md`.

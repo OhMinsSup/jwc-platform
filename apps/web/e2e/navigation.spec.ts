@@ -30,7 +30,7 @@ for (const fail of [false, true]) {
 		}
 		await expect(
 			page.getByRole("heading", {
-				name: fail ? "문제가 발생했습니다" : "행사 신청은 여기에서",
+				name: fail ? "문제가 발생했습니다" : "신청은 여기에서",
 			}),
 		).toBeVisible();
 		await expect(page.getByRole("status", { name: "페이지 이동" })).toHaveCount(

@@ -1,87 +1,106 @@
-import { Button } from "@jwc/ui/components/button";
+import { EmptyState } from "@jwc/ui-patterns/components/empty-state";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, CalendarX } from "lucide-react";
 
 import { listOpenFormsFn } from "../features/forms/functions/public";
 import { pageMeta } from "../platform/metadata";
 import { PublicShell } from "../platform/ui/public-shell";
 
+/** 메신저 공유 미리보기·설명 메타용 문장. 검색 노출은 root의 noindex를 따른다 (ADR-0015) */
+const HOME_DESCRIPTION =
+	"지금 접수 중인 신청서를 모았습니다. 신청서를 골라 신청하면 신청 내역과 안내를 문자로 보내드립니다.";
+const LIST_HEADING_ID = "open-forms-heading";
+
 export const Route = createFileRoute("/")({
 	loader: () => listOpenFormsFn(),
-	head: () => ({ meta: pageMeta({ title: "행사 신청" }) }),
+	head: () => ({
+		meta: pageMeta({ title: "신청서 목록", description: HOME_DESCRIPTION }),
+	}),
 	component: HomePage,
 });
 
 type OpenForm = Awaited<ReturnType<typeof listOpenFormsFn>>[number];
 
 /**
- * 공개 첫 화면 (typie 히어로 구조): 가운데 큰 제목 + 한 줄 설명 + 큰 수치(접수 중인 신청서 수),
- * 그 아래 신청서 카드 목록. 수치는 실제 목록 길이에서만 나온다.
+ * 공개 첫 화면: 짧은 소개 → "접수 중인 신청서" 목록. 목록이 첫 화면 안에 보이도록 소개는 낮게 둔다.
+ * 개수는 실제 목록 길이에서만 나온다.
  */
 function HomePage() {
 	const forms = Route.useLoaderData();
 	return (
 		<PublicShell width="max-w-3xl">
-			<Hero openCount={forms.length} />
-			{forms.length === 0 ? (
-				<p className="bg-card text-muted-foreground rounded-xl border px-6 py-10 text-center">
-					지금 접수 중인 신청서가 없습니다. 새 행사가 열리면 여기에 보입니다.
-				</p>
-			) : (
-				<ul className="grid gap-3">
-					{forms.map((form) => (
-						<FormCard form={form} key={form.slug} />
-					))}
-				</ul>
-			)}
+			<Intro />
+			<section aria-labelledby={LIST_HEADING_ID} className="mt-10 sm:mt-14">
+				<div className="mb-3 flex items-baseline justify-between px-1">
+					<h2 className="text-[15px] font-semibold" id={LIST_HEADING_ID}>
+						접수 중인 신청서
+					</h2>
+					<span className="text-faint-foreground text-[13px] tabular-nums">
+						{forms.length}개
+					</span>
+				</div>
+				{forms.length === 0 ? (
+					<EmptyState
+						description="새 행사가 열리면 여기에 보입니다."
+						icon={CalendarX}
+						title="지금 접수 중인 신청서가 없습니다"
+					/>
+				) : (
+					<ul className="grid gap-3">
+						{forms.map((form) => (
+							<FormCard form={form} key={form.slug} />
+						))}
+					</ul>
+				)}
+			</section>
 		</PublicShell>
 	);
 }
 
-function Hero({ openCount }: { openCount: number }) {
+function Intro() {
 	return (
-		<section className="flex flex-col items-center pt-10 pb-14 text-center sm:pt-16 sm:pb-20">
-			<h1 className="font-display text-[34px] leading-[1.2] font-bold tracking-[-0.03em] text-balance sm:text-[52px]">
-				행사 신청은 여기에서
+		<section className="flex flex-col items-center pt-6 text-center sm:pt-12">
+			<h1 className="font-display text-[32px] leading-[1.2] font-bold tracking-[-0.03em] text-balance sm:text-[44px]">
+				신청은 여기에서
 			</h1>
-			<p className="text-muted-foreground mt-4 max-w-md text-base leading-relaxed text-pretty sm:text-lg">
-				죽전우리교회 청년부 행사를 골라 신청하세요. 신청 내역과 회비 안내는
-				문자로 보내드립니다.
+			<p className="text-muted-foreground mt-3 max-w-md text-base leading-relaxed text-pretty sm:mt-4 sm:text-lg">
+				접수 중인 신청서를 골라 신청하세요. 신청 내역과 안내는 문자로
+				보내드립니다.
 			</p>
-			<div className="mt-10 flex flex-col items-center">
-				<span className="font-display text-[40px] leading-none font-semibold tabular-nums">
-					{openCount}
-					<span className="text-muted-foreground ml-1 text-xl font-medium">
-						개
-					</span>
-				</span>
-				<span className="text-faint-foreground mt-2 text-[13px]">
-					지금 접수 중인 신청서
-				</span>
-			</div>
 		</section>
 	);
 }
 
+/**
+ * 카드 전체가 눌리는 자리. 링크는 제목 하나에만 두고 after로 카드 전체를 덮는다
+ * (화면 낭독기에는 "제목" 링크 하나로 읽힌다). "신청하기"는 보이는 단서일 뿐이라 숨긴다.
+ */
 function FormCard({ form }: { form: OpenForm }) {
 	return (
-		<li className="bg-card flex flex-col gap-4 rounded-xl border p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+		<li className="group bg-card hover:border-border-strong relative flex flex-col gap-4 rounded-xl border p-5 transition-colors sm:flex-row sm:items-center sm:justify-between sm:p-6">
 			<div className="min-w-0">
-				<h2 className="text-lg font-bold tracking-[-0.02em]">{form.title}</h2>
+				<h3 className="text-lg font-bold tracking-[-0.02em]">
+					<Link
+						className="focus-visible:after:ring-ring after:absolute after:inset-0 after:rounded-xl focus-visible:outline-none focus-visible:after:ring-2"
+						params={{ slug: form.slug }}
+						to="/f/$slug"
+					>
+						{form.title}
+					</Link>
+				</h3>
 				{form.description && (
 					<p className="text-muted-foreground mt-1 line-clamp-2 text-[15px]">
 						{form.description}
 					</p>
 				)}
 			</div>
-			<Button
-				className="h-10 shrink-0 rounded-full px-5 text-[15px] font-semibold"
-				nativeButton={false}
-				render={<Link params={{ slug: form.slug }} to="/f/$slug" />}
+			<span
+				aria-hidden
+				className="bg-primary text-primary-foreground inline-flex h-10 shrink-0 items-center gap-1.5 self-start rounded-full px-5 text-[15px] font-semibold sm:self-auto"
 			>
 				신청하기
-				<ArrowRight className="size-4" />
-			</Button>
+				<ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+			</span>
 		</li>
 	);
 }

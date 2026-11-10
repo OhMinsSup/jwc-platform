@@ -17,6 +17,7 @@ import {
 } from "../../../../../features/forms/functions/admin";
 import { FormStatusBadge } from "../../../../../features/forms/ui/form-status-badge";
 import { FormTabs } from "../../../../../features/forms/ui/form-tabs";
+import { BRAND_NAME } from "../../../../../platform/brand";
 import { ADMIN_LOADER_STALE_TIME_MS } from "../../../../../platform/route-cache";
 
 /** 폼 안의 모든 화면(편집/미리보기/응답)이 공유하는 머리: 위치, 상태, 폼 단위 동작, 탭 */
@@ -30,7 +31,7 @@ export const Route = createFileRoute("/admin/_console/forms/$formId")({
 	},
 	staleTime: ADMIN_LOADER_STALE_TIME_MS,
 	head: ({ loaderData }) => ({
-		meta: [{ title: `${loaderData?.title ?? "폼"} · JWC 신청서` }],
+		meta: [{ title: `${loaderData?.title ?? "폼"} · ${BRAND_NAME}` }],
 	}),
 	component: FormLayout,
 });

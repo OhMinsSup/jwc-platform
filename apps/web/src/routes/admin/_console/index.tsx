@@ -7,11 +7,12 @@ import { listFormsFn } from "../../../features/forms/functions/admin";
 import { CreateFormDialog } from "../../../features/forms/ui/create-form-dialog";
 import { FormList } from "../../../features/forms/ui/form-list";
 import type { FormSummary } from "../../../features/forms/ui/form-list";
+import { BRAND_NAME } from "../../../platform/brand";
 import { formatCount } from "../../../platform/format";
 import { ADMIN_LOADER_STALE_TIME_MS } from "../../../platform/route-cache";
 
 export const Route = createFileRoute("/admin/_console/")({
-	head: () => ({ meta: [{ title: "폼 · JWC 신청서" }] }),
+	head: () => ({ meta: [{ title: `폼 · ${BRAND_NAME}` }] }),
 	loader: () => listFormsFn(),
 	staleTime: ADMIN_LOADER_STALE_TIME_MS,
 	component: FormsPage,
