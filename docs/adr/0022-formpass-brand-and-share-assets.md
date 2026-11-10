@@ -3,6 +3,7 @@
 - 상태: 채택
 - 작성일: 2026-11-10
 - 관련: ADR-0008(디자인 언어), ADR-0015(메타데이터·검색 비노출)
+- 변경: ADR-0015의 "robots.txt 전체 차단"을 "검색엔진 전체 차단 + 링크 미리보기 수집기만 공개 화면 허용"으로 좁힌다
 
 ## Problem 1-Pager
 
@@ -16,8 +17,10 @@
 
 - 이름 **Formpass** (form + pass). 체크가 찍힌 접수표 = 통과한 신청. 사용자가 "JWC가 아닌 개발자다운 이름, 아이콘과 맞는 것"을 요청해 정했다. 이름·소개는 `apps/web/src/platform/brand.ts` 한 곳.
 - **유지**: Better Auth `appName`/TOTP `issuer`("JWC 신청서")와 인증 문자 머리말 `[JWC]`. 사용자 결정이며, issuer를 바꾸면 이미 등록한 인증 앱의 표시와 개발용 관리자 스크립트가 어긋난다.
-- 아이콘 원본은 `public/favicon.svg`(라이트/다크 미디어 규칙 포함). 래스터(ico 16/32/48, 192/512, maskable 512, apple-touch 180)와 `og-image.png`(1200×630)는 `pnpm -C apps/web brand:images`가 Playwright로 그린다. 화면의 `TicketMark`/`AppIcon`과 같은 경로·배치인지 단위 테스트가 확인한다.
-- `og:image`는 메신저 수집기가 상대 주소를 읽지 못해 `SITE_URL` 출처로 절대 주소를 만든다(root 로더의 공개 설정 `siteOrigin`). 출처가 http(s)가 아니면 이미지 메타를 내보내지 않는다. 카드 형식은 `summary_large_image`.
+- 아이콘 원본은 `public/favicon.svg`(라이트/다크 미디어 규칙 포함). 래스터(ico 16/32/48, 192/512, maskable 512, apple-touch 180)와 `og-image.png`(1200×630)는 `pnpm -C apps/web brand:images`가 Playwright로 그린다. 화면의 `AppIcon`(머리·바닥·관리자 사이드바·로그인 카드 공통)과 같은 경로·배치인지 단위 테스트가 확인한다.
+- `og:image`는 메신저 수집기가 상대 주소를 읽지 못해 `SITE_URL` 출처로 절대 주소를 만든다(root 로더의 공개 설정 `siteOrigin`, 환경 스키마가 URL로 검증). 카드 종류(`twitter:card`)는 이미지와 함께 `shareCardMeta`가 root에서만 정한다. 출처를 모르면(로더 실패) 이미지 없는 큰 카드가 되지 않게 `summary`로 둔다. 하위 화면의 `pageMeta`는 카드 종류를 두지 않는다(HeadContent는 하위 값이 이긴다).
+- robots.txt: X·Slack·Facebook·카카오톡·Discord·Telegram의 링크 미리보기 수집기는 robots.txt를 지키며, 이미지뿐 아니라 공유된 페이지 자체를 읽어야 카드를 만든다. 그래서 이 수집기들에만 `Allow: /`를 주고, 개인정보 화면(`/r/`, `/admin`, `PRIVATE_PATHS`)은 그들에게도 막는다. 그 밖의 수집기(`*`)는 계속 `Disallow: /`이고, 모든 화면의 `noindex` 메타도 유지한다. 테스트가 두 묶음과 `PRIVATE_PATHS` 대응을 확인한다.
+- 화면 바탕색(라이트/다크)은 `BRAND_THEME_COLORS` 한 곳에 두고 theme-color·manifest·OG 이미지가 쓴다. meta는 CSS 변수를 읽지 못하므로 `styles.css`의 `--background`와 같은지 테스트로 확인한다.
 - `theme-color` 라이트/다크 한 쌍은 `HeadContent`가 같은 name의 meta를 하나만 남기므로 root 문서 `<head>`에 직접 둔다.
 
 ## 대안

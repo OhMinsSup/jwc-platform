@@ -1,4 +1,15 @@
 # https://www.robotstxt.org/robotstxt.html
+# 검색 노출은 하지 않는다 (ADR-0015). 링크 미리보기 수집기만 공개 화면과 공유 이미지를 읽게 한다 (ADR-0022).
+# 신청 내역(/r/)·관리자(/admin)는 미리보기 수집기에도 막는다 (security/policy.ts의 PRIVATE_PATHS).
+User-agent: Twitterbot
+User-agent: Slackbot
+User-agent: facebookexternalhit
+User-agent: kakaotalk-scrap
+User-agent: Discordbot
+User-agent: TelegramBot
+Disallow: /r/
+Disallow: /admin
+Allow: /
+
 User-agent: *
 Disallow: /
-

@@ -11,3 +11,12 @@ export const BRAND_TAGLINE = "신청 폼부터 접수 안내까지";
 /** 페이지별 설명이 없을 때 쓰는 기본 설명 (공유 미리보기) */
 export const BRAND_DESCRIPTION =
 	"신청 폼을 만들고 접수와 안내 문자까지 한 곳에서 처리하는 신청 폼 서비스입니다.";
+
+/**
+ * 화면 바탕(styles.css의 --background) 라이트/다크 값. meta theme-color·manifest·OG 이미지가 쓴다.
+ * meta 태그는 CSS 변수를 읽지 못해 값으로 둔다 (test/brand-assets.test.ts가 styles.css와 일치를 확인).
+ */
+export const BRAND_THEME_COLORS = {
+	light: "#f9fafd",
+	dark: "#0a0b0e",
+} as const;

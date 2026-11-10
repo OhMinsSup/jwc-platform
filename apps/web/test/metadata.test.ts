@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vite-plus/test";
 
 import { BRAND_DESCRIPTION } from "../src/platform/brand";
-import { pageMeta, shareImageMeta } from "../src/platform/metadata";
+import { pageMeta, shareCardMeta } from "../src/platform/metadata";
 
 describe(pageMeta, () => {
 	it("페이지 제목과 일반·공유 설명을 같은 값으로 만든다", () => {
@@ -38,27 +38,30 @@ describe(pageMeta, () => {
 		});
 	});
 
-	it("공유 미리보기는 큰 이미지 카드로 보인다", () => {
-		expect(pageMeta({ title: "신청" })).toContainEqual({
+	it("카드 종류는 이미지와 함께 정하도록 남겨 둔다 (하위 화면이 root의 카드를 덮지 않게)", () => {
+		const meta = pageMeta({ title: "신청" });
+		expect(meta.some((m) => "name" in m && m.name === "twitter:card")).toBe(
+			false,
+		);
+	});
+});
+
+describe(shareCardMeta, () => {
+	const ORIGIN = "https://forms.example.org";
+	const IMAGE = `${ORIGIN}/og-image.png`;
+
+	it("사이트 출처로 이미지의 절대 주소를 만들고 큰 이미지 카드로 선언한다", () => {
+		const meta = shareCardMeta(ORIGIN);
+		expect(meta).toContainEqual({ property: "og:image", content: IMAGE });
+		expect(meta).toContainEqual({ name: "twitter:image", content: IMAGE });
+		expect(meta).toContainEqual({
 			name: "twitter:card",
 			content: "summary_large_image",
 		});
 	});
-});
 
-describe(shareImageMeta, () => {
-	it("메신저가 읽을 수 있게 사이트 출처로 절대 주소를 만든다", () => {
-		const meta = shareImageMeta("https://forms.example.org");
-		for (const key of ["og:image", "twitter:image"]) {
-			expect(meta).toContainEqual(
-				expect.objectContaining({
-					content: "https://forms.example.org/og-image.png",
-				}),
-			);
-			expect(
-				meta.some((m) => ("property" in m ? m.property : m.name) === key),
-			).toBe(true);
-		}
+	it("이미지 크기를 함께 알린다", () => {
+		const meta = shareCardMeta(ORIGIN);
 		expect(meta).toContainEqual({
 			property: "og:image:width",
 			content: "1200",
@@ -69,10 +72,12 @@ describe(shareImageMeta, () => {
 		});
 	});
 
-	it.each(["", "not a url", "ftp://files.example.org"])(
-		"출처가 http(s) 주소가 아니면 이미지 메타를 만들지 않는다: %s",
+	it.each([undefined, ""])(
+		"출처를 모르면(로더 실패) 이미지 없이 기본 카드만 선언한다: %s",
 		(origin) => {
-			expect(shareImageMeta(origin)).toStrictEqual([]);
+			expect(shareCardMeta(origin)).toStrictEqual([
+				{ name: "twitter:card", content: "summary" },
+			]);
 		},
 	);
 });

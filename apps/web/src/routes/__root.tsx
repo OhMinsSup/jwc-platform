@@ -7,8 +7,9 @@ import {
 } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 
+import { BRAND_THEME_COLORS } from "../platform/brand";
 import { getClientConfigFn } from "../platform/functions/client-config";
-import { pageMeta, shareImageMeta } from "../platform/metadata";
+import { pageMeta, shareCardMeta } from "../platform/metadata";
 import { AnalyticsBridge } from "../platform/ui/analytics-bridge";
 import { NavigationProgress } from "../platform/ui/navigation-progress";
 
@@ -24,8 +25,8 @@ export const Route = createRootRoute({
 			{ name: "viewport", content: "width=device-width, initial-scale=1" },
 			{ name: "robots", content: "noindex, nofollow" },
 			...pageMeta({ title: "신청서" }),
-			// 하위 화면은 이미지 메타를 두지 않으므로 모든 화면의 공유 미리보기가 이 이미지를 쓴다
-			...shareImageMeta(loaderData?.siteOrigin ?? ""),
+			// 하위 화면은 카드 종류·이미지 메타를 두지 않으므로 모든 화면의 공유 미리보기가 이 카드를 쓴다
+			...shareCardMeta(loaderData?.siteOrigin),
 		],
 		links: [
 			{
@@ -63,12 +64,12 @@ function RootDocument({ children }: { children: ReactNode }) {
 				{/* 주소창·탭 색을 화면 바탕(--background)에 맞춘다. HeadContent는 같은 name의 meta를
 				    하나만 남기므로 라이트/다크 한 쌍은 여기에 직접 둔다 */}
 				<meta
-					content="#f9fafd"
+					content={BRAND_THEME_COLORS.light}
 					media="(prefers-color-scheme: light)"
 					name="theme-color"
 				/>
 				<meta
-					content="#0a0b0e"
+					content={BRAND_THEME_COLORS.dark}
 					media="(prefers-color-scheme: dark)"
 					name="theme-color"
 				/>
