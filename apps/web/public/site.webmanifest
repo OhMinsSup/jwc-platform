@@ -1,0 +1,20 @@
+{
+	"name": "Formpass",
+	"short_name": "Formpass",
+	"description": "신청 폼을 만들고 접수와 안내 문자까지 한 곳에서 처리하는 신청 폼 서비스입니다.",
+	"lang": "ko",
+	"start_url": "/",
+	"display": "browser",
+	"background_color": "#f9fafd",
+	"theme_color": "#f9fafd",
+	"icons": [
+		{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+		{ "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+		{
+			"src": "/icon-maskable-512.png",
+			"sizes": "512x512",
+			"type": "image/png",
+			"purpose": "maskable"
+		}
+	]
+}
