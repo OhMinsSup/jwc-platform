@@ -1,13 +1,14 @@
 import type { FormDefinition } from "@jwc/form-core/definition/definition";
+import type { LiveRegionHandle } from "@jwc/ui-patterns/components/live-region";
 import { useBlocker } from "@tanstack/react-router";
 import {
 	useCallback,
 	useDeferredValue,
 	useEffect,
 	useMemo,
-	useRef,
 	useState,
 } from "react";
+import type { RefObject } from "react";
 import { useStore } from "zustand";
 
 import { buildIndex } from "../model/derive";
@@ -21,17 +22,6 @@ import type { SaveState } from "./toolbar";
 export type CommandOutcome =
 	| { ok: true; message: string }
 	| { ok: false; message: string };
-
-/** LiveRegion이 등록한 알림 함수를 보관 (알림 상태는 LiveRegion 안에만 있다) */
-function useAnnouncer() {
-	const announceRef = useRef<(message: string) => void>(() => {
-		// LiveRegion이 등록되기 전의 알림은 버린다
-	});
-	const registerAnnouncer = useCallback((fn: (message: string) => void) => {
-		announceRef.current = fn;
-	}, []);
-	return { announceRef, registerAnnouncer };
-}
 
 const ID_KEY_SEPARATOR = ",";
 
@@ -59,6 +49,8 @@ function useStableIds(ids: readonly string[]): readonly string[] {
 export function useEditorState(
 	initial: FormDefinition,
 	lockedFieldIds: readonly string[],
+	/** 화면 낭독기 알림 영역. 마운트 전·해제 후(null)의 알림은 버린다 (알림 상태는 LiveRegion 안에만 있다) */
+	announcer: RefObject<LiveRegionHandle | null>,
 ) {
 	// oxlint-disable-next-line react/hook-use-state -- store는 마운트 동안 교체하지 않는다. useState로 인스턴스 수명을 보장한다.
 	const [editor] = useState(() => createEditorStore(initial));
@@ -78,17 +70,16 @@ export function useEditorState(
 		[deferred],
 	);
 
-	const { announceRef, registerAnnouncer } = useAnnouncer();
 	// 잠긴 id의 "내용"이 바뀔 때만 actions를 새로 만든다 (Actions 컨텍스트는 마운트 동안 사실상 불변)
 	const stableLockedIds = useStableIds(lockedFieldIds);
 	const actions = useMemo<EditorActions>(
 		() => ({
 			dispatch: editor.dispatch,
 			getDefinition: editor.getDefinition,
-			announce: (message) => announceRef.current(message),
+			announce: (message) => announcer.current?.announce(message),
 			lockedFieldIds: new Set(stableLockedIds),
 		}),
-		[editor, announceRef, stableLockedIds],
+		[editor, announcer, stableLockedIds],
 	);
 	return {
 		definition,
@@ -99,7 +90,6 @@ export function useEditorState(
 		index,
 		issues,
 		actions,
-		registerAnnouncer,
 	};
 }
 

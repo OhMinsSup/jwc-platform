@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 import type { FormDefinition } from "@jwc/form-core/definition/definition";
 import { blankDefinition } from "@jwc/form-core/samples/blank";
-import { act, createElement } from "react";
+import type { LiveRegionHandle } from "@jwc/ui-patterns/components/live-region";
+import { act, createElement, useRef } from "react";
 import { createRoot } from "react-dom/client";
 import {
 	afterEach,
@@ -26,7 +27,8 @@ interface HarnessProps {
 }
 
 function Harness({ initial, onSave }: HarnessProps) {
-	const session = useEditorState(initial, []);
+	const announcer = useRef<LiveRegionHandle>(null);
+	const session = useEditorState(initial, [], announcer);
 	const commands = useEditorCommands({
 		...session,
 		markSaved: session.setSaved,

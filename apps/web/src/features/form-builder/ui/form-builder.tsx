@@ -1,5 +1,6 @@
 import type { FormDefinition } from "@jwc/form-core/definition/definition";
 import { LiveRegion } from "@jwc/ui-patterns/components/live-region";
+import type { LiveRegionHandle } from "@jwc/ui-patterns/components/live-region";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -17,7 +18,7 @@ import {
 	TabsList,
 	TabsTrigger,
 } from "@jwc/ui/components/tabs";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import type { ReactNode } from "react";
 
 import { buildIndex } from "../model/derive";
@@ -232,7 +233,8 @@ export function FormBuilder({
 	onSave,
 	onPublish,
 }: FormBuilderProps) {
-	const session = useEditorState(initial, lockedFieldIds);
+	const announcer = useRef<LiveRegionHandle>(null);
+	const session = useEditorState(initial, lockedFieldIds, announcer);
 	const [tab, setTab] = useState<Tab>("questions");
 	const cards = useOpenCards();
 	const showIssues = useShowIssues(session.getDefinition, cards, setTab);
@@ -249,7 +251,7 @@ export function FormBuilder({
 	const { publish: handlePublish, save: handleSave } = commands;
 	return (
 		<EditorProviders session={session}>
-			<LiveRegion register={session.registerAnnouncer} />
+			<LiveRegion ref={announcer} />
 			<Tabs
 				onValueChange={(value) => {
 					if (isTab(value)) {
