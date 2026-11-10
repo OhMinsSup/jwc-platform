@@ -12,7 +12,8 @@ import type { ReactNode } from "react";
 
 import { resetAnalytics } from "../analytics/client";
 import { authClient } from "../auth-client";
-import { TicketMark } from "./brand-mark";
+import { BRAND_NAME } from "../brand";
+import { AppIcon } from "./brand-mark";
 
 /** 사이드바 메뉴. 화면이 늘면 이 표에 한 줄 추가한다 */
 const NAV_ITEMS = [
@@ -47,11 +48,13 @@ function BrandMark() {
 			className="focus-visible:ring-ring flex items-center gap-2.5 rounded-md focus-visible:ring-2 focus-visible:outline-none"
 			to="/admin"
 		>
-			<TicketMark className="h-7 w-7 shrink-0" />
+			<AppIcon className="h-7 w-7 shrink-0" />
 			<span className="leading-tight">
-				<span className="block text-[15px] font-bold">JWC 신청서</span>
+				<span className="font-display block text-[15px] font-bold tracking-[-0.02em]">
+					{BRAND_NAME}
+				</span>
 				<span className="text-muted-foreground block text-[13px]">
-					죽전우리교회 청년부
+					관리자 콘솔
 				</span>
 			</span>
 		</Link>

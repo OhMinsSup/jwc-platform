@@ -44,7 +44,7 @@ const PAGE_TEMPLATES: PageTemplate[] = [
 	{
 		name: "home",
 		path: "/",
-		heading: "행사 신청은 여기에서",
+		heading: "신청은 여기에서",
 		interaction: "home",
 	},
 	{ name: "form", path: FORM, heading: "기본 정보", interaction: "form" },

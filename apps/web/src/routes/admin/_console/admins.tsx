@@ -14,11 +14,12 @@ import {
 	InvitesTable,
 } from "../../../features/admin-access/ui/admin-access-tables";
 import { InviteForm } from "../../../features/admin-access/ui/invite-form";
+import { BRAND_NAME } from "../../../platform/brand";
 import { ADMIN_LOADER_STALE_TIME_MS } from "../../../platform/route-cache";
 
 /** 관리자 초대와 최근 활동(감사 기록). 두 목록은 따로 실패할 수 있어 결과 값 그대로 받는다 */
 export const Route = createFileRoute("/admin/_console/admins")({
-	head: () => ({ meta: [{ title: "관리자 · JWC 신청서" }] }),
+	head: () => ({ meta: [{ title: `관리자 · ${BRAND_NAME}` }] }),
 	loader: async () => {
 		const [invites, audit] = await Promise.all([
 			listInvitesFn(),

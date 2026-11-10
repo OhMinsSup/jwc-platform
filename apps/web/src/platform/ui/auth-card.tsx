@@ -8,7 +8,7 @@ import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import type { ReactNode, SubmitEvent } from "react";
 
-import { TicketMark } from "./brand-mark";
+import { AppIcon } from "./brand-mark";
 
 export interface AuthFieldDef {
 	autoComplete: string;
@@ -87,7 +87,7 @@ function AuthHeading({
 }) {
 	return (
 		<div>
-			<TicketMark className="text-foreground mx-auto mb-6 h-8 w-8" />
+			<AppIcon className="mx-auto mb-6 h-10 w-10" />
 			<h1 className="text-2xl font-extrabold tracking-[-0.02em]">{title}</h1>
 			{description && (
 				<p className="text-muted-foreground mt-1 text-sm">{description}</p>
