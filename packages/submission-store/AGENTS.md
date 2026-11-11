@@ -7,7 +7,7 @@
 ## 규칙
 
 - 앱(`apps/*`)을 import하지 않는다 (린트로 강제).
-- 서비스는 `SubmissionStore` 포트(`.`)에만 의존한다. 어댑터는 공급자 오류를 `SubmissionStoreError`(unavailable/forbidden/layout/not_found)로 바꿔 던진다.
+- 서비스는 `SubmissionStore` 포트(`.`)에만 의존한다. 한 폼의 공간에 묶어 쓸 때는 `./bound`의 `bindSubmissionStore`를 쓴다. 어댑터는 공급자 오류를 `SubmissionStoreError`(unavailable/forbidden/layout/not_found)로 바꿔 던진다.
 - 유니크 판정/동시 쓰기 직렬화는 저장소 책임이 아니다 (앱의 D1 `submission_keys`가 맡는다).
 - `paid`를 생략한 쓰기는 기존 값을 보존해야 한다 (운영자가 시트에서 바꾼 납입 여부).
 

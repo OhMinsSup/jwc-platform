@@ -24,7 +24,7 @@ class FailingSheets extends FakeSheets {
 		super();
 		this.error = error;
 	}
-	override listSheetTitles(): Promise<never> {
+	override listSheets(): Promise<never> {
 		return Promise.reject(this.error);
 	}
 	override getValues(): Promise<never> {

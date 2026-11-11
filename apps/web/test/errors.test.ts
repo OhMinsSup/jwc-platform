@@ -51,6 +51,15 @@ describe(classifyError, () => {
 		expect(failure.internalMessage).toContain("권한 없음");
 	});
 
+	it("회귀: 내부 문장에 원인(cause) 사슬을 남긴다 (DB 드라이버 오류는 원인에만 이유가 있다)", () => {
+		const driver = new Error("D1_ERROR: no such column: spreadsheet_id");
+		const query = new Error("Failed query: update forms …", { cause: driver });
+		const failure = classifyError(query);
+		expect(failure.internalMessage).toContain("Failed query");
+		expect(failure.internalMessage).toContain("no such column: spreadsheet_id");
+		expect(failure.userMessage).toBe(ERROR_CATALOG.internal.defaultMessage);
+	});
+
 	it("문자 발송 오류는 재시도 가능 여부로 나뉜다", () => {
 		expect(classifyError(new SmsSendError("x", true)).code).toBe(
 			"upstream_unavailable",

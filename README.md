@@ -63,20 +63,20 @@ AI·자동 검증은 실제 `.env`를 사용하지 않고 `pnpm test`, `pnpm -C 
 
 커밋 시 스테이징 파일에 `vp check --fix`가 자동 실행된다. 툴체인 결정: `docs/adr/0005-*.md`
 
-| 변수                                                   | 설명                                                                                 |
-| ------------------------------------------------------ | ------------------------------------------------------------------------------------ |
-| `SITE_URL`                                             | 공개 주소 (로컬은 `http://localhost:5173`)                                           |
-| `BETTER_AUTH_SECRET`                                   | `openssl rand -hex 32`                                                               |
-| `ADMIN_PHONES`                                         | 관리자별 SMS 인증 번호. `admin@example.org=01012345678` 형식으로 쉼표 구분           |
-| `ADMIN_EMAILS`                                         | 관리자 이메일, 쉼표 구분                                                             |
-| `ADMIN_SIGNUP_ENABLED`                                 | 첫 관리자 부트스트랩 허용 (계정이 0개일 때만 초대 코드 없이 가입). 이후 `false` 권장 |
-| `DATA_KEY`                                             | `openssl rand -base64 32` (분실 시 연락처 복호화 불가)                               |
-| `GOOGLE_SERVICE_ACCOUNT_EMAIL`, `GOOGLE_PRIVATE_KEY`   | 서비스 계정 JSON의 값                                                                |
-| `GOOGLE_SPREADSHEET_ID`                                | 응답 스프레드시트 ID. 서비스 계정에 편집 권한 공유 필수                              |
-| `SMS_MODE`                                             | `log`(기본, 발송 안 함) / `live`                                                     |
-| `SOLAPI_API_KEY`, `SOLAPI_API_SECRET`, `SOLAPI_SENDER` | `SMS_MODE=live`일 때 필수                                                            |
-| `POSTHOG_KEY`, `POSTHOG_HOST`                          | 선택. PostHog 분석/오류 추적/리플레이 (키가 없으면 아무것도 보내지 않음)             |
-| `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`           | 선택. 둘 다 있으면 공개 제출에 Cloudflare Turnstile 확인                             |
+| 변수                                                   | 설명                                                                                   |
+| ------------------------------------------------------ | -------------------------------------------------------------------------------------- |
+| `SITE_URL`                                             | 공개 주소 (로컬은 `http://localhost:5173`)                                             |
+| `BETTER_AUTH_SECRET`                                   | `openssl rand -hex 32`                                                                 |
+| `ADMIN_PHONES`                                         | 관리자별 SMS 인증 번호. `admin@example.org=01012345678` 형식으로 쉼표 구분             |
+| `ADMIN_EMAILS`                                         | 관리자 이메일, 쉼표 구분                                                               |
+| `ADMIN_SIGNUP_ENABLED`                                 | 첫 관리자 부트스트랩 허용 (계정이 0개일 때만 초대 코드 없이 가입). 이후 `false` 권장   |
+| `DATA_KEY`                                             | `openssl rand -base64 32` (분실 시 연락처 복호화 불가)                                 |
+| `GOOGLE_SERVICE_ACCOUNT_EMAIL`, `GOOGLE_PRIVATE_KEY`   | 서비스 계정 JSON의 값                                                                  |
+| `GOOGLE_SPREADSHEET_ID`                                | 기본 응답 스프레드시트 ID(폼 설정에서 폼별로 바꿀 수 있음). 서비스 계정 편집 권한 필수 |
+| `SMS_MODE`                                             | `log`(기본, 발송 안 함) / `live`                                                       |
+| `SOLAPI_API_KEY`, `SOLAPI_API_SECRET`, `SOLAPI_SENDER` | `SMS_MODE=live`일 때 필수                                                              |
+| `POSTHOG_KEY`, `POSTHOG_HOST`                          | 선택. PostHog 분석/오류 추적/리플레이 (키가 없으면 아무것도 보내지 않음)               |
+| `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`           | 선택. 둘 다 있으면 공개 제출에 Cloudflare Turnstile 확인                               |
 
 ## 배포
 

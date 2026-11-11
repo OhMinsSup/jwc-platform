@@ -6,6 +6,7 @@
 	"type": "module",
 	"exports": {
 		".": "./src/port.ts",
+		"./bound": "./src/bound.ts",
 		"./contract": "./src/contract.ts",
 		"./google-sheets": "./src/google-sheets/store.ts",
 		"./memory": "./src/memory.ts"

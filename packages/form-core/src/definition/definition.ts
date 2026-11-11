@@ -1,8 +1,19 @@
 import { z } from "zod";
 
+import { fieldSheetColumns } from "../field-types/values";
 import { ConditionSchema } from "./condition";
-import { FieldSchema, LOCAL_DATETIME_PATTERN, MAX_OPTIONS } from "./fields";
+import {
+	columnHeaderOf,
+	FieldSchema,
+	LOCAL_DATETIME_PATTERN,
+	MAX_OPTIONS,
+} from "./fields";
 import { checkDefinitionIntegrity } from "./integrity";
+import type { HeaderRules } from "./integrity-types";
+import {
+	STORED_RESERVED_HEADERS,
+	SYSTEM_COLUMN_HEADERS,
+} from "./system-columns";
 
 export const DEFINITION_SCHEMA_VERSION = 1;
 
@@ -79,21 +90,33 @@ const BaseDefinitionSchema = z.object({
 	completionMessage: z.string().max(1000).optional(),
 });
 
-/**
- * 폼 정의 스키마.
- * 구조 검증 + 상호 참조 무결성(필드/페이지/조건/결제/알림)까지 검사한다.
- */
-export const FormDefinitionSchema = BaseDefinitionSchema.superRefine(
-	(definition, ctx) => {
-		for (const issue of checkDefinitionIntegrity(definition)) {
+function definitionSchema(rules: HeaderRules) {
+	return BaseDefinitionSchema.superRefine((definition, ctx) => {
+		for (const issue of checkDefinitionIntegrity(definition, rules)) {
 			ctx.addIssue({
 				code: "custom",
 				message: issue.message,
 				path: issue.path,
 			});
 		}
-	},
-);
+	});
+}
+
+/**
+ * 폼 정의 스키마 (편집·발행용).
+ * 구조 검증 + 상호 참조 무결성(필드/페이지/조건/결제/알림)까지 검사한다.
+ */
+export const FormDefinitionSchema = definitionSchema({
+	reservedHeaders: SYSTEM_COLUMN_HEADERS,
+	headersOf: (field) => fieldSheetColumns(field).map((column) => column.header),
+});
+
+/** 이미 발행돼 저장된 정의용: 나중에 예약한 헤더 이름은 막지 않는다 (STORED_RESERVED_HEADERS) */
+const StoredFormDefinitionSchema = definitionSchema({
+	reservedHeaders: STORED_RESERVED_HEADERS,
+	// 질문당 열 하나였던 시절의 규칙. 나눈 열 이름이 다른 질문과 겹치면 시트에서 앞선 열이 이긴다 (sheet/columns.ts)
+	headersOf: (field) => [columnHeaderOf(field)],
+});
 
 export type FormDefinition = z.output<typeof FormDefinitionSchema>;
 export type FormDefinitionInput = z.input<typeof FormDefinitionSchema>;
@@ -109,11 +132,9 @@ export type DefinitionParseResult =
 /** 스키마에 직접 적지 않은 일반 오류(범위/형식)를 한국어로. 전역 설정이 아니라 이 파싱에만 적용한다. */
 const KOREAN_ERRORS = z.locales.ko().localeError;
 
-/** 외부 입력(관리자 편집기, DB에서 읽은 값)을 경계에서 검증한다. */
-export function parseFormDefinition(input: unknown): DefinitionParseResult {
-	const result = FormDefinitionSchema.safeParse(input, {
-		error: KOREAN_ERRORS,
-	});
+function toParseResult(
+	result: ReturnType<typeof FormDefinitionSchema.safeParse>,
+): DefinitionParseResult {
 	if (result.success) {
 		return { ok: true, definition: result.data };
 	}
@@ -124,4 +145,23 @@ export function parseFormDefinition(input: unknown): DefinitionParseResult {
 			message: issue.message,
 		})),
 	};
+}
+
+/** 외부 입력(관리자 편집기 초안, 발행할 정의)을 경계에서 검증한다. */
+export function parseFormDefinition(input: unknown): DefinitionParseResult {
+	return toParseResult(
+		FormDefinitionSchema.safeParse(input, { error: KOREAN_ERRORS }),
+	);
+}
+
+/**
+ * 이미 발행된 정의(form_versions)를 다시 읽을 때 검증한다. 이후 버전에서 예약한 헤더 때문에
+ * 운영 중인 폼이 "손상"으로 막히지 않게 그 규칙만 느슨하다. 나머지 검사는 같다.
+ */
+export function parseStoredFormDefinition(
+	input: unknown,
+): DefinitionParseResult {
+	return toParseResult(
+		StoredFormDefinitionSchema.safeParse(input, { error: KOREAN_ERRORS }),
+	);
 }

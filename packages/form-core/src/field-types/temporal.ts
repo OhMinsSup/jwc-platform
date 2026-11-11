@@ -33,6 +33,7 @@ export const dateSpec: FieldTypeSpec<FieldOf<"date">> = {
 			),
 	format: (_field, value) => String(value),
 	fromText: (_field, text) => text.trim().slice(0, 10),
+	sheet: { value: "date" },
 };
 
 export const timeSpec: FieldTypeSpec<FieldOf<"time">> = {
@@ -47,6 +48,7 @@ export const timeSpec: FieldTypeSpec<FieldOf<"time">> = {
 			),
 	format: (_field, value) => String(value),
 	fromText: (_field, text) => text.trim().padStart(5, "0"),
+	sheet: { value: "time" },
 };
 
 export const datetimeSpec: FieldTypeSpec<FieldOf<"datetime">> = {
@@ -75,4 +77,6 @@ export const datetimeSpec: FieldTypeSpec<FieldOf<"datetime">> = {
 		}
 		return `${groups.date}T${groups.time}`;
 	},
+	// 시트에서는 날짜 열 + 시간 열로 나눈다 (표에서 각각 날짜·시간 값으로 고칠 수 있게)
+	sheet: { value: "datetime", parts: ["date", "time"] },
 };

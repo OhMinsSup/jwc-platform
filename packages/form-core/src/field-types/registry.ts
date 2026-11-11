@@ -26,6 +26,7 @@ const numberSpec: FieldTypeRegistry["number"] = {
 	},
 	format: (_field, value) => String(value),
 	fromText: (_field, text) => Number(text.replaceAll(",", "").trim()),
+	sheet: { value: "number" },
 };
 
 /** 표시 전용. 답변을 받지 않으므로 어떤 값도 통과시키지 않는다. */
@@ -35,6 +36,8 @@ const statementSpec: FieldTypeRegistry["statement"] = {
 	fromText: () => {
 		// 시트 컬럼이 없으므로 셀에서 읽을 값이 없다 (undefined → valueSchema가 거부)
 	},
+	// 시트 열이 없다 (isDisplayOnly)
+	sheet: { value: "text" },
 };
 
 export const FIELD_TYPES: FieldTypeRegistry = {

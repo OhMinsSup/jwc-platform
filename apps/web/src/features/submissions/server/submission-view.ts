@@ -7,11 +7,8 @@ import { computeAmount } from "@jwc/form-core/messaging";
 import { formatInTimeZone } from "@jwc/form-core/time";
 
 import { NotFoundError } from "../../../platform/server/errors/not-found-error";
-import { submissionStore } from "../../../platform/server/runtime";
-import {
-	publishedFormById,
-	storeTargetOf,
-} from "../../forms/server/definitions";
+import { publishedFormById } from "../../forms/server/definitions";
+import { responseStore } from "../../forms/server/response-store";
 import { findKey, isStoredKey } from "./submission-keys-repository";
 
 const PHONE_MASK = /^(?<head>\d{3})-(?<middle>\d{3,4})-(?<tail>\d{4})$/u;
@@ -66,11 +63,8 @@ export async function loadSubmissionView(id: string): Promise<SubmissionView> {
 	if (!isStoredKey(key)) {
 		throw new NotFoundError(NOT_FOUND_MESSAGE);
 	}
-	const { form, definition } = await publishedFormById(key.formId);
-	const record = await submissionStore().get(
-		storeTargetOf(form, definition),
-		id,
-	);
+	const { definition, sheet } = await publishedFormById(key.formId);
+	const record = await responseStore(sheet, definition).get(id);
 	if (!record) {
 		throw new NotFoundError(NOT_FOUND_MESSAGE);
 	}

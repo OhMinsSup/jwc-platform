@@ -6,6 +6,7 @@ import { z } from "zod";
 import { SmsSendError } from "../solapi";
 import { ERROR_CATALOG } from "./catalog";
 import type { ErrorCode, ErrorSpec } from "./catalog";
+import { causeChain } from "./cause-chain";
 import { DomainError } from "./domain-error";
 import { InvalidInputError } from "./invalid-input-error";
 
@@ -51,10 +52,15 @@ function codeOf(error: unknown): ErrorCode {
 	return "internal";
 }
 
-function internalMessageOf(error: unknown): string {
+function describe(error: unknown): string {
 	return error instanceof Error
 		? `${error.name}: ${error.message}`
 		: String(error);
+}
+
+/** 로그용 내부 문장: 원인 사슬까지 남긴다 (사용자에게는 보내지 않는다) */
+function internalMessageOf(error: unknown): string {
+	return causeChain(error).map(describe).join(" ← cause: ");
 }
 
 export function classifyError(error: unknown): ClassifiedError {

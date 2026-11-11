@@ -80,7 +80,6 @@ export function planSubmissionWrite(
 	definition: FormDefinition,
 	key: KeyState,
 	answers: Answers,
-	now: number,
 ): SubmissionPlan {
 	const isNew = key.storedAt === null;
 	const kind: NotificationKind = isNew ? "onCreate" : "onUpdate";
@@ -90,7 +89,6 @@ export function planSubmissionWrite(
 			id: key.id,
 			answers,
 			submittedAt: key.createdAt,
-			updatedAt: now,
 			paid: isNew ? false : undefined,
 		},
 		notification: notificationFor(definition, answers, {

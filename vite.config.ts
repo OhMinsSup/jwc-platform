@@ -101,6 +101,9 @@ const IO_MODULES = [
 	"react-dom",
 	"@tanstack/*",
 	"@jwc/google/*",
+	// 예외: 스프레드시트 ID·주소·탭 이름 규칙은 I/O 없는 순수 함수다. 앱 domain이 Google 형식을 직접 갖지 않고
+	// 이 모듈을 쓰게 해 Google 지식을 패키지 한 곳에 둔다 (ADR-0025)
+	"!@jwc/google/spreadsheet-ref",
 	"@jwc/observability",
 	"@jwc/observability/*",
 	"@jwc/security/*",

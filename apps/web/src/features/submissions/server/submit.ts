@@ -8,11 +8,9 @@ import { ConflictError } from "../../../platform/server/errors/conflict-error";
 import { FormClosedError } from "../../../platform/server/errors/form-closed-error";
 import { InvalidInputError } from "../../../platform/server/errors/invalid-input-error";
 import { captureException, log } from "../../../platform/server/log";
-import { dataKeys, submissionStore } from "../../../platform/server/runtime";
-import {
-	publishedFormBySlug,
-	storeTargetOf,
-} from "../../forms/server/definitions";
+import { dataKeys } from "../../../platform/server/runtime";
+import { publishedFormBySlug } from "../../forms/server/definitions";
+import { responseStore } from "../../forms/server/response-store";
 import {
 	admitSubmission,
 	planSubmissionWrite,
@@ -83,7 +81,7 @@ export async function submitAnswers(
 	raw: Record<string, unknown>,
 	now: number,
 ): Promise<SubmitResult> {
-	const { form, definition } = await publishedFormBySlug(slug);
+	const { form, definition, sheet } = await publishedFormBySlug(slug);
 	const admission = admitSubmission(definition, form.status, raw, now);
 	if (!admission.ok) {
 		throw rejectionOf(admission);
@@ -99,9 +97,9 @@ export async function submitAnswers(
 		now,
 	});
 	await lockForWrite(key.id);
-	const plan = planSubmissionWrite(definition, key, admission.answers, now);
+	const plan = planSubmissionWrite(definition, key, admission.answers);
 	try {
-		await submissionStore().put(storeTargetOf(form, definition), plan.record);
+		await responseStore(sheet, definition).put(plan.record);
 		await markStored(key.id, now);
 	} catch (error) {
 		await releaseWriteLock(key.id);

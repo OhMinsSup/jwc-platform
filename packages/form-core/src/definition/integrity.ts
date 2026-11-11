@@ -2,10 +2,17 @@ import { collectConditionFieldIds } from "./condition";
 import type { Condition } from "./condition";
 import type { FieldDef } from "./fields";
 import { checkFieldRules, checkNotifications } from "./integrity-rules";
-import type { DefinitionShape, IntegrityIssue } from "./integrity-types";
+import type {
+	DefinitionShape,
+	HeaderRules,
+	IntegrityIssue,
+} from "./integrity-types";
 import { RESERVED_TEMPLATE_KEYS } from "./reserved";
 
-type Check = (definition: DefinitionShape) => IntegrityIssue[];
+type Check = (
+	definition: DefinitionShape,
+	rules: HeaderRules,
+) => IntegrityIssue[];
 
 function checkUniqueIds(definition: DefinitionShape): IntegrityIssue[] {
 	const issues: IntegrityIssue[] = [];
@@ -239,6 +246,7 @@ const CHECKS: Check[] = [
 
 export function checkDefinitionIntegrity(
 	definition: DefinitionShape,
+	rules: HeaderRules,
 ): IntegrityIssue[] {
-	return CHECKS.flatMap((check) => check(definition));
+	return CHECKS.flatMap((check) => check(definition, rules));
 }

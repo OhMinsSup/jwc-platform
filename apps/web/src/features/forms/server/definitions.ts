@@ -1,9 +1,9 @@
-import { parseFormDefinition } from "@jwc/form-core/definition/definition";
+import { parseStoredFormDefinition } from "@jwc/form-core/definition/definition";
 import type { FormDefinition } from "@jwc/form-core/definition/definition";
-import type { StoreTarget } from "@jwc/submission-store";
 
 import { NotFoundError } from "../../../platform/server/errors/not-found-error";
 import { log } from "../../../platform/server/log";
+import type { ResponseSheet } from "../domain/sheet-location";
 import {
 	findFormById,
 	findFormBySlug,
@@ -11,10 +11,13 @@ import {
 	listOpenForms,
 } from "./forms-repository";
 import type { FormRow } from "./forms-repository";
+import { responseSheetOf } from "./response-store";
 
 export interface PublishedForm {
 	definition: FormDefinition;
 	form: FormRow;
+	/** 응답을 읽고 쓰는 실제 위치 (기본 스프레드시트를 채운 값) */
+	sheet: ResponseSheet;
 	versionId: string;
 }
 
@@ -32,7 +35,7 @@ async function loadPublished(
 	if (!version) {
 		throw new NotFoundError("발행된 폼 버전을 찾을 수 없습니다");
 	}
-	const parsed = parseFormDefinition(version.definition);
+	const parsed = parseStoredFormDefinition(version.definition);
 	if (!parsed.ok) {
 		log.error("definition.corrupted", {
 			formId: form.id,
@@ -43,21 +46,18 @@ async function loadPublished(
 			"폼 정의가 손상되었습니다. 관리자에게 문의해주세요",
 		);
 	}
-	return { form, versionId: version.id, definition: parsed.definition };
+	return {
+		form,
+		versionId: version.id,
+		definition: parsed.definition,
+		sheet: responseSheetOf(form),
+	};
 }
 
 export async function publishedFormBySlug(
 	slug: string,
 ): Promise<PublishedForm> {
 	return await loadPublished(await findFormBySlug(slug));
-}
-
-/** 폼 → 응답 저장소 안의 공간 (폼마다 하나, 이름은 forms.sheetName) */
-export function storeTargetOf(
-	form: Pick<FormRow, "sheetName">,
-	definition: FormDefinition,
-): StoreTarget {
-	return { collection: form.sheetName, definition };
 }
 
 export async function publishedFormById(id: string): Promise<PublishedForm> {

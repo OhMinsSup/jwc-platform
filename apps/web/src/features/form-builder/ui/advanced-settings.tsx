@@ -1,5 +1,6 @@
 import { FIELD_ID_PATTERN } from "@jwc/form-core/definition/fields";
 import type { FieldDef } from "@jwc/form-core/definition/fields";
+import { fieldSheetColumns } from "@jwc/form-core/field-types/values";
 import {
 	CommitInput,
 	Disclosure,
@@ -62,18 +63,30 @@ function IdInput({ field }: { field: FieldDef }) {
 
 type Patch = (patch: FieldPatch) => void;
 
+/** 시트 열 이름 안내. 일시처럼 시트에서 여러 열로 나뉘는 질문은 실제로 생길 열 이름을 보여 준다 */
+function columnHeaderHint(field: FieldDef): string {
+	const created = fieldSheetColumns(field).filter(
+		(column) => !column.legacyOnly,
+	);
+	if (created.length <= 1) {
+		return "비우면 질문 제목을 씁니다";
+	}
+	const names = created.map((column) => `'${column.header}'`).join("·");
+	return `비우면 질문 제목을 씁니다. 시트에는 ${names} 열로 나뉩니다`;
+}
+
 /** 비워 두면 기본값을 쓰는 선택 텍스트 속성 (표로 기술) */
 const OPTIONAL_TEXTS: readonly {
 	key: "columnHeader" | "placeholder";
 	label: string;
-	hint?: string;
+	hint?: (field: FieldDef) => string;
 	/** 이 유형에서 보여줄지 */
 	shows: (field: FieldDef) => boolean;
 }[] = [
 	{
 		key: "columnHeader",
 		label: "시트 열 이름",
-		hint: "비우면 질문 제목을 씁니다",
+		hint: columnHeaderHint,
 		shows: () => true,
 	},
 	{
@@ -97,7 +110,7 @@ export function AdvancedSettings({
 		>
 			<IdInput field={field} />
 			{OPTIONAL_TEXTS.filter((spec) => spec.shows(field)).map((spec) => (
-				<FormRow hint={spec.hint} key={spec.key} label={spec.label}>
+				<FormRow hint={spec.hint?.(field)} key={spec.key} label={spec.label}>
 					{(ids) => (
 						<Input
 							aria-describedby={ids.describedBy}

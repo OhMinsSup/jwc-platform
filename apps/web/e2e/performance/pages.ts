@@ -140,6 +140,13 @@ const PAGE_TEMPLATES: PageTemplate[] = [
 		interaction: "responses",
 	},
 	{
+		name: "form-settings",
+		path: `${EDITOR}/settings`,
+		heading: "E2E 신청서",
+		account: "ready",
+		interaction: "text",
+	},
+	{
 		name: "not-found",
 		path: "/performance-missing-page",
 		heading: "페이지를 찾을 수 없습니다",

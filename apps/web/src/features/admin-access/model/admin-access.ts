@@ -7,6 +7,7 @@ export const AUDIT_ACTION_LABELS = {
 	"form.created": "폼 생성",
 	"form.published": "폼 발행",
 	"form.status_changed": "접수 상태 변경",
+	"form.sheet_changed": "응답 시트 변경",
 	"submission.paid_changed": "납입 상태 변경",
 	"admin.invite_created": "관리자 초대",
 	"admin.signed_up": "관리자 가입",

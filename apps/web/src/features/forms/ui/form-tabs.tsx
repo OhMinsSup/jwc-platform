@@ -1,12 +1,13 @@
 import { cn } from "@jwc/ui/lib/utils";
 import { Link } from "@tanstack/react-router";
-import { Eye, Inbox, PenLine } from "lucide-react";
+import { Eye, Inbox, PenLine, Settings } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 type FormTabPath =
 	| "/admin/forms/$formId"
 	| "/admin/forms/$formId/preview"
-	| "/admin/forms/$formId/submissions";
+	| "/admin/forms/$formId/submissions"
+	| "/admin/forms/$formId/settings";
 
 /** 폼 안의 화면들. 화면이 늘면 이 표에 한 줄 추가한다 */
 const FORM_TABS: readonly {
@@ -24,6 +25,7 @@ const FORM_TABS: readonly {
 		icon: Inbox,
 		requiresPublished: true,
 	},
+	{ to: "/admin/forms/$formId/settings", label: "설정", icon: Settings },
 ];
 
 const TAB_CLASS =

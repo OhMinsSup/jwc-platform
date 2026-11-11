@@ -38,6 +38,7 @@ export const shortTextSpec: FieldTypeSpec<FieldOf<"short_text">> = {
 			.max(field.maxLength, `${field.maxLength}자 이내로 입력해주세요`),
 	format: asText,
 	fromText: trimmed,
+	sheet: { value: "text" },
 };
 
 export const longTextSpec: FieldTypeSpec<FieldOf<"long_text">> = {
@@ -48,6 +49,7 @@ export const longTextSpec: FieldTypeSpec<FieldOf<"long_text">> = {
 			.max(field.maxLength, `${field.maxLength}자 이내로 입력해주세요`),
 	format: asText,
 	fromText: trimmed,
+	sheet: { value: "text" },
 };
 
 export const emailSpec: FieldTypeSpec<FieldOf<"email">> = {
@@ -59,6 +61,7 @@ export const emailSpec: FieldTypeSpec<FieldOf<"email">> = {
 			.pipe(z.email("올바른 이메일 주소를 입력해주세요")),
 	format: asText,
 	fromText: trimmed,
+	sheet: { value: "text" },
 };
 
 export const phoneSpec: FieldTypeSpec<FieldOf<"phone">> = {
@@ -72,4 +75,5 @@ export const phoneSpec: FieldTypeSpec<FieldOf<"phone">> = {
 			),
 	format: (_field, value) => formatPhone(String(value)),
 	fromText: trimmed,
+	sheet: { value: "text" },
 };

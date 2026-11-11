@@ -4,15 +4,13 @@ import type { FormDefinitionInput } from "@jwc/form-core/definition/definition";
 import { blankDefinition } from "@jwc/form-core/samples/blank";
 import { retreat2026Definition } from "@jwc/form-core/samples/retreat-2026";
 import { SubmissionStoreError } from "@jwc/submission-store";
-import type { StoreTarget } from "@jwc/submission-store";
+import type { BoundSubmissionStore } from "@jwc/submission-store/bound";
 
 import { ConflictError } from "../../../platform/server/errors/conflict-error";
 import { DomainError } from "../../../platform/server/errors/domain-error";
 import { InvalidInputError } from "../../../platform/server/errors/invalid-input-error";
 import { NotFoundError } from "../../../platform/server/errors/not-found-error";
 import { log } from "../../../platform/server/log";
-import { submissionStore } from "../../../platform/server/runtime";
-import { storeTargetOf } from "./definitions";
 import {
 	findFormById,
 	findFormBySlug,
@@ -23,6 +21,8 @@ import {
 	updateStatus,
 } from "./forms-repository";
 import type { FormRow } from "./forms-repository";
+import { responseSheetOf, responseStore } from "./response-store";
+import { firstFreeSheetName } from "./sheet-availability";
 
 export const FORM_TEMPLATES = {
 	blank: (title: string): FormDefinitionInput => blankDefinition(title),
@@ -33,7 +33,7 @@ export const FORM_TEMPLATES = {
 } as const;
 export type FormTemplate = keyof typeof FORM_TEMPLATES;
 
-async function requireForm(id: string): Promise<FormRow> {
+export async function requireForm(id: string): Promise<FormRow> {
 	const form = await findFormById(id);
 	if (!form) {
 		throw new NotFoundError("폼을 찾을 수 없습니다");
@@ -48,16 +48,24 @@ export async function createForm(
 	if (await findFormBySlug(input.slug)) {
 		throw new ConflictError("이미 사용 중인 주소(slug)입니다");
 	}
+	// 새 폼은 기본 스프레드시트의 주소 이름 탭에 저장한다 (겹치면 번호를 붙인다. 설정 화면에서 바꿀 수 있다)
+	const sheetName = await firstFreeSheetName(input.slug);
 	const id = randomId();
-	await insertForm({
+	const outcome = await insertForm({
 		id,
 		slug: input.slug,
 		status: "draft",
 		draftDefinition: FORM_TEMPLATES[input.template](input.title),
-		sheetName: input.slug,
+		sheetName,
 		createdAt: now,
 		updatedAt: now,
 	});
+	// 확인과 저장 사이에 다른 관리자가 같은 주소/탭으로 만들었으면 DB 유니크 인덱스가 막는다
+	if (outcome === "taken") {
+		throw new ConflictError(
+			"방금 같은 주소나 시트 탭으로 만든 폼이 있습니다. 다시 시도해주세요",
+		);
+	}
 	return id;
 }
 
@@ -88,7 +96,7 @@ export async function publishDraft(
 			fieldErrors,
 		);
 	}
-	await prepareStore(storeTargetOf(form, parsed.definition));
+	await prepareStore(responseStore(responseSheetOf(form), parsed.definition));
 	const version = (await latestVersionNumber(formId)) + 1;
 	await publishVersion(
 		{
@@ -106,9 +114,9 @@ export async function publishDraft(
 }
 
 /** 저장소 준비 실패 중 운영자가 조치할 수 있는 것(권한/구조)은 그 문장을 그대로 보여 준다 */
-async function prepareStore(target: StoreTarget): Promise<void> {
+export async function prepareStore(store: BoundSubmissionStore): Promise<void> {
 	try {
-		await submissionStore().prepare(target);
+		await store.prepare();
 	} catch (error) {
 		if (
 			error instanceof SubmissionStoreError &&

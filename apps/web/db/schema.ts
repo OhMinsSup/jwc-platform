@@ -115,21 +115,45 @@ export const verification = sqliteTable(
 /* ───────── forms ───────── */
 
 /** 폼 초안과 발행된 정의 스냅샷. */
-export const forms = sqliteTable("forms", {
-	id: text("id").primaryKey(),
-	slug: text("slug").notNull().unique(),
-	/** draft | open | closed */
-	status: text("status", { enum: ["draft", "open", "closed"] })
-		.notNull()
-		.default("draft"),
-	/** 편집 중인 정의 JSON (검증 전일 수 있음) */
-	draftDefinition: text("draft_definition", { mode: "json" }).notNull(),
-	publishedVersionId: text("published_version_id"),
-	/** 응답이 저장되는 시트 탭 이름 */
-	sheetName: text("sheet_name").notNull().unique(),
-	createdAt: integer("created_at").notNull(),
-	updatedAt: integer("updated_at").notNull(),
-});
+export const forms = sqliteTable(
+	"forms",
+	{
+		id: text("id").primaryKey(),
+		slug: text("slug").notNull().unique(),
+		/** draft | open | closed */
+		status: text("status", { enum: ["draft", "open", "closed"] })
+			.notNull()
+			.default("draft"),
+		/** 편집 중인 정의 JSON (검증 전일 수 있음) */
+		draftDefinition: text("draft_definition", { mode: "json" }).notNull(),
+		publishedVersionId: text("published_version_id"),
+		/** 응답을 저장할 스프레드시트 ID. null이면 기본 스프레드시트(GOOGLE_SPREADSHEET_ID) */
+		spreadsheetId: text("spreadsheet_id"),
+		/** 응답이 저장되는 시트 탭 이름 */
+		sheetName: text("sheet_name").notNull(),
+		/** 유니크 비교용(SQLite가 계산): null(기본 스프레드시트)끼리도 같게 보도록 ''로 채운다.
+		 *  기본 ID를 직접 적은 설정은 저장할 때 null로 정리한다 (sheet-settings.ts) */
+		spreadsheetKey: text("spreadsheet_key").generatedAlwaysAs(
+			sql`coalesce(spreadsheet_id, '')`,
+			{ mode: "virtual" },
+		),
+		/** 유니크 비교용(SQLite가 계산): Google 탭 이름은 대소문자를 구분하지 않는다 */
+		sheetNameKey: text("sheet_name_key").generatedAlwaysAs(
+			sql`lower(sheet_name)`,
+			{ mode: "virtual" },
+		),
+		createdAt: integer("created_at").notNull(),
+		updatedAt: integer("updated_at").notNull(),
+	},
+	(table) => [
+		// 같은 스프레드시트의 같은 탭을 두 폼이 쓰지 않게 한다 (검사와 저장 사이의 경쟁도 여기서 막힌다).
+		// 비교 키는 아래 두 생성 열이다 (drizzle가 식 인덱스를 잘못 따옴표 처리해 생성 열로 둔다)
+		uniqueIndex("forms_sheet_location_key_uq").on(
+			table.spreadsheetKey,
+			table.sheetNameKey,
+		),
+	],
+);
 
 export const formVersions = sqliteTable(
 	"form_versions",

@@ -1,11 +1,18 @@
 import { keysOf } from "@jwc/common/object";
-import { parseFormDefinition } from "@jwc/form-core/definition/definition";
+import {
+	parseFormDefinition,
+	parseStoredFormDefinition,
+} from "@jwc/form-core/definition/definition";
+import { spreadsheetEditUrl } from "@jwc/google/spreadsheet-ref";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { NotFoundError } from "../../../platform/server/errors/not-found-error";
 import { log } from "../../../platform/server/log";
-import { spreadsheetUrl } from "../../../platform/server/runtime";
+import {
+	defaultSpreadsheetId,
+	serviceAccountEmail,
+} from "../../../platform/server/runtime";
 import { toResult } from "../../../platform/server/server-fn";
 import { ID, SLUG } from "../../../platform/server/validation";
 import { adminOnly } from "../../admin-access/server/admin-only";
@@ -23,6 +30,8 @@ import {
 	listForms,
 } from "../server/forms-repository";
 import type { FormRow } from "../server/forms-repository";
+import { responseSheetOf } from "../server/response-store";
+import { changeSheetLocation } from "../server/sheet-settings";
 
 /**
  * 폼 관리(관리자) 서버 함수 경계. 바꾸는 작업은 audited로 감사 기록을 함께 남긴다.
@@ -57,7 +66,7 @@ async function publishedFieldIds(versionId: string | null): Promise<string[]> {
 		return [];
 	}
 	const version = await findVersion(versionId);
-	const parsed = parseFormDefinition(version?.definition);
+	const parsed = parseStoredFormDefinition(version?.definition);
 	return parsed.ok ? parsed.definition.fields.map((field) => field.id) : [];
 }
 
@@ -118,7 +127,7 @@ export const getFormSummaryFn = createServerFn({ method: "GET" })
 				status: form.status,
 				published: form.publishedVersionId !== null,
 				title: draftTitle(form.draftDefinition) ?? form.slug,
-				spreadsheetUrl: spreadsheetUrl(),
+				spreadsheetUrl: spreadsheetEditUrl(responseSheetOf(form).spreadsheetId),
 			};
 		}),
 	);
@@ -138,7 +147,7 @@ export const getFormEditorFn = createServerFn({ method: "GET" })
 				/** 전송용 직렬화. 편집은 클라이언트에서 객체로 한다 */
 				draftJson: JSON.stringify(form.draftDefinition),
 				publishedFieldIds: await publishedFieldIds(form.publishedVersionId),
-				spreadsheetUrl: spreadsheetUrl(),
+				spreadsheetUrl: spreadsheetEditUrl(responseSheetOf(form).spreadsheetId),
 			};
 		}),
 	);
@@ -213,4 +222,55 @@ export const getDraftPreviewFn = createServerFn({ method: "GET" })
 			const form = await requireForm(data.formId);
 			return parseFormDefinition(form.draftDefinition);
 		}),
+	);
+
+/** 응답 시트 설정 화면: 현재 위치와 운영자가 공유해야 할 서비스 계정 */
+export const getSheetSettingsFn = createServerFn({ method: "GET" })
+	.middleware([adminOnly])
+	.validator(z.object({ formId: ID }))
+	.handler(({ data }) =>
+		toResult("admin.getSheetSettings", async () => {
+			const form = await requireForm(data.formId);
+			return {
+				id: form.id,
+				/** 빈 문자열이면 기본 스프레드시트 */
+				spreadsheetId: form.spreadsheetId ?? "",
+				sheetName: form.sheetName,
+				published: form.publishedVersionId !== null,
+				spreadsheetUrl: spreadsheetEditUrl(responseSheetOf(form).spreadsheetId),
+				defaultSpreadsheetUrl: spreadsheetEditUrl(defaultSpreadsheetId()),
+				serviceAccountEmail: serviceAccountEmail(),
+			};
+		}),
+	);
+
+/** 스프레드시트는 URL을 붙여 넣을 수 있으므로 길이만 경계에서 막고 해석은 서비스(domain)가 한다 */
+const MAX_SPREADSHEET_INPUT = 500;
+const MAX_SHEET_NAME_INPUT = 200;
+
+export const updateSheetLocationFn = createServerFn({ method: "POST" })
+	.middleware([adminOnly])
+	.validator(
+		z.object({
+			formId: ID,
+			spreadsheet: z.string().max(MAX_SPREADSHEET_INPUT),
+			sheetName: z.string().max(MAX_SHEET_NAME_INPUT),
+		}),
+	)
+	.handler(({ data, context }) =>
+		toResult("admin.updateSheetLocation", () =>
+			audited(
+				context.admin,
+				(location) => ({
+					action: "form.sheet_changed",
+					targetType: "form",
+					targetId: data.formId,
+					detail: {
+						sheetName: location.sheetName,
+						customSpreadsheet: location.spreadsheetId !== null,
+					},
+				}),
+				() => changeSheetLocation(data.formId, data, Date.now()),
+			),
+		),
 	);

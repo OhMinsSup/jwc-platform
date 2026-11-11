@@ -3,16 +3,11 @@ import { isDisplayOnly } from "@jwc/form-core/definition/fields";
 import type { FieldDef } from "@jwc/form-core/definition/fields";
 import { formatFieldValue } from "@jwc/form-core/field-types/values";
 import { formatInTimeZone } from "@jwc/form-core/time";
+import { spreadsheetEditUrl } from "@jwc/google/spreadsheet-ref";
 import type { StoredSubmission } from "@jwc/submission-store";
 
-import {
-	spreadsheetUrl,
-	submissionStore,
-} from "../../../platform/server/runtime";
-import {
-	publishedFormById,
-	storeTargetOf,
-} from "../../forms/server/definitions";
+import { publishedFormById } from "../../forms/server/definitions";
+import { responseStore } from "../../forms/server/response-store";
 import { paymentDueOf } from "../domain/payment-due";
 import type { PaymentDue } from "../domain/payment-due";
 import { listStoredKeys } from "./submission-keys-repository";
@@ -67,10 +62,10 @@ function toRowView(
  * 표시는 저장소 순서를 따른다.
  */
 export async function listSubmissionRows(formId: string) {
-	const { form, definition } = await publishedFormById(formId);
+	const { definition, sheet } = await publishedFormById(formId);
 	const columns = previewColumns(definition);
 	const [records, keys] = await Promise.all([
-		submissionStore().list(storeTargetOf(form, definition)),
+		responseStore(sheet, definition).list(),
 		listStoredKeys(formId),
 	]);
 	const createdAt = new Map(keys.map((key) => [key.id, key.createdAt]));
@@ -99,6 +94,6 @@ export async function listSubmissionRows(formId: string) {
 							: null,
 				}
 			: null,
-		spreadsheetUrl: spreadsheetUrl(),
+		spreadsheetUrl: spreadsheetEditUrl(sheet.spreadsheetId),
 	};
 }

@@ -1,6 +1,6 @@
 # packages/google AGENTS.md
 
-Google API 최소 클라이언트: 서비스 계정 JWT/토큰 공급자, Sheets v4 REST(요청별 재시도 정책). fetch 주입으로 계약 테스트 가능. 테스트용 가짜 Sheets는 ./testing.
+Google API 최소 클라이언트와 Google 형식 규칙(`./spreadsheet-ref`: 스프레드시트 ID·주소, 탭 이름 제한 — 순수 함수라 앱 domain에서도 쓴다): 서비스 계정 JWT/토큰 공급자, Sheets v4 REST(요청별 재시도 정책). fetch 주입으로 계약 테스트 가능. 테스트용 가짜 Sheets는 ./testing.
 
 저장소 루트 `AGENTS.md`(공통 규칙)와 `docs/adr/0007`(패키지 경계)을 우선으로 따른다.
 

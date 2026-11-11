@@ -1,6 +1,7 @@
 import { deriveDataKeys } from "@jwc/common/crypto";
 import type { DataKeys } from "@jwc/common/crypto";
 import { createTokenProvider } from "@jwc/google/service-account";
+import type { TokenProvider } from "@jwc/google/service-account";
 import { createSheetsClient } from "@jwc/google/sheets-client";
 import type { PostHogConfig } from "@jwc/observability/posthog";
 import type { SubmissionStore } from "@jwc/submission-store";
@@ -20,7 +21,11 @@ import type { SmsSender } from "./solapi";
 const TRAILING_SLASH = /\/$/u;
 
 let keys: Promise<DataKeys> | null = null;
-let store: SubmissionStore | null = null;
+/** 스프레드시트 ID → 저장소 (폼마다 다른 스프레드시트를 쓸 수 있다) */
+const stores = new Map<string, SubmissionStore>();
+let memoryStore: SubmissionStore | null = null;
+/** 서비스 계정 토큰은 스프레드시트와 무관하므로 저장소들이 함께 쓴다 */
+let googleToken: TokenProvider | null = null;
 let sender: SmsSender | null = null;
 
 export function authRuntimeConfig() {
@@ -47,23 +52,37 @@ export function dataKeys(): Promise<DataKeys> {
 	return keys;
 }
 
+/** 폼에 스프레드시트를 따로 정하지 않았을 때 쓰는 기본 스프레드시트 */
+export function defaultSpreadsheetId(): string {
+	return env.GOOGLE_SPREADSHEET_ID;
+}
+
+/** 응답 시트를 편집하는 서비스 계정. 운영자가 새 스프레드시트를 이 주소에 공유해야 한다 */
+export function serviceAccountEmail(): string {
+	return env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+}
+
 /**
- * 응답 저장소. 저장소를 바꾸려면 여기서 다른 어댑터를 조립한다 (서비스는 포트에만 의존).
+ * 응답 저장소 (스프레드시트마다 하나). 저장소를 바꾸려면 여기서 다른 어댑터를 조립한다
+ * (서비스는 포트에만 의존). 메모리 저장소(테스트/E2E)는 스프레드시트 구분 없이 하나를 쓴다.
+ * 폼 설정의 기본값(null) 해석은 features/forms/server/response-store.ts가 한다.
  */
-export function submissionStore(): SubmissionStore {
-	store ??=
-		env.SUBMISSION_STORE === "memory"
-			? createMemorySubmissionStore()
-			: createGoogleSheetsStore(
-					createSheetsClient(
-						env.GOOGLE_SPREADSHEET_ID,
-						createTokenProvider({
-							email: env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-							privateKeyPem: env.GOOGLE_PRIVATE_KEY,
-						}),
-					),
-				);
-	return store;
+export function submissionStore(id: string): SubmissionStore {
+	if (env.SUBMISSION_STORE === "memory") {
+		memoryStore ??= createMemorySubmissionStore();
+		return memoryStore;
+	}
+	const cached = stores.get(id);
+	if (cached) {
+		return cached;
+	}
+	googleToken ??= createTokenProvider({
+		email: env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+		privateKeyPem: env.GOOGLE_PRIVATE_KEY,
+	});
+	const created = createGoogleSheetsStore(createSheetsClient(id, googleToken));
+	stores.set(id, created);
+	return created;
 }
 
 export function smsSender(): SmsSender {
@@ -99,10 +118,6 @@ function siteUrl(): string {
 
 export function submissionLink(submissionId: string): string {
 	return `${siteUrl()}/r/${submissionId}`;
-}
-
-export function spreadsheetUrl(): string {
-	return `https://docs.google.com/spreadsheets/d/${env.GOOGLE_SPREADSHEET_ID}/edit`;
 }
 
 export function adminSignupEnabled(): boolean {

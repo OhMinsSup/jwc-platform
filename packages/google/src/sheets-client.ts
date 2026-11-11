@@ -2,11 +2,20 @@ import { setTimeout as delay } from "node:timers/promises";
 
 import { z } from "zod";
 
+import { appendTableRowsRequest } from "./cell-data";
+import type { CellValue, ReadCell, TableTarget } from "./cell-data";
 import type { TokenProvider } from "./service-account";
+import {
+	SHEETS_FIELDS,
+	SheetsResponseSchema,
+	toSheetInfos,
+} from "./sheet-info";
+import type { SheetInfo } from "./sheet-info";
 
 /**
  * Google Sheets v4 REST 최소 클라이언트.
- * 값은 항상 RAW로 쓴다 → 시트에 보이는 텍스트 = 코덱이 만든 텍스트 (자동 날짜 변환 방지).
+ * 값은 항상 RAW로 쓴다 → 글자는 코덱이 만든 글자 그대로(자동 날짜 변환 방지), 숫자는 숫자(날짜 일련번호 포함).
+ * 읽기는 서식 없는 원래 값(UNFORMATTED_VALUE, 날짜는 일련번호)이다 → 운영자가 표시 서식을 바꿔도 해석이 같다.
  */
 
 const API_BASE = "https://sheets.googleapis.com/v4/spreadsheets";
@@ -28,14 +37,14 @@ export class SheetsApiError extends Error {
 	}
 }
 
-export type CellValue = string | null;
-
 export interface SheetsClient {
 	addSheet: (title: string) => Promise<number>;
+	/** 시트 "표"의 본문 끝(첫 빈 행)에 행을 더한다. 표 범위가 함께 늘어난다 */
+	appendTableRows: (target: TableTarget, rows: CellValue[][]) => Promise<void>;
 	appendValues: (range: string, rows: CellValue[][]) => Promise<void>;
 	batchUpdate: (requests: unknown[]) => Promise<void>;
-	getValues: (range: string) => Promise<string[][]>;
-	listSheetTitles: () => Promise<{ title: string; sheetId: number }[]>;
+	getValues: (range: string) => Promise<ReadCell[][]>;
+	listSheets: () => Promise<SheetInfo[]>;
 	updateValues: (range: string, rows: CellValue[][]) => Promise<void>;
 }
 
@@ -109,16 +118,6 @@ type SheetsRequest = <T>(
 	init?: JsonRequestInit,
 ) => Promise<T>;
 
-const SheetTitlesResponseSchema = z.object({
-	sheets: z
-		.array(
-			z.object({
-				properties: z.object({ title: z.string(), sheetId: z.number() }),
-			}),
-		)
-		.optional(),
-});
-
 const AddSheetResponseSchema = z.object({
 	replies: z.array(
 		z.object({
@@ -127,9 +126,11 @@ const AddSheetResponseSchema = z.object({
 	),
 });
 
-/** FORMATTED_VALUE로 읽으므로 셀은 항상 문자열이다 */
+/** UNFORMATTED_VALUE: 글자, 숫자(날짜는 일련번호), 체크박스는 불리언 */
 const ValuesResponseSchema = z.object({
-	values: z.array(z.array(z.string())).optional(),
+	values: z
+		.array(z.array(z.union([z.string(), z.number(), z.boolean()])))
+		.optional(),
 });
 
 /** 쓰기 응답 본문은 쓰지 않는다 */
@@ -189,12 +190,12 @@ function createRequest(
 	};
 }
 
-async function listSheetTitles(request: SheetsRequest) {
+async function listSheets(request: SheetsRequest): Promise<SheetInfo[]> {
 	const body = await request(
-		"?fields=sheets.properties(title,sheetId)",
-		SheetTitlesResponseSchema,
+		`?fields=${encodeURIComponent(SHEETS_FIELDS)}`,
+		SheetsResponseSchema,
 	);
-	return (body.sheets ?? []).map((sheet) => sheet.properties);
+	return toSheetInfos(body);
 }
 
 async function addSheet(request: SheetsRequest, title: string) {
@@ -218,7 +219,7 @@ async function addSheet(request: SheetsRequest, title: string) {
 
 async function getValues(request: SheetsRequest, range: string) {
 	const body = await request(
-		`${valuesPath(range)}?valueRenderOption=FORMATTED_VALUE`,
+		`${valuesPath(range)}?valueRenderOption=UNFORMATTED_VALUE&dateTimeRenderOption=SERIAL_NUMBER`,
 		ValuesResponseSchema,
 	);
 	return body.values ?? [];
@@ -240,13 +241,22 @@ export function createSheetsClient(
 ): SheetsClient {
 	const request = createRequest(spreadsheetId, getToken, fetchImpl, retry);
 	return {
-		listSheetTitles: () => listSheetTitles(request),
+		listSheets: () => listSheets(request),
 		addSheet: (title) => addSheet(request, title),
 		getValues: (range) => getValues(request, range),
 		updateValues: (range, rows) =>
 			send(request, `${valuesPath(range)}?valueInputOption=RAW`, {
 				method: "PUT",
 				body: JSON.stringify({ values: rows }),
+			}),
+		appendTableRows: (target, rows) =>
+			send(request, ":batchUpdate", {
+				method: "POST",
+				body: JSON.stringify({
+					requests: [appendTableRowsRequest(target, rows)],
+				}),
+				// 이미 반영됐으면 다시 보낼 때 중복 행이 생긴다 (5xx 재시도 금지)
+				retryOn: "rateLimitOnly",
 			}),
 		appendValues: (range, rows) =>
 			send(

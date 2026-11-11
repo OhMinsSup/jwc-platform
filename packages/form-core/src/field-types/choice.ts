@@ -28,6 +28,10 @@ export const singleChoiceSpec: FieldTypeSpec<FieldOf<"single_choice">> = {
 	valueSchema: (field) => z.enum(optionValues(field), "목록에서 선택해주세요"),
 	format: (field, value) => labelOf(field, String(value)),
 	fromText: valueFromLabel,
+	sheet: {
+		value: "text",
+		choices: (field) => field.options.map((option) => option.label),
+	},
 };
 
 export const multiChoiceSpec: FieldTypeSpec<FieldOf<"multi_choice">> = {
@@ -57,6 +61,8 @@ export const multiChoiceSpec: FieldTypeSpec<FieldOf<"multi_choice">> = {
 			.map((part) => part.trim())
 			.filter(Boolean)
 			.map((part) => valueFromLabel(field, part)),
+	// 여러 개를 고르므로 드롭다운(값 하나)을 걸지 않는다
+	sheet: { value: "text" },
 };
 
 export const booleanSpec: FieldTypeSpec<FieldOf<"boolean">> = {
@@ -73,6 +79,10 @@ export const booleanSpec: FieldTypeSpec<FieldOf<"boolean">> = {
 		}
 		return trimmed;
 	},
+	sheet: {
+		value: "text",
+		choices: (field) => [field.trueLabel, field.falseLabel],
+	},
 };
 
 export const ratingSpec: FieldTypeSpec<FieldOf<"rating">> = {
@@ -85,4 +95,5 @@ export const ratingSpec: FieldTypeSpec<FieldOf<"rating">> = {
 	format: (field, value) => `${String(value)}/${field.scale}`,
 	// oxlint-disable-next-line unicorn/prefer-number-coercion -- 시트 셀은 "3/5" 형식이라 앞쪽 정수만 읽는 parseInt가 필요하다 (Number는 NaN)
 	fromText: (_field, text) => Number.parseInt(text, 10),
+	sheet: { value: "text" },
 };

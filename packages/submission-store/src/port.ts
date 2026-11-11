@@ -25,7 +25,6 @@ export interface SubmissionWrite {
 	/** undefined면 기존 값을 보존한다 (재제출이 운영자가 바꾼 납입 여부를 덮어쓰지 않게) */
 	paid?: boolean;
 	submittedAt: number;
-	updatedAt: number;
 }
 
 /** 저장소에서 읽은 레코드 */

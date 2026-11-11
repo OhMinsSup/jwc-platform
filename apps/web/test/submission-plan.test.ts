@@ -12,7 +12,6 @@ import {
 	planSubmissionWrite,
 } from "../src/features/submissions/domain/submission-plan";
 
-const DAY_MS = 86_400_000;
 /** 2026-05-01 12:00 KST (마감 2026-06-14 23:59 KST 전) */
 const OPEN_AT = Date.UTC(2026, 4, 1, 3, 0, 0);
 /** 2026-06-15 00:30 KST (마감 후) */
@@ -90,12 +89,7 @@ describe(planSubmissionWrite, () => {
 	const key = { id: "sub_1", revision: 1, createdAt: OPEN_AT, storedAt: null };
 
 	it("처음 저장하는 키는 신규: 미납으로 시작하고 onCreate 알림", () => {
-		const plan = planSubmissionWrite(
-			definition(),
-			key,
-			admitted().answers,
-			OPEN_AT,
-		);
+		const plan = planSubmissionWrite(definition(), key, admitted().answers);
 		expect(plan.isNew).toBe(true);
 		expect(plan.record.paid).toBe(false);
 		expect(plan.record.submittedAt).toBe(OPEN_AT);
@@ -107,17 +101,14 @@ describe(planSubmissionWrite, () => {
 	});
 
 	it("재제출은 납입 여부를 쓰지 않고(보존) onUpdate, revision이 멱등 키에 들어간다", () => {
-		const later = OPEN_AT + DAY_MS;
 		const plan = planSubmissionWrite(
 			definition(),
 			{ ...key, revision: 3, storedAt: OPEN_AT },
 			admitted().answers,
-			later,
 		);
 		expect(plan.isNew).toBe(false);
 		expect(plan.record.paid).toBeUndefined();
 		expect(plan.record.submittedAt).toBe(OPEN_AT);
-		expect(plan.record.updatedAt).toBe(later);
 		expect(plan.notification?.idempotencyKey).toBe("sub_1:onUpdate:3");
 	});
 
@@ -126,7 +117,6 @@ describe(planSubmissionWrite, () => {
 			definition({ notifications: {} }),
 			key,
 			admitted().answers,
-			OPEN_AT,
 		);
 		expect(plan.notification).toBeNull();
 	});

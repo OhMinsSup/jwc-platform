@@ -1,4 +1,4 @@
-import type { ParsedSheetRow } from "@jwc/form-core/sheet/rows";
+import type { ParsedSheetRow } from "@jwc/form-core/sheet/record";
 import { GoogleAuthError } from "@jwc/google/service-account";
 import { SheetsApiError } from "@jwc/google/sheets-client";
 import type { SheetsClient } from "@jwc/google/sheets-client";
@@ -9,17 +9,18 @@ import type {
 	SubmissionStore,
 	SubmissionWrite,
 } from "../port";
+import { ensureSheetLayout } from "./sheet-layout";
 import {
-	ensureSheetLayout,
 	readAllRecords,
 	readRecord,
 	SheetLayoutError,
 	writePaidCell,
 	writeRecord,
 } from "./sheet-table";
+import { createTabCache } from "./tab-cache";
 
 /**
- * Google Sheets 어댑터: 폼마다 탭 1개, 1행 헤더, 응답 ID 컬럼으로 행을 찾는다.
+ * Google Sheets 어댑터: 폼마다 탭 1개, 1행 헤더, ID 컬럼으로 행을 찾는다.
  * 운영자는 시트에서 직접 값을 고칠 수 있고, 다음 읽기가 그 값을 그대로 쓴다(별도 동기화 없음).
  */
 
@@ -77,10 +78,13 @@ async function guarded<T>(run: () => Promise<T>): Promise<T> {
 }
 
 export function createGoogleSheetsStore(client: SheetsClient): SubmissionStore {
+	const tabs = createTabCache(client);
 	return {
 		prepare: (target) =>
 			guarded(async () => {
 				await ensureSheetLayout(client, target.collection, target.definition);
+				// 표가 새로 생겼을 수 있다 → 다음 쓰기에서 탭 정보를 다시 읽는다
+				tabs.forget(target.collection);
 			}),
 		get: (target, id) =>
 			guarded(async () => {
@@ -103,7 +107,7 @@ export function createGoogleSheetsStore(client: SheetsClient): SubmissionStore {
 			}),
 		put: (target, record: SubmissionWrite) =>
 			guarded(() =>
-				writeRecord(client, target.collection, target.definition, record),
+				writeRecord(client, tabs, target.collection, target.definition, record),
 			),
 		setPaid: (target, id, paid) =>
 			guarded(async () => {

@@ -1,52 +1,43 @@
 import type { FormDefinition } from "@jwc/form-core/definition/definition";
-import { isChoiceField } from "@jwc/form-core/definition/fields";
 import {
 	PAID_LABELS,
-	SYSTEM_COLUMNS,
+	systemColumnOf,
 } from "@jwc/form-core/definition/system-columns";
-import { headerRow, sheetColumns } from "@jwc/form-core/sheet/columns";
-import { parseSheetRow, toSheetRow } from "@jwc/form-core/sheet/rows";
-import type { ParsedSheetRow, SheetRecord } from "@jwc/form-core/sheet/rows";
 import {
-	columnLetter,
-	quoteSheetName,
-	SheetsApiError,
-} from "@jwc/google/sheets-client";
+	missingHeaders,
+	systemColumnIndex,
+} from "@jwc/form-core/sheet/columns";
+import type {
+	ParsedSheetRow,
+	SheetRecord,
+	SheetWriteCell,
+} from "@jwc/form-core/sheet/record";
+import { parseSheetRow, toSheetRow } from "@jwc/form-core/sheet/rows";
+import type { ReadCell } from "@jwc/google/cell-data";
+import { columnLetter, SheetsApiError } from "@jwc/google/sheets-client";
 import type { SheetsClient } from "@jwc/google/sheets-client";
 
+import { a1 as range, ensureSheetLayout, readHeaders } from "./sheet-layout";
+import type { TabCache } from "./tab-cache";
+
 /**
- * Google Sheets 탭 1개를 표처럼 다루는 저수준 함수 (어댑터 google-sheets-store.ts가 사용).
+ * Google Sheets 탭 1개를 표처럼 다루는 저수준 함수 (어댑터 store.ts가 사용). 탭 준비/디자인은 sheet-layout.ts.
  * - 1행은 헤더. 헤더 텍스트로 컬럼을 찾으므로 운영자가 열 순서를 바꿔도 동작한다.
  * - 행은 응답 ID 컬럼으로 찾는다 (정렬/필터 후에도 안전).
  */
 
 const HEADER_RANGE_COLUMNS = "1:1";
-const MAX_DROPDOWN_ROWS = 5000;
 const BAD_REQUEST = 400;
 
 export class SheetLayoutError extends Error {
 	override name = "SheetLayoutError";
 }
 
-function range(sheetName: string, a1: string): string {
-	return `${quoteSheetName(sheetName)}!${a1}`;
-}
-
-async function readHeaders(
-	client: SheetsClient,
-	sheetName: string,
-): Promise<string[]> {
-	const [headers = []] = await client.getValues(
-		range(sheetName, HEADER_RANGE_COLUMNS),
-	);
-	return headers.map((header) => header.trim());
-}
-
 /** 탭이 없으면(운영자가 삭제, 발행 전 등) Sheets API는 400을 준다 → 빈 표로 본다 */
 async function readValuesIfTabExists(
 	client: SheetsClient,
 	a1: string,
-): Promise<string[][]> {
+): Promise<ReadCell[][]> {
 	try {
 		return await client.getValues(a1);
 	} catch (error) {
@@ -65,98 +56,15 @@ async function readHeadersIfTabExists(
 		client,
 		range(sheetName, HEADER_RANGE_COLUMNS),
 	);
-	return headers.map((header) => header.trim());
-}
-
-/** 탭이 없으면 만들고, 정의에 있는데 시트에 없는 헤더를 오른쪽에 추가한다. 기존 열은 건드리지 않는다. */
-export async function ensureSheetLayout(
-	client: SheetsClient,
-	sheetName: string,
-	definition: FormDefinition,
-): Promise<string[]> {
-	const tabs = await client.listSheetTitles();
-	let sheetId = tabs.find((tab) => tab.title === sheetName)?.sheetId;
-	sheetId ??= await client.addSheet(sheetName);
-	const existing = await readHeaders(client, sheetName);
-	const missing = headerRow(definition).filter(
-		(header) => !existing.includes(header),
-	);
-	const headers = [...existing, ...missing];
-	if (missing.length > 0) {
-		await client.updateValues(
-			range(sheetName, `A1:${columnLetter(headers.length)}1`),
-			[headers],
-		);
-	}
-	await client.batchUpdate([
-		freezeHeader(sheetId),
-		...dropdownRules(sheetId, definition, headers),
-	]);
-	return headers;
-}
-
-function freezeHeader(sheetId: number) {
-	return {
-		updateSheetProperties: {
-			properties: { sheetId, gridProperties: { frozenRowCount: 1 } },
-			fields: "gridProperties.frozenRowCount",
-		},
-	};
-}
-
-/** 선택형 컬럼과 납입여부 컬럼에 드롭다운 검증을 건다 (운영자 입력 오류 예방) */
-function dropdownRules(
-	sheetId: number,
-	definition: FormDefinition,
-	headers: string[],
-) {
-	const rules: { header: string; values: string[] }[] = [];
-	for (const column of sheetColumns(definition)) {
-		if (column.kind === "system" && column.key === "paid") {
-			rules.push({
-				header: column.header,
-				values: [PAID_LABELS.true, PAID_LABELS.false],
-			});
-		}
-		if (
-			column.kind === "field" &&
-			column.field.type === "single_choice" &&
-			isChoiceField(column.field)
-		) {
-			rules.push({
-				header: column.header,
-				values: column.field.options.map((option) => option.label),
-			});
-		}
-	}
-	return rules
-		.map((rule) => ({ ...rule, index: headers.indexOf(rule.header) }))
-		.filter((rule) => rule.index >= 0)
-		.map((rule) => ({
-			setDataValidation: {
-				range: {
-					sheetId,
-					startRowIndex: 1,
-					endRowIndex: MAX_DROPDOWN_ROWS,
-					startColumnIndex: rule.index,
-					endColumnIndex: rule.index + 1,
-				},
-				rule: {
-					condition: {
-						type: "ONE_OF_LIST",
-						values: rule.values.map((value) => ({ userEnteredValue: value })),
-					},
-					strict: true,
-					showCustomUi: true,
-				},
-			},
-		}));
+	return headers.map((header) => String(header).trim());
 }
 
 function idColumnIndex(headers: string[]): number {
-	const index = headers.indexOf(SYSTEM_COLUMNS.id);
+	const index = systemColumnIndex(headers, "id");
 	if (index === -1) {
-		throw new SheetLayoutError(`시트에 "${SYSTEM_COLUMNS.id}" 컬럼이 없습니다`);
+		throw new SheetLayoutError(
+			`시트에 "${systemColumnOf("id").header}" 컬럼이 없습니다`,
+		);
 	}
 	return index;
 }
@@ -170,30 +78,82 @@ async function findRowNumber(
 ): Promise<number | null> {
 	const letter = columnLetter(idColumnIndex(headers) + 1);
 	const cells = await client.getValues(range(sheetName, `${letter}:${letter}`));
-	const index = cells.findIndex((row, i) => i > 0 && row[0]?.trim() === id);
+	const index = cells.findIndex(
+		(row, i) => i > 0 && String(row[0] ?? "").trim() === id,
+	);
 	return index === -1 ? null : index + 1;
 }
 
-/** 레코드 쓰기: 행이 있으면 갱신, 없으면 추가. 재시도해도 중복 행이 생기지 않는다. */
+function isBadRequest(error: unknown): boolean {
+	return error instanceof SheetsApiError && error.status === BAD_REQUEST;
+}
+
+interface AppendInput {
+	definition: FormDefinition;
+	headers: string[];
+	row: SheetWriteCell[];
+	sheetName: string;
+}
+
+/**
+ * 새 응답 행 추가. 탭에 응답 표(A1에서 시작하는 시트 "표")가 있으면 표 본문에 넣어 표가 함께 늘어나게 하고,
+ * 없으면(표를 만들 수 없던 탭) 시트 끝에 값을 붙인다.
+ * 캐시한 표가 그새 지워졌으면(400, 반영되지 않음) 탭 정보를 다시 읽어 한 번만 다시 시도한다.
+ */
+async function appendRow(
+	client: SheetsClient,
+	tabs: TabCache,
+	input: AppendInput,
+	retried = false,
+): Promise<void> {
+	const { sheetName, definition, headers, row } = input;
+	const handle = await tabs.handle(sheetName, definition, headers);
+	if (handle?.tableId) {
+		try {
+			await client.appendTableRows(
+				{ sheetId: handle.sheetId, tableId: handle.tableId },
+				[row],
+			);
+			return;
+		} catch (error) {
+			if (retried || !isBadRequest(error)) {
+				throw error;
+			}
+			tabs.forget(sheetName);
+			await appendRow(client, tabs, input, true);
+			return;
+		}
+	}
+	await client.appendValues(
+		range(sheetName, `A1:${columnLetter(headers.length)}1`),
+		[row.map((cell) => cell ?? "")],
+	);
+}
+
+/**
+ * 레코드 쓰기: 행이 있으면 갱신, 없으면 추가. 재시도해도 중복 행이 생기지 않는다.
+ * 탭 정보는 캐시에서 얻는다 (탭마다 처음 한 번 읽고 날짜·시간 서식을 다시 건다).
+ */
 export async function writeRecord(
 	client: SheetsClient,
+	tabs: TabCache,
 	sheetName: string,
 	definition: FormDefinition,
 	record: SheetRecord,
 ): Promise<void> {
 	let headers = await readHeadersIfTabExists(client, sheetName);
-	if (headerRow(definition).some((header) => !headers.includes(header))) {
+	if (missingHeaders(definition, headers).length > 0) {
 		headers = await ensureSheetLayout(client, sheetName, definition);
+		tabs.forget(sheetName);
 	}
 	const row = toSheetRow(definition, headers, record);
 	const rowNumber = await findRowNumber(client, sheetName, headers, record.id);
-	const lastColumn = columnLetter(headers.length);
 	if (rowNumber === null) {
-		await client.appendValues(range(sheetName, `A1:${lastColumn}1`), [
-			row.map((cell) => cell ?? ""),
-		]);
+		await appendRow(client, tabs, { sheetName, definition, headers, row });
 		return;
 	}
+	await tabs.handle(sheetName, definition, headers);
+	const lastColumn = columnLetter(headers.length);
 	await client.updateValues(
 		range(sheetName, `A${rowNumber}:${lastColumn}${rowNumber}`),
 		[row],
@@ -208,10 +168,10 @@ export async function writePaidCell(
 	paid: boolean,
 ): Promise<boolean> {
 	const headers = await readHeaders(client, sheetName);
-	const paidIndex = headers.indexOf(SYSTEM_COLUMNS.paid);
+	const paidIndex = systemColumnIndex(headers, "paid");
 	if (paidIndex === -1) {
 		throw new SheetLayoutError(
-			`시트에 "${SYSTEM_COLUMNS.paid}" 컬럼이 없습니다`,
+			`시트에 "${systemColumnOf("paid").header}" 컬럼이 없습니다`,
 		);
 	}
 	const rowNumber = await findRowNumber(client, sheetName, headers, id);
@@ -234,10 +194,11 @@ export async function readAllRecords(
 	sheetName: string,
 	definition: FormDefinition,
 ): Promise<ParsedSheetRow[]> {
-	const [headers = [], ...rows] = await readValuesIfTabExists(
+	const [headerCells = [], ...rows] = await readValuesIfTabExists(
 		client,
 		range(sheetName, "A:ZZ"),
 	);
+	const headers = headerCells.map((header) => String(header).trim());
 	const seen = new Set<string>();
 	const records: ParsedSheetRow[] = [];
 	for (const cells of rows) {

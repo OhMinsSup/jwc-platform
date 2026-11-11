@@ -1,5 +1,8 @@
+import { sheetTitleKey } from "@jwc/google/spreadsheet-ref";
 import { forms, formVersions, submissionKeys } from "@schema";
-import { count, db, desc, eq } from "void/db";
+import { count, db, desc, eq, sql } from "void/db";
+
+import { isUniqueViolation } from "../../../platform/server/db-errors";
 
 export type FormRow = typeof forms.$inferSelect;
 export type FormVersionRow = typeof formVersions.$inferSelect;
@@ -61,10 +64,21 @@ export async function latestVersionNumber(formId: string): Promise<number> {
 	return row?.version ?? 0;
 }
 
+/** 저장 결과. "taken" = 같은 주소(slug)나 탭을 다른 폼이 방금 썼음 (유니크 인덱스) */
+export type FormInsert = "inserted" | "taken";
+
 export async function insertForm(
 	row: typeof forms.$inferInsert,
-): Promise<void> {
-	await db.insert(forms).values(row);
+): Promise<FormInsert> {
+	try {
+		await db.insert(forms).values(row);
+		return "inserted";
+	} catch (error) {
+		if (isUniqueViolation(error)) {
+			return "taken";
+		}
+		throw error;
+	}
 }
 
 export async function updateDraft(
@@ -101,4 +115,42 @@ export async function publishVersion(
 			.set({ publishedVersionId: version.id, status: "open", updatedAt: now })
 			.where(eq(forms.id, version.formId)),
 	]);
+}
+
+/** 같은 탭 이름(대소문자 무시, Google 규칙)을 쓰는 폼들. 스프레드시트 비교는 서비스가 기본 ID를 채워서 한다 */
+export async function listFormsBySheetName(sheetName: string) {
+	return await db
+		.select({
+			id: forms.id,
+			spreadsheetId: forms.spreadsheetId,
+			sheetName: forms.sheetName,
+		})
+		.from(forms)
+		.where(sql`lower(${forms.sheetName}) = ${sheetTitleKey(sheetName)}`);
+}
+
+/** 저장 결과. "taken" = 같은 (스프레드시트, 탭)을 다른 폼이 이미 씀 (유니크 인덱스) */
+export type SheetLocationUpdate = "updated" | "taken";
+
+export async function updateSheetLocation(
+	id: string,
+	location: Pick<FormRow, "spreadsheetId" | "sheetName">,
+	now: number,
+): Promise<SheetLocationUpdate> {
+	try {
+		await db
+			.update(forms)
+			.set({
+				spreadsheetId: location.spreadsheetId,
+				sheetName: location.sheetName,
+				updatedAt: now,
+			})
+			.where(eq(forms.id, id));
+		return "updated";
+	} catch (error) {
+		if (isUniqueViolation(error)) {
+			return "taken";
+		}
+		throw error;
+	}
 }

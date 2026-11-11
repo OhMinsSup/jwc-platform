@@ -44,7 +44,6 @@ function write(
 	return {
 		id,
 		submittedAt: NOW,
-		updatedAt: NOW,
 		paid: false,
 		answers: validation.answers,
 	};

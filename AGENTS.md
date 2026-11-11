@@ -131,6 +131,7 @@
 
 - 배포: void.cloud (Cloudflare Workers) + TanStack Start. 결정 기록은 `docs/adr/0001`, `docs/adr/0002`.
 - 폼 구성 데이터(정의/버전)는 D1. 응답(답변/납입 여부)은 `SubmissionStore` 포트 뒤의 저장소(기본 Google Sheets)가 원본이고, D1에는 응답 키(유니크/멱등/락)와 발송 기록만 둔다 (`docs/adr/0006`).
+- 응답 시트 표 디자인·열 구성과 폼별 스프레드시트/탭 설정(관리자 폼 "설정" 탭)은 `docs/adr/0025`.
 - 폼 동작은 `packages/form-core`의 순수 함수가 정의(JSON)에서 파생한다. 라벨/옵션/금액을 코드 상수로 두지 않는다.
 - 부수효과(D1, Sheets, SMS, 큐)는 `apps/web/src/server/` 아래에만 둔다. env는 `src/server/runtime.ts`에서만 읽는다.
 - UI는 `packages/ui`(shadcn base-nova + Base UI). 결정 기록은 `docs/adr/0004`.

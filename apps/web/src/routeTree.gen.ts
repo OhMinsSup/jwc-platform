@@ -29,6 +29,7 @@ import { Route as FSlugDoneRouteImport } from './routes/f/$slug/done'
 import { Route as AdminConsoleFormsFormIdRouteRouteImport } from './routes/admin/_console/forms/$formId/route'
 import { Route as AdminConsoleFormsFormIdIndexRouteImport } from './routes/admin/_console/forms/$formId/index'
 import { Route as AdminConsoleFormsFormIdPreviewRouteImport } from './routes/admin/_console/forms/$formId/preview'
+import { Route as AdminConsoleFormsFormIdSettingsRouteImport } from './routes/admin/_console/forms/$formId/settings'
 import { Route as AdminConsoleFormsFormIdSubmissionsRouteImport } from './routes/admin/_console/forms/$formId/submissions'
 
 const IndexRoute = IndexRouteImport.update({
@@ -134,6 +135,12 @@ const AdminConsoleFormsFormIdPreviewRoute =
     path: '/preview',
     getParentRoute: () => AdminConsoleFormsFormIdRouteRoute,
   } as any)
+const AdminConsoleFormsFormIdSettingsRoute =
+  AdminConsoleFormsFormIdSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AdminConsoleFormsFormIdRouteRoute,
+  } as any)
 const AdminConsoleFormsFormIdSubmissionsRoute =
   AdminConsoleFormsFormIdSubmissionsRouteImport.update({
     id: '/submissions',
@@ -161,6 +168,7 @@ export interface FileRoutesByFullPath {
   '/f/$slug/': typeof FSlugIndexRoute
   '/admin/forms/$formId': typeof AdminConsoleFormsFormIdRouteRouteWithChildren
   '/admin/forms/$formId/preview': typeof AdminConsoleFormsFormIdPreviewRoute
+  '/admin/forms/$formId/settings': typeof AdminConsoleFormsFormIdSettingsRoute
   '/admin/forms/$formId/submissions': typeof AdminConsoleFormsFormIdSubmissionsRoute
   '/admin/forms/$formId/': typeof AdminConsoleFormsFormIdIndexRoute
 }
@@ -182,6 +190,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminConsoleIndexRoute
   '/f/$slug': typeof FSlugIndexRoute
   '/admin/forms/$formId/preview': typeof AdminConsoleFormsFormIdPreviewRoute
+  '/admin/forms/$formId/settings': typeof AdminConsoleFormsFormIdSettingsRoute
   '/admin/forms/$formId/submissions': typeof AdminConsoleFormsFormIdSubmissionsRoute
   '/admin/forms/$formId': typeof AdminConsoleFormsFormIdIndexRoute
 }
@@ -206,6 +215,7 @@ export interface FileRoutesById {
   '/f/$slug/': typeof FSlugIndexRoute
   '/admin/_console/forms/$formId': typeof AdminConsoleFormsFormIdRouteRouteWithChildren
   '/admin/_console/forms/$formId/preview': typeof AdminConsoleFormsFormIdPreviewRoute
+  '/admin/_console/forms/$formId/settings': typeof AdminConsoleFormsFormIdSettingsRoute
   '/admin/_console/forms/$formId/submissions': typeof AdminConsoleFormsFormIdSubmissionsRoute
   '/admin/_console/forms/$formId/': typeof AdminConsoleFormsFormIdIndexRoute
 }
@@ -231,6 +241,7 @@ export interface FileRouteTypes {
     | '/f/$slug/'
     | '/admin/forms/$formId'
     | '/admin/forms/$formId/preview'
+    | '/admin/forms/$formId/settings'
     | '/admin/forms/$formId/submissions'
     | '/admin/forms/$formId/'
   fileRoutesByTo: FileRoutesByTo
@@ -252,6 +263,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/f/$slug'
     | '/admin/forms/$formId/preview'
+    | '/admin/forms/$formId/settings'
     | '/admin/forms/$formId/submissions'
     | '/admin/forms/$formId'
   id:
@@ -275,6 +287,7 @@ export interface FileRouteTypes {
     | '/f/$slug/'
     | '/admin/_console/forms/$formId'
     | '/admin/_console/forms/$formId/preview'
+    | '/admin/_console/forms/$formId/settings'
     | '/admin/_console/forms/$formId/submissions'
     | '/admin/_console/forms/$formId/'
   fileRoutesById: FileRoutesById
@@ -439,6 +452,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminConsoleFormsFormIdPreviewRouteImport
       parentRoute: typeof AdminConsoleFormsFormIdRouteRoute
     }
+    '/admin/_console/forms/$formId/settings': {
+      id: '/admin/_console/forms/$formId/settings'
+      path: '/settings'
+      fullPath: '/admin/forms/$formId/settings'
+      preLoaderRoute: typeof AdminConsoleFormsFormIdSettingsRouteImport
+      parentRoute: typeof AdminConsoleFormsFormIdRouteRoute
+    }
     '/admin/_console/forms/$formId/submissions': {
       id: '/admin/_console/forms/$formId/submissions'
       path: '/submissions'
@@ -451,6 +471,7 @@ declare module '@tanstack/react-router' {
 
 interface AdminConsoleFormsFormIdRouteRouteChildren {
   AdminConsoleFormsFormIdPreviewRoute: typeof AdminConsoleFormsFormIdPreviewRoute
+  AdminConsoleFormsFormIdSettingsRoute: typeof AdminConsoleFormsFormIdSettingsRoute
   AdminConsoleFormsFormIdSubmissionsRoute: typeof AdminConsoleFormsFormIdSubmissionsRoute
   AdminConsoleFormsFormIdIndexRoute: typeof AdminConsoleFormsFormIdIndexRoute
 }
@@ -458,6 +479,7 @@ interface AdminConsoleFormsFormIdRouteRouteChildren {
 const AdminConsoleFormsFormIdRouteRouteChildren: AdminConsoleFormsFormIdRouteRouteChildren =
   {
     AdminConsoleFormsFormIdPreviewRoute: AdminConsoleFormsFormIdPreviewRoute,
+    AdminConsoleFormsFormIdSettingsRoute: AdminConsoleFormsFormIdSettingsRoute,
     AdminConsoleFormsFormIdSubmissionsRoute:
       AdminConsoleFormsFormIdSubmissionsRoute,
     AdminConsoleFormsFormIdIndexRoute: AdminConsoleFormsFormIdIndexRoute,

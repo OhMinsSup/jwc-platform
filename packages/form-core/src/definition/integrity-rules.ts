@@ -1,6 +1,9 @@
-import { columnHeaderOf, isChoiceField, isDisplayOnly } from "./fields";
-import type { DefinitionShape, IntegrityIssue } from "./integrity-types";
-import { SYSTEM_COLUMN_HEADERS } from "./system-columns";
+import { isChoiceField, isDisplayOnly } from "./fields";
+import type {
+	DefinitionShape,
+	HeaderRules,
+	IntegrityIssue,
+} from "./integrity-types";
 
 type Notifications = DefinitionShape["notifications"];
 
@@ -30,9 +33,12 @@ export function checkNotifications(
 	return issues;
 }
 
-export function checkFieldRules(definition: DefinitionShape): IntegrityIssue[] {
+export function checkFieldRules(
+	definition: DefinitionShape,
+	rules: HeaderRules,
+): IntegrityIssue[] {
 	const issues: IntegrityIssue[] = [];
-	const headers = new Set<string>(SYSTEM_COLUMN_HEADERS);
+	const headers = new Set<string>(rules.reservedHeaders);
 	for (const [index, field] of definition.fields.entries()) {
 		if (isDisplayOnly(field)) {
 			if (field.required) {
@@ -43,14 +49,15 @@ export function checkFieldRules(definition: DefinitionShape): IntegrityIssue[] {
 			}
 			continue;
 		}
-		const header = columnHeaderOf(field);
-		if (headers.has(header)) {
-			issues.push({
-				path: ["fields", index, "columnHeader"],
-				message: `시트 헤더 중복: ${header}`,
-			});
+		for (const header of rules.headersOf(field)) {
+			if (headers.has(header)) {
+				issues.push({
+					path: ["fields", index, "columnHeader"],
+					message: `시트 헤더 중복: ${header}`,
+				});
+			}
+			headers.add(header);
 		}
-		headers.add(header);
 		if (
 			isChoiceField(field) &&
 			new Set(field.options.map((o) => o.value)).size !== field.options.length

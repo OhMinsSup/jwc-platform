@@ -5,14 +5,15 @@ import { retreat2026Definition } from "@jwc/form-core/samples/retreat-2026";
 import { FakeSheets } from "@jwc/google/testing";
 import { beforeEach, describe, expect, it } from "vite-plus/test";
 
+import { ensureSheetLayout } from "../src/google-sheets/sheet-layout";
 import {
-	ensureSheetLayout,
 	readAllRecords,
 	readRecord,
 	SheetLayoutError,
 	writePaidCell,
 	writeRecord,
 } from "../src/google-sheets/sheet-table";
+import { createTabCache } from "../src/google-sheets/tab-cache";
 
 const TAB = "retreat";
 const NOW = Date.UTC(2026, 4, 1, 3, 0, 0);
@@ -43,7 +44,6 @@ function record(id: string, overrides: Record<string, unknown> = {}) {
 	return {
 		id,
 		submittedAt: NOW,
-		updatedAt: NOW,
 		paid: false,
 		answers: validation.answers,
 	};
@@ -58,7 +58,7 @@ describe("시트 저장소 (Sheets as DB)", () => {
 	it("탭이 없으면 만들고 헤더/고정행/드롭다운을 준비한다", async () => {
 		const headers = await ensureSheetLayout(sheets, TAB, definition());
 		expect(sheets.tabs.get(TAB)?.[0]).toStrictEqual(headers);
-		expect(headers[0]).toBe("응답 ID");
+		expect(headers.slice(0, 2)).toStrictEqual(["ID", "신청일시"]);
 		expect(
 			sheets.batchRequests.some((r) =>
 				JSON.stringify(r).includes("ONE_OF_LIST"),
@@ -67,9 +67,16 @@ describe("시트 저장소 (Sheets as DB)", () => {
 	});
 
 	it("같은 레코드를 두 번 써도 행이 하나다 (재시도 멱등)", async () => {
-		await writeRecord(sheets, TAB, definition(), record("s1"));
 		await writeRecord(
 			sheets,
+			createTabCache(sheets),
+			TAB,
+			definition(),
+			record("s1"),
+		);
+		await writeRecord(
+			sheets,
+			createTabCache(sheets),
 			TAB,
 			definition(),
 			record("s1", { name: "김철수" }),
@@ -81,7 +88,13 @@ describe("시트 저장소 (Sheets as DB)", () => {
 	});
 
 	it("운영자가 열 순서를 바꾸고 메모 열을 추가해도 메모를 보존하며 갱신한다", async () => {
-		await writeRecord(sheets, TAB, definition(), record("s1"));
+		await writeRecord(
+			sheets,
+			createTabCache(sheets),
+			TAB,
+			definition(),
+			record("s1"),
+		);
 		const grid = sheets.tabs.get(TAB) ?? [];
 		for (const row of grid) {
 			row.reverse();
@@ -89,6 +102,7 @@ describe("시트 저장소 (Sheets as DB)", () => {
 		}
 		await writeRecord(
 			sheets,
+			createTabCache(sheets),
 			TAB,
 			definition(),
 			record("s1", { stay_type: "day", arrival_at: "2026-06-27T10:00" }),
@@ -100,7 +114,13 @@ describe("시트 저장소 (Sheets as DB)", () => {
 	});
 
 	it("정의에 새 필드가 생기면 기존 열 뒤에 헤더를 추가한다", async () => {
-		await writeRecord(sheets, TAB, definition(), record("s1"));
+		await writeRecord(
+			sheets,
+			createTabCache(sheets),
+			TAB,
+			definition(),
+			record("s1"),
+		);
 		const extended = parseFormDefinition({
 			...retreat2026Definition,
 			fields: [
@@ -114,10 +134,16 @@ describe("시트 저장소 (Sheets as DB)", () => {
 		if (!extended.ok) {
 			throw new Error("extended invalid");
 		}
-		await writeRecord(sheets, TAB, extended.definition, {
-			...record("s2"),
-			answers: { ...record("s2").answers, memo: "잘 부탁드려요" },
-		});
+		await writeRecord(
+			sheets,
+			createTabCache(sheets),
+			TAB,
+			extended.definition,
+			{
+				...record("s2"),
+				answers: { ...record("s2").answers, memo: "잘 부탁드려요" },
+			},
+		);
 		expect(sheets.tabs.get(TAB)?.[0]?.at(-1)).toBe("남길 말");
 		const all = await readAllRecords(sheets, TAB, extended.definition);
 		expect(all.map((row) => row.id)).toStrictEqual(["s1", "s2"]);
@@ -125,14 +151,32 @@ describe("시트 저장소 (Sheets as DB)", () => {
 	});
 
 	it("회귀: 운영자가 탭을 삭제해도 다음 쓰기에서 탭과 헤더를 다시 만든다", async () => {
-		await writeRecord(sheets, TAB, definition(), record("s1"));
+		await writeRecord(
+			sheets,
+			createTabCache(sheets),
+			TAB,
+			definition(),
+			record("s1"),
+		);
 		sheets.tabs.delete(TAB);
-		await writeRecord(sheets, TAB, definition(), record("s1"));
+		await writeRecord(
+			sheets,
+			createTabCache(sheets),
+			TAB,
+			definition(),
+			record("s1"),
+		);
 		expect(sheets.tabs.get(TAB)).toHaveLength(2);
 	});
 
 	it("납입여부 셀만 갱신한다", async () => {
-		await writeRecord(sheets, TAB, definition(), record("s1"));
+		await writeRecord(
+			sheets,
+			createTabCache(sheets),
+			TAB,
+			definition(),
+			record("s1"),
+		);
 		await writePaidCell(sheets, TAB, "s1", true);
 		const stored = await readRecord(sheets, TAB, definition(), "s1");
 		expect(stored?.paid).toBe(true);
@@ -145,7 +189,13 @@ describe("시트 저장소 (Sheets as DB)", () => {
 	});
 
 	it("납입여부 컬럼이 지워졌으면 레이아웃 오류", async () => {
-		await writeRecord(sheets, TAB, definition(), record("s1"));
+		await writeRecord(
+			sheets,
+			createTabCache(sheets),
+			TAB,
+			definition(),
+			record("s1"),
+		);
 		const grid = sheets.tabs.get(TAB) ?? [];
 		const paidIndex = grid[0]?.indexOf("납입여부") ?? -1;
 		for (const row of grid) {
@@ -157,7 +207,13 @@ describe("시트 저장소 (Sheets as DB)", () => {
 	});
 
 	it("같은 응답 ID 행이 둘이면 목록에는 첫 행만 나온다", async () => {
-		await writeRecord(sheets, TAB, definition(), record("s1"));
+		await writeRecord(
+			sheets,
+			createTabCache(sheets),
+			TAB,
+			definition(),
+			record("s1"),
+		);
 		const grid = sheets.tabs.get(TAB) ?? [];
 		grid.push([...(grid[1] ?? [])]);
 		const all = await readAllRecords(sheets, TAB, definition());
