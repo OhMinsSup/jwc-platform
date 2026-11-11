@@ -62,7 +62,9 @@ function RootComponent() {
 
 function RootDocument({ children }: { children: ReactNode }) {
 	return (
-		<html lang="ko">
+		// 브라우저 확장(예: Google Tag Assistant)이 하이드레이션 전에 <html>에 속성을 넣어
+		// 경고가 난다. 이 요소 자신의 속성 불일치만 무시하고 자식 검사는 그대로 둔다
+		<html lang="ko" suppressHydrationWarning>
 			<head>
 				<HeadContent />
 				{/* 주소창·탭 색을 화면 바탕(--background)에 맞춘다. HeadContent는 같은 name의 meta를
