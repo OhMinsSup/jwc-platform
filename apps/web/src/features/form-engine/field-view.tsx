@@ -60,7 +60,11 @@ function FieldView({ field, value, error, onChange }: FieldViewProps) {
 	return (
 		<div aria-describedby={error ? errorId : undefined} className="space-y-3">
 			<div className="space-y-1">
-				<Label className="gap-0.5 text-[15px] font-semibold" htmlFor={inputId}>
+				{/* 띄어쓰기 없는 긴 제목도 줄을 바꾼다 (Label은 flex라 그대로면 최소 폭이 제목 전체가 된다) */}
+				<Label
+					className="gap-0.5 text-[15px] font-semibold [overflow-wrap:anywhere]"
+					htmlFor={inputId}
+				>
 					{field.label}
 					{field.required && <span className="text-destructive">*</span>}
 				</Label>

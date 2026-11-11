@@ -19,6 +19,10 @@ type Amount = PaymentDef["amount"];
 
 type ByOption = Extract<Amount, { kind: "byOption" }>;
 
+/** 선택지 이름 칸. 띄어쓰기 없는 긴 이름도 줄을 바꿔 표가 화면 밖으로 넓어지지 않게 한다 */
+const OPTION_LABEL_CELL =
+	"py-2 pr-3 text-left font-normal [overflow-wrap:anywhere]";
+
 /** 금액 하나 설정/해제. 빈칸은 키를 지워 "옵션 금액 누락" 검증이 잡도록 한다 */
 function withOptionAmount(
 	amount: ByOption,
@@ -60,7 +64,7 @@ function OptionAmounts({
 			<tbody className="divide-y">
 				{field.options.map((option) => (
 					<tr key={option.value}>
-						<th className="py-2 pr-3 text-left font-normal" scope="row">
+						<th className={OPTION_LABEL_CELL} scope="row">
 							{option.label}
 						</th>
 						<td className="py-2">

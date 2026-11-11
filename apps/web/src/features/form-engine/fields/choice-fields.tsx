@@ -32,7 +32,8 @@ function Chip({
 		<button
 			aria-pressed={selected}
 			className={cn(
-				"focus-visible:ring-ring cursor-pointer rounded-full border px-5 py-2.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none",
+				// 띄어쓰기 없는 긴 선택지도 칩 안에서 줄을 바꾼다 (본문 keep-all이라 그대로면 칩이 화면 밖으로 넘친다)
+				"focus-visible:ring-ring max-w-full cursor-pointer rounded-full border px-5 py-2.5 text-sm font-medium [overflow-wrap:anywhere] transition-colors focus-visible:ring-2 focus-visible:outline-none",
 				selected
 					? "border-primary bg-primary text-primary-foreground"
 					: "border-border bg-card text-muted-foreground hover:bg-muted group-data-invalid/choice:border-destructive/70",

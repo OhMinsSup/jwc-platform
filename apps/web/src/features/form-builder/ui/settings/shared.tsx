@@ -139,9 +139,10 @@ function VariableButtons({
 	return (
 		<fieldset className="flex flex-wrap gap-1.5">
 			<legend className="sr-only">변수 넣기</legend>
+			{/* 질문 제목이 길면 버튼 안에서 줄을 바꾼다 (한 줄 고정이면 작은 화면에서 페이지가 가로로 넘친다) */}
 			{variables.map((variable) => (
 				<Button
-					className="h-7 rounded-full px-2.5 text-xs"
+					className="h-auto min-h-7 max-w-full rounded-full px-2.5 py-1 text-left text-xs [overflow-wrap:anywhere] whitespace-normal"
 					key={variable.key}
 					onClick={() => onInsert(variable.key)}
 					title={`{{${variable.key}}}`}

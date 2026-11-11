@@ -177,8 +177,10 @@ export function QuestionsTab({
 		},
 		[dispatch, getDefinition, announce, reveal],
 	);
+	// 열 최소 폭을 0으로 둔다: 기본(auto)이면 작은 화면에서 가로 목차(shrink-0 항목들)의 폭이
+	// 열 폭이 되어 페이지 전체가 가로로 넘친다. 목차는 자기 영역 안에서만 가로 스크롤된다
 	return (
-		<div className="grid gap-6 lg:grid-cols-[14rem_1fr]">
+		<div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[14rem_minmax(0,1fr)]">
 			<OutlineAside cards={cards} definition={definition} />
 			<div className="min-w-0 space-y-6">
 				<UnplacedFields definition={definition} />

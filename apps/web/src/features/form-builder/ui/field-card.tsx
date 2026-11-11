@@ -26,7 +26,8 @@ function SummaryText({ field }: { field: FieldDef }) {
 	const { lockedFieldIds } = useEditorActions();
 	return (
 		<span className="min-w-0 flex-1">
-			<span className="block truncate font-medium">
+			{/* relative: 안의 sr-only(absolute)가 잘린 글자 끝 위치에 놓여 페이지 폭을 넓히지 않게 이 상자 기준으로 둔다 */}
+			<span className="relative block truncate font-medium">
 				{field.label || "제목 없음"}
 				{field.required && <RequiredMark />}
 			</span>
