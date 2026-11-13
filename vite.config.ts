@@ -296,6 +296,13 @@ export default defineConfig({
 	test: {
 		// 각 패키지의 테스트 설정을 그대로 쓴다 (앱 플러그인을 테스트에 싣지 않기 위해)
 		projects: [
+			// 로컬 보안 검사 연결 코드: 외부 서비스 대신 고정 입력과 가짜 도구로 검증한다.
+			{
+				test: {
+					name: "security-tools",
+					include: ["scripts/security/*.test.ts"],
+				},
+			},
 			"apps/web/vitest.config.ts",
 			"packages/analytics",
 			"packages/common",

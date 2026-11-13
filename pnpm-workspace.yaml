@@ -49,6 +49,9 @@ catalogs:
 overrides:
   vite: npm:@voidzero-dev/vite-plus-core@1.5.1
   vitest: "catalog:"
+  # Dependabot 보안 업데이트: 오래된 전이 의존성에만 수정 버전을 적용한다 (ADR-0026).
+  "@isaacs/brace-expansion@<5.0.1": 5.0.1
+  "esbuild@<0.28.1": 0.28.2
 
 # 위 vite 별칭은 패키지 버전이 1.5.0(Vite+ 코어)으로 보여 플러그인들의 `vite@^8` peer 검사가 오탐한다.
 # 실제 번들 Vite는 8.x다(`vp toolchain`).

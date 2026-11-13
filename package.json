@@ -24,9 +24,18 @@
 		"lint:ws": "pnpm dlx sherif@latest",
 		"prepare": "vp config --hooks --no-agent",
 		"test": "vp test run",
-		"typecheck": "turbo run typecheck",
-		"typecheck:tsc": "turbo run typecheck:tsc",
-		"verify": "pnpm check && pnpm check:deps && pnpm check:unused && pnpm typecheck && pnpm test"
+		"typecheck": "node tooling/typecheck/src/cli.mjs --noEmit -p scripts/security && turbo run typecheck",
+		"typecheck:tsc": "tsc --noEmit -p scripts/security && turbo run typecheck:tsc",
+		"verify": "pnpm check && pnpm check:deps && pnpm check:unused && pnpm typecheck && pnpm test",
+		"security": "node scripts/security/cli.ts all",
+		"security:setup": "python3 -m venv --copies .cache/security-tools && .cache/security-tools/bin/python -m pip install -r scripts/security/requirements.txt",
+		"security:audit": "node scripts/security/cli.ts audit",
+		"security:osv": "node scripts/security/cli.ts osv",
+		"security:code": "node scripts/security/cli.ts code",
+		"security:malware": "node scripts/security/cli.ts malware",
+		"security:install": "sfw pnpm install --frozen-lockfile",
+		"security:snyk": "pnpm dlx snyk@1.1308.4 test --all-projects --dev",
+		"security:snyk:auth": "pnpm dlx snyk@1.1308.4 auth"
 	},
 	"devDependencies": {
 		"@types/node": "catalog:",
@@ -34,11 +43,14 @@
 		"knip": "catalog:",
 		"oxfmt": "catalog:",
 		"oxlint": "catalog:",
+		"sfw": "2.0.6",
 		"syncpack": "catalog:",
 		"turbo": "^2.11.10",
 		"typescript": "catalog:",
 		"ultracite": "catalog:",
-		"vite-plus": "catalog:"
+		"vite-plus": "catalog:",
+		"yaml": "2.9.1",
+		"zod": "catalog:"
 	},
 	"engines": {
 		"node": ">=24"

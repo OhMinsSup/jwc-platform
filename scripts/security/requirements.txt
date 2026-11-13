@@ -1,0 +1,2 @@
+guarddog==3.2.0
+semgrep==1.185.0
