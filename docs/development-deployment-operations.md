@@ -13,7 +13,7 @@
 | 개발       | `pnpm dev`                          | `config/env/development/.env`를 dotenv-cli로 주입 | 별도 개발용 Sheets·Solapi 계정으로 검증 | 실제 키 접근 권한이 있는 개발자 |
 | 자동 검증  | `pnpm verify`, 웹 빌드, E2E         | 더미 설정·테스트 픽스처                           | 가짜 클라이언트, 메모리 응답, 로컬 D1   | 개발자·GitHub Actions           |
 | E2E 테스트 | `pnpm -C apps/web test:e2e`         | `config/env/test/defaults.env`                    | E2E 전용 D1과 메모리 응답               | 개발자·CI                       |
-| 성능 검사  | `pnpm -C apps/web test:performance` | `config/env/performance/.dev.vars`                | 성능 전용 D1과 더미 데이터              | 개발자·CI                       |
+| 성능 검사  | `pnpm -C apps/web test:performance` | `config/env/performance/.dev.vars`                | 성능 전용 D1과 더미 데이터              | 개발자(로컬 전용)               |
 | 운영       | `pnpm deploy:production`            | `config/env/production/.env` → Worker Secrets     | 운영 D1·Sheets·SMS                      | 배포 권한이 있는 운영자         |
 | 스테이징   | 전용 명령·배포 대상 미구성          | 별도 키·계정·리소스 필요                          | 운영과 분리한 검증 데이터 필요          | 구성 후 담당자 지정             |
 

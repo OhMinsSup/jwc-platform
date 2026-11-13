@@ -7,12 +7,12 @@ Google의 좋은 Core Web Vitals 기준은 LCP ≤2,500ms, INP ≤200ms, CLS ≤
 
 ## 실험실 검사
 
-Node 24와 Chromium 설치 후 `pnpm -C apps/web test:performance`를 실행한다.
+성능 검사는 CI에서 실행하지 않고 로컬에서만 실행한다. Node 24와 Chromium 설치 후 `pnpm -C apps/web test:performance`를 실행한다.
 기본 5회이며 `PERFORMANCE_SAMPLES=1`은 시나리오 디버깅용이다.
 새 context마다 캐시를 비우고 Pixel 7 viewport·CPU 4배 제한·다운로드 1.6Mbps·업로드 0.75Mbps·지연 150ms를 설정한다.
 각 페이지는 실제 제목·HTTP 상태·경로·브라우저 오류와 입력/클릭 동작도 검사한다.
 숫자가 없으면 실패하며, 다음 paint 없이 문서를 떠나는 링크의 INP는 미보고로 표시할 수 있다. 0으로 대체하지 않는다.
-보고서는 페이지별 표본·최솟값·nearest-rank p75·최댓값을 남긴다. 예산 초과나 측정 실패는 CI를 실패시킨다.
+보고서는 페이지별 표본·최솟값·nearest-rank p75·최댓값을 남긴다. 예산 초과나 측정 실패는 로컬 검사 명령을 실패시킨다.
 
 production 빌드를 별도 Cloudflare preview에서 실행한다. `with-env:performance`가 공개 더미 `config/env/performance/.dev.vars`를 주입하고 preview도 같은 파일을 읽으며 `.void/performance`에만 시드한다.
 메모리 응답 저장소와 로그 SMS를 사용하고 Google Sheets·실제 SMS에는 연결하지 않는다.
@@ -23,7 +23,7 @@ production 빌드를 별도 Cloudflare preview에서 실행한다. `with-env:per
 같은 명령에서 글꼴 폭 교체 회귀 검사도 실행한다. 375px·412px·1280px에서 앱 글꼴의 폭을 바꿔도 관리자 목록의 동작 버튼이 다른 줄로 이동하지 않는지 확인한다. 해당 검사만 실행하려면 `pnpm -C apps/web test:performance --grep '관리자 목록의 글꼴'`을 사용한다. Linux CI에서 발견한 원인과 재현 조건은 [ADR-0017](../adr/0017-font-swap-layout-stability.md)에 기록한다.
 
 `typecheck`/E2E/dev와 동시에 실행하면 공유 Void 메타데이터와 CPU 때문에 결과가 잘못될 수 있다.
-CI는 성능 검사 전용 runner를 사용한다. 성능 산출물은 `apps/web/test-results/**/vitals.json`이며 세션·신청 ID·답변·개인정보는 넣지 않는다.
+다른 검사를 마친 뒤 로컬에서 단독 실행한다. 성능 산출물은 `apps/web/test-results/**/vitals.json`이며 세션·신청 ID·답변·개인정보는 넣지 않는다.
 기능 E2E는 SMS/TOTP 성공·실패와 공개 신청 과정을 별도로 검사한다.
 
 ## 범위

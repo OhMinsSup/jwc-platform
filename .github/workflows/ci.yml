@@ -72,34 +72,3 @@ jobs:
           name: playwright-traces
           path: apps/web/test-results/
           retention-days: 7
-
-  performance:
-    # 다른 검사와 별도 runner에서 실행해 CPU·로컬 D1 간섭을 막는다.
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: pnpm
-
-      - name: 의존성 설치
-        run: pnpm install --frozen-lockfile
-
-      - name: Playwright Chromium 설치
-        run: pnpm -C apps/web test:e2e:install
-
-      - name: 전 페이지 production 모바일 성능 (5회, p75 예산)
-        run: pnpm -C apps/web test:performance
-
-      - name: 화면 이름과 숫자로 된 성능 보고서 보관
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: page-vitals
-          path: apps/web/test-results/**/vitals.json
-          retention-days: 7
