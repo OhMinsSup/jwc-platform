@@ -1,17 +1,38 @@
 import { recordingFetch, rejectionOf } from "@jwc/common/testing";
-import { buildCsp } from "@jwc/security/headers";
+import { buildCsp, privacyHeaders } from "@jwc/security/headers";
 import { judgeRequest } from "@jwc/security/request-policy";
 import { describe, expect, it } from "vite-plus/test";
 
 import { DomainError } from "../src/platform/server/errors/domain-error";
 import {
 	cspDirectives,
+	PRIVATE_PATHS,
 	requestPolicy,
 } from "../src/platform/server/security/policy";
 import { assertHuman } from "../src/platform/server/security/turnstile";
 
 const SITE = "https://forms.example.org";
 const POLICY = requestPolicy(SITE);
+
+describe("개인정보 응답 보호", () => {
+	it.each([
+		"/r/private-token",
+		"/admin/forms",
+		"/f/retreat/done",
+		"/_serverFn/private-function",
+		"/api/auth/get-session",
+	])("개인정보 경로 %s는 캐시와 리퍼러 전송을 막는다", (pathname) => {
+		expect(privacyHeaders(pathname, PRIVATE_PATHS)).toMatchObject({
+			"cache-control": "no-store",
+			"referrer-policy": "no-referrer",
+			"x-robots-tag": "noindex, nofollow",
+		});
+	});
+
+	it("공개 폼 HTML의 캐시 정책을 강제하지 않는다", () => {
+		expect(privacyHeaders("/f/retreat", PRIVATE_PATHS)).toStrictEqual({});
+	});
+});
 
 function post(path: string): Request {
 	return new Request(`${SITE}${path}`, {

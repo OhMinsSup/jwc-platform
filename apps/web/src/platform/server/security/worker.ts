@@ -5,13 +5,19 @@ import {
 	withHeaders,
 } from "@jwc/security/headers";
 import { clientIpOf, RateLimitExceededError } from "@jwc/security/rate-limit";
-import { judgeRequest } from "@jwc/security/request-policy";
+import {
+	limitRequestBody,
+	PayloadTooLargeError,
+} from "@jwc/security/request-body";
+import { isGuardedMutation, judgeRequest } from "@jwc/security/request-policy";
 
 import { ERROR_CATALOG } from "../errors/catalog";
 import { posthogConfig, siteOrigin, turnstileConfig } from "../runtime";
 import type { WorkerFetch } from "../telemetry/worker";
 import { cspDirectives, PRIVATE_PATHS, requestPolicy } from "./policy";
 import { enforceRateLimit } from "./rate-limit";
+
+const PAYLOAD_TOO_LARGE = 413;
 
 /**
  * 워커 fetch 앞단 보안: 정책 표(policy.ts)로 요청을 판정하고, 모든 응답에 보안 헤더를 붙인다.
@@ -58,10 +64,30 @@ function responseHeaders(pathname: string): Record<string, string> {
 	};
 }
 
+async function dispatch(
+	inner: WorkerFetch,
+	request: Request,
+	env: Parameters<WorkerFetch>[1],
+	ctx: Parameters<WorkerFetch>[2],
+): Promise<Response> {
+	const policy = requestPolicy(siteOrigin());
+	try {
+		const bounded = isGuardedMutation(request, policy)
+			? await limitRequestBody(request, policy.maxBodyBytes)
+			: request;
+		return await inner(bounded, env, ctx);
+	} catch (error) {
+		if (error instanceof PayloadTooLargeError) {
+			return jsonError(PAYLOAD_TOO_LARGE, error.message);
+		}
+		throw error;
+	}
+}
+
 export function secureFetch(inner: WorkerFetch): WorkerFetch {
 	return async (request, env, ctx) => {
 		const rejected = await judge(request);
-		const response = rejected ?? (await inner(request, env, ctx));
+		const response = rejected ?? (await dispatch(inner, request, env, ctx));
 		return withHeaders(
 			response,
 			responseHeaders(new URL(request.url).pathname),

@@ -35,7 +35,11 @@ export function privacyHeaders(
 	privatePaths: readonly RegExp[],
 ): Record<string, string> {
 	return privatePaths.some((pattern) => pattern.test(pathname))
-		? { "cache-control": "no-store", "x-robots-tag": "noindex, nofollow" }
+		? {
+				"cache-control": "no-store",
+				"x-robots-tag": "noindex, nofollow",
+				"referrer-policy": "no-referrer",
+			}
 		: {};
 }
 

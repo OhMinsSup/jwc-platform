@@ -13,7 +13,6 @@ import {
 	indexableHead,
 	siteOriginFrom,
 } from "../src/platform/search";
-import { PRIVATE_PATHS } from "../src/platform/server/security/policy";
 import {
 	formStructuredData,
 	homeStructuredData,
@@ -166,14 +165,23 @@ describe(robotsTxt, () => {
 		expect(text).toContain(`Sitemap: ${ORIGIN}/sitemap.xml`);
 	});
 
-	it("개인정보 화면(PRIVATE_PATHS)은 모두 막는다", () => {
+	it("신청 내역·관리자·인증 API·서버 함수는 수집기에서 차단한다", () => {
 		const disallowed = [...text.matchAll(/^Disallow: (?<path>.+)$/gmu)].map(
 			(match) => match.groups?.path ?? "",
 		);
 		expect(disallowed).toStrictEqual([...CRAWLER_DISALLOWED_PATHS]);
-		for (const privatePath of PRIVATE_PATHS) {
-			expect(disallowed.some((path) => privatePath.test(path))).toBe(true);
+		for (const privatePath of [
+			"/r/private-token",
+			"/admin/forms",
+			"/api/auth/get-session",
+			"/_serverFn/private-function",
+		]) {
+			expect(disallowed.some((prefix) => privatePath.startsWith(prefix))).toBe(
+				true,
+			);
 		}
+		// 완료 화면은 수집기가 noindex를 읽을 수 있어야 하므로 공개 /f/ 경로 전체를 막지 않는다.
+		expect(disallowed).not.toContain("/f/");
 	});
 });
 

@@ -7,6 +7,7 @@
 	"exports": {
 		"./headers": "./src/headers.ts",
 		"./rate-limit": "./src/rate-limit.ts",
+		"./request-body": "./src/request-body.ts",
 		"./request-policy": "./src/request-policy.ts",
 		"./turnstile": "./src/turnstile.ts"
 	},

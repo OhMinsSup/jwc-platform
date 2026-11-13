@@ -28,6 +28,12 @@ function post(path: string, headers: Record<string, string> = {}): Request {
 }
 
 describe(judgeRequest, () => {
+	it("Origin이 없는 브라우저의 cross-site 상태 변경도 거절한다", () => {
+		expect(
+			judgeRequest(post("/rpc/x", { "sec-fetch-site": "cross-site" }), POLICY),
+		).toMatchObject({ kind: "reject", status: 403 });
+	});
+
 	it("같은 출처 요청은 허용한다", () => {
 		expect(
 			judgeRequest(post("/rpc/x", { origin: SITE }), POLICY),

@@ -15,7 +15,7 @@ export interface PathRule<R extends string> {
 export interface RequestPolicy<R extends string> {
 	/** 상태 변경 요청을 검사할 경로 접두사 (예: 서버 함수, API) */
 	guardedPrefixes: readonly string[];
-	/** 본문 상한 (Content-Length 기준) */
+	/** 본문 상한. 선언 길이 판정 후 실제 스트림도 경계에서 제한한다. */
 	maxBodyBytes: number;
 	rules: readonly PathRule<R>[];
 	/** 이 출처가 아닌 Origin의 상태 변경 요청은 거절한다 (CSRF) */
@@ -38,10 +38,24 @@ function declaredBodySize(request: Request): number {
 	return Number.isFinite(length) ? length : 0;
 }
 
-/** Origin이 없으면 브라우저가 아닌 호출이라 쿠키 세션을 이용한 CSRF 위험이 없다 */
+/** 브라우저 Fetch Metadata와 Origin을 함께 확인한다. Origin 누락을 비브라우저의 증거로 보지 않는다. */
 function isCrossSite(request: Request, siteOrigin: string): boolean {
 	const origin = request.headers.get("origin");
-	return origin !== null && origin !== siteOrigin;
+	return (
+		request.headers.get("sec-fetch-site") === "cross-site" ||
+		(origin !== null && origin !== siteOrigin)
+	);
+}
+
+export function isGuardedMutation<R extends string>(
+	request: Request,
+	policy: RequestPolicy<R>,
+): boolean {
+	const { pathname } = new URL(request.url);
+	return (
+		!SAFE_METHODS.has(request.method) &&
+		policy.guardedPrefixes.some((prefix) => pathname.startsWith(prefix))
+	);
 }
 
 /** 판정 순서: 검사 대상 여부 → 본문 크기 → 교차 출처 → 경로 규칙 */
@@ -50,10 +64,7 @@ export function judgeRequest<R extends string>(
 	policy: RequestPolicy<R>,
 ): RequestVerdict<R> {
 	const { pathname } = new URL(request.url);
-	const guarded = policy.guardedPrefixes.some((prefix) =>
-		pathname.startsWith(prefix),
-	);
-	if (!guarded || SAFE_METHODS.has(request.method)) {
+	if (!isGuardedMutation(request, policy)) {
 		return ALLOW;
 	}
 	if (declaredBodySize(request) > policy.maxBodyBytes) {

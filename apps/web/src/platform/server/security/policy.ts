@@ -173,4 +173,7 @@ export function cspDirectives(sources: CspSources): CspDirectives {
 export const PRIVATE_PATHS: readonly RegExp[] = [
 	/^\/r\//u,
 	/^\/admin(?:\/|$)/u,
+	/^\/_serverFn(?:\/|$)/u,
+	/^\/api\/auth(?:\/|$)/u,
+	/^\/f\/[^/]+\/done(?:\/|$)/u,
 ];
