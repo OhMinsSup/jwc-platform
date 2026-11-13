@@ -57,8 +57,9 @@ function initOptions(sanitizeUrl: (url: string) => string) {
 		autocapture: false,
 		capture_performance: PERFORMANCE_CAPTURE,
 		capture_exceptions: {
-			capture_unhandled_errors: true,
-			capture_unhandled_rejections: true,
+			// SDK 자동 수집은 오류 원문·cause에 섞인 입력값을 허용 목록 밖으로 보낼 수 있다.
+			capture_unhandled_errors: false,
+			capture_unhandled_rejections: false,
 			capture_console_errors: false,
 		},
 		disable_session_recording: true,
@@ -195,7 +196,11 @@ function delegates<C extends EventCatalog>(
 			run((client) => client.capture(event, allowed));
 		},
 		captureError: (error: unknown) => {
-			run((client) => client.captureException(error));
+			// 오류 문장·cause·원본 stack에는 개인정보나 열람 URL이 들어갈 수 있다.
+			const safe = new Error("client_operation_failed");
+			safe.name = error instanceof TypeError ? "TypeError" : "Error";
+			safe.stack = `${safe.name}: client_operation_failed`;
+			run((client) => client.captureException(safe));
 		},
 		identify: (userId: string) => {
 			run((client) => client.identify(userId));

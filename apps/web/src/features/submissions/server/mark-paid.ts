@@ -30,5 +30,5 @@ export async function markPaid(
 		}
 		throw error;
 	}
-	log.info("submission.paid_changed", { submissionId, paid });
+	log.info("submission.paid_changed", { paid });
 }

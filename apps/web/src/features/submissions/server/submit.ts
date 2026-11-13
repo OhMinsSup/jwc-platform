@@ -110,7 +110,6 @@ export async function submitAnswers(
 	}
 	log.info("submission.stored", {
 		formId: form.id,
-		submissionId: key.id,
 		revision: key.revision,
 		isNew: plan.isNew,
 	});
@@ -126,7 +125,6 @@ async function notifyAfterStore(
 	} catch (error) {
 		const failure = classifyError(error);
 		log.error("notification.enqueue_failed", {
-			submissionId: args[2].submissionId,
 			kind: args[2].kind,
 			code: failure.code,
 			error: failure.internalMessage,

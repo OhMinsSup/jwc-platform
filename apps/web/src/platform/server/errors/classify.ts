@@ -52,13 +52,46 @@ function codeOf(error: unknown): ErrorCode {
 	return "internal";
 }
 
+const SAFE_ERROR_NAMES = new Set([
+	"Error",
+	"TypeError",
+	"RangeError",
+	"SyntaxError",
+	"ZodError",
+]);
+const SAFE_DATABASE_REASONS = [
+	{ text: "no such column", code: "database_schema_mismatch" },
+	{ text: "no such table", code: "database_schema_mismatch" },
+	{ text: "UNIQUE constraint failed", code: "database_unique_violation" },
+	{
+		text: "FOREIGN KEY constraint failed",
+		code: "database_foreign_key_violation",
+	},
+	{ text: "database is locked", code: "database_busy" },
+] as const;
+
+/** 외부 오류 문장에 SQL 파라미터·개인정보·토큰이 섞일 수 있으므로 원문은 전송하지 않는다. */
 function describe(error: unknown): string {
-	return error instanceof Error
-		? `${error.name}: ${error.message}`
-		: String(error);
+	if (error instanceof DomainError) {
+		return `DomainError:${error.code}`;
+	}
+	if (error instanceof SubmissionStoreError) {
+		return `SubmissionStoreError:${error.failure}`;
+	}
+	if (error instanceof SmsSendError) {
+		return `SmsSendError:${error.retryable ? "retryable" : "rejected"}`;
+	}
+	if (!(error instanceof Error)) {
+		return "NonError";
+	}
+	const name = SAFE_ERROR_NAMES.has(error.name) ? error.name : "Error";
+	const reason = SAFE_DATABASE_REASONS.find((candidate) =>
+		error.message.includes(candidate.text),
+	);
+	return reason ? `${name}:${reason.code}` : name;
 }
 
-/** 로그용 내부 문장: 원인 사슬까지 남긴다 (사용자에게는 보내지 않는다) */
+/** 원인 사슬의 안전한 분류만 남긴다. 원문·SQL·파라미터는 일반 로그와 오류 추적에 보내지 않는다. */
 function internalMessageOf(error: unknown): string {
 	return causeChain(error).map(describe).join(" ← cause: ");
 }

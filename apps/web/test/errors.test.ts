@@ -12,6 +12,19 @@ import { NotFoundError } from "../src/platform/server/errors/not-found-error";
 import { SmsSendError } from "../src/platform/server/solapi";
 
 describe(classifyError, () => {
+	it("오류 원문·DB 파라미터·던져진 문자열은 로그 및 예외 전송용 문장에 넣지 않는다", () => {
+		const sensitive = "test-only-private-answer@example.test";
+		const error = new Error(
+			`Failed query: insert into users; params: ${sensitive}`,
+			{ cause: new Error(`D1_ERROR: no such column: phone; ${sensitive}`) },
+		);
+		const failure = classifyError(error);
+		expect(failure.internalMessage).not.toContain(sensitive);
+		expect(failure.internalMessage).not.toContain("params:");
+		expect(failure.internalMessage).toContain("database_schema_mismatch");
+		expect(classifyError(sensitive).internalMessage).not.toContain(sensitive);
+	});
+
 	it("도메인 오류는 자기 코드와 사용자 문장을 그대로 쓴다", () => {
 		const failure = classifyError(
 			new ConflictError("이미 사용 중인 주소입니다"),
@@ -48,15 +61,17 @@ describe(classifyError, () => {
 		expect(failure.userMessage).toBe(
 			ERROR_CATALOG.store_misconfigured.defaultMessage,
 		);
-		expect(failure.internalMessage).toContain("권한 없음");
+		expect(failure.internalMessage).toBe("SubmissionStoreError:forbidden");
+		expect(failure.internalMessage).not.toContain("service-account@x");
 	});
 
-	it("회귀: 내부 문장에 원인(cause) 사슬을 남긴다 (DB 드라이버 오류는 원인에만 이유가 있다)", () => {
+	it("DB 원인 사슬의 안전한 진단 분류를 유지한다", () => {
 		const driver = new Error("D1_ERROR: no such column: spreadsheet_id");
 		const query = new Error("Failed query: update forms …", { cause: driver });
 		const failure = classifyError(query);
-		expect(failure.internalMessage).toContain("Failed query");
-		expect(failure.internalMessage).toContain("no such column: spreadsheet_id");
+		expect(failure.internalMessage).toBe(
+			"Error ← cause: Error:database_schema_mismatch",
+		);
 		expect(failure.userMessage).toBe(ERROR_CATALOG.internal.defaultMessage);
 	});
 

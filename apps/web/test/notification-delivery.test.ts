@@ -1,14 +1,23 @@
-import { deriveDataKeys, encryptJson } from "@jwc/common/crypto";
+import { decryptJson, deriveDataKeys, encryptJson } from "@jwc/common/crypto";
 import { bytesToBase64 } from "@jwc/common/encoding";
+import { parseFormDefinition } from "@jwc/form-core/definition/definition";
+import { retreat2026Definition } from "@jwc/form-core/samples/retreat-2026";
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
+import { z } from "zod";
 
-import { deliverSms } from "../src/features/submissions/server/notify";
+import {
+	deliverSms,
+	enqueueNotification,
+} from "../src/features/submissions/server/notify";
 import type {
 	findMessageByKey,
 	recordDelivery,
 } from "../src/features/submissions/server/submission-keys-repository";
 
-const { findMessage, record, send, keys } = vi.hoisted(() => ({
+const { findMessage, record, send, keys, queueSend } = vi.hoisted(() => ({
+	queueSend: vi.fn<Queue["send"]>().mockResolvedValue({
+		metadata: { metrics: { backlogCount: 0, backlogBytes: 0 } },
+	}),
 	findMessage: vi.fn<typeof findMessageByKey>().mockResolvedValue(undefined),
 	record: vi.fn<typeof recordDelivery>().mockResolvedValue(undefined),
 	send: vi
@@ -19,7 +28,7 @@ const { findMessage, record, send, keys } = vi.hoisted(() => ({
 vi.mock(import("void/queues"), () => ({
 	queues: {
 		sms: {
-			send: vi.fn<Queue["send"]>(),
+			send: queueSend,
 			sendBatch: vi.fn<Queue["sendBatch"]>(),
 			metrics: vi.fn<Queue["metrics"]>(),
 		},
@@ -56,6 +65,90 @@ describe(deliverSms, () => {
 		findMessage.mockResolvedValue(undefined);
 		keys.mockResolvedValue(
 			await deriveDataKeys(bytesToBase64(new Uint8Array(32).fill(7))),
+		);
+	});
+
+	it("신규 큐 메시지는 조회 토큰·멱등 키·연락처를 모두 암호화하고 그대로 발송한다", async () => {
+		const parsed = parseFormDefinition(retreat2026Definition);
+		if (!parsed.ok) {
+			throw new Error("잘못된 테스트 폼 정의");
+		}
+		const intent = {
+			submissionId: "private-capability-token-fixture",
+			idempotencyKey: "private-capability-token-fixture:onCreate:1",
+			kind: "onCreate" as const,
+		};
+		await expect(
+			enqueueNotification(
+				parsed.definition,
+				{ name: "테스트", phone: "01012345678" },
+				intent,
+			),
+		).resolves.toBe(true);
+		const queued: unknown = queueSend.mock.calls[0]?.[0];
+		const envelope = z
+			.object({ version: z.literal(2), payload: z.string() })
+			.parse(queued);
+		expect(JSON.stringify(queued)).not.toMatch(
+			/private-capability-token-fixture|01012345678/u,
+		);
+		const dataKeys = await keys();
+		await expect(
+			decryptJson(dataKeys.encryption, envelope.payload),
+		).resolves.toMatchObject({ ...intent, to: "01012345678" });
+		await expect(deliverSms(queued, NOW)).resolves.toBe("sent");
+		expect(record).toHaveBeenCalledWith(
+			expect.objectContaining({
+				submissionId: intent.submissionId,
+				idempotencyKey: intent.idempotencyKey,
+			}),
+		);
+	});
+
+	it("암호화된 신규 메시지에 잘못된 키를 사용하면 발송하지 않는다", async () => {
+		const original = await keys();
+		const payload = await encryptJson(original.encryption, {
+			...QUEUED,
+			kind: "onCreate",
+			to: "01012345678",
+			text: "안내",
+		});
+		keys.mockResolvedValue(
+			await deriveDataKeys(bytesToBase64(new Uint8Array(32).fill(8))),
+		);
+		await expect(
+			deliverSms({ version: 2, payload }, NOW),
+		).rejects.toMatchObject({ name: "OperationError" });
+		expect(send).not.toHaveBeenCalled();
+	});
+
+	it("신규 메시지의 바깥 ID를 바꿔도 암호문에 묶인 발송 문맥을 바꿀 수 없다", async () => {
+		const dataKeys = await keys();
+		const payload = await encryptJson(dataKeys.encryption, {
+			submissionId: QUEUED.submissionId,
+			idempotencyKey: QUEUED.idempotencyKey,
+			kind: "onCreate",
+			to: "01012345678",
+			text: "안내",
+		});
+		await expect(
+			deliverSms(
+				{
+					version: 2,
+					payload,
+					submissionId: "forged-id",
+					idempotencyKey: "forged-key",
+					kind: "onUpdate",
+				},
+				NOW,
+			),
+		).resolves.toBe("sent");
+		expect(record).toHaveBeenCalledWith(
+			expect.objectContaining({
+				submissionId: QUEUED.submissionId,
+				idempotencyKey: QUEUED.idempotencyKey,
+				kind: "onCreate",
+			}),
 		);
 	});
 

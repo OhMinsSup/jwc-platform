@@ -54,6 +54,38 @@ describe(createAnalytics, () => {
 		vi.unstubAllGlobals();
 	});
 
+	it("입력·토큰이 섞일 수 있는 브라우저 오류 원문과 cause를 전송하지 않는다", async () => {
+		const analytics = makeAnalytics();
+		analytics.init(CONFIG);
+		await settle();
+		const sensitive = "test-only-private-error-input";
+		analytics.captureError(new Error(sensitive, { cause: sensitive }));
+		const reported = posthog.captureException.mock.calls[0]?.[0];
+		expect(reported).toBeInstanceOf(Error);
+		if (!(reported instanceof Error)) {
+			throw new TypeError("오류 보고 누락");
+		}
+		expect(reported.message).not.toContain(sensitive);
+		expect(reported.cause).toBeUndefined();
+		expect(reported.stack).not.toContain(sensitive);
+	});
+
+	it("자동 원문 예외 수집은 끄고 명시적으로 정리한 오류만 보낸다", async () => {
+		const analytics = makeAnalytics();
+		analytics.init(CONFIG);
+		await settle();
+		expect(posthog.init).toHaveBeenCalledWith(
+			CONFIG.key,
+			expect.objectContaining({
+				capture_exceptions: {
+					capture_unhandled_errors: false,
+					capture_unhandled_rejections: false,
+					capture_console_errors: false,
+				},
+			}),
+		);
+	});
+
 	it("init 직후(로딩 중)에 부른 track·identify도 로드가 끝나면 보낸다", async () => {
 		const analytics = makeAnalytics();
 		analytics.init(CONFIG);

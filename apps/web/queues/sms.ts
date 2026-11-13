@@ -13,8 +13,6 @@ export default defineQueue<SmsMessage>(async (batch) => {
 			// oxlint-disable-next-line no-await-in-loop -- 발송 업체 속도 제한과 멱등 키 기록 순서를 지키기 위해 순차 발송한다
 			const result = await deliverSms(message.body, Date.now());
 			log.info("sms.processed", {
-				submissionId: message.body.submissionId,
-				kind: message.body.kind,
 				result,
 				traceId: message.body.traceId,
 			});
@@ -22,8 +20,6 @@ export default defineQueue<SmsMessage>(async (batch) => {
 		} catch (error) {
 			const failure = classifyError(error);
 			log[failure.spec.level]("sms.failed", {
-				submissionId: message.body.submissionId,
-				kind: message.body.kind,
 				code: failure.code,
 				attempts: message.attempts,
 				error: failure.internalMessage,
